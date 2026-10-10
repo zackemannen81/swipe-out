@@ -42,9 +42,11 @@ architecture or behavior.
 
 ## Technical direction and constraints
 
-- Three.js is the intended 3D rendering foundation; no specific application
-  framework, renderer configuration, physics engine, or build system is yet
-  established.
+- The initial implementation is a Vite-powered browser application using
+  Three.js for rendering. `npm run dev`, `npm run build`, and `npm run preview`
+  provide the development, production-build, and local-preview workflows.
+- The current Three.js scene is a responsive rendering prototype with simple
+  procedural geometry; it does not yet implement playable race behavior.
 - Treat mobile touch input, variable device performance, asset download size,
   memory, and audio playback behavior as first-class design constraints.
 - Generated assets and custom music must be reviewed for quality, consistency,

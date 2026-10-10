@@ -2,6 +2,20 @@
 
 Newest first. Append dated work waves here.
 
+## 2026-10-10 — IMPLEMENT-001: establish the rendering foundation
+
+- Added a minimal Vite browser app and Three.js scene with responsive sizing,
+  capped pixel ratio, ambient lighting, and procedural prototype geometry.
+- Added a restrained responsive landing presentation that labels the build as
+  a rendering prototype and explicitly says gameplay is not implemented.
+- Added npm setup/run/build/preview instructions; no external assets, framework,
+  physics engine, or race mechanics were introduced.
+- Verified `npm install` (zero reported vulnerabilities), `npm run build`, and
+  HTTP 200 responses for the development app and its JavaScript/CSS modules.
+  Visual browser automation could not be confirmed in this environment.
+- Updated task, status, system direction, and file map. This is only the minimal
+  app/rendering foundation; the playable 0.1 race slice remains outstanding.
+
 ## 2026-10-10 — MILESTONE-001: stage the delivery plan
 
 - Replaced the single undifferentiated initial scope with gated 0.1, 0.5, and

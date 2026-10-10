@@ -4,10 +4,14 @@ Last verified: 2026-10-10
 
 ## Repository reality
 
-The repository currently contains `AGENTS.md` and seven Markdown documents
-under `docs/`. No game source, Three.js setup, package manifest, build/test
-configuration, game assets, or audio files were present during this review.
-This is a documentation baseline, not a playable or partially implemented game.
+A minimal Vite browser app now renders a responsive Three.js 3D prototype
+scene. `src/main.js` creates the scene, renderer, lights, platform, and a
+static craft-shaped study; `src/style.css` provides the responsive presentation;
+`index.html` contains the app shell. `package.json` provides development,
+production-build, and preview scripts. No external 3D assets, race controls,
+track traversal, race state, finish detection, elapsed-time results, or retry
+are implemented. This is Step 1's rendering foundation, not the playable 0.1
+vertical slice.
 
 ## Product direction
 
@@ -18,14 +22,14 @@ in MP3 format. These are product goals, not verified implemented features.
 
 ## Next work
 
-Begin implementation with version 0.1, the first playable vertical slice:
-- Establish the minimal application and Three.js rendering foundation.
-- Build one continuous track and one player craft with automatic movement and
-  touch steering.
-- Complete and verify the race loop: start, finish detection, elapsed-time
-  result, and retry.
-- Preserve simple seams between input, rendering, race flow, track data, and
-  craft handling so later milestones can extend the same game.
+Continue version 0.1 from the minimal rendering foundation:
+- Build one continuous, traversable track and one player craft with automatic
+  movement and bounded, responsive touch steering.
+- Add race start, finish detection, elapsed-time result, and retry so the race
+  can be completed repeatedly without reloading the app.
+- Verify the complete playable loop, including speed feedback and readable
+  track edges; keep input, rendering, race flow, track data, and craft handling
+  as simple seams rather than speculative abstractions.
 
 Version 0.5 adds CPU rivals, HUD, placement/results, audio, and polished visual
 style. Version 1.0 targets the full GDD: three tracks, multiple distinct craft,

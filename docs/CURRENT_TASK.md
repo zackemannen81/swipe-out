@@ -1,6 +1,6 @@
 # Current Task
 
-Task ID: MILESTONE-001
+Task ID: IMPLEMENT-001
 Status: Complete
 Owner: Agent 008
 Created: 2026-10-10
@@ -8,21 +8,20 @@ Last updated: 2026-10-10
 
 ## Task Summary
 
-Define a staged delivery plan for Swipe-out: a complete playable 0.1 vertical slice, an impressive 0.5 race experience, and a 1.0 release covering the GDD. Specify acceptance criteria, sequencing gates, and lightweight architectural guidance without implying that implementation exists.
+Implement Step 1 of the version 0.1 plan: establish a minimal runnable browser application and Three.js rendering foundation. This is infrastructure and a rendered prototype scene only; it is not the playable race slice.
 
 ## Definition of Done
 
-- [x] `docs/GDD.md` defines scope and verifiable acceptance criteria for versions 0.1, 0.5, and 1.0.
-- [x] The 0.1 criteria describe a complete start-to-finish race with one track, one craft, working touch steering, speed feedback, results, and retry.
-- [x] The plan describes reusable architectural seams without prematurely prescribing frameworks or building generic systems.
-- [x] `SYSTEMDOC.md` and `CURRENT_STATUS.md` reflect the staged strategy while preserving the distinction between goals and verified implementation.
-- [x] The journal records this work wave; existing documentation and user changes are preserved.
-- [x] Documentation consistency and whitespace validation are complete; no implementation is claimed.
+- [x] A minimal application can be installed, started in development, and built for production using documented npm scripts.
+- [x] The app creates and displays a responsive Three.js 3D scene with a render loop and handles viewport resizing without unbounded device-pixel-ratio rendering.
+- [x] The initial scene is clearly prototype presentation; no steering, track completion, results, retry, or playable race behavior is claimed.
+- [x] `SYSTEMDOC.md`, `CURRENT_STATUS.md`, and `FILESTRUCTURE.md` accurately describe the selected setup and observed implementation; the journal records this work wave.
+- [x] Installation/build and a development-server smoke check pass; repository diff passes whitespace validation.
 
 ## Outcome
 
-Recorded the three milestone scopes, acceptance criteria, and progression gates. The repository remains documentation-only; no game code or playable slice was created by this task.
+Implemented the Vite and Three.js rendering foundation with responsive presentation, procedural prototype geometry, and documented npm workflows. Version 0.1 race gameplay remains unimplemented.
 
 ## Verification
 
-Cross-checked the milestone plan against the GDD and repository status. Ran `git diff --check` after updating the documentation. No code tests apply to this documentation-only task.
+`npm install` completed and reported zero vulnerabilities. `npm run build` succeeded. `curl` received HTTP 200 for the Vite app HTML and its `src/main.js` and `src/style.css` modules. `git diff --check` passed. Visual browser verification was not available because the browser tool could not start in this environment.
