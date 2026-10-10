@@ -2,6 +2,29 @@
 
 Newest first. Append dated work waves here.
 
+## 2026-10-10 — Task transition: IMPLEMENT-002 archived; IMPLEMENT-003 ready
+
+- Marked IMPLEMENT-002 complete after verifying the one-track playable 0.1 race and archived the task at `docs/archive/IMPLEMENT-002.md` with its implemented scope and validation evidence.
+- Updated verified status, durable system description, file map, and README for the live one-lap race, timed result, and retry; kept physical-device validation limits explicit.
+- Set up IMPLEMENT-003 as a scoped follow-on for accessible pause/resume that freezes and preserves the active run. The elapsed/lap/speed HUD is already implemented.
+
+## 2026-10-10 — IMPLEMENT-002: build the first playable 0.1 race
+
+- Replaced the static presentation stage with an original procedural one-lap circuit, visible road-edge lighting, guide rails, and a marked start/finish gate; added a controllable player craft.
+- Implemented automatic forward travel and a following camera, bounded pointer/touch drag steering with smooth recentering, and Arrow/A/D keyboard steering for desktop testing.
+- Added an explicit race start, live elapsed-time/lap/speed display, finish results, and repeatable retry; updated the responsive UI and first-playable run instructions.
+- Removed the obsolete rendering-only entry point; the browser shell now loads `src/game.js` and gameplay components in `src/track.js` and `src/craft.js`.
+- Verified a production build, JavaScript syntax, Vite HTTP 200 smoke checks, `git diff --check`, and headless Chrome WebGL 2 execution. Desktop and 390x844 mobile-emulated races finished in approximately 17.13s; steering, result state, focused retry, state reset, and a fresh run were exercised without JS exceptions.
+- Checked start-screen/HUD layout at 320x568, 390x844, 844x390, and 1440x900. Physical mobile-device validation was not performed.
+- Archived IMPLEMENT-002 as complete and set up IMPLEMENT-003 (Ready) for a pause/resume flow and verified live race telemetry; CPU opponents, audio, and content expansion remain out of scope.
+
+## 2026-10-10 — Task transition: IMPLEMENT-001 archived; IMPLEMENT-002 ready
+
+- Archived the completed Step 1 rendering-foundation task at `docs/archive/IMPLEMENT-001.md` without changing its recorded outcome or verification.
+- Confirmed the current app remains a rendering prototype and does not yet implement race gameplay.
+- Set up IMPLEMENT-002 as the active Ready task, scoped to the GDD's first playable 0.1 race: one continuous course and craft, automatic movement, bounded touch/pointer drag steering, finish detection, elapsed-time result, and repeatable retry.
+- Kept CPU rivals, audio, multiple tracks/craft, and polish out of scope. No gameplay implementation was started in this task-transition wave.
+
 ## 2026-10-10 — IMPLEMENT-001: establish the rendering foundation
 
 - Added a minimal Vite browser app and Three.js scene with responsive sizing,

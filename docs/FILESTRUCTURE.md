@@ -1,22 +1,27 @@
 # File Structure
 
-Verified 2026-10-10 after IMPLEMENT-001. The project now includes a minimal
-Vite and Three.js rendering prototype; race gameplay and external assets do
-not exist yet.
+Verified 2026-10-10 after IMPLEMENT-002. The project implements the playable
+version 0.1 circuit race with procedural Three.js geometry, touch/keyboard
+controls, finish/results, and retry. IMPLEMENT-001 and IMPLEMENT-002 are archived
+under `docs/archive/`; IMPLEMENT-003 is the active Ready task.
 
 - `AGENTS.md` — repository instructions and docs-first entry point
-- `README.md` — runtime requirements, local commands, and prototype scope
+- `README.md` — runtime requirements, race instructions, and project map
 - `package.json` / `package-lock.json` — npm scripts and pinned dependency graph
 - `.gitignore` — generated and local-only files excluded from version control
-- `index.html` — browser app shell and module entry
-- `src/main.js` — Three.js scene, lighting, prototype geometry, renderer, resize, and render loop
-- `src/style.css` — responsive prototype presentation
-- `docs/CURRENT_TASK.md` — active task, definition of done, and verification
+- `index.html` — game canvas, start/results overlay, race HUD, and module entry
+- `src/game.js` — Three.js renderer/camera, input, race flow, HUD updates, and render loop
+- `src/track.js` — closed procedural circuit, road edges, guide posts, start/finish gate, and track frame
+- `src/craft.js` — procedural player craft, engine accents, and glow
+- `src/style.css` — responsive overlays, live HUD, and visual presentation
+- `docs/CURRENT_TASK.md` — active task IMPLEMENT-003 (Ready): accessible pause/resume with frozen state and preserved race result
+- `docs/archive/IMPLEMENT-001.md` — completed Step 1 rendering-foundation task
+- `docs/archive/IMPLEMENT-002.md` — completed version 0.1 playable-race task
 - `docs/TASK_WORKFLOW.md` — task lifecycle and continuity rules
-- `docs/CURRENT_STATUS.md` — verified repository reality and implementation gaps
+- `docs/CURRENT_STATUS.md` — verified application behavior and remaining work
 - `docs/SYSTEMDOC.md` — durable product direction and technical constraints
-- `docs/GDD.md` — detailed game design goals, proposed experience, scope, and open decisions
-- `docs/JOURNAL.md` — dated record of completed work waves
+- `docs/GDD.md` — detailed game-design goals, release scope, and open decisions
+- `docs/JOURNAL.md` — dated record of completed work waves and task transitions
 - `docs/FILESTRUCTURE.md` — this factual repository map
 
 Update this map when files or directories are added, removed, or reorganized.

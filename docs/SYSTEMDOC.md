@@ -45,8 +45,7 @@ architecture or behavior.
 - The initial implementation is a Vite-powered browser application using
   Three.js for rendering. `npm run dev`, `npm run build`, and `npm run preview`
   provide the development, production-build, and local-preview workflows.
-- The current Three.js scene is a responsive rendering prototype with simple
-  procedural geometry; it does not yet implement playable race behavior.
+- The current Vite application presents one playable procedural Three.js race: one craft follows one closed circuit under automatic forward travel. Pointer/touch drag or the documented keyboard alternatives steer it, the camera follows it, and a lap timer/result/retry flow completes the run. Pause/resume is a follow-on task; CPU opponents, audio, multiple tracks, and multiple craft remain unimplemented.
 - Treat mobile touch input, variable device performance, asset download size,
   memory, and audio playback behavior as first-class design constraints.
 - Generated assets and custom music must be reviewed for quality, consistency,
