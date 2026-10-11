@@ -1,4 +1,37 @@
-## 2026-10-10 — IMPLEMENT-004: user acceptance confirmation
+## 2026-10-11 — IMPLEMENT-008: add panorama cylinder backdrop
+
+- Added the user-provided `public/images/backdrop_track-001.jpg` as a large inside-facing `THREE.CylinderGeometry` around the track.
+- Kept the panorama unlit, fog-independent, and non-depth-writing/testing so it stays behind the existing road, craft, bloom, and speed trails at low rendering cost.
+- Updated the active task and factual file map. Production build, syntax, whitespace, and interactive visual confirmation remain pending.
+
+## 2026-10-11 — IMPLEMENT-007: add audio-reactive bloom and speed trails
+
+- Added `EffectComposer`, `RenderPass`, and `UnrealBloomPass` to give the existing emissive track, engine glow, thrusters, and markers a restrained neon bleed.
+- Bloom strength responds to kick hits and bass energy without changing the accepted beat analyser or music start/stop behavior.
+- Added lightweight additive cyan/pink speed trails behind the player craft; their length and opacity respond to bass/kick energy and remain hidden outside the race.
+- Deliberately deferred the dynamic backdrop/skybox until the user's concept layers are ready.
+- `npm run build`, `node --check src/game.js`, and `git diff --check` passed. Interactive visual confirmation remains pending.
+
+## 2026-10-11 — IMPLEMENT-006: add beat-reactive thrusters
+
+- Added paired additive underbody thruster cones beneath the player engine pods, matching the requested rear/downward silhouette while preserving the existing engine glow.
+- Thruster length and opacity respond to the existing bass and kick analyser channels; thrusters are visible only during the player race loop. Rival craft share the procedural geometry but keep their thrusters hidden.
+- Build and syntax/whitespace verification are pending for this work wave. Interactive visual confirmation remains pending.
+
+## 2026-10-11 — IMPLEMENT-005: strengthen beat response
+
+- Increased kick and bass sensitivity, raised analyser energy scaling, and changed channel smoothing to a fast attack with a steadier release so beat changes read more clearly.
+- Lowered the transient trigger threshold and accumulated kick hit energy briefly instead of replacing it, reducing weak/missed-looking visual pulses while preserving the analyser's band-based detection.
+- Increased the engine glow contribution from kick hits and bass energy; music start/stop behavior remains unchanged.
+- `npm run build`, `node --check src/audio.js`, `node --check src/game.js`, and `git diff --check` passed. Interactive browser verification remains pending.
+
+## 2026-10-10 — IMPLEMENT-005: add race music and reusable audio analysis
+
+- Added `src/audio.js`, extracting the visualizer's frequency-band analysis into reusable kick, bass, mid, high, and hi-hat channels with smoothing and transient hit detection.
+- Start Race now begins the bundled `public/audio/tracks/track_002.mp3` from the user gesture; audio stops at the finish and kick/bass energy modulates the engine glow as the first audio-reactive hook.
+- Updated README, current status, system direction, and file map. Browser audio playback and visual beat response remain pending interactive verification.
+- `npm run build`, JavaScript syntax checks, and `git diff --check` are the required verification for this pass.
+
 
 - The user manually tested the current CPU-race build and confirmed that the speed, floating feel, natural course variation, and current race implementation are satisfactory for continuing development.
 - This manual confirmation is recorded as user-reported evidence; browser automation was not independently observed in this environment, and no physical-device result was reported.

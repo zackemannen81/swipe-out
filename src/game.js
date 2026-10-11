@@ -1,6 +1,10 @@
 import * as THREE from 'three';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { RaceAudio, RACE_TRACK_AUDIO } from './audio.js';
 import './style.css';
-import { createCraft } from './craft.js';
+import { createCraft, loadCraftModel } from './craft.js';
 import { createTrack, getTrackFrame } from './track.js';
 import { createOpponents, getPlayerPosition, resetOpponents, updateOpponents } from './opponents.js';
 
@@ -19,12 +23,39 @@ const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x080d18);
 scene.fog = new THREE.FogExp2(0x080d18, 0.0065);
 
+const panoramaTexture = new THREE.TextureLoader().load(
+  '/images/backdrop_track-001.jpg',
+  (texture) => {
+    texture.colorSpace = THREE.SRGBColorSpace;
+    texture.needsUpdate = true;
+  },
+  undefined,
+  (error) => console.warn('Unable to load panorama backdrop.', error),
+);
+panoramaTexture.colorSpace = THREE.SRGBColorSpace;
+const panoramaBackdrop = new THREE.Mesh(
+  new THREE.CylinderGeometry(190, 190, 380, 96, 1, true),
+  new THREE.MeshBasicMaterial({
+    map: panoramaTexture,
+    side: THREE.BackSide,
+    depthWrite: false,
+    depthTest: false,
+    fog: false,
+  }),
+);
+panoramaBackdrop.renderOrder = -10;
+scene.add(panoramaBackdrop);
+
 const camera = new THREE.PerspectiveCamera(53, 1, 0.1, 220);
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.25;
+const composer = new EffectComposer(renderer);
+composer.addPass(new RenderPass(scene, camera));
+const bloomPass = new UnrealBloomPass(new THREE.Vector2(1, 1), 0.78, 0.7, 0.78);
+composer.addPass(bloomPass);
 
 scene.add(new THREE.HemisphereLight(0x98c8ff, 0x111421, 1.8));
 const keyLight = new THREE.DirectionalLight(0xd8e8ff, 2.8);
@@ -37,27 +68,32 @@ const pinkLight = new THREE.PointLight(0xff397b, 58, 42);
 pinkLight.position.set(-24, 10, -16);
 scene.add(pinkLight);
 
-const ground = new THREE.Mesh(
-  new THREE.PlaneGeometry(1400, 1400),
-  new THREE.MeshStandardMaterial({ color: 0x0a101b, roughness: 0.92, metalness: 0.12 }),
-);
-ground.rotation.x = -Math.PI / 2;
-ground.position.y = -16;
-scene.add(ground);
-const grid = new THREE.GridHelper(1400, 700, 0x16464e, 0x152131);
-grid.position.y = -15.9;
-grid.material.transparent = true;
-grid.material.opacity = 0.26;
-scene.add(grid);
-
 const { group: track, curve } = createTrack();
 scene.add(track);
-const { group: craft, engineMaterials, glow } = createCraft();
+const { group: craft, engineMaterials, thrusterMaterials, thrusters, glow } = createCraft();
 scene.add(craft);
+const speedTrails = [-1, 1].map((side) => {
+  const material = new THREE.MeshBasicMaterial({
+    color: side < 0 ? 0xff4388 : 0x5cf5ec,
+    transparent: true,
+    opacity: 0.28,
+    blending: THREE.AdditiveBlending,
+    depthWrite: false,
+  });
+  const trail = new THREE.Mesh(new THREE.PlaneGeometry(0.18, 3.8), material);
+  trail.position.set(side * 0.84, -0.12, 0.78);
+  trail.rotation.x = -Math.PI / 2;
+  trail.visible = false;
+  craft.add(trail);
+  return trail;
+});
+loadCraftModel({ group: craft })
+  .catch((error) => console.warn('Unable to load racer model; using procedural craft.', error));
 const opponents = createOpponents();
 for (const opponent of opponents) scene.add(opponent.group);
 
 const clock = new THREE.Clock();
+const raceAudio = new RaceAudio(RACE_TRACK_AUDIO);
 const cameraLook = new THREE.Vector3();
 const desiredCameraPosition = new THREE.Vector3();
 const lookTarget = new THREE.Vector3();
@@ -121,6 +157,7 @@ function updateCraftPose(delta = 0) {
 }
 
 function beginRace() {
+  raceAudio.play().catch((error) => console.warn('Unable to start race music.', error));
   race.state = 'racing';
   race.distance = 0;
   race.elapsed = 0;
@@ -148,6 +185,7 @@ function beginRace() {
 }
 
 function finishRace() {
+  raceAudio.stop();
   race.state = 'finished';
   race.playerFinishTime = race.elapsed;
   positionDisplay.textContent = `${getPlayerPosition(opponents, race.distance, race.playerFinishTime)} / 3`;
@@ -228,6 +266,7 @@ function resize() {
   camera.fov = width < 700 ? 56 : 48;
   camera.updateProjectionMatrix();
   renderer.setSize(width, height, false);
+  composer.setSize(width, height);
 }
 window.addEventListener('resize', resize, { passive: true });
 resize();
@@ -237,6 +276,7 @@ function render() {
   let crossedFinish = false;
   if (race.state === 'racing') {
     race.elapsed += delta;
+    raceAudio.update(delta);
     race.throttleTarget = drag.active ? drag.throttle : race.keyboardThrottle;
     const speedTarget = baseSpeed * (1 + race.throttleTarget * 0.3);
     race.currentSpeed = THREE.MathUtils.damp(race.currentSpeed, speedTarget, 2.8, delta);
@@ -264,14 +304,32 @@ function render() {
   lookTarget.y += 0.25;
   cameraLook.lerp(lookTarget, 1 - Math.exp(-4.8 * delta));
   camera.lookAt(cameraLook);
+  panoramaBackdrop.position.copy(camera.position);
 
-  const pulse = 0.78 + Math.sin(clock.elapsedTime * 19) * 0.22;
+  const kick = race.state === 'racing' ? raceAudio.channels.kick : { hitValue: 0 };
+  const bass = race.state === 'racing' ? raceAudio.channels.bass : { value: 0 };
+  bloomPass.strength = 0.62 + kick.hitValue * 0.55 + bass.value * 0.12;
+  const pulse = 0.78 + Math.sin(clock.elapsedTime * 19) * 0.12 + kick.hitValue * 0.75;
   engineMaterials.forEach((material) => material.color.setRGB(0.28 * pulse, 0.95 * pulse, 0.9 * pulse));
-  glow.intensity = 2.4 + pulse;
+  const thrusterPower = 0.72 + bass.value * 0.85 + kick.hitValue * 0.72;
+  thrusters.forEach((thruster, index) => {
+    thruster.visible = race.state === 'racing';
+    thruster.scale.y = thrusterPower * (1 + Math.sin(clock.elapsedTime * 31 + index * Math.PI) * 0.08);
+  });
+  const trailPower = race.state === 'racing' ? THREE.MathUtils.clamp(0.18 + bass.value * 0.42 + kick.hitValue * 0.35, 0.18, 0.9) : 0;
+  speedTrails.forEach((trail, index) => {
+    trail.visible = race.state === 'racing';
+    trail.scale.y = trailPower * (0.82 + Math.sin(clock.elapsedTime * 23 + index * 2.4) * 0.12);
+    trail.material.opacity = trailPower * 0.38;
+  });
+  thrusterMaterials.forEach((material) => {
+    material.opacity = race.state === 'racing' ? THREE.MathUtils.clamp(0.36 + thrusterPower * 0.14, 0.36, 0.82) : 0;
+  });
+  glow.intensity = 2.4 + pulse * 1.2 + kick.hitValue * 5.5 + bass.value * 2.4;
   speedDisplay.textContent = race.state === 'racing'
     ? `${race.airborne ? 'AIR' : race.throttleTarget > 0.1 ? 'THRUST' : race.throttleTarget < -0.1 ? 'BRAKE' : 'AUTO'} · ${Math.round(race.currentSpeed * 36)} KM/H`
     : 'AUTO · READY';
-  renderer.render(scene, camera);
+  composer.render();
   requestAnimationFrame(render);
 }
 updateCraftPose();

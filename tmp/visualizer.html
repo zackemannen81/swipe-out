@@ -1,0 +1,1118 @@
+﻿<!doctype html>
+<html lang="sv">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Audio Visualizer</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        font-family: "Courier New", monospace;
+        background: #03040b;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        padding: 18px;
+        background: radial-gradient(circle at 50% 30%, #24275c, #03040b 65%);
+      }
+      main {
+        max-width: 1100px;
+        margin: auto;
+      }
+      canvas {
+        display: block;
+        width: 100%;
+        aspect-ratio: 16/9;
+        background: #03040b;
+        border: 1px solid #6669d5;
+      }
+      .toolbar,
+      .registers {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 12px;
+        align-items: center;
+      }
+      button,
+      select {
+        padding: 8px 10px;
+        background: #202255;
+        color: #e7e8ff;
+        border: 1px solid #6c6cf0;
+        font: inherit;
+      }
+      #audioStatus {
+        color: #ffb5e9;
+        font-size: 12px;
+      }
+      .registers {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      }
+      fieldset {
+        margin: 0;
+        border: 1px solid #3f428b;
+        background: #080a1fcc;
+        padding: 9px;
+      }
+      legend {
+        color: #f1a8e8;
+        font-size: 12px;
+      }
+      label {
+        display: grid;
+        grid-template-columns: 45px 1fr 42px;
+        gap: 6px;
+        align-items: center;
+        margin-top: 5px;
+        color: #c4c7ff;
+        font-size: 11px;
+      }
+      .switch {
+        display: flex;
+        gap: 7px;
+      }
+      input[type="range"] {
+        width: 100%;
+        accent-color: #f650c5;
+      }
+      output {
+        color: #ffb5e9;
+        text-align: right;
+      }
+      .hint {
+        font-size: 11px;
+        color: #8589d3;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <canvas id="screen" width="960" height="540"></canvas>
+      <div class="toolbar">
+        <button id="audioToggle">AKTIVERA SYSTEMLJUD</button
+        ><label for="sceneSelect">SCEN</label
+        ><select id="sceneSelect">
+          <option value="nebula">NEBULA</option>
+          <option value="spectrum">SPEKTRUM</option>
+          <option value="tunnel">TUNNEL</option>
+          <option value="matrix">MATRIX</option>
+          <option value="stars4d">4D STARS</option>
+          <option value="vortex">PARTIKELVIRVEL</option>
+          <option value="warp4d">4D WARP</option>
+          <option value="magictrip">BRITTAN & ZACKES MAGISKA FÄRD</option>
+        </select>
+        <label class="strength" for="strength"
+          >STRENGTH
+          <input
+            id="strength"
+            type="range"
+            min="0"
+            max="2"
+            step="0.05"
+            value="1"
+          /><output id="strengthValue">1.00x</output></label
+        >
+        ><span id="audioStatus">LJUDREAKTIVT LÄGE: AV</span>
+      </div>
+      <section id="registers" class="registers"></section>
+      <p class="hint">
+        Range = frekvensområde i Hz. Sensitivitet förstärker varje registers
+        respons.
+      </p>
+    </main>
+    <script>
+      (() => {
+        const c = document.querySelector("#screen"),
+          x = c.getContext("2d"),
+          toggle = document.querySelector("#audioToggle"),
+          status = document.querySelector("#audioStatus"),
+          scenes = document.querySelector("#sceneSelect"),
+          strengthInput = document.querySelector("#strength"),
+          strengthValue = document.querySelector("#strengthValue"),
+          box = document.querySelector("#registers");
+        const defs = [
+          ["kick", "KICK", 40, 160, 1.7, "#ff4fd8", 1],
+          ["bass", "BAS", 45, 250, 1.25, "#ff855f"],
+          ["mid", "MID", 250, 2200, 1, "#a678ff"],
+          ["high", "HIGH", 2200, 8000, 1, "#5bceff"],
+          ["hihat", "HI-HAT", 6000, 14000, 1.4, "#fff19c", 1],
+        ];
+        const TRIG_LUT_SIZE = 2048,
+          TRIG_LUT_MASK = TRIG_LUT_SIZE - 1,
+          TRIG_LUT_QUARTER = TRIG_LUT_SIZE >> 2,
+          TRIG_LUT_SCALE = TRIG_LUT_SIZE / (Math.PI * 2),
+          SIN_LUT = new Float32Array(TRIG_LUT_SIZE);
+        for (let i = 0; i < TRIG_LUT_SIZE; i++)
+          SIN_LUT[i] = Math.sin((i / TRIG_LUT_SIZE) * Math.PI * 2);
+        const trigIndex = (angle) =>
+            ((angle * TRIG_LUT_SCALE) | 0) & TRIG_LUT_MASK,
+          fastSin = (angle) => SIN_LUT[trigIndex(angle)],
+          fastCos = (angle) =>
+            SIN_LUT[(trigIndex(angle) + TRIG_LUT_QUARTER) & TRIG_LUT_MASK];
+        const r = Object.fromEntries(
+          defs.map((d) => [
+            d[0],
+            {
+              id: d[0],
+              name: d[1],
+              low: d[2],
+              high: d[3],
+              sensitivity: d[4],
+              color: d[5],
+              hit: d[6],
+              enabled: true,
+              value: 0,
+              previous: 0,
+              hitValue: 0,
+              baseline: 0,
+            },
+          ]),
+        );
+        let ac,
+          an,
+          stream,
+          source,
+          data,
+          previous,
+          time = 0,
+          strength = +strengthInput.value,
+          scene = scenes.value;
+        const particles = Array.from({ length: 420 }, () => ({
+            x: Math.random(),
+            y: Math.random(),
+            z: Math.random(),
+            speed: 0.2 + Math.random() * 0.8,
+          })),
+          columns = Array.from({ length: 64 }, () => Math.random() * 540),
+          stars4d = Array.from({ length: 520 }, () => ({
+            x: Math.random() * 2 - 1,
+            y: Math.random() * 2 - 1,
+            z: Math.random() * 2 - 1,
+            w: Math.random() * 2 - 1,
+          })),
+          vortexParticles = [],
+          warpStars = Array.from({ length: 1150 }, () => ({
+            x: Math.random() * 2 - 1,
+            y: Math.random() * 2 - 1,
+            z: Math.random() * 2 - 1,
+            w: Math.random() * 2 - 1,
+            phase: Math.random() * Math.PI * 2,
+            hue: [32, 198, 304][Math.floor(Math.random() * 3)],
+            trail: Math.random() < 0.34,
+          })),
+          warpBendX = new Float32Array(48),
+          warpBendY = new Float32Array(48),
+magicStars = Array.from({ length: 1330 }, (_, i) => {
+  const kind = i < 900 ? 0 : i < 1250 ? 1 : 2;
+  const spread = kind === 2 ? 1.1 : kind === 1 ? 1.45 : 1.95;
+  return {
+    x: (Math.random() * 2 - 1) * spread,
+    y: (Math.random() * 2 - 1) * spread * 0.72,
+    z: 0.06 + Math.random() * 0.94,
+    speed:
+      kind === 2
+        ? 0.85 + Math.random() * 0.9
+        : kind === 1
+          ? 0.65 + Math.random() * 0.75
+          : 0.45 + Math.random() * 0.55,
+    phase: Math.random() * Math.PI * 2,
+    bend: Math.random() * 2 - 1,
+    hue: [32, 198, 304][Math.floor(Math.random() * 3)],
+    kind,
+  };
+});
+          magicSparks = Array.from({ length: 96 }, () => ({
+            angle: Math.random() * Math.PI * 2,
+            radius: 72 + Math.random() * 225,
+            phase: Math.random() * Math.PI * 2,
+            hue: [32, 198, 304][Math.floor(Math.random() * 3)],
+          }));
+        function resetVortex() {
+          vortexParticles.length = 0;
+          const count = Math.min(
+            1500,
+            Math.floor((c.clientWidth * c.clientHeight) / 850),
+          );
+          for (let i = 0; i < count; i++)
+            vortexParticles.push({
+              x: Math.random() * 960,
+              y: Math.random() * 540,
+              px: 0,
+              py: 0,
+              life: Math.random() * 100,
+              speed: 0.5 + Math.random() * 1.4,
+              hue: 190 + Math.random() * 100,
+            });
+        }
+        resetVortex();
+        defs.forEach((d) => {
+          const s = r[d[0]],
+            f = document.createElement("fieldset");
+          f.innerHTML = `<legend>${s.name}</legend><label class="switch"><input data-id="${s.id}" data-key="enabled" type="checkbox" checked> AKTIV</label><label>MIN<input data-id="${s.id}" data-key="low" type="range" min="20" max="16000" step="10" value="${s.low}"><output></output></label><label>MAX<input data-id="${s.id}" data-key="high" type="range" min="30" max="18000" step="10" value="${s.high}"><output></output></label><label>SENS<input data-id="${s.id}" data-key="sensitivity" type="range" min="0.1" max="4" step="0.1" value="${s.sensitivity}"><output></output></label>`;
+          box.append(f);
+        });
+        function out(i) {
+          const o = i.closest("label").querySelector("output");
+          if (o)
+            o.value =
+              i.dataset.key === "sensitivity"
+                ? `${+i.value.toFixed?.(1) || i.value}x`
+                : `${i.value}Hz`;
+        }
+        box.querySelectorAll("input").forEach((i) => {
+          out(i);
+          i.oninput = () => {
+            const s = r[i.dataset.id];
+            s[i.dataset.key] = i.type === "checkbox" ? i.checked : +i.value;
+            if (s.low >= s.high) {
+              if (i.dataset.key === "low") s.high = s.low + 10;
+              else s.low = s.high - 10;
+              box.querySelectorAll(`[data-id="${s.id}"]`).forEach((q) => {
+                if (q.dataset.key !== "enabled") q.value = s[q.dataset.key];
+                out(q);
+              });
+            }
+            out(i);
+          };
+        });
+        scenes.onchange = () => (scene = scenes.value);
+        strengthInput.oninput = () => {
+          strength = +strengthInput.value;
+          strengthValue.value = `${strength.toFixed(2)}x`;
+        };
+        function energy(s) {
+          const bw = ac.sampleRate / an.fftSize,
+            lo = Math.max(1, Math.ceil(s.low / bw)),
+            hi = Math.min(data.length - 1, Math.floor(s.high / bw));
+          let total = 0;
+          for (let b = lo; b <= hi; b++) {
+            const v = 10 ** (data[b] / 20);
+            total += v * v;
+          }
+          return Math.sqrt(total / Math.max(1, hi - lo + 1));
+        }
+        function audio(dt) {
+          if (!an) {
+            Object.values(r).forEach((s) => {
+              s.value *= Math.exp(-dt / 0.15);
+              s.hitValue *= Math.exp(-dt / 0.07);
+            });
+            return;
+          }
+          an.getFloatFrequencyData(data);
+          Object.values(r).forEach((s) => {
+            const target = s.enabled
+              ? Math.min(1, energy(s) * s.sensitivity * 7 * strength)
+              : 0;
+            s.value += (target - s.value) * (1 - Math.exp(-dt / 0.075));
+            const attack = Math.max(0, target - s.previous);
+            s.previous = target;
+            s.baseline += (target - s.baseline) * (1 - Math.exp(-dt / 0.45));
+            if (s.hit && attack > Math.max(0.1, s.baseline * 0.45))
+              s.hitValue = Math.min(1, attack * 3.2);
+            s.hitValue *= Math.exp(-dt / 0.09);
+          });
+        }
+        function background() {
+          const g = x.createLinearGradient(0, 0, 0, 540);
+          g.addColorStop(0, "#050723");
+          g.addColorStop(1, "#19031b");
+          x.fillStyle = g;
+          x.fillRect(0, 0, 960, 540);
+        }
+        function nebula() {
+          const { kick, bass, mid, high, hihat } = r;
+          x.save();
+          x.globalCompositeOperation = "screen";
+          particles.forEach((p) => {
+            p.z -= (0.004 + bass.value * 0.018) * p.speed;
+            if (p.z < 0.02)
+              Object.assign(p, { z: 1, x: Math.random(), y: Math.random() });
+            const px = ((p.x - 0.5) / p.z) * 520 + 480,
+              py = ((p.y - 0.5) / p.z) * 300 + 270;
+            x.fillStyle = `hsla(${210 + mid.value * 120},100%,78%,${0.42 + high.value * 0.55})`;
+            const size = Math.min(13, (1 - p.z) * (3.8 + high.value * 10));
+            x.fillRect(px - size / 2, py - size / 2, size, size);
+          });
+          x.strokeStyle = `rgba(255,79,216,${0.2 + kick.hitValue * 0.8})`;
+          x.lineWidth = 2 + kick.hitValue * 12;
+          x.beginPath();
+          x.arc(480, 270, 60 + bass.value * 210 + kick.hitValue * 70, 0, 7);
+          x.stroke();
+          x.fillStyle = `rgba(255,241,156,${hihat.hitValue})`;
+          x.fillRect(0, 0, 960, 540);
+          x.restore();
+        }
+        function spectrum() {
+          const { kick, bass, mid, high, hihat } = r,
+            v = [
+              kick.hitValue,
+              bass.value,
+              mid.value,
+              high.value,
+              hihat.hitValue,
+            ],
+            co = defs.map((d) => d[5]);
+          x.save();
+          x.globalCompositeOperation = "screen";
+          for (let i = 0; i < 90; i++) {
+            const h =
+              18 + v[i % 5] * 440 * (0.7 + 0.3 * fastSin(i * 0.4 + time));
+            x.fillStyle = co[i % 5];
+            x.fillRect(i * 11, 520 - h, 8, h);
+          }
+          x.strokeStyle = `rgba(255,255,255,${0.2 + high.value * 0.7})`;
+          x.lineWidth = 1 + hihat.value * 5;
+          x.beginPath();
+          for (let p = 0; p <= 960; p += 8) {
+            const y =
+              270 +
+              fastSin(p * 0.03 + time * 4) * (30 + mid.value * 120) +
+              fastSin(p * 0.11 - time * 8) * high.value * 45;
+            p ? x.lineTo(p, y) : x.moveTo(p, y);
+          }
+          x.stroke();
+          x.restore();
+        }
+        function tunnel() {
+          const { kick, bass, mid, high, hihat } = r,
+            speed = 0.105 + bass.value * 0.075 + kick.hitValue * 0.035,
+            glow = Math.min(1, 0.24 + bass.value * 0.28 + high.value * 0.32 + hihat.hitValue * 0.3);
+          x.save();
+          x.translate(480, 270);
+          x.globalCompositeOperation = "screen";
+          for (let i = 0; i < 38; i++) {
+            const d = (i / 38 + time * speed) % 1,
+              far = 1 - d,
+              radius = (12 + d * 650) * (1 + kick.hitValue * 0.055),
+              bendX = fastSin(time * 0.43 + d * 3.8) * (18 + far * 92),
+              bendY = fastSin(time * 0.31 + d * 2.75 + 1.2) * (10 + far * 54),
+              squash = 0.82 + fastSin(time * 0.22 + d * 2.4) * 0.055,
+              tilt = fastSin(time * 0.18 + d * 2.1) * 0.12,
+              hue = 292 + i * 6 + mid.value * 34,
+              alpha = (0.055 + d * 0.34) * (0.7 + glow * 0.75);
+            x.strokeStyle = `hsla(${hue},100%,72%,${alpha})`;
+            x.shadowColor = `hsla(${hue},100%,70%,0.9)`;
+            x.shadowBlur = 8 + glow * 28;
+            x.lineWidth = 0.8 + high.value * 1.4 + d * 0.9;
+            x.beginPath();
+            x.ellipse(bendX, bendY, radius, radius * squash, tilt, 0, Math.PI * 2);
+            x.stroke();
+          }
+          x.shadowBlur = 0;
+          for (let i = 0; i < 12; i++) {
+            const a = (i / 12) * Math.PI * 2 + time * 0.075,
+              farX = fastSin(time * 0.43 + 0.2) * 86,
+              farY = fastSin(time * 0.31 + 1.75) * 48;
+            x.strokeStyle = `rgba(91,206,255,${0.025 + hihat.value * 0.06})`;
+            x.lineWidth = 0.55 + high.value * 0.45;
+            x.beginPath();
+            x.moveTo(farX * 0.2, farY * 0.2);
+            x.quadraticCurveTo(
+              farX + fastCos(a) * 170,
+              farY + fastSin(a) * 105,
+              fastCos(a) * 760,
+              fastSin(a) * 610,
+            );
+            x.stroke();
+          }
+          x.restore();
+        }
+        function matrix() {
+          const { kick, bass, mid, high, hihat } = r;
+          x.font = "bold 16px monospace";
+          columns.forEach((v, i) => {
+            v += 2 + bass.value * 12 + mid.value * 6;
+            if (v > 570) v = -Math.random() * 220;
+            columns[i] = v;
+            x.fillStyle = `rgba(120,255,${120 + Math.floor(high.value * 135)},${0.25 + hihat.value * 0.7})`;
+            x.fillText(
+              String.fromCharCode(
+                0x30a0 + ((i * 13 + Math.floor(time * 30)) % 96),
+              ),
+              i * 15,
+              v,
+            );
+          });
+          x.strokeStyle = `rgba(255,79,216,${kick.hitValue})`;
+          x.lineWidth = 4 + kick.hitValue * 14;
+          x.strokeRect(14, 14, 932, 512);
+        }
+        function stars4dScene() {
+
+          const { kick, bass, mid, high, hihat } = r,
+            x_rotationMultiplier = 1 + (bass.value*0.2) ,
+            a = time*x_rotationMultiplier,// * (0.65 + bass.value * 0.45),
+            b = time, //* (0.43 + mid.value * 0.35),
+            ca = fastCos(a),
+            sa = fastSin(a),
+            cb = fastCos(b),
+            sb = fastSin(b),
+            focal = 100 * (1 + kick.hitValue * 0.25);
+          x.save();
+          x.globalCompositeOperation = "screen";
+          for (const s of stars4d) {
+            const rx = s.x * ca - s.w * sa,
+              rw = s.x * sa + s.w * ca,
+              ry = s.y * cb - s.z * sb,
+              rz = s.y * sb + s.z * cb,
+              d = rw + 1.35;
+            if (d < 0.16) continue;
+            const p = focal / d,
+              px = 480 + rx * p * 2.5,
+              py = 270 + rz * p * 2.5;
+            if (px < -1 || px > 968 || py < -1 || py > 548) continue;
+            const pp = focal / (d + 0.16),
+              q = 480 + rx * pp * 2.8,
+              u = 270 + rz * pp * 2.8,
+              alpha = Math.max(0.14, Math.min(0.95, 0.9 - Math.abs(rw) * 0.34)),
+              size = Math.max(
+                0.45,
+                Math.min(6.5, 2.4 - Math.abs(rw) * 0.7 + high.value * 3.6),
+              );
+            x.strokeStyle = `hsla(${(time * 70 + (rz + 1) * 95) % 360},100%,72%,${Math.min(1, alpha * 0.85)})`;
+            x.lineWidth = size * 0.9;
+            x.beginPath();
+            x.moveTo(px+1, py+1);
+            x.lineTo(px, py);
+            x.stroke();
+            x.fillStyle = `hsla(${(time * 70 + (rz + 1) * 95) % 360},100%,80%,${alpha})`;
+            x.fillRect(px - size / 2, py - size / 2, size, size);
+          }
+          x.strokeStyle = `rgba(255,79,216,${0.12 + kick.hitValue * 0.7})`;
+          x.lineWidth = 2 + kick.hitValue * 9;
+          x.beginPath();
+          x.arc(480, 270, 45 + bass.value * 170, 0, 7);
+          x.stroke();
+          x.restore();
+        }
+        function vortex() {
+          const { kick, bass, mid, high, hihat } = r,
+            drive = 0.2 + bass.value * 1.8 + mid.value * 0.8,
+            burst = 0.5 + kick.hitValue * 3.5 + hihat.hitValue * 0.8,
+            cx =
+              480 +
+              fastCos(time * (0.33 + mid.value * 0.8)) *
+                115 *
+                (0.25 + bass.value),
+            cy =
+              270 +
+              fastSin(time * (0.47 + high.value * 0.9)) *
+                78 *
+                (0.25 + mid.value);
+          x.fillStyle = `rgba(5,6,21,${0.16 - high.value * 0.07})`;
+          x.fillRect(0, 0, 960, 540);
+          x.save();
+          x.globalCompositeOperation = "screen";
+          for (const p of vortexParticles) {
+            p.px = p.x;
+            p.py = p.y;
+            const dx = p.x - cx,
+              dy = p.y - cy,
+              radius = Math.max(18, Math.hypot(dx, dy)),
+              spin = 0.025 + 175 / radius + drive * 0.09,
+              radial =
+                (0.11 + bass.value * 0.55 + kick.hitValue * 1.9) *
+                (1 + 120 / radius);
+            p.x +=
+              ((-dy / radius) * spin + (dx / radius) * radial) *
+              p.speed *
+              burst;
+            p.y +=
+              ((dx / radius) * spin + (dy / radius) * radial) * p.speed * burst;
+            p.life -= 0.42 + high.value * 1.8 + hihat.hitValue * 2;
+            if (p.life < 0 || p.x < -45 || p.x > 1005 || p.y < -45 || p.y > 585)
+              Object.assign(p, {
+                x: cx + (Math.random() - 0.5) * 18,
+                y: cy + (Math.random() - 0.5) * 18,
+                px: cx,
+                py: cy,
+                life: 70 + Math.random() * 70,
+                speed: 0.8 + Math.random() * 2.2,
+                hue: 190 + Math.random() * 140,
+              });
+            const alpha =
+              Math.min(0.95, p.life / 28) * (0.35 + high.value * 0.9);
+            x.beginPath();
+            x.moveTo(p.px, p.py);
+            x.lineTo(p.x, p.y);
+            x.strokeStyle = `hsla(${p.hue + fastSin(time * 1.7) * 45},95%,70%,${alpha})`;
+            x.lineWidth = 1.4 + alpha * 3 + hihat.hitValue * 2;
+            x.stroke();
+          }
+          x.fillStyle = `rgba(255,255,255,${kick.hitValue * 0.45})`;
+          x.beginPath();
+          x.arc(cx, cy, 8 + kick.hitValue * 38, 0, 7);
+          x.fill();
+          x.restore();
+        }
+        function warp4d() {
+          const { kick, bass, mid, high, hihat } = r,
+            ax = time * 0.235 + bass.value * 0.055 + kick.hitValue * 0.018,
+            ay = time * 0.165 + mid.value * 0.045,
+            ca = fastCos(ax),
+            sa = fastSin(ax),
+            cb = fastCos(ay),
+            sb = fastSin(ay),
+            focal = 84 * (1 + kick.hitValue * 0.045),
+            starDrive = Math.min(
+              1,
+              0.12 +
+                bass.value * 0.2 +
+                mid.value * 0.14 +
+                high.value * 0.38 +
+                Math.max(hihat.value, hihat.hitValue) * 0.34 +
+                kick.hitValue * 0.16,
+            );
+          for (let i = 0; i < 48; i++) {
+            const t = i / 47;
+            warpBendX[i] =
+              fastSin(time * 0.34 + t * 3.8) * (10 + t * 72);
+            warpBendY[i] =
+              fastSin(time * 0.255 + t * 2.9 + 1.1) * (7 + t * 42);
+          }
+          x.save();
+          x.globalCompositeOperation = "screen";
+          for (const s of warpStars) {
+            const rx = s.x * ca - s.w * sa,
+              rw = s.x * sa + s.w * ca,
+              rz = s.y * sb + s.z * cb,
+              depth = rw + 1.35;
+            if (depth < 0.18) continue;
+
+            const travel = Math.max(0, Math.min(1, (2.35 - depth) / 2.17)),
+              bendIndex = Math.min(47, Math.max(0, (travel * 47) | 0)),
+              bendX = warpBendX[bendIndex],
+              bendY = warpBendY[bendIndex],
+              perspective = focal / depth,
+              px = 480 + bendX + rx * perspective * 4.08,
+              py = 270 + bendY + rz * perspective * 4.08,
+              previousDepth = depth + 0.13 + bass.value * 0.025,
+              previousTravel = Math.max(
+                0,
+                Math.min(1, (2.35 - previousDepth) / 2.17),
+              ),
+              previousIndex = Math.min(
+                47,
+                Math.max(0, (previousTravel * 47) | 0),
+              ),
+              previousPerspective = focal / previousDepth,
+              qx =
+                480 +
+                warpBendX[previousIndex] +
+                rx * previousPerspective * 4.08,
+              qy =
+                270 +
+                warpBendY[previousIndex] +
+                rz * previousPerspective * 4.08;
+            if (px < -14 || px > 974 || py < -14 || py > 554) continue;
+
+            const twinkle =
+                0.78 + fastSin(time * 3.8 + s.phase) * 0.22,
+              baseRadius = Math.max(
+                0.42,
+                Math.min(2.9, 1.18 - Math.abs(rw) * 0.34 + high.value * 0.9),
+              ),
+              radius = baseRadius * (0.9 + starDrive * 1.1) * twinkle,
+              baseAlpha = Math.max(
+                0.22,
+                Math.min(0.96, 0.92 - Math.abs(rw) * 0.31),
+              ),
+              alpha = Math.min(
+                1,
+                baseAlpha * (0.5 + starDrive * 0.78) * (0.82 + twinkle * 0.24),
+              ),
+              hue = s.hue + time * 4.5 + mid.value * 10,
+              trailAlpha =
+                alpha * (0.045 + bass.value * 0.05 + hihat.value * 0.035);
+
+            if (s.trail) {
+              x.globalAlpha = trailAlpha;
+              x.strokeStyle = `hsl(${hue},100%,72%)`;
+              x.lineWidth = Math.max(0.45, radius * 0.34);
+              x.beginPath();
+              x.moveTo(qx, qy);
+              x.lineTo(px, py);
+              x.stroke();
+            }
+
+            const halo = radius * (3.2 + starDrive * 1.4),
+              dot = Math.max(1, radius * 1.55),
+              core = Math.max(0.8, radius * 0.48);
+
+            x.globalAlpha = alpha * (0.08 + starDrive * 0.1);
+            x.fillStyle = `hsl(${hue},100%,70%)`;
+            x.fillRect(px - halo / 2, py - halo / 2, halo, halo);
+
+            x.globalAlpha = alpha;
+            x.fillStyle = `hsl(${hue},100%,86%)`;
+            x.fillRect(px - dot / 2, py - dot / 2, dot, dot);
+
+            x.globalAlpha = alpha * (0.48 + starDrive * 0.44);
+            x.fillStyle = "#ffffff";
+            x.fillRect(px - core / 2, py - core / 2, core, core);
+          }
+          x.shadowBlur = 0;
+          x.restore();
+        }
+        function magicFog() {
+  const { bass, mid, high } = r;
+  x.save();
+  x.globalCompositeOperation = "screen";
+
+  const clouds = [
+    [210, 0.12, 0.31, 360, 140, 90],
+    [300, 0.18, 0.47, 300, -120, -60],
+    [265, 0.10, 0.59, 420, 90, -120],
+    [28, 0.06, 0.73, 250, -40, 130],
+  ];
+
+  for (let i = 0; i < clouds.length; i++) {
+    const [hue, alpha, phase, radius, ox, oy] = clouds[i];
+    const cx =
+      480 + ox + fastSin(time * (0.05 + i * 0.01) + phase * 6) * 40;
+    const cy =
+      270 + oy + fastCos(time * (0.04 + i * 0.012) + phase * 5) * 30;
+
+    const g = x.createRadialGradient(cx, cy, 0, cx, cy, radius);
+    g.addColorStop(0, `hsla(${hue + mid.value * 10},100%,62%,${alpha + bass.value * 0.04})`);
+    g.addColorStop(0.45, `hsla(${hue},95%,42%,${alpha * (0.42 + high.value * 0.14)})`);
+    g.addColorStop(1, `hsla(${hue},90%,18%,0)`);
+
+    x.fillStyle = g;
+    x.fillRect(0, 0, 960, 540);
+  }
+
+  x.restore();
+}
+        /*function magicFog() {
+          const { bass, mid, high, hihat } = r;
+          x.save();
+          x.globalCompositeOperation = "screen";
+          const fog = [
+            [198, 0.17, 0.31, 330],
+            [304, 0.23, 0.43, 285],
+            [258, 0.11, 0.57, 380],
+            [28, 0.07, 0.71, 245],
+          ];
+          fog.forEach(([hue, alpha, phase, radius], i) => {
+            const cx =
+                480 +
+                fastSin(time * (0.07 + i * 0.013) + phase * 7) *
+                  (135 + i * 24),
+              cy =
+                270 +
+                fastCos(time * (0.055 + i * 0.011) + phase * 5) *
+                  (72 + i * 15),
+              g = x.createRadialGradient(cx, cy, 0, cx, cy, radius);
+            g.addColorStop(
+              0,
+              `hsla(${hue + mid.value * 18},100%,65%,${alpha + bass.value * 0.055})`,
+            );
+            g.addColorStop(
+              0.42,
+              `hsla(${hue},95%,48%,${alpha * (0.42 + high.value * 0.16)})`,
+            );
+            g.addColorStop(1, `hsla(${hue},90%,25%,0)`);
+            x.fillStyle = g;
+            x.fillRect(0, 0, 960, 540);
+          });
+
+          x.lineCap = "round";
+          for (let i = 0; i < 5; i++) {
+            const y = 105 + i * 88 + fastSin(time * 0.13 + i) * 26,
+              bend = fastSin(time * 0.09 + i * 1.7) * 115;
+            x.globalAlpha = 0.025 + high.value * 0.018 + hihat.value * 0.012;
+            x.strokeStyle = i % 2 ? "#ff62da" : "#5fd8ff";
+            x.lineWidth = 18 + i * 4;
+            x.beginPath();
+            x.moveTo(-80, y + 35);
+            x.bezierCurveTo(
+              180,
+              y - 95 + bend,
+              660,
+              y + 90 - bend,
+              1040,
+              y - 28,
+            );
+            x.stroke();
+          }
+          x.restore();
+        }*/
+
+        function magicPortal(cx, cy) {
+          const { kick, bass, mid, high, hihat } = r,
+            levels = [
+              kick.hitValue,
+              bass.value,
+              mid.value,
+              high.value,
+              Math.max(hihat.value, hihat.hitValue),
+            ],
+            colors = ["#ff4fd8", "#ff936f", "#a678ff", "#5bceff", "#fff2a8"],
+            bases = [62, 108, 154, 205, 257];
+
+          x.save();
+          x.translate(cx, cy);
+          x.rotate(fastSin(time * 0.11) * 0.035);
+          x.scale(1, 0.965);
+          x.globalCompositeOperation = "screen";
+          x.lineCap = "round";
+
+          for (let i = 0; i < 5; i++) {
+            const level = levels[i],
+              radius = bases[i] + level * (18 + i * 5),
+              start = time * (0.11 + i * 0.021) + i * 0.77,
+              span =
+                Math.PI *
+                (1.18 +
+                  i * 0.075 +
+                  level * 0.28 +
+                  fastSin(time * 0.31 + i) * 0.035),
+              width = 2.2 + level * (7 + i * 0.9);
+
+            x.globalAlpha = 0.1 + level * 0.13;
+            x.strokeStyle = colors[i];
+            x.lineWidth = width * 6.2;
+            x.beginPath();
+            x.arc(0, 0, radius, start, start + span);
+            x.stroke();
+
+            x.globalAlpha = 0.24 + level * 0.42;
+            x.lineWidth = width * 2.5;
+            x.beginPath();
+            x.arc(0, 0, radius, start, start + span);
+            x.stroke();
+
+            x.globalAlpha = 0.76 + level * 0.24;
+            x.lineWidth = width;
+            x.beginPath();
+            x.arc(0, 0, radius, start, start + span);
+            x.stroke();
+
+            x.globalAlpha = 0.16 + level * 0.38;
+            x.strokeStyle = "#ffffff";
+            x.lineWidth = Math.max(0.7, width * 0.18);
+            x.beginPath();
+            x.arc(0, 0, radius, start, start + span);
+            x.stroke();
+          }
+
+          x.setLineDash([2, 10]);
+          x.globalAlpha = 0.13 + high.value * 0.1;
+          x.strokeStyle = "#8edfff";
+          x.lineWidth = 1;
+          x.beginPath();
+          x.arc(0, 0, 181, -time * 0.08, Math.PI * 1.72 - time * 0.08);
+          x.stroke();
+          x.setLineDash([]);
+
+          for (const p of magicSparks) {
+            const a = p.angle + time * (0.055 + p.radius / 9000),
+              rr = p.radius + fastSin(time * 0.7 + p.phase) * 5,
+              sparkle =
+                0.28 +
+                high.value * 0.42 +
+                hihat.hitValue * 0.3 +
+                fastSin(time * 3.1 + p.phase) * 0.13,
+              px = fastCos(a) * rr,
+              py = fastSin(a) * rr * 0.965;
+            x.globalAlpha = Math.max(0.08, sparkle);
+            x.fillStyle = `hsl(${p.hue},100%,82%)`;
+            x.fillRect(px - 1, py - 1, 2, 2);
+          }
+          x.restore();
+        }
+
+        function magicTrip(dt) {
+          const { kick, bass, mid, high, hihat } = r,
+            thrust = 0.13 + bass.value * 0.115 + kick.hitValue * 0.08,
+            curve = 48 + mid.value * 46,
+            starLight = Math.min(
+              1,
+              0.28 +
+                high.value * 0.38 +
+                hihat.value * 0.16 +
+                hihat.hitValue * 0.26 +
+                kick.hitValue * 0.18,
+            );
+
+          magicFog();
+
+          x.save();
+          x.globalCompositeOperation = "screen";
+          x.lineCap = "round";
+
+          for (const s of magicStars) {
+            s.z -= dt * thrust * s.speed;
+            if (s.z < 0.045) {
+              const spread = s.kind === 2 ? 1.15 : s.kind === 1 ? 1.48 : 1.82;
+              s.x = (Math.random() * 2 - 1) * spread;
+              s.y = (Math.random() * 2 - 1) * spread * 0.72;
+              s.z = 0.96 + Math.random() * 0.08;
+              s.phase = Math.random() * Math.PI * 2;
+            }
+const originX =
+  480 +
+  fastSin(time * 0.19) * 16 +
+  fastCos(time * 0.073) * 11 +
+  fastSin(time * 0.041 + 1.7) * 7;
+
+const originY =
+  270 +
+  fastSin(time * 0.157 + 0.8) * 12 +
+  fastCos(time * 0.061 + 2.1) * 18 +
+  fastSin(time * 0.029 + 4.3) * 6;
+
+            const travel = 1 - s.z,
+cx =
+  originX +
+  fastSin(time * 0.18 + travel * 2.75) * (18 + travel * curve) +
+  fastCos(time * 0.09 + travel * 5.1) * travel * 14 +
+  s.bend * travel * 8,
+
+ cy =
+  originY +
+  fastSin(time * 0.137 + travel * 2.18 + 1.4) * (10 + travel * curve * 0.55) +
+  fastCos(time * 0.071 + travel * 4.3 + 0.9) * travel * 10,
+              roll = time * 0.085 + travel * 1.06 + mid.value * 0.055,
+              cr = fastCos(roll),
+              sr = fastSin(roll),
+              rx = s.x * cr - s.y * sr,
+              ry = s.x * sr + s.y * cr,
+              perspective = 132 / s.z,
+              px = cx + rx * perspective,
+              py = cy + ry * perspective;
+
+            if (px < -90 || px > 1050 || py < -90 || py > 630) continue;
+
+            const prevZ = Math.min(1.08, s.z + 0.038 + thrust * s.speed * 0.08),
+              prevTravel = 1 - prevZ,
+
+               prevCx =
+  originX +
+  fastSin(time * 0.18 + prevTravel * 2.75) * (18 + prevTravel * curve) +
+  fastCos(time * 0.09 + prevTravel * 5.1) * prevTravel * 14 +
+  s.bend * prevTravel * 8,
+ prevCy =
+  originY +
+  fastSin(time * 0.137 + prevTravel * 2.18 + 1.4) * (10 + prevTravel * curve * 0.55) +
+  fastCos(time * 0.071 + prevTravel * 4.3 + 0.9) * prevTravel * 10,
+              prevRoll = time * 0.085 + prevTravel * 1.06 + mid.value * 0.055,
+              pcr = fastCos(prevRoll),
+              psr = fastSin(prevRoll),
+              prx = s.x * pcr - s.y * psr,
+              pry = s.x * psr + s.y * pcr,
+              prevPerspective = 132 / prevZ,
+              qx = prevCx + prx * prevPerspective,
+              qy = prevCy + pry * prevPerspective,
+              depthGlow = Math.max(0.18, Math.min(1, 1.08 - s.z)),
+              twinkle = 0.78 + fastSin(time * 3.4 + s.phase) * 0.22,
+              alpha = Math.min(
+                1,
+                (0.24 + starLight * 0.7) * (0.44 + depthGlow * 0.7) * twinkle,
+              ),
+              hue = s.hue + mid.value * 12 + time * 2.4;
+
+            if (s.kind > 0) {
+              x.globalAlpha = alpha * (s.kind === 2 ? 0.34 : 0.115);
+              x.strokeStyle = `hsl(${hue},100%,76%)`;
+              x.lineWidth =
+                s.kind === 2
+                  ? 1.4 + depthGlow * 2.8
+                  : 0.55 + depthGlow * 0.8;
+              x.beginPath();
+              x.moveTo(qx, qy);
+              x.lineTo(px, py);
+              x.stroke();
+            }
+
+            if (s.kind === 2) {
+              const halo = 7 + depthGlow * 17 + starLight * 8,
+                core = 1.5 + depthGlow * 3.6;
+              x.globalAlpha = alpha * 0.11;
+              x.fillStyle = `hsl(${hue},100%,70%)`;
+              x.fillRect(px - halo / 2, py - halo / 2, halo, halo);
+              x.globalAlpha = alpha * 0.44;
+              x.fillStyle = `hsl(${hue},100%,86%)`;
+              x.fillRect(px - core, py - core, core * 2, core * 2);
+              x.globalAlpha = alpha;
+              x.fillStyle = "#ffffff";
+              x.fillRect(px - 0.8, py - 0.8, 1.6, 1.6);
+            } else {
+              const size =
+                s.kind === 1
+                  ? 1.25 + depthGlow * 2.4
+                  : 0.65 + depthGlow * 1.15;
+              x.globalAlpha = alpha * (s.kind === 1 ? 0.9 : 0.62);
+              x.fillStyle = `hsl(${hue},100%,84%)`;
+              x.fillRect(px - size / 2, py - size / 2, size, size);
+            }
+          }
+          x.restore();
+
+          const portalX = 480 + fastSin(time * 0.18) * 9,
+            portalY = 270 + fastSin(time * 0.137 + 1.4) * 5;
+
+          x.save();
+          x.globalCompositeOperation = "source-over";
+          const voidGlow = x.createRadialGradient(
+            portalX,
+            portalY,
+            0,
+            portalX,
+            portalY,
+            118 + bass.value * 18,
+          );
+          voidGlow.addColorStop(0, "rgba(1,2,13,0.92)");
+          voidGlow.addColorStop(0.5, "rgba(5,4,24,0.62)");
+          voidGlow.addColorStop(1, "rgba(7,4,30,0)");
+          x.fillStyle = voidGlow;
+          x.fillRect(0, 0, 960, 540);
+          x.restore();
+
+          magicPortal(portalX, portalY);
+        }
+
+        function neonRings() {
+          const rings = [
+            [r.kick, 62, r.kick.hitValue],
+            [r.bass, 106, r.bass.value],
+            [r.mid, 152, r.mid.value],
+            [r.high, 201, r.high.value],
+            [r.hihat, 252, Math.max(r.hihat.value, r.hihat.hitValue)],
+          ];
+          x.save();
+          x.translate(480, 270);
+          x.globalCompositeOperation = "screen";
+          rings.forEach(([register, baseRadius, level], index) => {
+            const pulse = level * (38 + index * 9),
+              radius = baseRadius + pulse,
+              alpha = 0.3 + level * 0.56,
+              width = 1.35 + level * 10.8,
+              start = time * (0.16 + index * 0.032),
+              end = start + Math.PI * (1.34 + level * 0.52);
+            x.strokeStyle = register.color;
+            x.shadowColor = register.color;
+            x.shadowBlur = 68 + level * 154;
+            x.globalAlpha = alpha * 0.5;
+            x.lineWidth = width * 7.6;
+            x.beginPath();
+            x.arc(0, 0, radius, start, end);
+            x.stroke();
+            x.shadowBlur = 24 + level * 52;
+            x.globalAlpha = alpha * 0.7;
+            x.lineWidth = width * 3.6;
+            x.beginPath();
+            x.arc(0, 0, radius, start, end);
+            x.stroke();
+            x.shadowBlur = 5 + level * 14;
+            x.globalAlpha = Math.min(1, alpha + 0.18);
+            x.lineWidth = width;
+            x.beginPath();
+            x.arc(0, 0, radius, start, end);
+            x.stroke();
+
+            x.shadowColor = "#ffffff";
+            x.shadowBlur = 3 + level * 8;
+            x.strokeStyle = "#ffffff";
+            x.globalAlpha = 0.16 + level * 0.34;
+            x.lineWidth = Math.max(0.65, width * 0.22);
+            x.beginPath();
+            x.arc(0, 0, radius, start, end);
+            x.stroke();
+          });
+          x.restore();
+        }
+        function frame(now) {
+          const dt =
+            previous === undefined ? 0 : Math.min(0.1, (now - previous) / 1000);
+          previous = now;
+          time += dt;
+          audio(dt);
+          background();
+          if (scene === "nebula") nebula();
+          else if (scene === "spectrum") spectrum();
+          else if (scene === "tunnel") tunnel();
+          else if (scene === "matrix") matrix();
+          else if (scene === "stars4d") stars4dScene();
+          else if (scene === "warp4d") warp4d();
+          else if (scene === "magictrip") magicTrip(dt);
+          else vortex();
+          if (scene !== "magictrip") neonRings();
+          x.fillStyle = "#e8eaff";
+          x.font = "12px monospace";
+          const sceneName =
+            scene === "magictrip"
+              ? "BRITTAN & ZACKES MAGISKA FÄRD"
+              : scene.toUpperCase();
+          x.fillText(
+            `SCEN: ${sceneName}  K:${r.kick.value.toFixed(2)} B:${r.bass.value.toFixed(2)} M:${r.mid.value.toFixed(2)} H:${r.high.value.toFixed(2)}`,
+            18,
+            29,
+          );
+          requestAnimationFrame(frame);
+        }
+        function stop() {
+          source?.disconnect();
+          source = undefined;
+          stream?.getTracks().forEach((t) => t.stop());
+          stream = an = data = undefined;
+          toggle.textContent = "AKTIVERA SYSTEMLJUD";
+          status.textContent = "LJUDREAKTIVT LÄGE: AV";
+        }
+        async function start() {
+          if (stream) return stop();
+          if (!navigator.mediaDevices?.getDisplayMedia) {
+            status.textContent = "SYSTEMLJUD STÖDS INTE HÄR";
+            return;
+          }
+          toggle.disabled = true;
+          try {
+            status.textContent = "VÄLJ FLÖDE OCH DELA LJUDET";
+            stream = await navigator.mediaDevices.getDisplayMedia({
+              video: true,
+              audio: true,
+            });
+            const track = stream.getAudioTracks()[0];
+            if (!track) {
+              stop();
+              status.textContent = "INGET LJUD DELADES";
+              return;
+            }
+            ac ??= new AudioContext();
+            await ac.resume();
+            an = ac.createAnalyser();
+            an.fftSize = 2048;
+            an.smoothingTimeConstant = 0;
+            data = new Float32Array(an.frequencyBinCount);
+            source = ac.createMediaStreamSource(new MediaStream([track]));
+            source.connect(an);
+            stream
+              .getTracks()
+              .forEach((t) =>
+                t.addEventListener("ended", stop, { once: true }),
+              );
+            toggle.textContent = "STÄNG AV SYSTEMLJUD";
+            status.textContent = "SYSTEMLJUD AKTIVT";
+          } catch (e) {
+            stop();
+            status.textContent =
+              e.name === "NotAllowedError"
+                ? "LJUDDELNING AVBRÖTS"
+                : "KUNDE INTE STARTA SYSTEMLJUD";
+          } finally {
+            toggle.disabled = false;
+          }
+        }
+        toggle.onclick = start;
+        requestAnimationFrame(frame);
+      })();
+    </script>
+  </body>
+</html>
