@@ -1,3 +1,23 @@
+## 2026-10-11 — IMPLEMENT-013: closer chase camera and three-lap race
+
+- Moved the chase camera from 5.2 behind / 2.45 above the craft to 3.6 behind / 1.72 above, targeting the requested roughly 30% closer framing.
+- Changed the race to three laps, with total-distance finish logic, lap HUD updates, looping player/opponent track frames, and updated start copy.
+- Kept the accepted controls, speed balance, floating physics, visuals, audio, and opponent speeds unchanged.
+- Production build, syntax, and whitespace checks remain pending; browser and physical-device interaction are still unverified.
+
+## 2026-10-11 — IMPLEMENT-012: soften gravity for a floatier race feel
+
+- Following the user's preference for a more realistic hovering sensation, reduced airborne gravity from 8.5 to 6.4 world units/s².
+- Increased crest launch impulse slightly from a 3–7 to 3.5–8 world-unit/s range and made airborne lateral steering settle more gradually, without adding air-brake or pitch controls.
+- Preserved touch/keyboard controls, player speed, opponent movement, race flow, visuals, and audio. This is still arcade tuning, not a physics simulation.
+- Production build, syntax, and whitespace checks are pending; browser and physical-device interaction remain unverified.
+
+## 2026-10-11 — tighten CPU race difficulty
+
+- Following the user's feedback that the game feels too easy despite the graphics, music, track, and speed feeling right, raised Vanta's cruise speed from 60 to 72.5 and Kestrel's from 70.5 to 78.5 world units/second.
+- Kept player speed/controls, rival movement logic, models, and race flow unchanged; the faster deterministic rivals make player throttle and clean steering more important without introducing catch-up behavior.
+- Updated README, current status, and system documentation. Production build, syntax, and whitespace verification remain pending; the new balance has not yet been interactively playtested.
+
 ## 2026-10-11 — IMPLEMENT-008: add panorama cylinder backdrop
 
 - Added the user-provided `public/images/backdrop_track-001.jpg` as a large inside-facing `THREE.CylinderGeometry` around the track.

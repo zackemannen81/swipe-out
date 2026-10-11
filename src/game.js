@@ -104,6 +104,7 @@ const race = {
   airborne: false, airWorldY: 0, airVelocity: 0, previousSlope: 0, jumpCooldown: 0,
 };
 const baseSpeed = 65;
+const totalLaps = 3;
 let viewportWidth = window.innerWidth;
 let viewportHeight = window.innerHeight;
 
@@ -128,11 +129,11 @@ function updateCraftPose(delta = 0) {
 
   if (race.state === 'racing' && !race.airborne && race.jumpCooldown === 0 && slopeChange < -0.18) {
     race.airborne = true;
-    race.airVelocity = THREE.MathUtils.clamp(-slopeChange * 18, 3, 7);
+    race.airVelocity = THREE.MathUtils.clamp(-slopeChange * 20, 3.5, 8);
     race.jumpCooldown = 0.55;
   }
   if (race.airborne) {
-    race.airVelocity -= 8.5 * delta;
+    race.airVelocity -= 6.4 * delta;
     race.airWorldY += race.airVelocity * delta;
     if (race.airWorldY <= 0) {
       race.airWorldY = 0;
@@ -144,7 +145,7 @@ function updateCraftPose(delta = 0) {
   race.drift = THREE.MathUtils.damp(
     race.drift,
     race.targetSteering * (race.airborne ? 0.34 : 0.16),
-    race.airborne ? 1.5 : 2.4,
+    race.airborne ? 1.25 : 2.4,
     delta,
   );
   const position = frame.center.clone()
@@ -176,7 +177,7 @@ function beginRace() {
   drag.active = false;
   drag.throttle = 0;
   timerDisplay.textContent = '00:00.00';
-  lapDisplay.textContent = '01 / 01';
+  lapDisplay.textContent = `01 / ${String(totalLaps).padStart(2, '0')}`;
   positionDisplay.textContent = '1 / 3';
   resultPositionDisplay.textContent = '1 / 3';
   setScreen(startScreen, false);
@@ -263,7 +264,7 @@ function resize() {
   const width = Math.max(1, window.innerWidth);
   const height = Math.max(1, window.innerHeight);
   camera.aspect = width / height;
-  camera.fov = width < 700 ? 56 : 48;
+  camera.fov = width < 700 ? 54 : 46;
   camera.updateProjectionMatrix();
   renderer.setSize(width, height, false);
   composer.setSize(width, height);
@@ -282,9 +283,12 @@ function render() {
     race.currentSpeed = THREE.MathUtils.damp(race.currentSpeed, speedTarget, 2.8, delta);
     race.distance += race.currentSpeed * delta;
     race.steering = THREE.MathUtils.damp(race.steering, race.targetSteering, race.airborne ? 4.8 : 7.5, delta);
+    const completedLaps = Math.floor(race.distance / curve.getLength());
+    const currentLap = Math.min(completedLaps + 1, totalLaps);
+    const lapProgress = race.distance / curve.getLength() - completedLaps;
     timerDisplay.textContent = formatTime(race.elapsed);
-    lapDisplay.textContent = race.distance >= curve.getLength() * 0.72 ? '01 / 01 · FINAL' : '01 / 01';
-    crossedFinish = race.distance >= curve.getLength();
+    lapDisplay.textContent = `${String(currentLap).padStart(2, '0')} / ${String(totalLaps).padStart(2, '0')}${currentLap === totalLaps && lapProgress >= 0.72 ? ' · FINAL' : ''}`;
+    crossedFinish = race.distance >= curve.getLength() * totalLaps;
   } else {
     race.steering = THREE.MathUtils.damp(race.steering, race.targetSteering, 7.5, delta);
   }
@@ -297,8 +301,8 @@ function render() {
   }
   if (crossedFinish) finishRace();
   positionDisplay.textContent = `${getPlayerPosition(opponents, race.distance, race.playerFinishTime)} / 3`;
-  desiredCameraPosition.copy(position).addScaledVector(frame.tangent, -6.2);
-  desiredCameraPosition.y += 2.8;
+  desiredCameraPosition.copy(position).addScaledVector(frame.tangent, -3.6);
+  desiredCameraPosition.y += 1.72;
   camera.position.lerp(desiredCameraPosition, 1 - Math.exp(-3.6 * delta));
   lookTarget.copy(position).addScaledVector(frame.tangent, 9);
   lookTarget.y += 0.25;
@@ -314,7 +318,11 @@ function render() {
   const thrusterPower = 0.72 + bass.value * 0.85 + kick.hitValue * 0.72;
   thrusters.forEach((thruster, index) => {
     thruster.visible = race.state === 'racing';
-    thruster.scale.y = thrusterPower * (1 + Math.sin(clock.elapsedTime * 31 + index * Math.PI) * 0.08);
+    thruster.scale.set(
+      0.82 + thrusterPower * 0.22,
+      thrusterPower * (1 + Math.sin(clock.elapsedTime * 31 + index * Math.PI) * 0.08),
+      0.82 + thrusterPower * 0.22,
+    );
   });
   const trailPower = race.state === 'racing' ? THREE.MathUtils.clamp(0.18 + bass.value * 0.42 + kick.hitValue * 0.35, 0.18, 0.9) : 0;
   speedTrails.forEach((trail, index) => {
