@@ -1,24 +1,26 @@
 # Current Task
 
-Task ID: IMPLEMENT-003
-Status: Ready
+Task ID: IMPLEMENT-004
+Status: In Progress
 Owner: Agent 008
 Created: 2026-10-10
 Last updated: 2026-10-10
 
 ## Task Summary
 
-Add an explicit pause/resume action to the verified 0.1 race. Preserve the current one-track course, player craft, and live time/lap/speed HUD; while paused, movement and elapsed race time must stop and touch steering must not change the craft's position. Resume the same run in place. Keep CPU opponents, audio, extra content, and broad polish out of scope.
+Advance the approved one-track arcade racer with a small CPU field: add two distinct rivals that follow Neon Causeway, race at tunable deterministic cruising speeds, and contribute to live and final player placement. Preserve the accepted player handling, course, camera, and one-lap start/finish/retry flow. This is a first competition prototype, not sophisticated opponent AI.
 
 ## Definition of Done
 
-- [ ] Provide a clearly accessible pause action during a race and a resume action while paused; support keyboard and touch activation with visible keyboard focus.
-- [ ] Pause freezes automatic travel, elapsed time, and player steering at the current race position; resume continues that exact run with no time or distance jump.
-- [ ] Starting a new run, finish/results, and retry continue to work correctly when pause/resume has been used.
-- [ ] The existing live elapsed-time, lap/progress, and velocity HUD remains readable and updates only while racing.
-- [ ] `README.md`, `SYSTEMDOC.md`, `CURRENT_STATUS.md`, `FILESTRUCTURE.md`, and the journal describe only observed behavior; the journal records implementation and validation.
-- [ ] `npm run build`, development-server smoke check, `git diff --check`, and a manual/browser start, pause, resume, finish, and retry flow pass; note physical-device validation limits.
+- [ ] Two visually distinct CPU craft start with the player, remain on the route, and advance according to their own distance/speed without modifying the player's handling.
+- [ ] Live HUD shows the player's correct position in a three-racer field; finishing displays the position recorded at the player's finish.
+- [ ] Race Again resets both rival distances, race position, and player race state for a fresh run.
+- [ ] The three-racer HUD and results remain legible in desktop and narrow mobile layouts.
+- [ ] Document that opponent movement is deterministic prototype behavior with no collision system or advanced track-aware strategy.
+- [ ] JavaScript syntax checks, production build, a distance/position/reset simulation, and `git diff --check` pass.
+- [ ] Interactive browser race/finish/retry and physical-device checks are recorded only if actually observed; otherwise keep them explicitly pending.
+- [ ] README, GDD, system/status docs, file map, and journal accurately describe the new implementation and its verification limits.
 
 ## Scope notes
 
-Reuse the established Three.js race flow and DOM HUD. Add only simple pause/resume behavior necessary to make a race session usable. CPU competition, sound, multiple ships/tracks, and broad visual polish remain out of scope.
+Use two simple procedural CPU racers on the existing track. Keep fixed lane neighborhoods with only subtle deterministic lateral variation, and modestly distinct speed profiles so throttle choice can affect placement. No collisions, rubber-banding, opponent names/personality systems, new tracks/crafts, audio, or handling/camera retuning in this task. The user's accepted drive-feel tuning from IMPLEMENT-003 is closed and should be preserved.

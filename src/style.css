@@ -54,10 +54,10 @@ h2 { font-size: clamp(55px, 6.6vw, 82px); }
   .topbar { padding: 22px 21px; }
   .wordmark { font-size: 18px; }
   .build-tag { font-size: 8px; letter-spacing: .09em; }
-  .race-hud { top: 76px; left: 21px; gap: 19px; padding: 11px 12px; }
-  .race-hud strong { font-size: 12px; }
-  .race-hud .hud-speed strong { font-size: 9px; }
-  .hud-speed { display: none; }
+  .race-hud { top: 76px; left: 21px; gap: 12px; padding: 10px; }
+  .race-hud strong { font-size: 11px; }
+  .race-hud .hud-speed strong { font-size: 8px; }
+  .race-hud .hud-speed { display: grid; }
   .screen-card { top: 65%; left: 21px; width: min(430px, calc(100vw - 42px)); padding: 25px 23px 23px; transform: translateY(-39%); }
   h1 { font-size: clamp(62px, 15vw, 86px); }
   h2 { font-size: clamp(56px, 13vw, 78px); }

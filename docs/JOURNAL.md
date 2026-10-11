@@ -1,6 +1,44 @@
-# Journal
+## 2026-10-10 — IMPLEMENT-003: bring the chase camera much closer
 
-Newest first. Append dated work waves here.
+- Reduced the follow offset from 10.2 to 6.2 world units behind and 4.7 to 2.8 above the craft; moved the look target from 13.5 to 9 units ahead.
+- Tightened the desktop/mobile field of view from 53/62 to 48/56 degrees and kept smoothed follow/aim interpolation, making the craft occupy more of the view without removing forward visibility.
+- `npm run build`, `node --check src/game.js`, and `git diff --check` passed. Camera framing has not been interactively verified in a browser or on a physical device.
+- Updated README, active task, current status, and system documentation to record the new configuration and verification limit.
+
+
+- Added a brief gravity-settled arcade lift when the sampled course tangent sharply transitions toward a descent, plus looser steering response and lateral slide while airborne. 3,000 progress samples at 65 units/s found three lift events; the strongest rose about 0.7 world units.
+- Retained the 65-unit/s cruising speed; holding in the upper half of the touch/pointer surface ramps speed toward +30%, while holding in the lower half ramps toward -30%. Releasing returns toward cruise. Arrow-up/down and W/S provide keyboard throttle/brake, and the HUD reflects live speed and thrust/brake/air state.
+- Race distance, finish, timer/results, and retry remain on the existing race loop. Updated start-screen control guidance, mobile HUD visibility, README, status, system description, and active task.
+- Production build, JS syntax checks, analytic crest/control sampling, and diff whitespace checks pass; Vite starts successfully at `http://127.0.0.1:5173/`. Browser automation failed to start, so interactive drive feel, finish/results/retry and visual behavior remain unverified, as does physical-device behavior. Keep these features described as arcade prototypes, not tested physics.
+
+## 2026-10-10 — IMPLEMENT-003: sharper turns, larger elevation, +30% speed
+
+- Reworked Neon Causeway from 19 to 33 3D centerline points, adding tighter alternating bends and a broader elevation profile. Horizontal scale remains 3.25 and road width remains 10 units.
+- The sampled course is about 2,967.5 units (4.34× the earlier 683.96-unit version); smoothed height runs from approximately -12 to 36 (48 units). The 1,400-point nonlocal spacing check found no route points within the road width (minimum spacing about 39.9 units).
+- Increased automatic speed from 50 to 65 units/s (+30%); the derived HUD reads 2,340 km/h. Estimated length/speed lap time is about 45.7 seconds, not a measured race time. Lowered the ground and grid below the full vertical range to keep the track from intersecting the terrain.
+- `npm run build`, JS syntax checks, and `git diff --check` passed. Sampling 5,000 progress frames and generated mesh vertices found no invalid values; minimum frame-normal Y was about 0.984, and the four repeated-object meshes remain instanced. Interactive race/visual checks and physical-device performance are still unverified.
+- Updated README, active task, current status, and system document to reflect current implementation and verification limits.
+
+## 2026-10-10 — IMPLEMENT-003: extend and elevate Neon Causeway
+
+- Kept the 50-unit/s speed and existing race loop; expanded the data-defined circuit to 19 3D centerline points with horizontal scale 3.25 and elevation varying from about 0 to 16 units. Added tighter apex points to vary turn radii alongside open turns/straights.
+- The sampled route measures about 2,223.6 units, about 3.25× the previous 683.96-unit course. Road ribbons, lane markers, side supports/lights, gate, track frames, and craft follow the 3D path; repeated roadside/marker geometry is instanced.
+- Sampled 5,000 progress frames and generated mesh vertices without non-finite values; the 1,400-point nonlocal route-spacing check found no points within the 10-unit road width. Production build, JavaScript syntax checks, and `git diff --check` passed. The Vite dev server returned HTTP 200 for the page and gameplay/track modules, but browser startup failed; interactive race and physical-device checks remain unverified.
+- Updated README, active task, verified status, system document, and file map. The roughly 44.5-second lap time is a length/speed estimate, not a measured race.
+
+## 2026-10-10 — IMPLEMENT-003: raise the speed close to double
+
+- Following the positive handling feedback on the wider, sweeping course, raised automatic travel speed from 26.5 to 50 world units/second (about 1.89×); the existing HUD label remains derived from the same speed value and now reads 1,800 km/h.
+- Updated the active task, README, and verified status to reflect the new setting. The sampled 683.96-unit circuit implies a nominal lap duration of about 13.68 seconds at this speed; this is a calculation, not an interactive race observation.
+- Interactive browser validation of steering, visual speed, finish/results, and retry remains pending.
+
+## 2026-10-10 — IMPLEMENT-003: tune the first playable race feel
+
+- Reprioritized IMPLEMENT-003 from the stale pause/resume task to the user's current drive-feel milestone, preserving the approved 0.1 race loop and keeping additional content/polish out of scope.
+- Moved Neon Causeway centerline coordinates and width into `src/track-data.js`; reshaped it into longer straights and broad turns, and increased lane-marker/beacon density; made the start/finish gate dimensions follow the data-defined road width.
+- Raised automatic travel speed from 17.5 to 26.5 world units/second (displayed as 954 km/h), with the HUD label derived from the configured value.
+- Lowered and softened camera follow and moved its look target farther ahead. Updated README, task, status, system direction, and file map.
+- `npm ci` completed (zero reported vulnerabilities); `npm run build`, JS syntax checks, `git diff --check`, Vite HTTP 200 smoke checks, and direct Three.js curve/frame/mesh sampling passed. The curve measures 683.96 world units, yielding about 25.81 seconds at configured speed; a 60 Hz distance/time simulation reached the finish threshold at 25.82 seconds. Interactive browser steering/finish/retry could not be run because browser startup failed in the available tool; physical-device testing was not performed.
 
 ## 2026-10-10 — Task transition: IMPLEMENT-002 archived; IMPLEMENT-003 ready
 
