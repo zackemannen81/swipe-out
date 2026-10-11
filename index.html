@@ -18,18 +18,21 @@
       <section class="race-hud" aria-label="Race information">
         <div><span class="hud-label">TIME</span><strong id="race-time">00:00.00</strong></div>
         <div><span class="hud-label">LAP</span><strong id="race-lap">01 / 01</strong></div>
+        <div><span class="hud-label">POSITION</span><strong id="race-position">1 / 3</strong></div>
         <div class="hud-speed"><span class="hud-label">VELOCITY</span><strong id="race-speed">AUTO · READY</strong></div>
       </section>
       <section class="screen-card start-card" id="start-screen" aria-labelledby="headline" aria-describedby="start-copy">
         <p class="eyebrow"><span>01</span> &nbsp; NEON CAUSEWAY</p>
         <h1 id="headline">FIND<br />YOUR <em>LINE.</em></h1>
-        <p class="description" id="start-copy">A full-circuit anti-gravity sprint.<br />Drag anywhere to steer; release to recenter.</p>
+        <p class="description" id="start-copy">A full-circuit anti-gravity sprint.<br />Drag left or right to steer; hold higher to accelerate or lower to brake.</p>
         <button class="action-button" id="start-button" type="button">START RACE <span aria-hidden="true">↗</span></button>
-        <p class="control-hint">TOUCH / POINTER DRAG &nbsp; · &nbsp; ARROW KEYS ALSO WORK</p>
+        <p class="control-hint">DRAG TO STEER · UP = THRUST · DOWN = BRAKE · ARROWS / W A S D</p>
       </section>
       <section class="screen-card results-card" id="results-screen" aria-labelledby="results-heading" aria-live="assertive" hidden>
         <p class="eyebrow"><span>FINISH</span> &nbsp; NEON CAUSEWAY</p>
         <h2 id="results-heading">RUN<br />COMPLETE.</h2>
+        <p class="result-label">YOUR POSITION</p>
+        <strong class="result-time" id="result-position">1 / 3</strong>
         <p class="result-label">YOUR TIME</p>
         <strong class="result-time" id="result-time">00:00.00</strong>
         <button class="action-button" id="retry-button" type="button">RACE AGAIN <span aria-hidden="true">↻</span></button>

@@ -45,7 +45,7 @@ architecture or behavior.
 - The initial implementation is a Vite-powered browser application using
   Three.js for rendering. `npm run dev`, `npm run build`, and `npm run preview`
   provide the development, production-build, and local-preview workflows.
-- The current Vite application presents one playable procedural Three.js race: one craft follows one closed circuit under automatic forward travel. Pointer/touch drag or the documented keyboard alternatives steer it, the camera follows it, and a lap timer/result/retry flow completes the run. Pause/resume is a follow-on task; CPU opponents, audio, multiple tracks, and multiple craft remain unimplemented.
+- The current Three.js circuit race cruises automatically at 65 world units/second and supports touch/pointer horizontal steering plus vertical throttle/braking around that cruise speed; touch acceleration and braking are capped at ±30%. Crest-triggered lift and increased steering drift while airborne are arcade handling features rather than a physical simulation. The HUD reports live speed and the current thrust/brake/air state. The chase camera follows 6.2 units behind and 2.8 units above the craft, aims 9 units ahead, and uses a 48-degree desktop / 56-degree mobile field of view with smoothed position and aim interpolation; visual tuning remains unverified. Track geometry and width are separate from race flow; other track properties and craft tuning data are not yet generalized. CPU opponents, audio, multiple tracks, and multiple craft remain unimplemented.
 - Treat mobile touch input, variable device performance, asset download size,
   memory, and audio playback behavior as first-class design constraints.
 - Generated assets and custom music must be reviewed for quality, consistency,
