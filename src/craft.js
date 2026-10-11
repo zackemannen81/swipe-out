@@ -1,4 +1,7 @@
 import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+const craftModelLoader = new GLTFLoader();
 
 export function createCraft({
   hullColor = 0xc1d0e7,
@@ -33,6 +36,8 @@ export function createCraft({
 
   const wingMaterial = new THREE.MeshStandardMaterial({ color: wingColor, metalness: 0.72, roughness: 0.3 });
   const engineMaterials = [];
+  const thrusterMaterials = [];
+  const thrusters = [];
   for (const side of [-1, 1]) {
     const wing = new THREE.Mesh(new THREE.BoxGeometry(1.72, 0.12, 0.62), wingMaterial);
     wing.position.set(side * 0.76, -0.04, -0.04);
@@ -53,6 +58,18 @@ export function createCraft({
     engine.position.set(side * 0.38, -0.08, -1.28);
     craft.add(engine);
     engineMaterials.push(engineMaterial);
+
+    const thrusterMaterial = new THREE.MeshBasicMaterial({
+      color: glowColor, transparent: true, opacity: 0.5,
+      blending: THREE.AdditiveBlending, depthWrite: false,
+    });
+    const thruster = new THREE.Mesh(new THREE.ConeGeometry(0.28, 1.55, 12), thrusterMaterial);
+    thruster.rotation.x = -Math.PI / 2;
+    thruster.position.set(side * 0.38, -0.08, -1.82);
+    thruster.visible = showGlow;
+    craft.add(thruster);
+    thrusterMaterials.push(thrusterMaterial);
+    thrusters.push(thruster);
   }
 
   if (showGlow) {
@@ -61,5 +78,36 @@ export function createCraft({
     craft.add(glow);
   }
 
-  return { group: craft, engineMaterials, glow: craft.children.find((child) => child.isPointLight) ?? null };
+  return {
+    group: craft, engineMaterials, thrusterMaterials, thrusters,
+    glow: craft.children.find((child) => child.isPointLight) ?? null,
+  };
+}
+
+export function loadCraftModel(craft, url = '/models/racer_optimized.glb') {
+  return new Promise((resolve, reject) => {
+    craftModelLoader.load(url, (gltf) => {
+      const model = gltf.scene;
+      const bounds = new THREE.Box3().setFromObject(model);
+      const size = bounds.getSize(new THREE.Vector3());
+      const center = bounds.getCenter(new THREE.Vector3());
+      const largestDimension = Math.max(size.x, size.y, size.z);
+      if (!largestDimension || !Number.isFinite(largestDimension)) {
+        reject(new Error('Craft model has no measurable geometry'));
+        return;
+      }
+
+      model.position.set(-center.x, -center.y, -center.z);
+      model.scale.setScalar(3.15 / largestDimension);
+      model.rotation.y = Math.PI / 2;
+      model.traverse((object) => {
+        if (object.isMesh) object.frustumCulled = false;
+      });
+      craft.group.traverse((object) => {
+        if (object.isMesh) object.visible = false;
+      });
+      craft.group.add(model);
+      resolve(model);
+    }, undefined, reject);
+  });
 }

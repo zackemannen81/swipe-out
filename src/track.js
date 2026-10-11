@@ -69,6 +69,62 @@ export function createTrack(definition = NEON_CAUSEWAY) {
   ribbon(-trackWidth / 2 - 0.15, 0.1, darkMaterial, 0.14);
   ribbon(trackWidth / 2 + 0.15, 0.1, darkMaterial, 0.14);
 
+  // Floating neon guardrails make the road edge readable at race speed.
+  const railGeometry = new THREE.CylinderGeometry(0.07, 0.07, 8.5, 8);
+  const railTransforms = [];
+  for (let distance = 4.25; distance < curve.getLength(); distance += 8.5) {
+    const frame = getTrackFrame(curve, distance / curve.getLength());
+    for (const side of [-1, 1]) {
+      const position = frame.center.clone()
+        .addScaledVector(frame.right, side * (trackWidth / 2 + 1.15))
+        .addScaledVector(frame.normal, 1.18);
+      const quaternion = new THREE.Quaternion().setFromUnitVectors(
+        new THREE.Vector3(0, 1, 0),
+        frame.tangent,
+      );
+      railTransforms.push({ position, quaternion });
+    }
+  }
+  addInstances(group, railGeometry, darkMaterial, railTransforms);
+  const railLightGeometry = new THREE.CylinderGeometry(0.045, 0.045, 8.5, 6);
+  const pinkRailTransforms = [];
+  const cyanRailTransforms = [];
+  for (let distance = 4.25; distance < curve.getLength(); distance += 17) {
+    const frame = getTrackFrame(curve, distance / curve.getLength());
+    for (const side of [-1, 1]) {
+      const position = frame.center.clone()
+        .addScaledVector(frame.right, side * (trackWidth / 2 + 1.15))
+        .addScaledVector(frame.normal, 1.18);
+      const quaternion = new THREE.Quaternion().setFromUnitVectors(
+        new THREE.Vector3(0, 1, 0),
+        frame.tangent,
+      );
+      (side < 0 ? pinkRailTransforms : cyanRailTransforms).push({ position, quaternion });
+    }
+  }
+  addInstances(group, railLightGeometry, pinkMaterial, pinkRailTransforms);
+  addInstances(group, railLightGeometry, cyanMaterial, cyanRailTransforms);
+
+  // Directional chevrons sit just above the road and point into the flow of the course.
+  const arrowGeometry = new THREE.BoxGeometry(0.1, 0.06, 0.86);
+  const pinkArrowTransforms = [];
+  const cyanArrowTransforms = [];
+  for (let distance = 10; distance < curve.getLength(); distance += 22) {
+    const frame = getTrackFrame(curve, distance / curve.getLength());
+    const side = Math.floor(distance / 22) % 2 === 0 ? -1 : 1;
+    const basePosition = frame.center.clone()
+      .addScaledVector(frame.right, side * (trackWidth / 2 - 0.85))
+      .addScaledVector(frame.normal, 0.12);
+    for (const angle of [-0.62, 0.62]) {
+      const position = basePosition.clone().addScaledVector(frame.right, angle * 0.48);
+      const quaternion = frame.rotation.clone();
+      quaternion.multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), angle));
+      (side < 0 ? pinkArrowTransforms : cyanArrowTransforms).push({ position, quaternion });
+    }
+  }
+  addInstances(group, arrowGeometry, pinkMaterial, pinkArrowTransforms);
+  addInstances(group, arrowGeometry, cyanMaterial, cyanArrowTransforms);
+
   const laneMaterial = new THREE.MeshBasicMaterial({ color: 0x6f899f, transparent: true, opacity: 0.46 });
   const dash = new THREE.BoxGeometry(0.065, 0.035, 1.05);
   const markerTransforms = [];

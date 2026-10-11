@@ -295,5 +295,8 @@ update this GDD and the system document when durable choices are confirmed.
 
 This GDD describes intended design and proposed starting points. It is not
 proof that any game feature, asset, track, or soundtrack has been implemented.
-See `CURRENT_STATUS.md` for verified repository state and `SYSTEMDOC.md` for
+The current prototype does include a small deterministic CPU field as an
+implementation step, but that does not establish the complete version 0.5
+acceptance criteria or interactive/device verification. See
+`CURRENT_STATUS.md` for verified repository state and `SYSTEMDOC.md` for
 durable product and technical direction.
