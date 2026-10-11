@@ -1,4 +1,18 @@
-## 2026-10-10 — IMPLEMENT-003: bring the chase camera much closer
+## 2026-10-10 — IMPLEMENT-004: user acceptance confirmation
+
+- The user manually tested the current CPU-race build and confirmed that the speed, floating feel, natural course variation, and current race implementation are satisfactory for continuing development.
+- This manual confirmation is recorded as user-reported evidence; browser automation was not independently observed in this environment, and no physical-device result was reported.
+- The accepted drive feel, camera, course, and one-lap race flow are now treated as closed for this wave. The user requested that the complete change set be committed and pushed before the next development step.
+
+## 2026-10-10 — IMPLEMENT-004: add the first CPU competition field
+
+- Added two visually distinct procedural rivals, Vanta and Kestrel, to the existing Neon Causeway race. They use fixed lane neighborhoods, subtle deterministic lateral motion, and distinct cruising speeds of 60 and 70.5 world units/second.
+- Added live player placement in the three-racer HUD, rival finish-time recording, final placement on the results screen, and complete rival/player reset on Race Again. Moved finish evaluation after the same-frame rival update to keep placement timing consistent.
+- Documented the prototype boundary: no collisions, rubber-banding, advanced track-aware strategy, audio, or interactive/device verification claims.
+- `npm run build`, `node --check` for game/opponent/craft modules, a deterministic distance/position/reset simulation, and `git diff --check` passed. Browser automation did not start, so interactive race/finish/retry, visual rival readability, and physical-device behavior remain pending.
+- The player's accepted speed, floating feel, course variation, and closer camera were preserved without retuning.
+
+
 
 - Reduced the follow offset from 10.2 to 6.2 world units behind and 4.7 to 2.8 above the craft; moved the look target from 13.5 to 9 units ahead.
 - Tightened the desktop/mobile field of view from 53/62 to 48/56 degrees and kept smoothed follow/aim interpolation, making the craft occupy more of the view without removing forward visibility.

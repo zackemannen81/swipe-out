@@ -1,6 +1,6 @@
 # Swipe-out — First playable 0.1
 
-Swipe-out is a small Three.js anti-gravity racing prototype. Version 0.1 is a complete one-track, one-craft race: start a run, drag to steer, cross the finish, and race again. Track geometry, craft geometry, and the visual treatment are procedural and original prototype content.
+Swipe-out is a small Three.js anti-gravity racing prototype. Version 0.1 is a complete one-track, three-racer race: start a run, drag to steer, race two deterministic CPU rivals, cross the finish, and race again. Track geometry, craft geometry, and the visual treatment are procedural and original prototype content.
 
 ## Requirements and run
 
@@ -17,7 +17,7 @@ Open the local URL printed by Vite. Run `npm run build` for the production bundl
 
 ## Play
 
-Press **Start Race** to begin. Forward travel cruises automatically at 2,340 km/h (65 world units/second). Drag left or right anywhere on the scene to steer; while holding, keep your finger in the upper half of the screen to accelerate up to 30% above cruise, or in the lower half to brake down to 30% below cruise. Release to return toward cruise speed and recenter steering. Up/down arrows or W/S provide keyboard throttle and braking; left/right arrows or A/D steer. The HUD reports current speed and whether the craft is thrusting, braking, or airborne. Leaving a downward-facing crest can give the craft a brief arcade-style lift; steering slides more while airborne. The single lap ends at the start/finish gate, and the result panel offers **Race Again** without reloading the page.
+Press **Start Race** to begin. Forward travel cruises automatically at 2,340 km/h (65 world units/second). Drag left or right anywhere on the scene to steer; while holding, keep your finger in the upper half of the screen to accelerate up to 30% above cruise, or in the lower half to brake down to 30% below cruise. Release to return toward cruise speed and recenter steering. Up/down arrows or W/S provide keyboard throttle and braking; left/right arrows or A/D steer. The HUD reports current speed, status, and live position in the three-racer field. Two simple deterministic CPU rivals follow fixed lane neighborhoods at 60 and 70.5 world units/second; they have no collision system or advanced track-aware strategy. Leaving a downward-facing crest can give the craft a brief arcade-style lift; steering slides more while airborne. The single lap ends at the start/finish gate, and the result panel records final position/time and offers **Race Again** without reloading the page.
 
 This extended/elevated layout has not yet been exercised through an interactive browser race. The earlier touch-emulation checks apply to the baseline 0.1 build only; steering, course readability, finish/results/retry, and representative physical-device feel on the new layout still need playtesting. The chase camera follows closely (6.2 units behind, 2.8 above) and aims 9 units ahead, with a slightly wider view on mobile. Its visual framing still needs interactive browser/device playtesting. See `docs/CURRENT_STATUS.md` for the current verification boundary and `docs/CURRENT_TASK.md` for the remaining check.
 

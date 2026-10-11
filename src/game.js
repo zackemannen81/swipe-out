@@ -234,6 +234,7 @@ resize();
 
 function render() {
   const delta = Math.min(clock.getDelta(), 0.05);
+  let crossedFinish = false;
   if (race.state === 'racing') {
     race.elapsed += delta;
     race.throttleTarget = drag.active ? drag.throttle : race.keyboardThrottle;
@@ -243,7 +244,7 @@ function render() {
     race.steering = THREE.MathUtils.damp(race.steering, race.targetSteering, race.airborne ? 4.8 : 7.5, delta);
     timerDisplay.textContent = formatTime(race.elapsed);
     lapDisplay.textContent = race.distance >= curve.getLength() * 0.72 ? '01 / 01 · FINAL' : '01 / 01';
-    if (race.distance >= curve.getLength()) finishRace();
+    crossedFinish = race.distance >= curve.getLength();
   } else {
     race.steering = THREE.MathUtils.damp(race.steering, race.targetSteering, 7.5, delta);
   }
@@ -254,6 +255,7 @@ function render() {
   } else {
     updateOpponents(opponents, curve, 0, race.elapsed, false);
   }
+  if (crossedFinish) finishRace();
   positionDisplay.textContent = `${getPlayerPosition(opponents, race.distance, race.playerFinishTime)} / 3`;
   desiredCameraPosition.copy(position).addScaledVector(frame.tangent, -6.2);
   desiredCameraPosition.y += 2.8;
