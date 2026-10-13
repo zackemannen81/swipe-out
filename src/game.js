@@ -62,10 +62,10 @@ scene.add(new THREE.HemisphereLight(0x98c8ff, 0x111421, 1.8));
 const keyLight = new THREE.DirectionalLight(0xd8e8ff, 2.8);
 keyLight.position.set(-15, 28, 12);
 scene.add(keyLight);
-const cyanLight = new THREE.PointLight(0x32f4e8, 75, 46);
+const cyanLight = new THREE.PointLight(0x32f4e8, 80, 46);
 cyanLight.position.set(18, 12, 22);
 scene.add(cyanLight);
-const pinkLight = new THREE.PointLight(0xff397b, 58, 42);
+const pinkLight = new THREE.PointLight(0xff397b, 80, 42);
 pinkLight.position.set(-24, 10, -16);
 scene.add(pinkLight);
 
@@ -157,17 +157,20 @@ const cameraSystem = {
    case 'external': {
   // Kameran följer banans riktning i stället för
   // att reagera direkt på skeppets rotation.
+        const idealOffset = new THREE.Vector3(0, 3.3, -7.2).applyQuaternion(craftQuaternion);
   const forward = trackFrame.tangent.clone().normalize();
+
   const worldUp = new THREE.Vector3(0, 1, 0);
 
   const desiredPos = craftPosition.clone()
-    .addScaledVector(forward, -4.2)
-    .addScaledVector(worldUp, 4.3);
+  .add(idealOffset)
+    //.addScaledVector(forward, -2.2)
+    .addScaledVector(worldUp, 2.8);
 
   // Mjuk, tidsbaserad förflyttning mot målpositionen.
   this.position.lerp(
     desiredPos,
-    1 - Math.exp(-3.5 * delta)
+    1 - Math.exp(-3.0 * delta)
   );
 
   // Blickpunkten ligger framför skeppet längs banan.
@@ -175,24 +178,24 @@ const cameraSystem = {
   this.lookTarget.copy(craftPosition)
     .addScaledVector(forward, 10);
 
-  this.lookTarget.y += 1.0;
+  this.lookTarget.y += 0.42;
   break;
 }
 
-    case 'circle': {
-      this.orbitAngle += delta * this.orbitSpeed;
+case 'circle': {
+  this.orbitAngle += delta * this.orbitSpeed;
 
-      const offset = new THREE.Vector3(
-        Math.sin(this.orbitAngle) * 8,
-        3.5,
-        -Math.cos(this.orbitAngle) * 8
-      );
+  const offset = new THREE.Vector3(
+    Math.sin(this.orbitAngle) * 10,
+    3.2,
+    -Math.cos(this.orbitAngle) * 10
+  );
 
-      this.position.copy(craftPosition).add(offset);
-      this.lookTarget.copy(craftPosition);
-      this.lookTarget.y += 0.5;
-      break;
-  }
+  this.position.copy(craftPosition).add(offset);
+  this.lookTarget.copy(craftPosition);
+  this.lookTarget.y += 0.5;
+  break;
+}
 
     case 'static': {
       // En fast kamerastation vid sidan av banan.
@@ -217,11 +220,12 @@ const cameraSystem = {
     }
 
     camera.position.copy(this.position);
-   
+
 this.currentLook.lerp(
   this.lookTarget,
   1 - Math.exp(-3.0 * delta)
 );
+
 camera.lookAt(this.currentLook);
 
 

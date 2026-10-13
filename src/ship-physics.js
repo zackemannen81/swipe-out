@@ -45,7 +45,7 @@ export function stepShipPhysics(ship, input, dt, curve, baseSpeed = 65) {
   // Original thrust rises while held and falls off when released.
   const thrustInput = THREE.MathUtils.clamp(input.thrust ?? 0, 0, 1);
   ship.thrust = THREE.MathUtils.clamp(
-    ship.thrust + (thrustInput > 0 ? 1.75 * thrustInput : -2.1) * dt,
+    ship.thrust + (thrustInput > 0 ? 1.75 * thrustInput : -1.1) * dt,
     0,
     1,
   );
@@ -56,19 +56,19 @@ export function stepShipPhysics(ship, input, dt, curve, baseSpeed = 65) {
 
   // Angular acceleration / inertia, inspired by ship_player_update_race().
   const steer = THREE.MathUtils.clamp(input.steer ?? 0, -1, 1);
-  const turnAcceleration = 4.7 + brake * 1.8;
-  ship.yawVelocity += (steer * turnAcceleration - ship.yawVelocity * (steer === 0 ? 7.0 : 1.15)) * dt;
-  ship.yawVelocity = THREE.MathUtils.clamp(ship.yawVelocity, -2.5, 2.5);
+  const turnAcceleration = 3.7 + brake * 1.8;
+  ship.yawVelocity += (steer * turnAcceleration - ship.yawVelocity * (steer === 0 ? 7.5 : 1.15)) * dt;
+  ship.yawVelocity = THREE.MathUtils.clamp(ship.yawVelocity, -2.2, 2.2);
   ship.yaw = damp(ship.yaw, THREE.MathUtils.clamp(ship.yawVelocity * 0.15, -0.24, 0.24), 5.2, dt);
   ship.pitch = damp(ship.pitch, THREE.MathUtils.clamp(input.pitch ?? 0, -1, 1) * 0.09, 3.2, dt);
 
   // Longitudinal force balance: thrust, drag and braking. Speed is in the
   // existing SwipeOut world scale, rather than the original PS1 fixed-point scale.
-  const throttleForce = ship.thrust * 38;
+  const throttleForce = ship.thrust * 28;
   const baselineDrag = ship.speed * 0.045;
   const brakingForce = brake * 18;
   ship.speed += (throttleForce - baselineDrag - brakingForce) * dt;
-  ship.speed = THREE.MathUtils.clamp(ship.speed, 12, 120);
+  ship.speed = THREE.MathUtils.clamp(ship.speed, 12, 104);
 
   // Find the current local track frame and preserve the original jump response
   // to a sharp downward change in track tangent.
@@ -132,10 +132,10 @@ export function stepShipPhysics(ship, input, dt, curve, baseSpeed = 65) {
   // Track-relative bank and attitude damping.
   const desiredRoll = THREE.MathUtils.clamp(
     -(ship.lateralVelocity * 0.035 + ship.yawVelocity * 0.08),
-    -0.84,
-    0.84,
+    -0.34,
+    0.34,
   );
-  ship.roll = damp(ship.roll, desiredRoll, ship.airborne ? 3.0 : 6.0, dt);
+  ship.roll = damp(ship.roll, desiredRoll, ship.airborne ? 2.0 : 4.8, dt);
 
   // Progress advances with forward speed, not with steering input.
   ship.distance += ship.speed * dt;

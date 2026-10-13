@@ -77,4 +77,4 @@ export class RaceAudio {
   }
 }
 
-export const RACE_TRACK_AUDIO = '/audio/tracks/track_002.mp3';
+export const RACE_TRACK_AUDIO = '/audio/tracks/track_005.mp3';
