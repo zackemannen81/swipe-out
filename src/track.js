@@ -23,11 +23,11 @@ export function createTrack(definition = NEON_CAUSEWAY) {
     emissive: 0x06121c, emissiveIntensity: 0.7,
   });
   const cyanMaterial = new THREE.MeshStandardMaterial({
-    color: 0x58f4e8, emissive: 0x23dace, emissiveIntensity: 2.1,
+    color: 0x58f4e8, emissive: 0x23dace, emissiveIntensity: 7.1,
     metalness: 0.25, roughness: 0.32,
   });
   const pinkMaterial = new THREE.MeshStandardMaterial({
-    color: 0xff4b91, emissive: 0xd51e63, emissiveIntensity: 1.5,
+    color: 0xff4b91, emissive: 0xd51e63, emissiveIntensity: 9.5,
     metalness: 0.2, roughness: 0.36,
   });
   const darkMaterial = new THREE.MeshStandardMaterial({ color: 0x101827, metalness: 0.7, roughness: 0.38 });
