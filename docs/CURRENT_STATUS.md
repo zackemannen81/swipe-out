@@ -1,6 +1,10 @@
 # Current Status
 
-Last verified: 2026-10-10
+Last verified: 2026-10-13
+
+## Recent change — live minimap position
+
+The minimap player marker now follows the player's actual craft world position and is updated each render frame, including lateral movement from steering. The route and start marker remain derived from the active track. This is presentation-only: no physics, input, race progression, opponent, or finish logic was changed. Production build passed; interactive browser verification is still pending.
 
 ## Repository reality
 

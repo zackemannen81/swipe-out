@@ -1,4 +1,10 @@
-## 2026-10-11 — IMPLEMENT-013: closer chase camera and three-lap race
+## 2026-10-13 — minimap: live player position
+
+- Changed the minimap player marker to use the craft's current Three.js world position instead of only the route progress centerline.
+- Updated the marker every render frame after the craft pose is applied, so steering and lateral movement are reflected visually.
+- Left ship physics, race distance, controls, opponents, and finish logic unchanged.
+- `npm run build` passed; interactive browser verification remains pending.
+
 
 - Moved the chase camera from 5.2 behind / 2.45 above the craft to 3.6 behind / 1.72 above, targeting the requested roughly 30% closer framing.
 - Changed the race to three laps, with total-distance finish logic, lap HUD updates, looping player/opponent track frames, and updated start copy.
