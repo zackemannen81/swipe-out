@@ -6,12 +6,16 @@ Verified 2026-10-11 after IMPLEMENT-008. The project implements the competitive 
 - `README.md` — runtime requirements, race instructions, and project map
 - `package.json` / `package-lock.json` — npm scripts and pinned dependency graph
 - `.gitignore` — generated and local-only files excluded from version control
-- `index.html` — game canvas, start/results overlay, race HUD, and module entry
+- `vite.config.js` — multi-page Vite build entries for the race and editor
+- `index.html` — game canvas, start/results overlay, race HUD, read-only minimap, and module entry
+- `editor.html` — standalone developer track editor page
+- `src/editor.js` — draggable route editor, local save/load, copy, and JSON download
+- `src/editor.css` — responsive editor presentation
 - `public/images/backdrop_track-001.jpg` — user-provided panorama backdrop image
-- `src/game.js` — Three.js renderer/camera, panorama backdrop, input, race flow, HUD updates, placement, and render loop
+- `src/game.js` — Three.js renderer/camera, panorama backdrop, input, race flow, HUD, active track loading, and minimap updates
 - `src/opponents.js` — deterministic CPU racer definitions, movement, finish times, placement, and reset
 - `src/track.js` — procedural road/edges, guide posts, start/finish gate, and track-frame helpers
-- `src/track-data.js` — Neon Causeway 3D centerline, horizontal scale, and road width
+- `src/track-data.js` — Neon Causeway default centerline, horizontal scale, and road width
 - `src/craft.js` — procedural player/rival craft, engine accents, and glow
 - `src/audio.js` — race music playback and reusable kick/bass/mid/high/hi-hat analyser channels
 - `src/style.css` — responsive overlays, live HUD, and visual presentation

@@ -13,7 +13,11 @@ npm install
 npm run dev
 ```
 
-Open the local URL printed by Vite. Run `npm run build` for the production bundle or `npm run preview` to serve that bundle locally.
+Open the local URL printed by Vite. Run `npm run build` for the production bundle or `npm run preview` to serve that bundle locally. The developer track editor is available at `/editor.html`.
+
+## Track editor and minimap
+
+Open `/editor.html` to drag the top-down route points, edit point heights, road width, and horizontal scale. **Save to Game** stores the definition in browser `localStorage`; reloading the race reads it and rebuilds the same Three.js track. **Reset** removes the browser override. The race HUD includes a read-only minimap generated from the active track curve. This integration changes track data presentation/loading only; ship physics, input, opponents, and race flow remain in the existing gameplay path.
 
 ## Play
 

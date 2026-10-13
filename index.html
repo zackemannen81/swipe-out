@@ -14,12 +14,21 @@
       <header class="topbar">
         <a class="wordmark" href="#top" aria-label="Swipe-out home">SWIPE<span>/</span>OUT</a>
         <span class="build-tag"><i></i> 0.1 · NEON CAUSEWAY</span>
+        <a class="editor-link" href="/editor.html">TRACK EDITOR ↗</a>
       </header>
       <section class="race-hud" aria-label="Race information">
         <div><span class="hud-label">TIME</span><strong id="race-time">00:00.00</strong></div>
         <div><span class="hud-label">LAP</span><strong id="race-lap">01 / 03</strong></div>
         <div><span class="hud-label">POSITION</span><strong id="race-position">1 / 3</strong></div>
         <div class="hud-speed"><span class="hud-label">VELOCITY</span><strong id="race-speed">AUTO · READY</strong></div>
+      </section>
+      <section class="minimap" aria-label="Read-only track minimap">
+        <div class="minimap-heading"><span>COURSE MAP</span><b>LIVE</b></div>
+        <svg id="minimap-svg" viewBox="0 0 100 100" role="img" aria-label="Top-down course map">
+          <polyline id="minimap-route" points="" />
+          <circle id="minimap-start" cx="0" cy="0" r="2" />
+          <circle id="minimap-player" cx="0" cy="0" r="3" />
+        </svg>
       </section>
       <section class="screen-card start-card" id="start-screen" aria-labelledby="headline" aria-describedby="start-copy">
         <p class="eyebrow"><span>01</span> &nbsp; NEON CAUSEWAY</p>
