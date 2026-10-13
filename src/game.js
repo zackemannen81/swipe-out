@@ -103,15 +103,13 @@ function setupMinimap() {
   minimapPlayer.dataset.mapBounds = JSON.stringify({ minX, maxX, minZ, maxZ, scale });
 }
 
-function updateMinimap(progress) {
-  const frame = getTrackFrame(curve, progress);
+function updateMinimap(position) {
   const { minX, maxX, minZ, maxZ, scale } = JSON.parse(minimapPlayer.dataset.mapBounds);
-  minimapPlayer.setAttribute('cx', 50 + (frame.center.x - (minX + maxX) / 2) * scale);
-  minimapPlayer.setAttribute('cy', 50 + (frame.center.z - (minZ + maxZ) / 2) * scale);
+  minimapPlayer.setAttribute('cx', 50 + (position.x - (minX + maxX) / 2) * scale);
+  minimapPlayer.setAttribute('cy', 50 + (position.z - (minZ + maxZ) / 2) * scale);
 }
 
 setupMinimap();
-updateMinimap(0);
 const { group: craft, engineMaterials, thrusterMaterials, thrusters, glow } = createCraft();
 scene.add(craft);
 
@@ -500,6 +498,7 @@ function render() {
     updateCraftPose(0);
   }
 
+  updateMinimap(craft.position);
   const trackFrame = getTrackFrame(curve, race.distance / curve.getLength());
 
   if (race.state === 'racing') {
