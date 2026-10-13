@@ -6,6 +6,7 @@ import { RaceAudio, RACE_TRACK_AUDIO } from './audio.js';
 import './style.css';
 import { createCraft, loadCraftModel } from './craft.js';
 import { createTrack, getTrackFrame } from './track.js';
+import { createShipPhysics, stepShipPhysics } from './ship-physics.js';
 import { createOpponents, getPlayerPosition, resetOpponents, updateOpponents } from './opponents.js';
 
 const canvas = document.querySelector('#game-canvas');
@@ -72,6 +73,7 @@ const { group: track, curve } = createTrack();
 scene.add(track);
 const { group: craft, engineMaterials, thrusterMaterials, thrusters, glow } = createCraft();
 scene.add(craft);
+
 const speedTrails = [-1, 1].map((side) => {
   const material = new THREE.MeshBasicMaterial({
     color: side < 0 ? 0xff4388 : 0x5cf5ec,
@@ -87,6 +89,7 @@ const speedTrails = [-1, 1].map((side) => {
   craft.add(trail);
   return trail;
 });
+
 loadCraftModel({ group: craft })
   .catch((error) => console.warn('Unable to load racer model; using procedural craft.', error));
 const opponents = createOpponents();
@@ -94,14 +97,158 @@ for (const opponent of opponents) scene.add(opponent.group);
 
 const clock = new THREE.Clock();
 const raceAudio = new RaceAudio(RACE_TRACK_AUDIO);
-const cameraLook = new THREE.Vector3();
-const desiredCameraPosition = new THREE.Vector3();
-const lookTarget = new THREE.Vector3();
+
+// --- KAMERASYSTEM INTEGRATION (Vänd 180 grader för att titta framåt) ---
+const cameraSystem = {
+  previousMode: 'external',
+  modeTimer: 0,
+  orbitAngle: 0,
+  orbitSpeed: 0.55,
+  mode: 'external', // 'external' (chase-vy bakifrån) eller 'internal' (cockpit-vy)
+  position: new THREE.Vector3(),
+  velocity: new THREE.Vector3(),
+  lastPosition: new THREE.Vector3(),
+  lookTarget: new THREE.Vector3(),
+  currentLook: new THREE.Vector3(),
+  shakeTimer: 0,
+  shakeIntensity: 0.25,
+
+  setShake(duration) {
+    this.shakeTimer = duration;
+  },
+
+  update(craftPosition, craftQuaternion, craftVelocity, delta, trackFrame) {
+    this.lastPosition.copy(this.position);
+
+    switch (this.mode) {
+    case 'internal':
+    {  
+    // Cockpit-vy
+      const cockpitOffset = new THREE.Vector3(0, 0.4, 0.2);
+      this.position.copy(craftPosition).add(cockpitOffset.applyQuaternion(craftQuaternion));
+      
+      const forwardDir = new THREE.Vector3(0, 0, 1).applyQuaternion(craftQuaternion);
+      this.lookTarget.copy(this.position).add(forwardDir.multiplyScalar(10));
+      break;
+    }
+ /*   case 'external':
+      {
+      // Extern / Chase-vy (Vänd 180 grader: Z är nu positivt bakåt, så kameran hamnar bakom skeppet)
+      const idealOffset = new THREE.Vector3(0, 3.3, -11.2).applyQuaternion(craftQuaternion);
+      const desiredPos = craftPosition.clone().add(idealOffset);
+
+      // Tröghet och studs
+      const displacement = desiredPos.clone().sub(this.position);
+      this.velocity.addScaledVector(displacement, delta * 15.0);
+      this.velocity.multiplyScalar(Math.max(0, 1 - delta * 8.0));
+      this.position.addScaledVector(this.velocity, delta * 30.0);
+
+      this.position.lerp(desiredPos, 1 - Math.exp(-4.5 * delta));
+
+      // Titta framåt i skeppets riktning istället för bakåt
+      const forwardDir = new THREE.Vector3(0, 0, 1).applyQuaternion(craftQuaternion);
+      this.lookTarget.copy(craftPosition).add(forwardDir.multiplyScalar(12));
+  
+  this.lookTarget.y += 0.3;
+  break;
+
+    };*/
+        
+   case 'external': {
+  // Kameran följer banans riktning i stället för
+  // att reagera direkt på skeppets rotation.
+  const forward = trackFrame.tangent.clone().normalize();
+  const worldUp = new THREE.Vector3(0, 1, 0);
+
+  const desiredPos = craftPosition.clone()
+    .addScaledVector(forward, -4.2)
+    .addScaledVector(worldUp, 4.3);
+
+  // Mjuk, tidsbaserad förflyttning mot målpositionen.
+  this.position.lerp(
+    desiredPos,
+    1 - Math.exp(-3.5 * delta)
+  );
+
+  // Blickpunkten ligger framför skeppet längs banan.
+  
+  this.lookTarget.copy(craftPosition)
+    .addScaledVector(forward, 10);
+
+  this.lookTarget.y += 1.0;
+  break;
+}
+
+    case 'circle': {
+      this.orbitAngle += delta * this.orbitSpeed;
+
+      const offset = new THREE.Vector3(
+        Math.sin(this.orbitAngle) * 8,
+        3.5,
+        -Math.cos(this.orbitAngle) * 8
+      );
+
+      this.position.copy(craftPosition).add(offset);
+      this.lookTarget.copy(craftPosition);
+      this.lookTarget.y += 0.5;
+      break;
+  }
+
+    case 'static': {
+      // En fast kamerastation vid sidan av banan.
+    // trackFrame.center förutsätter att trackFrame skickas in.
+      const side = trackFrame?.right ?? new THREE.Vector3(1, 0, 0);
+
+    this.position.copy(trackFrame.center)
+        .addScaledVector(side, 7)
+        .add(new THREE.Vector3(0, 2.5, 0));
+
+      this.lookTarget.copy(craftPosition);
+      this.lookTarget.y += 0.3;
+      break;
+    }
+  }
+
+    if (this.shakeTimer > 0) {
+      this.shakeTimer -= delta;
+      const s = this.shakeIntensity * Math.max(0, this.shakeTimer);
+      this.position.x += (Math.random() - 0.5) * s;
+      this.position.y += (Math.random() - 0.5) * s;
+    }
+
+    camera.position.copy(this.position);
+   
+this.currentLook.lerp(
+  this.lookTarget,
+  1 - Math.exp(-3.0 * delta)
+);
+camera.lookAt(this.currentLook);
+
+
+  },
+
+  toggleMode() {
+    this.mode = this.mode === 'external' ? 'internal' : 'external';
+  },
+  cycleMode() {
+  const modes = ['external', 'internal', 'circle', 'static'];
+  const index = modes.indexOf(this.mode);
+  this.mode = modes[(index + 1) % modes.length];
+
+  // Undvik att kameran drar med sig hastighet från föregående läge.
+  this.velocity.set(0, 0, 0);
+  this.orbitAngle = 0;
+  }
+};
+
 const drag = { active: false, lastX: 0, pointerId: null, throttle: 0 };
+const heldKeys = new Set();
+const shipPhysics = createShipPhysics(65);
 const race = {
   state: 'ready', distance: 0, elapsed: 0, steering: 0, targetSteering: 0, drift: 0,
-  currentSpeed: 65, throttleTarget: 0, keyboardThrottle: 0, playerFinishTime: null,
+  lateralVelocity: 0, roll: 0, currentSpeed: 65, throttleTarget: 0, keyboardThrottle: 0, playerFinishTime: null,
   airborne: false, airWorldY: 0, airVelocity: 0, previousSlope: 0, jumpCooldown: 0,
+  crashTimer: 0, crashCooldown: 0,
 };
 const baseSpeed = 65;
 const totalLaps = 3;
@@ -120,49 +267,40 @@ function setScreen(screen, visible) {
 }
 
 function updateCraftPose(delta = 0) {
-  const progress = race.distance / curve.getLength();
-  const frame = getTrackFrame(curve, progress);
-  const slope = frame.tangent.y;
-  const slopeChange = (slope - race.previousSlope) / Math.max(delta, 1 / 120);
-  race.previousSlope = slope;
-  race.jumpCooldown = Math.max(0, race.jumpCooldown - delta);
+  const input = {
+    steer: race.steering,
+    thrust: Math.max(0, race.throttleTarget),
+    brakeLeft: heldKeys.has('q') || race.throttleTarget < -0.1,
+    brakeRight: heldKeys.has('e') || race.throttleTarget < -0.1,
+    pitch: (heldKeys.has('r') ? 1 : 0) - (heldKeys.has('f') ? 1 : 0),
+  };
+  const pose = race.state === 'racing' && delta > 0
+    ? stepShipPhysics(shipPhysics, input, delta, curve, baseSpeed)
+    : stepShipPhysics(shipPhysics, input, 0, curve, baseSpeed);
 
-  if (race.state === 'racing' && !race.airborne && race.jumpCooldown === 0 && slopeChange < -0.18) {
-    race.airborne = true;
-    race.airVelocity = THREE.MathUtils.clamp(-slopeChange * 20, 3.5, 8);
-    race.jumpCooldown = 0.55;
-  }
-  if (race.airborne) {
-    race.airVelocity -= 6.4 * delta;
-    race.airWorldY += race.airVelocity * delta;
-    if (race.airWorldY <= 0) {
-      race.airWorldY = 0;
-      race.airVelocity = 0;
-      race.airborne = false;
-    }
-  }
-
-  race.drift = THREE.MathUtils.damp(
-    race.drift,
-    race.targetSteering * (race.airborne ? 0.34 : 0.16),
-    race.airborne ? 1.25 : 2.4,
-    delta,
-  );
-  const position = frame.center.clone()
-    .addScaledVector(frame.right, THREE.MathUtils.clamp(race.steering + race.drift, -3.7, 3.7))
-    .addScaledVector(frame.normal, 0.62 + race.airWorldY);
-  craft.position.copy(position);
-  craft.quaternion.copy(frame.rotation);
-  craft.rotateZ(-THREE.MathUtils.clamp(race.targetSteering - race.steering, -0.7, 0.7) * 0.16);
-  return { frame, position };
+  race.distance = shipPhysics.distance;
+  race.currentSpeed = shipPhysics.speed;
+  race.lateralVelocity = shipPhysics.lateralVelocity;
+  race.airborne = shipPhysics.airborne;
+  race.airWorldY = shipPhysics.verticalOffset;
+  race.roll = shipPhysics.roll;
+  race.crashTimer = shipPhysics.crashTimer;
+  craft.position.copy(pose.position);
+  craft.quaternion.copy(pose.orientation);
+  return pose;
 }
 
 function beginRace() {
   raceAudio.play().catch((error) => console.warn('Unable to start race music.', error));
   race.state = 'racing';
+  Object.assign(shipPhysics, createShipPhysics(baseSpeed));
+  shipPhysics.previousSlope = getTrackFrame(curve, 0).tangent.y;
   race.distance = 0;
   race.elapsed = 0;
   race.steering = 0;
+  race.targetSteering = 0;
+  race.lateralVelocity = 0;
+  race.roll = 0;
   race.drift = 0;
   race.currentSpeed = baseSpeed;
   race.throttleTarget = 0;
@@ -174,6 +312,9 @@ function beginRace() {
   race.airVelocity = 0;
   race.previousSlope = getTrackFrame(curve, 0).tangent.y;
   race.jumpCooldown = 0;
+  race.crashTimer = 0;
+  race.crashCooldown = 0;
+  heldKeys.clear();
   drag.active = false;
   drag.throttle = 0;
   timerDisplay.textContent = '00:00.00';
@@ -219,9 +360,9 @@ canvas.addEventListener('pointermove', (event) => {
   drag.lastX = event.clientX;
   drag.throttle = getVerticalThrottle(event.clientY);
   race.targetSteering = THREE.MathUtils.clamp(
-    race.targetSteering + (delta / Math.max(viewportWidth, 1)) * 15,
-    -3.15,
-    3.15,
+    race.targetSteering + (delta / Math.max(viewportWidth, 1)) * 5.5,
+    -1,
+    1,
   );
 });
 function releasePointer(event) {
@@ -236,22 +377,39 @@ canvas.addEventListener('pointercancel', releasePointer);
 canvas.addEventListener('lostpointercapture', releasePointer);
 
 window.addEventListener('keydown', (event) => {
-  if (race.state !== 'racing') return;
-  if (['ArrowUp', 'ArrowDown', 'w', 's', 'W', 'S'].includes(event.key)) {
-    event.preventDefault();
-    race.keyboardThrottle = event.key === 'ArrowUp' || event.key.toLowerCase() === 'w' ? 1 : -1;
+  const key = event.key.toLowerCase();
+  
+  // Växla kameraläge med 'v'
+  if (key === 'v') {
+    cameraSystem.toggleMode();
     return;
   }
-  if (!['ArrowLeft', 'ArrowRight', 'a', 'd', 'A', 'D'].includes(event.key)) return;
-  event.preventDefault();
-  const direction = event.key === 'ArrowLeft' || event.key.toLowerCase() === 'a' ? -1 : 1;
-  race.targetSteering = THREE.MathUtils.clamp(race.targetSteering + direction * 0.52, -3.15, 3.15);
+  if (key === 'c') {
+  cameraSystem.cycleMode();
+  }
+
+  if (race.state !== 'racing') return;
+  if (['arrowup', 'w', 'arrowdown', 's', 'arrowleft', 'arrowright', 'a', 'd', 'q', 'e', 'r', 'f'].includes(key)) {
+    event.preventDefault();
+  }
+  heldKeys.add(key);
+  if (key === 'arrowup' || key === 'w') race.keyboardThrottle = 1;
+  if (key === 'arrowdown' || key === 's') race.keyboardThrottle = -1;
+  if (key === 'arrowleft' || key === 'a') race.targetSteering = 1;
+  if (key === 'arrowright' || key === 'd') race.targetSteering = -1;
 });
 window.addEventListener('keyup', (event) => {
-  if (['ArrowLeft', 'ArrowRight', 'a', 'd', 'A', 'D'].includes(event.key)) race.targetSteering = 0;
-  if (['ArrowUp', 'ArrowDown', 'w', 's', 'W', 'S'].includes(event.key)) race.keyboardThrottle = 0;
+  const key = event.key.toLowerCase();
+  heldKeys.delete(key);
+  if (['arrowup', 'w', 'arrowdown', 's'].includes(key)) race.keyboardThrottle = 0;
+  if (['arrowleft', 'a', 'arrowright', 'd'].includes(key)) {
+    const left = heldKeys.has('arrowleft') || heldKeys.has('a');
+    const right = heldKeys.has('arrowright') || heldKeys.has('d');
+    race.targetSteering = left === right ? 0 : left ? -1 : 1;
+  }
 });
 window.addEventListener('blur', () => {
+  heldKeys.clear();
   drag.active = false;
   drag.throttle = 0;
   race.keyboardThrottle = 0;
@@ -279,10 +437,13 @@ function render() {
     race.elapsed += delta;
     raceAudio.update(delta);
     race.throttleTarget = drag.active ? drag.throttle : race.keyboardThrottle;
-    const speedTarget = baseSpeed * (1 + race.throttleTarget * 0.3);
-    race.currentSpeed = THREE.MathUtils.damp(race.currentSpeed, speedTarget, 2.8, delta);
-    race.distance += race.currentSpeed * delta;
-    race.steering = THREE.MathUtils.damp(race.steering, race.targetSteering, race.airborne ? 4.8 : 7.5, delta);
+    race.steering = THREE.MathUtils.damp(
+      race.steering,
+      race.targetSteering,
+      race.airborne ? 2.7 : 4.8,
+      delta,
+    );
+    updateCraftPose(delta);
     const completedLaps = Math.floor(race.distance / curve.getLength());
     const currentLap = Math.min(completedLaps + 1, totalLaps);
     const lapProgress = race.distance / curve.getLength() - completedLaps;
@@ -291,9 +452,11 @@ function render() {
     crossedFinish = race.distance >= curve.getLength() * totalLaps;
   } else {
     race.steering = THREE.MathUtils.damp(race.steering, race.targetSteering, 7.5, delta);
+    updateCraftPose(0);
   }
 
-  const { frame, position } = updateCraftPose(delta);
+  const trackFrame = getTrackFrame(curve, race.distance / curve.getLength());
+
   if (race.state === 'racing') {
     updateOpponents(opponents, curve, delta, race.elapsed, true);
   } else {
@@ -301,13 +464,15 @@ function render() {
   }
   if (crossedFinish) finishRace();
   positionDisplay.textContent = `${getPlayerPosition(opponents, race.distance, race.playerFinishTime)} / 3`;
-  desiredCameraPosition.copy(position).addScaledVector(frame.tangent, -3.6);
-  desiredCameraPosition.y += 1.72;
-  camera.position.lerp(desiredCameraPosition, 1 - Math.exp(-3.6 * delta));
-  lookTarget.copy(position).addScaledVector(frame.tangent, 9);
-  lookTarget.y += 0.25;
-  cameraLook.lerp(lookTarget, 1 - Math.exp(-4.8 * delta));
-  camera.lookAt(cameraLook);
+
+  // Aktivera kameraskakning om skeppet kraschar
+  if (race.crashTimer > 0) {
+    cameraSystem.setShake(0.3);
+  }
+
+  // Kör det nya integrerade kamerapasset
+  cameraSystem.update(craft.position, craft.quaternion, shipPhysics.velocity, delta, trackFrame);
+  
   panoramaBackdrop.position.copy(camera.position);
 
   const kick = race.state === 'racing' ? raceAudio.channels.kick : { hitValue: 0 };
