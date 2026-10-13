@@ -23,8 +23,18 @@ button { font: inherit; }
 .wordmark { color: #f4f6ff; text-decoration: none; font: 800 20px/1 'Barlow Condensed', sans-serif; letter-spacing: .15em; }
 .wordmark span { color: var(--cyan); padding: 0 2px; }
 .build-tag, .eyebrow, .footer-bar, .hud-label, .control-hint, .result-label { font: 10px/1.5 'DM Mono', monospace; letter-spacing: .15em; }
-.build-tag { display: flex; align-items: center; gap: 10px; color: #d0d4e2; }
+.build-tag, .editor-link { color: #d0d4e2; font: 9px 'DM Mono', monospace; letter-spacing: .09em; }
+.editor-link { text-decoration: none; }
+.editor-link:hover { color: var(--cyan); }
+.build-tag { display: flex; align-items: center; gap: 10px; }
 .build-tag i, .footer-center i { width: 6px; height: 6px; border-radius: 50%; background: var(--cyan); box-shadow: 0 0 12px var(--cyan); }
+.minimap { position: absolute; z-index: 2; top: 92px; right: 5.4vw; width: 142px; padding: 10px; border: 1px solid rgba(137, 222, 228, .16); border-radius: 3px; background: rgba(8, 13, 24, .68); backdrop-filter: blur(12px); }
+.minimap-heading { display: flex; justify-content: space-between; color: #8c9ba9; font: 8px 'DM Mono', monospace; letter-spacing: .12em; }
+.minimap-heading b { color: var(--cyan); font-weight: 400; }
+#minimap-svg { display: block; width: 100%; margin-top: 6px; overflow: visible; }
+#minimap-route { fill: none; stroke: rgba(102, 243, 237, .72); stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+#minimap-start { fill: #ff4b91; }
+#minimap-player { fill: #fff; stroke: var(--cyan); stroke-width: 1; }
 .race-hud { position: absolute; z-index: 2; top: 92px; left: 5.4vw; display: flex; gap: clamp(22px, 4.2vw, 64px); align-items: flex-start; padding: 15px 19px; border: 1px solid rgba(137, 222, 228, .16); border-radius: 3px; background: rgba(8, 13, 24, .68); backdrop-filter: blur(12px); }
 .race-hud div { display: grid; gap: 5px; }
 .hud-label { color: #8c9ba9; font-size: 8px; }
@@ -53,7 +63,9 @@ h2 { font-size: clamp(55px, 6.6vw, 82px); }
 @media (max-width: 700px) {
   .topbar { padding: 22px 21px; }
   .wordmark { font-size: 18px; }
+  .editor-link { font-size: 8px; }
   .build-tag { font-size: 8px; letter-spacing: .09em; }
+  .minimap { top: 132px; right: 21px; width: 112px; }
   .race-hud { top: 76px; left: 21px; gap: 12px; padding: 10px; }
   .race-hud strong { font-size: 11px; }
   .race-hud .hud-speed strong { font-size: 8px; }

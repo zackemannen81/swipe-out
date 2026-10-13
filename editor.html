@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#08101a" />
+    <title>Swipe-out — Track Editor</title>
+  </head>
+  <body>
+    <main class="editor-shell">
+      <header class="editor-header">
+        <div>
+          <p class="eyebrow">DEV TOOL / TRACK AUTHORING</p>
+          <h1>NEON <span>CAUSEWAY</span></h1>
+        </div>
+        <a href="/" class="game-link">BACK TO RACE ↗</a>
+      </header>
+      <section class="editor-layout">
+        <div class="canvas-panel">
+          <div class="panel-heading"><span>TOP-DOWN ROUTE PREVIEW</span><b id="point-count">33 POINTS</b></div>
+          <canvas id="editor-canvas" aria-label="Draggable top-down track route"></canvas>
+          <p class="canvas-help">DRAG POINTS TO SHAPE THE TRACK · SELECT A POINT TO EDIT ITS HEIGHT</p>
+        </div>
+        <aside class="controls-panel">
+          <div class="panel-heading"><span>TRACK SETTINGS</span><b id="save-state">SAVED</b></div>
+          <label>ROAD WIDTH <output id="width-value">10.00</output><input id="width-input" type="range" min="4" max="24" step="0.25" /></label>
+          <label>HORIZONTAL SCALE <output id="scale-value">3.25</output><input id="scale-input" type="range" min="0.5" max="8" step="0.05" /></label>
+          <div class="point-editor">
+            <div class="subheading">SELECTED POINT <b id="selected-point">—</b></div>
+            <label>X <input id="point-x" type="number" step="1" /></label>
+            <label>HEIGHT <input id="point-y" type="number" step="1" /></label>
+            <label>Z <input id="point-z" type="number" step="1" /></label>
+          </div>
+          <div class="button-row"><button id="save-button" class="primary">SAVE TO GAME</button><button id="reset-button">RESET</button></div>
+          <div class="button-row"><button id="copy-button">COPY JSON</button><button id="download-button">DOWNLOAD</button></div>
+          <p class="status" id="status" role="status">Changes are local to this browser. Reload the race to preview them.</p>
+        </aside>
+      </section>
+      <footer>LOCAL DEV TOOL <span>·</span> EDITOR DATA IS STORED IN LOCAL STORAGE</footer>
+    </main>
+    <script type="module" src="/src/editor.js"></script>
+  </body>
+</html>

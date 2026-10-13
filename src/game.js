@@ -6,6 +6,7 @@ import { RaceAudio, RACE_TRACK_AUDIO } from './audio.js';
 import './style.css';
 import { createCraft, loadCraftModel } from './craft.js';
 import { createTrack, getTrackFrame } from './track.js';
+import { NEON_CAUSEWAY } from './track-data.js';
 import { createShipPhysics, stepShipPhysics } from './ship-physics.js';
 import { createOpponents, getPlayerPosition, resetOpponents, updateOpponents } from './opponents.js';
 
@@ -20,6 +21,9 @@ const lapDisplay = document.querySelector('#race-lap');
 const positionDisplay = document.querySelector('#race-position');
 const resultPositionDisplay = document.querySelector('#result-position');
 const speedDisplay = document.querySelector('#race-speed');
+const minimapRoute = document.querySelector('#minimap-route');
+const minimapStart = document.querySelector('#minimap-start');
+const minimapPlayer = document.querySelector('#minimap-player');
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x080d18);
 scene.fog = new THREE.FogExp2(0x080d18, 0.0065);
@@ -69,8 +73,45 @@ const pinkLight = new THREE.PointLight(0xff397b, 80, 42);
 pinkLight.position.set(-24, 10, -16);
 scene.add(pinkLight);
 
-const { group: track, curve } = createTrack();
+const savedTrack = (() => {
+  try {
+    const value = JSON.parse(localStorage.getItem('swipe-out-track-definition'));
+    return value?.centerline?.length >= 4 ? value : NEON_CAUSEWAY;
+  } catch (error) {
+    console.warn('Unable to load saved track definition.', error);
+    return NEON_CAUSEWAY;
+  }
+})();
+const { group: track, curve } = createTrack(savedTrack);
 scene.add(track);
+
+function setupMinimap() {
+  const samples = 160;
+  const points = Array.from({ length: samples }, (_, index) => {
+    const frame = getTrackFrame(curve, index / samples);
+    return { x: frame.center.x, z: frame.center.z };
+  });
+  const minX = Math.min(...points.map(({ x }) => x));
+  const maxX = Math.max(...points.map(({ x }) => x));
+  const minZ = Math.min(...points.map(({ z }) => z));
+  const maxZ = Math.max(...points.map(({ z }) => z));
+  const scale = Math.min(84 / Math.max(maxX - minX, 1), 84 / Math.max(maxZ - minZ, 1));
+  const toMapPoint = ({ x, z }) => `${50 + (x - (minX + maxX) / 2) * scale},${50 + (z - (minZ + maxZ) / 2) * scale}`;
+  minimapRoute.setAttribute('points', points.map(toMapPoint).join(' '));
+  minimapStart.setAttribute('cx', 50 + (points[0].x - (minX + maxX) / 2) * scale);
+  minimapStart.setAttribute('cy', 50 + (points[0].z - (minZ + maxZ) / 2) * scale);
+  minimapPlayer.dataset.mapBounds = JSON.stringify({ minX, maxX, minZ, maxZ, scale });
+}
+
+function updateMinimap(progress) {
+  const frame = getTrackFrame(curve, progress);
+  const { minX, maxX, minZ, maxZ, scale } = JSON.parse(minimapPlayer.dataset.mapBounds);
+  minimapPlayer.setAttribute('cx', 50 + (frame.center.x - (minX + maxX) / 2) * scale);
+  minimapPlayer.setAttribute('cy', 50 + (frame.center.z - (minZ + maxZ) / 2) * scale);
+}
+
+setupMinimap();
+updateMinimap(0);
 const { group: craft, engineMaterials, thrusterMaterials, thrusters, glow } = createCraft();
 scene.add(craft);
 
