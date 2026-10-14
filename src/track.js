@@ -106,7 +106,7 @@ export function createTrack(definition = NEON_CAUSEWAY) {
   addInstances(group, railLightGeometry, cyanMaterial, cyanRailTransforms);
 
   // Directional chevrons sit just above the road and point into the flow of the course.
-  const arrowGeometry = new THREE.BoxGeometry(0.1, 0.06, 0.86);
+  const arrowGeometry = new THREE.BoxGeometry(0.5, 0.06, 0.86);
   const pinkArrowTransforms = [];
   const cyanArrowTransforms = [];
   for (let distance = 10; distance < curve.getLength(); distance += 22) {
@@ -118,15 +118,15 @@ export function createTrack(definition = NEON_CAUSEWAY) {
     for (const angle of [-0.62, 0.62]) {
       const position = basePosition.clone().addScaledVector(frame.right, angle * 0.48);
       const quaternion = frame.rotation.clone();
-      quaternion.multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), angle));
+      quaternion.multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), -angle));
       (side < 0 ? pinkArrowTransforms : cyanArrowTransforms).push({ position, quaternion });
     }
   }
   addInstances(group, arrowGeometry, pinkMaterial, pinkArrowTransforms);
   addInstances(group, arrowGeometry, cyanMaterial, cyanArrowTransforms);
 
-  const laneMaterial = new THREE.MeshBasicMaterial({ color: 0x6f899f, transparent: true, opacity: 0.46 });
-  const dash = new THREE.BoxGeometry(0.065, 0.035, 1.05);
+  const laneMaterial = new THREE.MeshBasicMaterial({ color: 0x1f999f, transparent: true, opacity: 0.05 });
+  const dash = new THREE.BoxGeometry(3.565, 0.035, 5.05);
   const markerTransforms = [];
   for (let distance = 4.5; distance < curve.getLength(); distance += 9) {
     const frame = getTrackFrame(curve, distance / curve.getLength());

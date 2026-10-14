@@ -2,11 +2,11 @@ import * as THREE from 'three';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
-import { RaceAudio, RACE_TRACK_AUDIO } from './audio.js';
+import { RaceAudio } from './audio.js';
 import './style.css';
 import { createCraft, loadCraftModel } from './craft.js';
 import { createTrack, getTrackFrame } from './track.js';
-import { NEON_CAUSEWAY } from './track-data.js';
+import { NEON_CAUSEWAY, SYNTHETIC_DREAMS, DIGITAL_HORIZON } from './track-data.js';
 import { createShipPhysics, stepShipPhysics } from './ship-physics.js';
 import { createOpponents, getPlayerPosition, resetOpponents, updateOpponents } from './opponents.js';
 
@@ -25,8 +25,18 @@ const minimapRoute = document.querySelector('#minimap-route');
 const minimapStart = document.querySelector('#minimap-start');
 const minimapPlayer = document.querySelector('#minimap-player');
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x080d18);
-scene.fog = new THREE.FogExp2(0x080d18, 0.0065);
+scene.background = new THREE.Color(0x080c0a);
+scene.fog = new THREE.FogExp2(0x080d18, 0.00065);
+
+const TRACK_CONFIG = {
+  'track1': { name: 'Neon Causeway', data: NEON_CAUSEWAY, defaultAudio: '/audio/tracks/track_001.mp3' },
+  'track2': { name: 'Synthetic Dreams', data: SYNTHETIC_DREAMS, defaultAudio: '/audio/tracks/track_003.mp3' },
+  'track3': { name: 'Digital Horizon', data: DIGITAL_HORIZON, defaultAudio: '/audio/tracks/track_006.mp3' }
+};
+
+let currentTrackId = 'track1'; 
+// Ändra din raceAudio till att vara en let istället för const så vi kan byta ut den
+let raceAudio = new RaceAudio(TRACK_CONFIG[currentTrackId].defaultAudio);
 
 const panoramaTexture = new THREE.TextureLoader().load(
   '/images/backdrop_track-001.jpg',
@@ -39,13 +49,13 @@ const panoramaTexture = new THREE.TextureLoader().load(
 );
 panoramaTexture.colorSpace = THREE.SRGBColorSpace;
 const panoramaBackdrop = new THREE.Mesh(
-  new THREE.CylinderGeometry(190, 190, 380, 96, 1, true),
+  new THREE.CylinderGeometry(196, 196, 376, 128, 4, true),
   new THREE.MeshBasicMaterial({
     map: panoramaTexture,
     side: THREE.BackSide,
     depthWrite: false,
     depthTest: false,
-    fog: false,
+    fog: true,
   }),
 );
 panoramaBackdrop.renderOrder = -10;
@@ -135,7 +145,7 @@ const opponents = createOpponents();
 for (const opponent of opponents) scene.add(opponent.group);
 
 const clock = new THREE.Clock();
-const raceAudio = new RaceAudio(RACE_TRACK_AUDIO);
+//const raceAudio = new RaceAudio(RACE_TRACK_AUDIO);
 
 // --- KAMERASYSTEM INTEGRATION (Vänd 180 grader för att titta framåt) ---
 const cameraSystem = {
@@ -196,7 +206,11 @@ const cameraSystem = {
    case 'external': {
   // Kameran följer banans riktning i stället för
   // att reagera direkt på skeppets rotation.
-        const idealOffset = new THREE.Vector3(0, 3.3, -7.2).applyQuaternion(craftQuaternion);
+        const speedBlend = THREE.MathUtils.clamp((race.currentSpeed - baseSpeed) / (104 - baseSpeed), 0, 1);
+  // Pull the chase camera 25% closer as the ship approaches maximum speed.
+  const chaseDistance = THREE.MathUtils.lerp(6.2, 5.4, speedBlend);
+  const chaseHeight = THREE.MathUtils.lerp(3.3, 2.8, speedBlend);
+  const idealOffset = new THREE.Vector3(0, chaseHeight, -chaseDistance).applyQuaternion(craftQuaternion);
   const forward = trackFrame.tangent.clone().normalize();
 
   const worldUp = new THREE.Vector3(0, 1, 0);
@@ -209,15 +223,15 @@ const cameraSystem = {
   // Mjuk, tidsbaserad förflyttning mot målpositionen.
   this.position.lerp(
     desiredPos,
-    1 - Math.exp(-3.0 * delta)
+    1 - Math.exp(-3.8 * delta)
   );
 
   // Blickpunkten ligger framför skeppet längs banan.
   
   this.lookTarget.copy(craftPosition)
-    .addScaledVector(forward, 10);
+    .addScaledVector(forward, 9);
 
-  this.lookTarget.y += 0.42;
+  this.lookTarget.y += 3.8;
   break;
 }
 
@@ -246,7 +260,6 @@ case 'circle': {
         .add(new THREE.Vector3(0, 2.5, 0));
 
       this.lookTarget.copy(craftPosition);
-      this.lookTarget.y += 0.3;
       break;
     }
   }
@@ -260,10 +273,11 @@ case 'circle': {
 
     camera.position.copy(this.position);
 
-this.currentLook.lerp(
-  this.lookTarget,
-  1 - Math.exp(-3.0 * delta)
-);
+if (this.mode === 'circle' || this.mode === 'static') {
+  this.currentLook.copy(this.lookTarget); // Titta direkt på skeppet
+} else {
+  this.currentLook.lerp(this.lookTarget, 1 - Math.exp(-3.0 * delta)); // Behåll mjukheten i andra lägen
+}
 
 camera.lookAt(this.currentLook);
 

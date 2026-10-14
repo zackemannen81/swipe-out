@@ -21,12 +21,16 @@ const RACER_DEFINITIONS = [
 
 export function createOpponents() {
   return RACER_DEFINITIONS.map((definition) => {
-    const craft = createCraft({ ...definition, showGlow: false });
+    const craft = createCraft({ ...definition, showGlow: true });
     loadCraftModel({ group: craft.group }, definition.modelUrl)
       .catch((error) => console.warn(`Unable to load ${definition.name} racer model; using procedural craft.`, error));
     return {
       ...definition,
       group: craft.group,
+      engineMaterials: craft.engineMaterials ?? [],
+      thrusterMaterials: craft.thrusterMaterials ?? [],
+      thrusters: craft.thrusters ?? [],
+      glow: craft.glow ?? null,
       distance: 0,
       finishTime: null,
     };
@@ -59,6 +63,26 @@ export function updateOpponents(opponents, curve, delta, elapsed, racing) {
       .addScaledVector(frame.normal, 0.62);
     opponent.group.quaternion.copy(frame.rotation);
     opponent.group.rotateZ(-laneMotion * 0.045);
+
+    // Give each CPU racer its own animated engine glow and exhaust.
+    const pulse = 0.82 + Math.sin(elapsed * 19 + opponent.phase) * 0.16;
+    for (const material of opponent.engineMaterials) {
+      material.color.setHex(opponent.accentColor);
+      material.emissive?.setHex(opponent.accentColor);
+    }
+    const enginePower = racing ? 0.9 + Math.sin(elapsed * 27 + opponent.phase) * 0.22 : 0.25;
+    opponent.thrusters.forEach((thruster, index) => {
+      thruster.visible = true;
+      thruster.scale.set(
+        0.82 + enginePower * 0.22,
+        enginePower * (1 + Math.sin(elapsed * 31 + index * 2.1 + opponent.phase) * 0.1),
+        0.82 + enginePower * 0.22,
+      );
+    });
+    opponent.thrusterMaterials.forEach((material) => {
+      material.opacity = racing ? THREE.MathUtils.clamp(0.42 + enginePower * 0.18, 0.42, 0.82) : 0.28;
+    });
+    if (opponent.glow) opponent.glow.intensity = 1.8 + pulse * 1.5;
   }
 }
 

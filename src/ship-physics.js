@@ -91,7 +91,7 @@ export function stepShipPhysics(ship, input, dt, curve, baseSpeed = 65) {
     yawLateralForce + brakeSteerForce - ship.lateralVelocity * grip
   ) * dt;
   ship.lateralVelocity = THREE.MathUtils.clamp(ship.lateralVelocity, -15, 15);
-  ship.lateralOffset += ship.lateralVelocity * dt;
+  ship.lateralOffset += ship.lateralVelocity * dt * 2;
 
   // Magnetic track hold: a damped spring to the road plane. In flight, gravity
   // takes over and steering authority is reduced, as in the source physics.
@@ -135,7 +135,7 @@ export function stepShipPhysics(ship, input, dt, curve, baseSpeed = 65) {
     -0.34,
     0.34,
   );
-  ship.roll = damp(ship.roll, desiredRoll, ship.airborne ? 2.0 : 4.8, dt);
+  ship.roll = damp(ship.roll, desiredRoll, ship.airborne ? 4.0 : 9.6, dt);
 
   // Progress advances with forward speed, not with steering input.
   ship.distance += ship.speed * dt;
