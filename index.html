@@ -18,8 +18,8 @@
       <canvas id="game-canvas" tabindex="0" aria-label="Neon Causeway racing scene"></canvas>
       <div class="vignette" aria-hidden="true"></div>
       <header class="topbar">
-        <a class="wordmark" href="#top" aria-label="Swipe-out home">SWIPE<span>/</span>OUT</a>
-        <span class="build-tag"><i></i> 0.1 · NEON CAUSEWAY</span>
+        <a class="wordmark" href="#top" aria-label="Swipe-out home">Swipe<span>Out</span></a>
+        <span class="build-tag"><i></i> Version 0.5Y</span>
         <a class="editor-link" href="/editor.html">TRACK EDITOR ↗</a>
       </header>
       <section class="race-hud" aria-label="Race information">
@@ -37,10 +37,11 @@
         </svg>
       </section>
       <section class="screen-card start-card" id="start-screen" aria-labelledby="headline" aria-describedby="start-copy">
-        <p class="eyebrow"><span>01</span> &nbsp; NEON CAUSEWAY</p>
+        <p class="eyebrow"><span>01</span> &nbsp; RACE</p>
         <h1 id="headline">FIND<br />YOUR <em>LINE.</em></h1>
         <p class="description" id="start-copy">A three-lap anti-gravity race against two CPU rivals.<br />Drag left or right to steer; hold higher to accelerate or lower to brake.</p>
         <button class="action-button" id="start-button" type="button">START RACE <span aria-hidden="true">↗</span></button>
+        
         <p class="control-hint">DRAG TO STEER · UP = THRUST · DOWN = BRAKE · ARROWS / W A S D</p>
         <select id="track-select">
           <option value="track1">Neon Causeway</option>
@@ -63,6 +64,7 @@
         <p class="result-label">YOUR TIME</p>
         <strong class="result-time" id="result-time">00:00.00</strong>
         <button class="action-button" id="retry-button" type="button">RACE AGAIN <span aria-hidden="true">↻</span></button>
+        <button class="action-button" id="menu-button" type="button">MENU <span aria-hidden="true">☰</span></button>
       </section>
       <section class="screen-card results-card" id="pause-screen" aria-live="assertive" hidden>
   <p class="eyebrow"><span>PAUSED</span> &nbsp; SWIPE-OUT</p>

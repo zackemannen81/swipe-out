@@ -114,7 +114,11 @@ export class RaceAudio {
     const files = {
       boost: '/audio/sfx/boost.wav',
       crash: '/audio/sfx/collision.wav',
-      thrust: '/audio/sfx/thrust.wav'
+      thrust: '/audio/sfx/thrust.wav',
+      countdownThree: '/audio/voice/three-cyborg.wav',
+      countdownTwo: '/audio/voice/two-cyborg.wav',
+      countdownOne: '/audio/voice/one-cyborg.wav',
+      countdownGo: '/audio/voice/go-cyborg.wav'
     };
 
     for (const [name, url] of Object.entries(files)) {

@@ -24,6 +24,17 @@ const speedDisplay = document.querySelector('#race-speed');
 const minimapRoute = document.querySelector('#minimap-route');
 const minimapStart = document.querySelector('#minimap-start');
 const minimapPlayer = document.querySelector('#minimap-player');
+// Hämta element för meny-knapp (lägg till detta bland dina DOM-element längst upp)
+const menuButton = document.querySelector('#menu-button'); // Skapa gärna denna i HTML om den saknas
+if (menuButton) {
+  menuButton.addEventListener('click', () => {
+    race.state = 'ready';
+    raceAudio.stop();
+    setScreen(resultsScreen, false);
+    setScreen(startScreen, true);
+  });
+}
+
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x080c0a);
 scene.fog = new THREE.FogExp2(0x080d18, 0.00065);
@@ -306,6 +317,7 @@ const race = {
   lateralVelocity: 0, roll: 0, currentSpeed: 65, throttleTarget: 0, keyboardThrottle: 0, playerFinishTime: null,
   airborne: false, airWorldY: 0, airVelocity: 0, previousSlope: 0, jumpCooldown: 0,
   crashTimer: 0, crashCooldown: 0,
+  countdownTimer: 3.0, // NY: För nedräkningen
 };
 const baseSpeed = 65;
 const totalLaps = 3;
@@ -331,7 +343,7 @@ function updateCraftPose(delta = 0) {
     brakeRight: heldKeys.has('e') || race.throttleTarget < -0.1,
     pitch: (heldKeys.has('r') ? 1 : 0) - (heldKeys.has('f') ? 1 : 0),
   };
-  const pose = race.state === 'racing' && delta > 0
+const pose = (race.state === 'racing' || race.state === 'finished') && delta > 0
     ? stepShipPhysics(shipPhysics, input, delta, curve, baseSpeed)
     : stepShipPhysics(shipPhysics, input, 0, curve, baseSpeed);
 
@@ -416,6 +428,8 @@ Object.assign(shipPhysics, createShipPhysics(baseSpeed));
     shipPhysics.assistLevel = parseFloat(assistSelect.value);
   }
   
+  race.state = 'countdown';
+  race.countdownTimer = 4.0; // 3 sekunders nedräkning
   shipPhysics.previousSlope = getTrackFrame(curve, 0).tangent.y;
   race.distance = 0;
   race.elapsed = 0;
@@ -463,20 +477,53 @@ Object.assign(shipPhysics, createShipPhysics(baseSpeed));
   });
 
   // Lägg ut Boost-pads jämnt över hela banan (exempelvis var 150:e meter)
-
-
   setScreen(startScreen, false);
   setScreen(resultsScreen, false);
   canvas.focus({ preventScroll: true });
 }
 
+function handleGamepadInput() {
+    const gamepads = navigator.getGamepads();
+    const gp = gamepads[0]; // Tar den första anslutna handkontrollen
+
+    if (!gp) return; // Om ingen handkontroll är ansluten, avbryt
+
+    // --- Axlar (Spakar) ---
+    // gp.axes[0] är oftast vänster spak i sidled (-1 = vänster, 1 = höger)
+    const steeringAxis = gp.axes[0]; 
+
+    // gp.axes[1] är vänster spak i höjdled (eller höger spak beroende på konfig)
+    const throttleAxis = gp.axes[1]; 
+
+    // --- Knappar ---
+    // gp.buttons[0] är oftast A (Xbox) eller Cross (PlayStation)
+    const isBoosting = gp.buttons[0].pressed; 
+
+    // gp.buttons[7] är oftast höger trigger (R2 / RT) för gas
+    const gasTrigger = gp.buttons[7] ? gp.buttons[7].value : 0;
+
+    // Här kopplar du ihop det med din styrning av skeppet:
+    // Exempel:
+    // ship.steer(steeringAxis);
+    // ship.accelerate(gasTrigger > 0.1 ? gasTrigger : -throttleAxis);
+    // if (isBoosting) triggerBoost();
+}
+
 function finishRace() {
-  raceAudio.stop();
+  // VIKTIGT: Ta bort raceAudio.stop() så musiken spelar under ärovarvet!
+  
   race.state = 'finished';
   race.playerFinishTime = race.elapsed;
   positionDisplay.textContent = `${getPlayerPosition(opponents, race.distance, race.playerFinishTime)} / 3`;
   resultPositionDisplay.textContent = positionDisplay.textContent;
   drag.active = false;
+  
+  // Aktivera Autopilot-inställningar för ärovarvet
+  shipPhysics.assistLevel = 1.0; // Sätt lane assist till max
+  shipPhysics.boostTimer = 0;    // Nollställ eventuell boost
+  shipPhysics.speed = 65;        // Sätt farten till basfarten
+  cameraSystem.mode = 'circle';  // Byt till snurrande kameran
+
   resultDisplay.textContent = formatTime(race.elapsed);
   setScreen(resultsScreen, true);
   retryButton.focus({ preventScroll: true });
@@ -623,6 +670,7 @@ window.addEventListener('resize', resize, { passive: true });
 resize();
 
 function render() {
+  handleGamepadInput();
     // Om spelet är pausat, rita bara om bilden och avbryt funktionen
   if (isPaused) {
     composer.render();
@@ -631,7 +679,39 @@ function render() {
   }
   const delta = Math.min(clock.getDelta(), 0.05);
   let crossedFinish = false;
-  if (race.state === 'racing') {
+  if (race.state === 'countdown') {
+   
+    // Uppdatera timer-displayen med nedräkning (t.ex. 3, 2, 1 eller GO!)
+const prevCount = Math.ceil(race.countdownTimer);
+    race.countdownTimer -= delta;
+    const countVal = Math.ceil(race.countdownTimer);
+
+    timerDisplay.textContent = countVal > 0 ? `00:0${countVal}` : 'GO!';
+    lapDisplay.textContent = `01 / ${String(totalLaps).padStart(2, '0')}`;
+    
+    // Håll skeppet fryst under nedräkningen
+    updateCraftPose(0);
+    raceAudio.updateEngine(0, false, false);
+if (countVal !== prevCount) {
+      if (countVal === 4) {
+        raceAudio.playSfx('countdownFour'); // Förutsätter att du lagt till den i loadSfx
+      } else if (countVal === 3) {
+        raceAudio.playSfx('countdownThree');
+      } else if (countVal === 2) {
+        raceAudio.playSfx('countdownTwo');
+      } else if (countVal === 1) {
+        raceAudio.playSfx('countdownOne');
+      } else if (countVal <= 0 && prevCount > 0) {
+        raceAudio.playSfx('countdownGo');
+      }
+    }
+    // När räknaren når 0, startar loppet på riktigt!
+    if (race.countdownTimer <= 0) {
+      race.state = 'racing';
+      race.elapsed = 0;
+    }
+
+  } else if (race.state === 'racing') {
     race.elapsed += delta;
     raceAudio.update(delta);
     race.throttleTarget = drag.active ? drag.throttle : race.keyboardThrottle;
@@ -650,11 +730,35 @@ function render() {
     const lapProgress = race.distance / curve.getLength() - completedLaps;
     timerDisplay.textContent = formatTime(race.elapsed);
     lapDisplay.textContent = `${String(currentLap).padStart(2, '0')} / ${String(totalLaps).padStart(2, '0')}${currentLap === totalLaps && lapProgress >= 0.72 ? ' · FINAL' : ''}`;
-    crossedFinish = race.distance >= curve.getLength() * totalLaps;
-  } else {
+    //crossedFinish = race.distance >= curve.getLength() * totalLaps;
+    raceAudio.updateEngine(race.currentSpeed, shipPhysics.boostTimer > 0, true);
+    if (race.distance >= curve.getLength() * totalLaps) {
+        finishRace();
+    }
+
+  } else if (race.state === 'finished') {
+    // --- ÄROVARV (AUTOPILOT) ---
+    raceAudio.update(delta); // Låt musiken fortsätta driva bloom-effekterna
+    
+    race.targetSteering = 0; // Släpp ratten
+    race.throttleTarget = 0; // Släpp gasen
+    race.steering = THREE.MathUtils.damp(race.steering, race.targetSteering, 4.8, delta);
+    
+    // Tvinga farten och assistansen varje frame ifall fysiken försöker ändra den
+    shipPhysics.speed = 65;
+    shipPhysics.assistLevel = 1.0;
+    
+    updateCraftPose(delta); // Fortsätt flytta skeppet framåt!
+    
+    // Håll motorljudet igång på lågvarv
+    raceAudio.updateEngine(65, false, true); 
+    
+  }
+  else {
+    // --- STARTMENYN (READY) ---
     race.steering = THREE.MathUtils.damp(race.steering, race.targetSteering, 7.5, delta);
-    updateCraftPose(0);
-        raceAudio.updateEngine(0, false, false); // Stäng av motorn
+    updateCraftPose(0); // Frys skeppet
+    raceAudio.updateEngine(0, false, false); // Stäng av motorljudet
   }
 // --- GHOSTING EFFEKT ---
     race.ghostTimer = (race.ghostTimer || 0) + delta;
@@ -761,7 +865,7 @@ function render() {
 
         opponents.forEach(opp => {
           if (opp.checkpointTimes[race.nextCheckpointIndex]) {
-            // Motståndaren passerade före oss
+            //  passerade före oss
             const gap = race.elapsed - opp.checkpointTimes[race.nextCheckpointIndex];
             if (!timeGapAhead || gap < timeGapAhead) timeGapAhead = gap;
           } else {

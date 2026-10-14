@@ -101,7 +101,7 @@ const maxSpeed = ship.boostTimer > 0 ? 140 : 100;
   const driftFactor = 1.0 - (ship.assistLevel ?? 1.0);
   
   // Omvandla svängen till en acceleration (skalad med hastighet). 0.06 är en justerbar styrkekonstant.
-  const centrifugalAccel = (trackTurnAmount / Math.max(dt, 0.001)) * ship.speed * driftFactor * 0.06;
+  const centrifugalAccel = (trackTurnAmount / Math.max(dt, 0.001)) * ship.speed * driftFactor * 0.1;
   ship.previousTangent.copy(frame.tangent);
   // ------------------------------------------
 
@@ -117,8 +117,9 @@ const maxSpeed = ship.boostTimer > 0 ? 140 : 100;
   ) * dt;
 
   ship.lateralVelocity = THREE.MathUtils.clamp(ship.lateralVelocity, -15, 15);
-  ship.lateralOffset += ship.lateralVelocity * dt * 2;
-
+  //ship.lateralOffset += ship.lateralVelocity * dt * 2;
+const centeringForce = -ship.lateralOffset * (ship.assistLevel * 5.0); 
+  ship.lateralOffset += (ship.lateralVelocity + centeringForce) * dt * 2;
   // Magnetic track hold: a damped spring to the road plane. In flight, gravity
   // takes over and steering authority is reduced, as in the source physics.
   if (ship.airborne) {
