@@ -9,6 +9,12 @@
   </head>
   <body>
     <main class="experience">
+      <!-- Lägg detta någonstans inuti <main class="experience"> -->
+<div id="race-messages" style="position: absolute; top: 30%; width: 100%; text-align: center; color: white; pointer-events: none; opacity: 0; transition: opacity 0.2s; z-index: 100;">
+  <div style="font-family: monospace; font-size: 1.5rem; font-style: italic; color: #5cf5ec; text-shadow: 0 0 10px #5cf5ec;">CHECKPOINT</div>
+  <strong id="msg-time" style="font-size: 2.5rem; display: block; margin-top: 5px;">00:00.00</strong>
+  <div id="msg-gap" style="font-size: 1.2rem; font-weight: bold; margin-top: 5px; color: #ff397b;"></div>
+</div>
       <canvas id="game-canvas" tabindex="0" aria-label="Neon Causeway racing scene"></canvas>
       <div class="vignette" aria-hidden="true"></div>
       <header class="topbar">

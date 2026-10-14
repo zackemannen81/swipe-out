@@ -124,6 +124,44 @@ export function createTrack(definition = NEON_CAUSEWAY) {
   }
   addInstances(group, arrowGeometry, pinkMaterial, pinkArrowTransforms);
   addInstances(group, arrowGeometry, cyanMaterial, cyanArrowTransforms);
+// NYTT MATERIAL FÖR BOOST
+  const greenMaterial = new THREE.MeshStandardMaterial({
+    color: 0x58f442, emissive: 0x23da32, emissiveIntensity: 9.0,
+    metalness: 0.2, roughness: 0.32,
+  });
+  
+  // LOGIK FÖR BOOST-PILARNA
+  const greenArrowTransforms = [];
+  const boostPadPlacements = []; // Vi sparar positionerna för fysiken
+
+  for (let distance = 50; distance < curve.getLength(); distance += 150) {
+    const frame = getTrackFrame(curve, distance / curve.getLength());
+    
+    // Växla position: 0 = mitten, 1 = vänster, 2 = höger
+    const posType = Math.floor(distance / 150) % 3;
+    let offset = 0;
+    if (posType === 1) offset = -(trackWidth / 2 - 2.5); // Vänster
+    if (posType === 2) offset = (trackWidth / 2 - 2.5);  // Höger
+    
+    boostPadPlacements.push({ d: distance, offset: offset });
+
+    // Skapa 3 pilar med kort mellanrum (bakåt längs tangenten)
+    const basePos = frame.center.clone()
+      .addScaledVector(frame.right, offset)
+      .addScaledVector(frame.normal, 0.12);
+
+    for (let i = 0; i < 3; i++) {
+      const chevronPos = basePos.clone().addScaledVector(frame.tangent, i * -2.0);
+      for (const angle of [-0.62, 0.62]) {
+        const position = chevronPos.clone().addScaledVector(frame.right, angle * 0.48);
+        const quaternion = frame.rotation.clone();
+        quaternion.multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), -angle));
+        greenArrowTransforms.push({ position, quaternion });
+      }
+    }
+  }
+  addInstances(group, arrowGeometry, greenMaterial, greenArrowTransforms);
+
 
   const laneMaterial = new THREE.MeshBasicMaterial({ color: 0x182234, transparent: true, opacity: 0.85 });
   const dash = new THREE.BoxGeometry(3.565, 0.045, 5.05,2);
@@ -187,8 +225,10 @@ export function createTrack(definition = NEON_CAUSEWAY) {
     gate.add(tile);
   }
   group.add(gate);
+// Rita ut Boost-pads visuellt som gula block på marken
 
-  return { group, curve, length: curve.getLength() };
+
+return { group, curve, length: curve.getLength(), boostPads: boostPadPlacements };
 }
 
 export function getTrackFrame(curve, progress) {

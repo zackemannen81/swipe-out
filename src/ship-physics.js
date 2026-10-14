@@ -6,6 +6,7 @@ import * as THREE from 'three';
 // brakes, track adhesion, airborne gravity, angular inertia and edge impacts.
 export function createShipPhysics(baseSpeed = 65) {
   return {
+    boostTimer: 0,        
     distance: 0,
     speed: baseSpeed,
     lateralOffset: 0,
@@ -47,6 +48,7 @@ export function stepShipPhysics(ship, input, dt, curve, baseSpeed = 65) {
   ship.crashTimer = Math.max(0, ship.crashTimer - dt);
   ship.crashCooldown = Math.max(0, ship.crashCooldown - dt);
   ship.lastImpact = Math.max(0, ship.lastImpact - dt);
+ship.boostTimer = Math.max(0, ship.boostTimer - dt);
 
   // Original thrust rises while held and falls off when released.
   const thrustInput = THREE.MathUtils.clamp(input.thrust ?? 0, 0, 1);
@@ -74,7 +76,8 @@ export function stepShipPhysics(ship, input, dt, curve, baseSpeed = 65) {
   const baselineDrag = ship.speed * 0.045;
   const brakingForce = brake * 18;
   ship.speed += (throttleForce - baselineDrag - brakingForce) * dt;
-  ship.speed = THREE.MathUtils.clamp(ship.speed, 12, 104);
+const maxSpeed = ship.boostTimer > 0 ? 140 : 100;
+  ship.speed = THREE.MathUtils.clamp(ship.speed, 12, maxSpeed);
 
   // Find the current local track frame and preserve the original jump response
   // to a sharp downward change in track tangent.
@@ -112,7 +115,7 @@ export function stepShipPhysics(ship, input, dt, curve, baseSpeed = 65) {
   ship.lateralVelocity += (
     yawLateralForce + brakeSteerForce + centrifugalAccel - ship.lateralVelocity * grip
   ) * dt;
-  
+
   ship.lateralVelocity = THREE.MathUtils.clamp(ship.lateralVelocity, -15, 15);
   ship.lateralOffset += ship.lateralVelocity * dt * 2;
 

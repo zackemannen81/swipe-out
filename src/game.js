@@ -372,9 +372,10 @@ function beginRace() {
   }
 
   // Skapa och lägg till den nya banan
-  const trackAssets = createTrack(trackData);
+const trackAssets = createTrack(trackData);
   track = trackAssets.group;
   curve = trackAssets.curve;
+  race.boostPads = trackAssets.boostPads; // Hämta de slumpade positionerna från banan!
   scene.add(track);
 
   // Uppdatera minimappen för den nya banan
@@ -442,6 +443,28 @@ Object.assign(shipPhysics, createShipPhysics(baseSpeed));
   lapDisplay.textContent = `01 / ${String(totalLaps).padStart(2, '0')}`;
   positionDisplay.textContent = '1 / 3';
   resultPositionDisplay.textContent = '1 / 3';
+  // --- Checkpoint & Boost Setup ---
+  const trackLen = curve.getLength();
+  
+  // Skapa 3 checkpoints per varv (33%, 66% och Start/Mål)
+  race.checkpoints = [];
+  for (let lap = 0; lap < totalLaps; lap++) {
+    race.checkpoints.push(trackLen * lap + trackLen * 0.33);
+    race.checkpoints.push(trackLen * lap + trackLen * 0.66);
+    race.checkpoints.push(trackLen * lap + trackLen);
+  }
+  race.nextCheckpointIndex = 0;
+  race.checkpointTimes = []; // Spelarens tider
+
+  // Nollställ motståndarnas checkpoints
+  opponents.forEach(opp => { 
+    opp.nextCheckpointIndex = 0; 
+    opp.checkpointTimes = []; 
+  });
+
+  // Lägg ut Boost-pads jämnt över hela banan (exempelvis var 150:e meter)
+
+
   setScreen(startScreen, false);
   setScreen(resultsScreen, false);
   canvas.focus({ preventScroll: true });
@@ -619,6 +642,9 @@ function render() {
       delta,
     );
     updateCraftPose(delta);
+    // Uppdatera motorljudet
+    raceAudio.updateEngine(race.currentSpeed, shipPhysics.boostTimer > 0, true);
+
     const completedLaps = Math.floor(race.distance / curve.getLength());
     const currentLap = Math.min(completedLaps + 1, totalLaps);
     const lapProgress = race.distance / curve.getLength() - completedLaps;
@@ -628,12 +654,147 @@ function render() {
   } else {
     race.steering = THREE.MathUtils.damp(race.steering, race.targetSteering, 7.5, delta);
     updateCraftPose(0);
+        raceAudio.updateEngine(0, false, false); // Stäng av motorn
   }
+// --- GHOSTING EFFEKT ---
+    race.ghostTimer = (race.ghostTimer || 0) + delta;
+    race.ghosts = race.ghosts || [];
 
+    // Skapa ett nytt "eftersken" var 50:e millisekund under boosten
+    if (shipPhysics.boostTimer > 0 && race.ghostTimer > 0.1) {
+      race.ghostTimer = 0;
+      
+      const ghostGroup = craft.clone(); // Klona skeppet på dess exakta position och vinkel
+      
+      // Byt ut alla material på klonen mot ett glödande wireframe-material
+      ghostGroup.traverse((child) => {
+        if (child.isMesh) {
+          child.material = new THREE.MeshBasicMaterial({
+            color: 0x58f442, // Samma neongröna som boost-pilarna
+            transparent: true, 
+            opacity: 0.5, 
+            blending: THREE.AdditiveBlending,
+            depthWrite: false,
+            wireframe: true // Ger en väldigt cool digital hologrameffekt
+          });
+        }
+      });
+      
+      scene.add(ghostGroup);
+      race.ghosts.push({ group: ghostGroup, life: 1.0 });
+    }
+
+    // Tona ut och städa bort gamla ghosts så vi inte kraschar minnet
+    for (let i = race.ghosts.length - 1; i >= 0; i--) {
+      const ghost = race.ghosts[i];
+      ghost.life -= delta * 4.5; // Fade-hastighet. Högre siffra = försvinner snabbare.
+      
+      if (ghost.life <= 0) {
+        scene.remove(ghost.group);
+        ghost.group.traverse((child) => {
+          // Viktigt att frigöra materialet från grafikkortet!
+          if (child.isMesh) child.material.dispose(); 
+        });
+        race.ghosts.splice(i, 1);
+      } else {
+        ghost.group.traverse((child) => {
+          if (child.isMesh) child.material.opacity = ghost.life * 0.5;
+        });
+      }
+    }
   updateMinimap(craft.position);
   const trackFrame = getTrackFrame(curve, race.distance / curve.getLength());
 
   if (race.state === 'racing') {
+// --- SPEEDBOOST LOGIK ---
+    const trackLen = curve.getLength();
+    const lapDistance = race.distance % trackLen;
+    
+    // 1. Hitta först om vi är över en pad i längdled
+    const currentPadIndex = race.boostPads.findIndex(pad => lapDistance >= pad.d && lapDistance < pad.d + 10);
+    
+    if (currentPadIndex !== -1) {
+      // 2. Om vi är vid en pad, kolla om vi prickar den i sidled!
+      // Vi krymper träffytan från 2.8 till 1.2 (mycket striktare)
+      const currentPad = race.boostPads[currentPadIndex];
+      const inWidth = Math.abs(shipPhysics.lateralOffset - currentPad.offset) < 1.2;
+      
+      // 3. Bara ge boost om vi prickar rätt och inte redan tagit just denna pad
+      if (inWidth && race.lastBoostIndex !== currentPadIndex) {
+        race.lastBoostIndex = currentPadIndex;
+        raceAudio.playSfx('boost');
+        // AKTIVERA BOOST!
+        shipPhysics.boostTimer = 1.0; 
+        shipPhysics.speed = 140; 
+        
+        cameraSystem.shakeTimer = 0.8;
+        cameraSystem.shakeIntensity = 0.65;
+        bloomPass.strength = 0.6;
+      }
+    } else {
+      // Återställ när vi har åkt förbi paden, så den kan tas nästa varv
+      race.lastBoostIndex = -1;
+    }
+
+    // --- CHECKPOINT LOGIK (Motståndare) ---
+    // Motståndarnas checkpoint-tider uppdateras
+    opponents.forEach(opp => {
+      if (opp.nextCheckpointIndex < race.checkpoints.length) {
+        if (opp.distance >= race.checkpoints[opp.nextCheckpointIndex]) {
+          opp.checkpointTimes[opp.nextCheckpointIndex] = race.elapsed;
+          opp.nextCheckpointIndex++;
+        }
+      }
+    });
+
+    // --- CHECKPOINT LOGIK (Spelaren) ---
+    if (race.nextCheckpointIndex < race.checkpoints.length) {
+      const nextCpDist = race.checkpoints[race.nextCheckpointIndex];
+      if (race.distance >= nextCpDist) {
+        race.checkpointTimes[race.nextCheckpointIndex] = race.elapsed;
+        raceAudio.playSfx('checkpoint');
+        // Beräkna gap till framför/bakom
+        let gapText = "LEADER";
+        let color = "#5cf5ec"; // Cyan för ledning
+        let timeGapAhead = null;
+        let timeGapBehind = null;
+
+        opponents.forEach(opp => {
+          if (opp.checkpointTimes[race.nextCheckpointIndex]) {
+            // Motståndaren passerade före oss
+            const gap = race.elapsed - opp.checkpointTimes[race.nextCheckpointIndex];
+            if (!timeGapAhead || gap < timeGapAhead) timeGapAhead = gap;
+          } else {
+            // Motståndaren är bakom. Beräkna uppskattad tid baserat på avstånd
+            const distGap = race.distance - opp.distance;
+            // Uppskattar att CPU kör i ca 65 km/h (basfart)
+            const estimatedTime = distGap / 65; 
+            if (!timeGapBehind || estimatedTime < timeGapBehind) timeGapBehind = estimatedTime;
+          }
+        });
+
+        if (timeGapAhead) {
+          gapText = `▲ +${timeGapAhead.toFixed(2)}s PÅ LEDAREN`;
+          color = "#ff397b"; // Rosa/Rött när vi ligger under
+        } else if (timeGapBehind) {
+          gapText = `▼ -${timeGapBehind.toFixed(2)}s TILL BAKOMLIGGANDE`;
+        }
+
+        // Visa UI-meddelandet
+        const msgContainer = document.querySelector('#race-messages');
+        document.querySelector('#msg-time').textContent = formatTime(race.elapsed);
+        const gapEl = document.querySelector('#msg-gap');
+        gapEl.textContent = gapText;
+        gapEl.style.color = color;
+        
+        msgContainer.style.opacity = '1';
+        
+        // Dölj meddelandet efter 2.5 sekunder
+        setTimeout(() => { msgContainer.style.opacity = '0'; }, 2500);
+
+        race.nextCheckpointIndex++;
+      }
+    }
     updateOpponents(opponents, curve, delta, race.elapsed, true);
   } else {
     updateOpponents(opponents, curve, 0, race.elapsed, false);
@@ -642,9 +803,14 @@ function render() {
   positionDisplay.textContent = `${getPlayerPosition(opponents, race.distance, race.playerFinishTime)} / 3`;
 
   // Aktivera kameraskakning om skeppet kraschar
-  if (race.crashTimer > 0) {
+    if (race.crashTimer > 0) {
     cameraSystem.setShake(0.3);
+    // Spela bara ljudet i exakt samma frame som kraschen startar (0.42 är startvärdet i ship-physics)
+    if (Math.abs(race.crashTimer - 0.42) < 0.02) {
+      raceAudio.playSfx('crash');
+    }
   }
+  
 
   // Kör det nya integrerade kamerapasset
   cameraSystem.update(craft.position, craft.quaternion, shipPhysics.velocity, delta, trackFrame);
