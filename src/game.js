@@ -29,9 +29,9 @@ scene.background = new THREE.Color(0x080c0a);
 scene.fog = new THREE.FogExp2(0x080d18, 0.00065);
 
 const TRACK_CONFIG = {
-  'track1': { name: 'Neon Causeway', data: NEON_CAUSEWAY, defaultAudio: '/audio/tracks/track_001.mp3' },
-  'track2': { name: 'Synthetic Dreams', data: SYNTHETIC_DREAMS, defaultAudio: '/audio/tracks/track_003.mp3' },
-  'track3': { name: 'Digital Horizon', data: DIGITAL_HORIZON, defaultAudio: '/audio/tracks/track_006.mp3' }
+  'track1': { name: 'Neon Causeway', data: NEON_CAUSEWAY, defaultAudio: '/audio/tracks/track_001.mp3', backdrop: '/images/backdrop_track-001.jpg' },
+  'track2': { name: 'Synthetic Dreams', data: SYNTHETIC_DREAMS, defaultAudio: '/audio/tracks/track_004.mp3', backdrop: '/images/backdrop_track-002.jpg' },
+  'track3': { name: 'Digital Horizon', data: DIGITAL_HORIZON, defaultAudio: '/audio/tracks/track_006.mp3', backdrop: '/images/backdrop_track-003.jpg' }
 };
 
 let currentTrackId = 'track1'; 
@@ -92,7 +92,7 @@ const savedTrack = (() => {
     return NEON_CAUSEWAY;
   }
 })();
-const { group: track, curve } = createTrack(savedTrack);
+let { group: track, curve } = createTrack(savedTrack);
 scene.add(track);
 
 function setupMinimap() {
@@ -348,9 +348,73 @@ function updateCraftPose(delta = 0) {
 }
 
 function beginRace() {
+  // Läs av vilken bana som valts
+  const trackSelect = document.querySelector('#track-select');
+  currentTrackId = trackSelect.value;
+  const trackData = TRACK_CONFIG[currentTrackId].data;
+// Hämta banans namn och gör det till stora bokstäver
+  const trackName = TRACK_CONFIG[currentTrackId].name.toUpperCase();
+
+  // Uppdatera texten i toppmenyn
+  const buildTag = document.querySelector('.build-tag');
+  if (buildTag) {
+    buildTag.innerHTML = `<i></i> 0.1 · ${trackName}`;
+  }
+
+  // Uppdatera texten på resultatskärmen
+  const resultsEyebrow = document.querySelector('#results-screen .eyebrow');
+  if (resultsEyebrow) {
+    resultsEyebrow.innerHTML = `<span>FINISH</span> &nbsp; ${trackName}`;
+  }
+  // Ta bort den gamla banan om den finns
+  if (track) {
+    scene.remove(track);
+  }
+
+  // Skapa och lägg till den nya banan
+  const trackAssets = createTrack(trackData);
+  track = trackAssets.group;
+  curve = trackAssets.curve;
+  scene.add(track);
+
+  // Uppdatera minimappen för den nya banan
+  setupMinimap();
+
+  // Byt musik
+  raceAudio.stop();
+  raceAudio = new RaceAudio(TRACK_CONFIG[currentTrackId].defaultAudio);
+  // Läs av sökvägen till den nya bakgrundsbilden
+  const backdropUrl = TRACK_CONFIG[currentTrackId].backdrop;
+
+  // Ladda den nya texturen och byt ut den gamla
+  new THREE.TextureLoader().load(
+    backdropUrl,
+    (texture) => {
+      texture.colorSpace = THREE.SRGBColorSpace;
+      
+      // Frigör minne från den gamla texturen om den finns
+      if (panoramaBackdrop.material.map) {
+        panoramaBackdrop.material.map.dispose(); 
+      }
+      
+      // Applicera den nya texturen
+      panoramaBackdrop.material.map = texture;
+      panoramaBackdrop.material.needsUpdate = true;
+    },
+    undefined,
+    (error) => console.warn('Unable to load new panorama backdrop.', error)
+  );
+  
   raceAudio.play().catch((error) => console.warn('Unable to start race music.', error));
   race.state = 'racing';
-  Object.assign(shipPhysics, createShipPhysics(baseSpeed));
+Object.assign(shipPhysics, createShipPhysics(baseSpeed));
+  
+  // Läs av hur mycket styrhjälp spelaren vill ha
+  const assistSelect = document.querySelector('#assist-select');
+  if (assistSelect) {
+    shipPhysics.assistLevel = parseFloat(assistSelect.value);
+  }
+  
   shipPhysics.previousSlope = getTrackFrame(curve, 0).tangent.y;
   race.distance = 0;
   race.elapsed = 0;
@@ -473,6 +537,54 @@ window.addEventListener('blur', () => {
   race.targetSteering = 0;
 });
 
+let isPaused = false;
+const pauseScreen = document.querySelector('#pause-screen');
+const resumeButton = document.querySelector('#resume-button');
+const musicSelect = document.querySelector('#music-select');
+
+// Lyssna efter Escape för att pausa/avpausa
+window.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape' && race.state === 'racing') {
+    togglePause();
+  }
+});
+
+resumeButton.addEventListener('click', togglePause);
+
+function togglePause() {
+  isPaused = !isPaused;
+  setScreen(pauseScreen, isPaused);
+  
+  if (isPaused) {
+    raceAudio.audio.pause();
+  } else {
+    raceAudio.audio.play();
+    // Nollställ klockan så inte fysiken hoppar framåt när vi avpausar
+    clock.getDelta(); 
+  }
+}
+
+// Byt låt direkt när man ändrar i pausmenyn
+musicSelect.addEventListener('change', async (event) => {
+  const newAudioUrl = event.target.value;
+  raceAudio.stop();
+  raceAudio = new RaceAudio(newAudioUrl);
+  
+  if (!isPaused) {
+    await raceAudio.play();
+  }
+});
+const trackSelect = document.querySelector('#track-select');
+trackSelect.addEventListener('change', (event) => {
+  const newTrackName = TRACK_CONFIG[event.target.value].name.toUpperCase();
+  const startEyebrow = document.querySelector('#start-screen .eyebrow');
+  if (startEyebrow) {
+    // 01, 02 eller 03 beroende på vald bana
+    const trackNumber = event.target.value.replace('track', '0'); 
+    startEyebrow.innerHTML = `<span>${trackNumber}</span> &nbsp; ${newTrackName}`;
+  }
+});
+
 function resize() {
   viewportWidth = window.innerWidth;
   viewportHeight = window.innerHeight;
@@ -488,6 +600,12 @@ window.addEventListener('resize', resize, { passive: true });
 resize();
 
 function render() {
+    // Om spelet är pausat, rita bara om bilden och avbryt funktionen
+  if (isPaused) {
+    composer.render();
+    requestAnimationFrame(render);
+    return; 
+  }
   const delta = Math.min(clock.getDelta(), 0.05);
   let crossedFinish = false;
   if (race.state === 'racing') {

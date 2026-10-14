@@ -25,6 +25,12 @@ export function createShipPhysics(baseSpeed = 65) {
     crashTimer: 0,
     crashCooldown: 0,
     lastImpact: 0,
+    // ... dina andra variabler ...
+    jumpCooldown: 0,
+    previousSlope: 0,
+    previousTangent: null, // NY: Håller koll på kurvans riktning
+    assistLevel: 1.0,      // NY: 1.0 = Ingen drift (som nu), 0.0 = Full drift
+    crashTimer: 0,
   };
 }
 
@@ -81,15 +87,32 @@ export function stepShipPhysics(ship, input, dt, curve, baseSpeed = 65) {
     ship.verticalVelocity = THREE.MathUtils.clamp(-slopeChange * 1.7, 2.8, 7.2);
     ship.jumpCooldown = 0.6;
   }
+// --- NY KOD: CENTRIFUGALKRAFT OCH DRIFT ---
+  if (!ship.previousTangent) {
+    ship.previousTangent = frame.tangent.clone();
+  }
+  
+  // Dot-produkten mellan förra framens riktning och den nya "höger"-vektorn 
+  // ger oss ett exakt mått på hur skarpt banan precis svängde.
+  const trackTurnAmount = ship.previousTangent.dot(frame.right);
+  const driftFactor = 1.0 - (ship.assistLevel ?? 1.0);
+  
+  // Omvandla svängen till en acceleration (skalad med hastighet). 0.06 är en justerbar styrkekonstant.
+  const centrifugalAccel = (trackTurnAmount / Math.max(dt, 0.001)) * ship.speed * driftFactor * 0.06;
+  ship.previousTangent.copy(frame.tangent);
+  // ------------------------------------------
 
   // Wipeout's forward-velocity correction (skid) and weaker airborne grip.
   const grip = ship.airborne ? 1.0 : 4.5 + brake * 1.8;
   const speedRatio = THREE.MathUtils.clamp(ship.speed / baseSpeed, 0.35, 1.55);
   const yawLateralForce = ship.yawVelocity * ship.speed * 0.12;
   const brakeSteerForce = differentialBrake * ship.speed * 0.10;
+  
+  // ÄNDRING HÄR: Lägg till centrifugalAccel i beräkningen av lateralVelocity
   ship.lateralVelocity += (
-    yawLateralForce + brakeSteerForce - ship.lateralVelocity * grip
+    yawLateralForce + brakeSteerForce + centrifugalAccel - ship.lateralVelocity * grip
   ) * dt;
+  
   ship.lateralVelocity = THREE.MathUtils.clamp(ship.lateralVelocity, -15, 15);
   ship.lateralOffset += ship.lateralVelocity * dt * 2;
 
