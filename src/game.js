@@ -482,33 +482,6 @@ Object.assign(shipPhysics, createShipPhysics(baseSpeed));
   canvas.focus({ preventScroll: true });
 }
 
-function handleGamepadInput() {
-    const gamepads = navigator.getGamepads();
-    const gp = gamepads[0]; // Tar den första anslutna handkontrollen
-
-    if (!gp) return; // Om ingen handkontroll är ansluten, avbryt
-
-    // --- Axlar (Spakar) ---
-    // gp.axes[0] är oftast vänster spak i sidled (-1 = vänster, 1 = höger)
-    const steeringAxis = gp.axes[0]; 
-
-    // gp.axes[1] är vänster spak i höjdled (eller höger spak beroende på konfig)
-    const throttleAxis = gp.axes[1]; 
-
-    // --- Knappar ---
-    // gp.buttons[0] är oftast A (Xbox) eller Cross (PlayStation)
-    const isBoosting = gp.buttons[0].pressed; 
-
-    // gp.buttons[7] är oftast höger trigger (R2 / RT) för gas
-    const gasTrigger = gp.buttons[7] ? gp.buttons[7].value : 0;
-
-    // Här kopplar du ihop det med din styrning av skeppet:
-    // Exempel:
-    // ship.steer(steeringAxis);
-    // ship.accelerate(gasTrigger > 0.1 ? gasTrigger : -throttleAxis);
-    // if (isBoosting) triggerBoost();
-}
-
 function finishRace() {
   // VIKTIGT: Ta bort raceAudio.stop() så musiken spelar under ärovarvet!
   
@@ -556,6 +529,35 @@ canvas.addEventListener('pointermove', (event) => {
     1,
   );
 });
+function handleGamepadInput() {
+    const gamepads = navigator.getGamepads();
+    const gp = gamepads[0]; 
+
+    if (!gp) return; 
+
+    // Styrning (vänster spak i sidled)
+    const steeringAxis = gp.axes[0];
+    if (Math.abs(steeringAxis) > 0.1) {
+        race.targetSteering = steeringAxis; // Invertera eventuellt med minus (-) om det känns tvärtom
+    }
+
+    // Gas (t.ex. höger trigger R2 / RT eller A-knappen)
+    const gasTrigger = gp.buttons[7] ? gp.buttons[7].value : 0;
+    const isAccelerating = gp.buttons[0].pressed || gasTrigger > 0.1;
+    
+    // Broms (t.ex. vänster trigger L2 / LT)
+    const brakeTrigger = gp.buttons[6] ? gp.buttons[6].value : 0;
+
+    // Sätt gas/broms-mål baserat på handkontrollen
+    if (brakeTrigger > 0.1) {
+        race.throttleTarget = -brakeTrigger; // Backa / bromsa
+    } else if (isAccelerating) {
+        race.throttleTarget = Math.max(gasTrigger, 1.0); // Full gas (eller variabel gas med trigger)
+    } else if (!drag.active && heldKeys.size === 0) {
+        race.throttleTarget = 0; // Släpp gasen om inget trycks in
+    }
+}
+
 function releasePointer(event) {
   if (event.pointerId !== drag.pointerId) return;
   drag.active = false;
@@ -586,8 +588,8 @@ window.addEventListener('keydown', (event) => {
   heldKeys.add(key);
   if (key === 'arrowup' || key === 'w') race.keyboardThrottle = 1;
   if (key === 'arrowdown' || key === 's') race.keyboardThrottle = -1;
-  if (key === 'arrowleft' || key === 'a') race.targetSteering = 1;
-  if (key === 'arrowright' || key === 'd') race.targetSteering = -1;
+  if (key === 'arrowleft' || key === 'a') race.targetSteering = -1;
+  if (key === 'arrowright' || key === 'd') race.targetSteering = 1;
 });
 window.addEventListener('keyup', (event) => {
   const key = event.key.toLowerCase();

@@ -63,7 +63,7 @@ ship.boostTimer = Math.max(0, ship.boostTimer - dt);
   const differentialBrake = ship.brakeLeft - ship.brakeRight;
 
   // Angular acceleration / inertia, inspired by ship_player_update_race().
-  const steer = THREE.MathUtils.clamp(input.steer ?? 0, -1, 1);
+  const steer = THREE.MathUtils.clamp(-input.steer ?? 0, -1, 1);
   const turnAcceleration = 3.7 + brake * 1.8;
   ship.yawVelocity += (steer * turnAcceleration - ship.yawVelocity * (steer === 0 ? 7.5 : 1.15)) * dt;
   ship.yawVelocity = THREE.MathUtils.clamp(ship.yawVelocity, -2.2, 2.2);
@@ -118,8 +118,20 @@ const maxSpeed = ship.boostTimer > 0 ? 140 : 100;
 
   ship.lateralVelocity = THREE.MathUtils.clamp(ship.lateralVelocity, -15, 15);
   //ship.lateralOffset += ship.lateralVelocity * dt * 2;
+/*
 const centeringForce = -ship.lateralOffset * (ship.assistLevel * 5.0); 
   ship.lateralOffset += (ship.lateralVelocity + centeringForce) * dt * 2;
+*/
+// Låt spelarens egen styrning (lateralVelocity) få motverka eller väga upp centeringForce
+const steeringInput = input.steer ?? 0;
+const centeringForce = -ship.lateralOffset * (ship.assistLevel * 2.0); 
+
+// Om spelaren styr aktivt, dämpa centreringen så man kan svänga ut!
+const effectiveCentering = THREE.MathUtils.lerp(centeringForce, 0, Math.abs(steeringInput));
+
+ship.lateralOffset += (ship.lateralVelocity + effectiveCentering) * dt * 2;
+
+
   // Magnetic track hold: a damped spring to the road plane. In flight, gravity
   // takes over and steering authority is reduced, as in the source physics.
   if (ship.airborne) {
