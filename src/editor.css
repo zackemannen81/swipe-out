@@ -20,6 +20,17 @@ h1 span { color: #5de8df; }
 .controls-panel { padding-bottom: 17px; }
 .controls-panel > label { display: block; padding: 19px 18px 0; color: #aabac3; font: 10px 'DM Mono', monospace; letter-spacing: .12em; }
 .controls-panel output { float: right; color: #5de8df; }
+.primitive-row { margin-top: 8px; padding: 9px; border: 1px solid #263944; background: #0b151e; font: 9px 'DM Mono', monospace; }
+.primitive-row:has([data-remove]) { transition: border-color .15s ease, background .15s ease; }
+.primitive-row label { display: flex; justify-content: space-between; align-items: center; margin-top: 6px; color: #8599a3; }
+.primitive-row b { color: #5de8df; }
+.primitive-row input[type=number] { width: 80px; padding: 4px; border: 1px solid #304650; background: #10202a; color: #fff; }
+.object-dimensions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; margin-top: 10px; padding-top: 8px; border-top: 1px solid #263944; color: #8599a3; }
+.object-dimensions > span { grid-column: 1 / -1; font-size: 8px; letter-spacing: .1em; }
+.object-dimensions label { display: flex; flex-direction: column; gap: 4px; color: #8599a3; }
+.object-dimensions input[type=number] { width: 100%; }
+.primitive-row input[type=file] { width: 145px; font-size: 8px; }
+.primitive-row button { width: 100%; min-height: 27px; margin-top: 8px; font-size: 8px; }
 input[type=range] { display: block; width: 100%; margin-top: 12px; accent-color: #5de8df; }
 .point-editor { margin: 23px 18px 0; padding-top: 17px; border-top: 1px solid #263944; }
 .subheading { margin-bottom: 12px; color: #aabac3; }.subheading b { float: right; color: #5de8df; font-weight: 400; }

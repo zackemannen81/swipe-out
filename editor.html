@@ -19,10 +19,11 @@
         <div class="canvas-panel">
           <div class="panel-heading"><span>TOP-DOWN ROUTE PREVIEW</span><b id="point-count">33 POINTS</b></div>
           <canvas id="editor-canvas" aria-label="Draggable top-down track route"></canvas>
-          <p class="canvas-help">DRAG POINTS TO SHAPE THE TRACK · SELECT A POINT TO EDIT ITS HEIGHT</p>
+          <p class="canvas-help">DRAG POINTS TO SHAPE THE TRACK · CLICK/DRAG OBJECT MARKERS TO PLACE THEM · SELECTED OBJECTS ARE HIGHLIGHTED</p>
         </div>
         <aside class="controls-panel">
           <div class="panel-heading"><span>TRACK SETTINGS</span><b id="save-state">SAVED</b></div>
+          <label>TRACK <select id="track-select"><option value="track1">NEON CAUSEWAY</option><option value="track2">SYNTHETIC DREAMS</option><option value="track3">DIGITAL HORIZON</option><option value="track4">MOMMY I'M SCARED</option></select></label>
           <label>ROAD WIDTH <output id="width-value">10.00</output><input id="width-input" type="range" min="4" max="24" step="0.25" /></label>
           <label>HORIZONTAL SCALE <output id="scale-value">3.25</output><input id="scale-input" type="range" min="0.5" max="8" step="0.05" /></label>
           <div class="point-editor">
@@ -30,6 +31,11 @@
             <label>X <input id="point-x" type="number" step="1" /></label>
             <label>HEIGHT <input id="point-y" type="number" step="1" /></label>
             <label>Z <input id="point-z" type="number" step="1" /></label>
+          </div>
+          <div class="primitive-editor">
+            <div class="subheading">3D PRIMITIVES</div>
+            <div class="button-row compact"><button data-primitive="box">+ BOX</button><button data-primitive="cylinder">+ CYLINDER</button><button data-primitive="sphere">+ SPHERE</button></div>
+            <div id="primitive-list"></div>
           </div>
           <div class="button-row"><button id="save-button" class="primary">SAVE TO GAME</button><button id="reset-button">RESET</button></div>
           <div class="button-row"><button id="copy-button">COPY JSON</button><button id="download-button">DOWNLOAD</button></div>

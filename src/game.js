@@ -95,14 +95,13 @@ const pinkLight = new THREE.PointLight(0xff397b, 80, 42);
 pinkLight.position.set(-24, 10, -16);
 scene.add(pinkLight);
 
+const savedTracks = (() => {
+  try { return JSON.parse(localStorage.getItem('swipe-out-track-definitions') || '{}'); }
+  catch (error) { console.warn('Unable to load saved track definitions.', error); return {}; }
+})();
 const savedTrack = (() => {
-  try {
-    const value = JSON.parse(localStorage.getItem('swipe-out-track-definition'));
-    return value?.centerline?.length >= 4 ? value : NEON_CAUSEWAY;
-  } catch (error) {
-    console.warn('Unable to load saved track definition.', error);
-    return NEON_CAUSEWAY;
-  }
+  const configured = savedTracks[currentTrackId];
+  return configured?.centerline?.length >= 4 ? configured : TRACK_CONFIG[currentTrackId].data;
 })();
 let { group: track, curve } = createTrack(savedTrack);
 scene.add(track);
@@ -457,7 +456,7 @@ function beginRace() {
   // Läs av vilken bana som valts
   const trackSelect = document.querySelector('#track-select');
   currentTrackId = trackSelect.value;
-  const trackData = TRACK_CONFIG[currentTrackId].data;
+  const trackData = savedTracks[currentTrackId]?.centerline?.length >= 4 ? savedTracks[currentTrackId] : TRACK_CONFIG[currentTrackId].data;
 // Hämta banans namn och gör det till stora bokstäver
   const trackName = TRACK_CONFIG[currentTrackId].name.toUpperCase();
 

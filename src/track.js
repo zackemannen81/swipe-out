@@ -228,7 +228,25 @@ export function createTrack(definition = NEON_CAUSEWAY) {
 // Rita ut Boost-pads visuellt som gula block på marken
 
 
-return { group, curve, length: curve.getLength(), boostPads: boostPadPlacements };
+  // Editor-authored primitives are stored on the track definition, so every track has its own objects.
+  const textureLoader = new THREE.TextureLoader();
+  for (const object of definition.objects ?? []) {
+    const geometry = object.type === 'box'
+      ? new THREE.BoxGeometry(2, 2, 2)
+      : object.type === 'cylinder'
+        ? new THREE.CylinderGeometry(1, 1, 2, 24)
+        : new THREE.SphereGeometry(1, 20, 14);
+    const materialOptions = { color: 0xffffff, metalness: 0.25, roughness: 0.55 };
+    if (object.texture) { materialOptions.map = textureLoader.load(object.texture); materialOptions.map.colorSpace = THREE.SRGBColorSpace; }
+    const mesh = new THREE.Mesh(geometry, new THREE.MeshStandardMaterial(materialOptions));
+    mesh.position.set(...(object.position ?? [0, 1, 0]));
+    mesh.rotation.set(...(object.rotation ?? [0, 0, 0]));
+    mesh.scale.set(...(object.scale ?? [1, 1, 1]));
+    mesh.userData.editorObjectId = object.id;
+    group.add(mesh);
+  }
+
+  return { group, curve, length: curve.getLength(), boostPads: boostPadPlacements };
 }
 
 export function getTrackFrame(curve, progress) {
