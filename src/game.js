@@ -335,7 +335,26 @@ function setScreen(screen, visible) {
   screen.setAttribute('aria-hidden', String(!visible));
 }
 
+
+const raycaster = new THREE.Raycaster();
+
+raycaster.layers.set(1); // Sätt till samma Layer som banan
+
+const arrows = {
+    center: new THREE.ArrowHelper(new THREE.Vector3(0, -1, 0), new THREE.Vector3(), 4.0, 0xff0000),
+    noseDown: new THREE.ArrowHelper(new THREE.Vector3(0, -1, 0), new THREE.Vector3(), 4.0, 0xff0000),
+    noseForward: new THREE.ArrowHelper(new THREE.Vector3(0, 0, -1), new THREE.Vector3(), 4.0, 0xff0000),
+    leftWingDown: new THREE.ArrowHelper(new THREE.Vector3(0, -1, 0), new THREE.Vector3(), 4.0, 0xff0000),
+    rightWingDown: new THREE.ArrowHelper(new THREE.Vector3(0, -1, 0), new THREE.Vector3(), 4.0, 0xff0000),
+    leftWingOut: new THREE.ArrowHelper(new THREE.Vector3(-1, 0, 0), new THREE.Vector3(), 4.0, 0xff0000),
+    rightWingOut: new THREE.ArrowHelper(new THREE.Vector3(1, 0, 0), new THREE.Vector3(), 4.0, 0xff0000)
+};
+
+// Lägg till alla pilar i scenen
+Object.values(arrows).forEach(arrow => scene.add(arrow));
+
 function updateCraftPose(delta = 0) {
+
   const input = {
     steer: race.steering,
     thrust: Math.max(0, race.throttleTarget),
@@ -356,6 +375,57 @@ const pose = (race.state === 'racing' || race.state === 'finished') && delta > 0
   race.crashTimer = shipPhysics.crashTimer;
   craft.position.copy(pose.position);
   craft.quaternion.copy(pose.orientation);
+
+
+// Definiera var punkterna sitter relativt skeppets mittpunkt.
+// Z är oftast framåt/bakåt och X är höger/vänster. 
+// Justera siffrorna om vingarna hamnar för långt ut eller nosen för långt bak!
+const offsets = {
+    center: new THREE.Vector3(0, 0, 0),
+    noseDown: new THREE.Vector3(0, 0, 1.6), 
+    noseForward: new THREE.Vector3(0, 0, 1.6), 
+    leftWingDown: new THREE.Vector3(-1.3, 0, 0.2),
+    rightWingDown: new THREE.Vector3(1.3, 0, 0.2),
+    leftWingOut: new THREE.Vector3(-1.3, 0, 0.2),
+    rightWingOut: new THREE.Vector3(1.3, 0, 0.2)
+};
+
+for (const [key, offset] of Object.entries(offsets)) {
+    // 1. Ta den lokala offseten
+    // 2. Rotera den så den följer skeppets aktuella vinkel
+    // 3. Addera skeppets världsposition
+   // if leftWingOut or rightWingOut, we want to check the horizontal direction instead of downwards. So we will use a different vector for those two cases.
+    const partVector = key.includes('Out') ? new THREE.Vector3(0, 0, -1)  : key.includes('Forward') ? new THREE.Vector3(0, 0, -1) : new THREE.Vector3(0, -1, 0);
+    
+
+    const worldPos = offset.clone().applyQuaternion(craft.quaternion).add(craft.position);
+    
+    // Testa gärna att höja upp hela rasket tillfälligt för att se att de slår om till rött:
+    // worldPos.y += 5.0; 
+      
+    raycaster.set(worldPos, partVector);
+
+    arrows[key].position.copy(worldPos);
+    if(key.includes('Out')) {
+        arrows[key].setDirection(offset.clone().normalize().applyQuaternion(craft.quaternion));
+    }
+        if(key.includes('Forward')) {
+        arrows[key].setDirection(offset.clone().normalize().applyQuaternion(craft.quaternion));
+    }
+    const intersects = raycaster.intersectObject(track, true);
+    
+    // Om vi träffar banan och är närmare än 4 enheter
+    if (intersects.length > 0 && intersects[0].distance < 4.0) {
+        arrows[key].setColor(0x00ff00); // Grön = Träff
+        
+        // Spara värdena för fysiken senare (t.ex. avstånd och lutning)
+        // const distance = intersects[0].distance;
+        // const normal = intersects[0].face.normal;
+    } else {
+        arrows[key].setColor(0xff0000); // Röd = Miss
+    }
+}
+
   return pose;
 }
 
@@ -388,6 +458,12 @@ const trackAssets = createTrack(trackData);
   track = trackAssets.group;
   curve = trackAssets.curve;
   race.boostPads = trackAssets.boostPads; // Hämta de slumpade positionerna från banan!
+  track.traverse((child) => {
+    if (child.isMesh) {
+      child.layers.enable(1); // Aktivera lager 1 för alla banans mesh-objekt      
+    }
+  });
+
   scene.add(track);
 
   // Uppdatera minimappen för den nya banan

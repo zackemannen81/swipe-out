@@ -156,7 +156,7 @@ export class RaceAudio {
   }
 
   // Uppdaterar motorns pitch och volym
-  updateEngine(speed, isBoosting, isRacing) {
+updateEngine(speed, isBoosting, isRacing) {
     if (!this.context || !this.thrustSource || !this.thrustGain) return;
     const t = this.context.currentTime;
     
@@ -173,6 +173,15 @@ export class RaceAudio {
     this.thrustSource.playbackRate.setTargetAtTime(rate, t, 0.1);
     this.thrustGain.gain.setTargetAtTime(vol, t, 0.1);
   }
+
+ shipPlayerUpdateSfx( ship )
+ {
+    if (!this.context || !this.thrustSource || !this.thrustGain) return;
+    const rate = 0.6 + (speed / 100) * 0.8 + (isBoosting ? 0.4 : 0);
+    const vol = isBoosting ? 0.8 : (speed > 20 ? 0.5 : 0.0);
+  	this.thrustGain.gain.value = THREE.MathUtils.clamp(vol, 0, 0.6);
+	  this.thrustSource.playbackRate.value = 0.5 + rate * 1.25;
+ }
 
   // Spelar upp engångsljud (boost och kollision)
   playSfx(type) {
