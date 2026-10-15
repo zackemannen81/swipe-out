@@ -1,10 +1,11 @@
 import * as THREE from 'three';
+import {SPEEDCALIBRATION} from './game.js';
 
 // A scale-adapted port of the original Wipeout ship dynamics.
 // The original triangle/section collision system is replaced by the track frame
 // supplied by SwipeOut, while retaining thrust build-up, skid, differential
 // brakes, track adhesion, airborne gravity, angular inertia and edge impacts.
-export function createShipPhysics(baseSpeed = 65) {
+export function createShipPhysics(baseSpeed = 65 + SPEEDCALIBRATION) {
   return {
     boostTimer: 0,        
     distance: 0,
@@ -38,7 +39,7 @@ export function createShipPhysics(baseSpeed = 65) {
 const damp = (value, target, lambda, dt) =>
   THREE.MathUtils.damp(value, target, lambda, dt);
 
-export function stepShipPhysics(ship, input, dt, curve, baseSpeed = 65) {
+export function stepShipPhysics(ship, input, dt, curve, baseSpeed = 65 + SPEEDCALIBRATION  ) {
   if (dt <= 0) {
     const frame = getFrame(curve, ship.distance);
     return makePose(ship, frame);
@@ -76,7 +77,7 @@ ship.boostTimer = Math.max(0, ship.boostTimer - dt);
   const baselineDrag = ship.speed * 0.045;
   const brakingForce = brake * 18;
   ship.speed += (throttleForce - baselineDrag - brakingForce) * dt;
-const maxSpeed = ship.boostTimer > 0 ? 140 : 100;
+const maxSpeed = ship.boostTimer > 0 ?baseSpeed+ 40 : baseSpeed ; // NY: Maxhastighet under boost
   ship.speed = THREE.MathUtils.clamp(ship.speed, 12, maxSpeed);
 
   // Find the current local track frame and preserve the original jump response

@@ -6,7 +6,7 @@ import { RaceAudio } from './audio.js';
 import './style.css';
 import { createCraft, loadCraftModel } from './craft.js';
 import { createTrack, getTrackFrame } from './track.js';
-import { NEON_CAUSEWAY, SYNTHETIC_DREAMS, DIGITAL_HORIZON } from './track-data.js';
+import { NEON_CAUSEWAY, SYNTHETIC_DREAMS, DIGITAL_HORIZON, MOMMY_IM_SCARED } from './track-data.js';
 import { createShipPhysics, stepShipPhysics } from './ship-physics.js';
 import { createOpponents, getPlayerPosition, resetOpponents, updateOpponents } from './opponents.js';
 
@@ -34,15 +34,16 @@ if (menuButton) {
     setScreen(startScreen, true);
   });
 }
-
+export const SPEEDCALIBRATION = 40; // Justera detta värde för att kalibrera spelets hastighet
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x080c0a);
 scene.fog = new THREE.FogExp2(0x080d18, 0.00065);
 
 const TRACK_CONFIG = {
   'track1': { name: 'Neon Causeway', data: NEON_CAUSEWAY, defaultAudio: '/audio/tracks/track_001.mp3', backdrop: '/images/backdrop_track-001.jpg' },
-  'track2': { name: 'Synthetic Dreams', data: SYNTHETIC_DREAMS, defaultAudio: '/audio/tracks/track_004.mp3', backdrop: '/images/backdrop_track-002.jpg' },
-  'track3': { name: 'Digital Horizon', data: DIGITAL_HORIZON, defaultAudio: '/audio/tracks/track_006.mp3', backdrop: '/images/backdrop_track-003.jpg' }
+  'track2': { name: 'Synthetic Dreams', data: SYNTHETIC_DREAMS, defaultAudio: '/audio/tracks/track_002.mp3', backdrop: '/images/backdrop_track-002.jpg' },
+  'track3': { name: 'Digital Horizon', data: DIGITAL_HORIZON, defaultAudio: '/audio/tracks/track_006.mp3', backdrop: '/images/backdrop_track-003.jpg' },
+  'track4': { name: 'Mommy I\'m Scared', data: MOMMY_IM_SCARED, defaultAudio: '/audio/tracks/track_005.mp3', backdrop: '/images/backdrop_track-004.jpg' }
 };
 
 let currentTrackId = 'track1'; 
@@ -213,13 +214,36 @@ const cameraSystem = {
   break;
 
     };*/
-        
+case 'wipeoutStyle': {
+      // Konfiguration (dessa kan du flytta upp till state-variablerna i början av cameraSystem om du vill)
+      const distance = 3.0;      // Hur långt bakom
+      const height = 3.0;        // Hur högt över
+      const positionLerp = 5.0;  // Hur stram gummisnodden är (högre = stummare, lägre = sladdrigare)
+
+      // 1. Skapa offset utifrån skeppets lokala rotation. 
+      // Eftersom Z=1 verkar vara framåt i din motor, sätter vi Z till -distance för att hamna bakom.
+      const offset = new THREE.Vector3(0, height, -distance).applyQuaternion(craftQuaternion);
+      
+      // 2. Beräkna den ideala positionen (där kameran VILL vara)
+      const idealPosition = craftPosition.clone().add(offset);
+
+      // 3. Dra kamerans nuvarande position mot den ideala positionen (Gummisnoddseffekten)
+      this.position.lerp(idealPosition, 1 - Math.exp(-positionLerp * delta));
+
+      // 4. Sätt vad vi vill titta på (en bit framför skeppet in i kurvan)
+      const forwardDir = new THREE.Vector3(0, 0, 1).applyQuaternion(craftQuaternion);
+      this.lookTarget.copy(craftPosition).add(forwardDir.multiplyScalar(8));
+      this.lookTarget.y += 1.0; // Lyft blicken lite så vi inte tittar rakt ner i marken
+
+      break;
+    }
+    
    case 'external': {
   // Kameran följer banans riktning i stället för
   // att reagera direkt på skeppets rotation.
         const speedBlend = THREE.MathUtils.clamp((race.currentSpeed - baseSpeed) / (104 - baseSpeed), 0, 1);
   // Pull the chase camera 25% closer as the ship approaches maximum speed.
-  const chaseDistance = THREE.MathUtils.lerp(6.2, 5.4, speedBlend);
+  const chaseDistance = THREE.MathUtils.lerp(5.2, 4.4, speedBlend);
   const chaseHeight = THREE.MathUtils.lerp(3.3, 2.8, speedBlend);
   const idealOffset = new THREE.Vector3(0, chaseHeight, -chaseDistance).applyQuaternion(craftQuaternion);
   const forward = trackFrame.tangent.clone().normalize();
@@ -229,7 +253,7 @@ const cameraSystem = {
   const desiredPos = craftPosition.clone()
   .add(idealOffset)
     //.addScaledVector(forward, -2.2)
-    .addScaledVector(worldUp, 2.8);
+    .addScaledVector(worldUp, 1.8);
 
   // Mjuk, tidsbaserad förflyttning mot målpositionen.
   this.position.lerp(
@@ -284,7 +308,7 @@ case 'circle': {
 
     camera.position.copy(this.position);
 
-if (this.mode === 'circle' || this.mode === 'static') {
+if (this.mode === 'circle' || this.mode === 'static' || this.mode === 'wipeoutStyle') {
   this.currentLook.copy(this.lookTarget); // Titta direkt på skeppet
 } else {
   this.currentLook.lerp(this.lookTarget, 1 - Math.exp(-3.0 * delta)); // Behåll mjukheten i andra lägen
@@ -299,7 +323,7 @@ camera.lookAt(this.currentLook);
     this.mode = this.mode === 'external' ? 'internal' : 'external';
   },
   cycleMode() {
-  const modes = ['external', 'internal', 'circle', 'static'];
+  const modes = ['external', 'internal', 'circle', 'static', 'wipeoutStyle'];
   const index = modes.indexOf(this.mode);
   this.mode = modes[(index + 1) % modes.length];
 
@@ -319,7 +343,7 @@ const race = {
   crashTimer: 0, crashCooldown: 0,
   countdownTimer: 3.0, // NY: För nedräkningen
 };
-const baseSpeed = 65;
+const baseSpeed = 65+SPEEDCALIBRATION; // NY: Basfart för spelet, justeras med SPEEDCALIBRATION
 const totalLaps = 3;
 let viewportWidth = window.innerWidth;
 let viewportHeight = window.innerHeight;

@@ -1,7 +1,9 @@
 import * as THREE from 'three';
 
-import type { Section, TrackFace } from './track';
-import type { Sfx } from './sfx';
+// @ts-ignore -- track.js does not currently provide a declaration file.
+import type { Section, TrackFace } from './track.js';
+// @ts-ignore -- audio.js does not currently provide a declaration file.
+import type { Sfx } from './audio';
 
 // Ship state flags
 export enum ShipFlags {
@@ -42,24 +44,7 @@ export class Ship {
 
     // ... (din init och update-kod)
 
-    nose(): THREE.Vector3 {
-        // Kopiera offseten, snurra den efter skeppets vinkel och addera skeppets position
-        return this._nosePos.copy(this._noseOffset)
-            .applyQuaternion(this.model?.quaternion || new THREE.Quaternion())
-            .add(this.position);
-    }
 
-    wingLeft(): THREE.Vector3 {
-        return this._wingLeftPos.copy(this._wingLeftOffset)
-            .applyQuaternion(this.model?.quaternion || new THREE.Quaternion())
-            .add(this.position);
-    }
-
-    wingRight(): THREE.Vector3 {
-        return this._wingRightPos.copy(this._wingRightOffset)
-            .applyQuaternion(this.model?.quaternion || new THREE.Quaternion())
-            .add(this.position);
-    }
 
     // Timing constants (original NTSC frame units)
     static readonly UPDATE_TIME_INITIAL   = 200 / 30;
@@ -235,25 +220,23 @@ export class Ship {
     cockpit(): THREE.Vector3 {
         return new THREE.Vector3();
     }
-
-    nose(): THREE.Vector3 {
-        return new THREE.Vector3();
+        nose(): THREE.Vector3 {
+        // Kopiera offseten, snurra den efter skeppets vinkel och addera skeppets position
+        return this._nosePos.copy(this._noseOffset)
+            .applyQuaternion(this.model?.quaternion || new THREE.Quaternion())
+            .add(this.position);
     }
 
     wingLeft(): THREE.Vector3 {
-        return new THREE.Vector3();
+        return this._wingLeftPos.copy(this._wingLeftOffset)
+            .applyQuaternion(this.model?.quaternion || new THREE.Quaternion())
+            .add(this.position);
     }
 
     wingRight(): THREE.Vector3 {
-        return new THREE.Vector3();
+        return this._wingRightPos.copy(this._wingRightOffset)
+            .applyQuaternion(this.model?.quaternion || new THREE.Quaternion())
+            .add(this.position);
     }
-}
-```
 
-/*
-if (ship.hasFlag(ShipFlags.FLYING)) {
-    // Ship is flying
 }
-
-ship.clearFlag(ShipFlags.FLYING);
-*/

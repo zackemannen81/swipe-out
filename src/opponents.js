@@ -6,13 +6,13 @@ const TOTAL_LAPS = 3;
 
 const RACER_DEFINITIONS = [
   {
-    name: 'Vanta', speed: 92.5, lane: -2.15, phase: 0.4,
+    name: 'Vanta', speed: 94.5, lane: -2.15, phase: 0.4,
     modelUrl: '/models/racer_optimized-team2.glb',
     hullColor: 0x8b426c, canopyColor: 0x55132d,
     accentColor: 0xff4b91, secondaryAccentColor: 0xffb24a,
   },
   {
-    name: 'Kestrel', speed: 99.5, lane: 2.15, phase: 2.2,
+    name: 'Kestrel', speed: 102.5, lane: 2.15, phase: 2.2,
     modelUrl: '/models/racer_optimized-team3.glb',
     hullColor: 0x4c7890, canopyColor: 0x123d55,
     accentColor: 0x63f4e8, secondaryAccentColor: 0xc2ff61,
