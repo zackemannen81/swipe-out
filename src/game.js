@@ -9,6 +9,8 @@ import { createTrack, getTrackFrame } from './track.js';
 import { NEON_CAUSEWAY, SYNTHETIC_DREAMS, DIGITAL_HORIZON, MOMMY_IM_SCARED } from './track-data.js';
 import { createShipPhysics, stepShipPhysics } from './ship-physics.js';
 import { createOpponents, getPlayerPosition, resetOpponents, updateOpponents } from './opponents.js';
+import Nebula, { SpriteRenderer, Rate, Span } from 'three-nebula';
+import thrusterConfig from './thruster.json';
 
 const canvas = document.querySelector('#game-canvas');
 const startScreen = document.querySelector('#start-screen');
@@ -134,7 +136,7 @@ function updateMinimap(position) {
 setupMinimap();
 const { group: craft, engineMaterials, thrusterMaterials, thrusters, glow } = createCraft();
 scene.add(craft);
-
+/*
 const speedTrails = [-1, 1].map((side) => {
   const material = new THREE.MeshBasicMaterial({
     color: side < 0 ? 0xff4388 : 0x5cf5ec,
@@ -152,6 +154,15 @@ const speedTrails = [-1, 1].map((side) => {
   craft.add(trail);
   return trail;
 });
+*/
+let particleSystem = null;
+let thrusterEmitter = null;
+
+Nebula.fromJSONAsync(thrusterConfig, THREE).then(loaded => {
+  const particleRenderer = new SpriteRenderer(scene, THREE);
+  particleSystem = loaded.addRenderer(particleRenderer);
+  thrusterEmitter = particleSystem.emitters[0];
+}).catch(err => console.error("Nebula Error:", err));
 
 loadCraftModel({ group: craft })
   .catch((error) => console.warn('Unable to load racer model; using procedural craft.', error));
@@ -1030,7 +1041,7 @@ if (countVal !== prevCount) {
   bloomPass.strength = 0.62 + kick.hitValue * 0.55 + bass.value * 0.12;
   const pulse = 0.78 + Math.sin(clock.elapsedTime * 19) * 0.12 + kick.hitValue * 0.75;
   engineMaterials.forEach((material) => material.color.setRGB(0.28 * pulse, 0.95 * pulse, 0.9 * pulse));
-const thrusterPower = 0.72 + bass.value * 0.85 + kick.hitValue * 0.72;
+  const thrusterPower = 0.72 + bass.value * 0.85 + kick.hitValue * 0.72;
   thrusters.forEach((thruster, index) => {
     thruster.visible = race.state === 'racing';
     thruster.scale.set(
@@ -1040,17 +1051,39 @@ const thrusterPower = 0.72 + bass.value * 0.85 + kick.hitValue * 0.72;
     );
   });
 
-  const trailPower = race.state === 'racing' ? THREE.MathUtils.clamp(0.18 + bass.value * 0.42 + kick.hitValue * 0.35, 0.18, 0.9) : 0;
-  
-  // NYTT: Beräkna hastighetsfaktor baserat på aktuell fart
-  const speedFactor = race.state === 'racing' ? Math.max(0.1, race.currentSpeed / baseSpeed) : 0;
+// --- UPPDATERA NEBULA PARTIKLAR ---
+  if (particleSystem && thrusterEmitter) {
+    // Fäst emittern exakt vid avgasröret
+    const exhaustPos = new THREE.Vector3(0, -0.12, 1.5)
+      .applyQuaternion(craft.quaternion)
+      .add(craft.position);
+    
+    thrusterEmitter.position.x = exhaustPos.x;
+    thrusterEmitter.position.y = exhaustPos.y;
+    thrusterEmitter.position.z = exhaustPos.z;
 
+    // Kör systemet! (Nebulas update sköter tidsberäkningen internt)
+    particleSystem.update();
+  }
+
+ const trailPower = race.state === 'racing' ? THREE.MathUtils.clamp(0.18 + bass.value * 0.42 + kick.hitValue * 0.35, 0.18, 0.9) : 0;
+  
+  // NYTT: Räkna ut en hastighetsfaktor. Är 1.0 vid normal maxfart, över 1.0 vid boost, och nära 0 vid inbromsning/krasch.
+  const speedFactor = race.state === 'racing' ? THREE.MathUtils.clamp(race.currentSpeed / baseSpeed, 0.1, 1.8) : 0;
+/*
   speedTrails.forEach((trail, index) => {
     trail.visible = race.state === 'racing';
-    // Gör dem dynamiskt längre ju fortare du kör (multiplicerar med speedFactor * 1.5)
-    trail.scale.y = trailPower * speedFactor * 1.5 * (0.82 + Math.sin(clock.elapsedTime * 23 + index * 2.4) * 0.12);
-    // Tona ut dem lite om du kör långsamt
-    trail.material.opacity = trailPower * 0.38 * Math.min(speedFactor, 1.0);
+    
+    // ÄNDRING: Multiplicera in speedFactor i Y-skalan. Detta sträcker ut spåret!
+    // Siffran 1.2 här nedanför är en bas-förlängare. Öka den om du vill ha ÄNNU längre spår vid hög fart.
+    trail.scale.y = trailPower * speedFactor * 1.2 * (0.82 + Math.sin(clock.elapsedTime * 23 + index * 2.4) * 0.12);
+    
+    // ÄNDRING: Gör spåren lite tydligare/starkare när man kör fort
+    trail.material.opacity = trailPower * 0.38 * Math.min(speedFactor, 1.2);
+  });
+  */
+  thrusterMaterials.forEach((material) => {
+    material.opacity = race.state === 'racing' ? THREE.MathUtils.clamp(0.36 + thrusterPower * 0.14, 0.36, 0.82) : 0;
   });
   glow.intensity = 2.4 + pulse * 1.2 + kick.hitValue * 5.5 + bass.value * 2.4;
   speedDisplay.textContent = race.state === 'racing'
