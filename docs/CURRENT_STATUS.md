@@ -1,6 +1,10 @@
 # Current Status
 
-Last verified: 2026-10-13
+Last verified: 2026-10-16
+
+## Recent change — raycast wall collision response
+
+Track guardrails now use raycast layer 2, separate from the road hover surface on layer 1, while both layers are also enabled on the default camera layer so the track remains visible. Wing and nose probes query the guardrails with forward/outward directions; each hit uses the world-space normal, removes velocity into the wall, applies an immediate outward impulse, and pushes the craft clear of the rail to reduce high-speed clipping. Spline projection, race distance, checkpoints, camera progression, and lap logic remain unchanged. Production build, JavaScript syntax checks, and whitespace verification pass; interactive driving and visual collision feel remain pending.
 
 ## Recent change — live minimap position
 

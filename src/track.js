@@ -1,8 +1,13 @@
 import * as THREE from 'three';
 import { NEON_CAUSEWAY } from './track-data.js';
 
-function addInstances(group, geometry, material, transforms) {
+function addInstances(group, geometry, material, transforms, layer = 1) {
   const mesh = new THREE.InstancedMesh(geometry, material, transforms.length);
+  // Keep every track object renderable on the camera's default layer while
+  // also exposing road (1) and guardrail (2) as separate raycast layers.
+  mesh.layers.enable(0);
+  mesh.layers.enable(layer);
+  mesh.userData.isTrackWall = layer === 2;
   const matrix = new THREE.Matrix4();
   const scale = new THREE.Vector3(1, 1, 1);
   transforms.forEach(({ position, quaternion }, index) => {
@@ -58,7 +63,10 @@ export function createTrack(definition = NEON_CAUSEWAY) {
     geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
     geometry.setIndex(indices);
     geometry.computeVertexNormals();
-    group.add(new THREE.Mesh(geometry, material));
+    const roadMesh = new THREE.Mesh(geometry, material);
+    roadMesh.layers.enable(0);
+    roadMesh.layers.enable(1);
+    group.add(roadMesh);
   }
 
   const trackWidth = definition.width;
@@ -69,8 +77,13 @@ export function createTrack(definition = NEON_CAUSEWAY) {
   ribbon(-trackWidth / 2 - 0.15, 0.1, darkMaterial, 0.14);
   ribbon(trackWidth / 2 + 0.15, 0.1, darkMaterial, 0.14);
 
+  const railMaterial = new THREE.MeshStandardMaterial({
+    color: 0x26384d, emissive: 0x16283b, emissiveIntensity: 1.8,
+    metalness: 0.72, roughness: 0.34,
+  });
+
   // Floating neon guardrails make the road edge readable at race speed.
-  const railGeometry = new THREE.CylinderGeometry(0.07, 0.07, 8.5, 8);
+  const railGeometry = new THREE.CylinderGeometry(0.1, 0.1, 8.5, 8);
   const railTransforms = [];
   for (let distance = 4.25; distance < curve.getLength(); distance += 8.5) {
     const frame = getTrackFrame(curve, distance / curve.getLength());
@@ -85,7 +98,7 @@ export function createTrack(definition = NEON_CAUSEWAY) {
       railTransforms.push({ position, quaternion });
     }
   }
-  addInstances(group, railGeometry, darkMaterial, railTransforms);
+  addInstances(group, railGeometry, railMaterial, railTransforms, 2);
   const railLightGeometry = new THREE.CylinderGeometry(0.045, 0.045, 8.5, 6);
   const pinkRailTransforms = [];
   const cyanRailTransforms = [];
@@ -102,8 +115,8 @@ export function createTrack(definition = NEON_CAUSEWAY) {
       (side < 0 ? pinkRailTransforms : cyanRailTransforms).push({ position, quaternion });
     }
   }
-  addInstances(group, railLightGeometry, pinkMaterial, pinkRailTransforms);
-  addInstances(group, railLightGeometry, cyanMaterial, cyanRailTransforms);
+  addInstances(group, railLightGeometry, pinkMaterial, pinkRailTransforms, 2);
+  addInstances(group, railLightGeometry, cyanMaterial, cyanRailTransforms, 2);
 
   // Directional chevrons sit just above the road and point into the flow of the course.
   const arrowGeometry = new THREE.BoxGeometry(0.5, 0.06, 0.86);
@@ -194,9 +207,9 @@ export function createTrack(definition = NEON_CAUSEWAY) {
       });
     }
   }
-  addInstances(group, railPost, darkMaterial, postTransforms);
-  addInstances(group, beaconGeometry, pinkMaterial, pinkBeaconTransforms);
-  addInstances(group, beaconGeometry, cyanMaterial, cyanBeaconTransforms);
+  addInstances(group, railPost, darkMaterial, postTransforms, 2);
+  addInstances(group, beaconGeometry, pinkMaterial, pinkBeaconTransforms, 2);
+  addInstances(group, beaconGeometry, cyanMaterial, cyanBeaconTransforms, 2);
 
   const startFrame = getTrackFrame(curve, 0);
   const gateWidth = trackWidth - 0.9;

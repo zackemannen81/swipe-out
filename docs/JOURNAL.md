@@ -1,3 +1,9 @@
+## 2026-10-16 — raycast wall collision response
+
+- Separated road/hover raycasts (layer 1) from guardrail collision raycasts (layer 2); guardrail instanced meshes retain a wall marker through track setup.
+- Added diagonal forward/outward wing probes and a forward nose wall probe. World-space instance normals drive an immediate impulse away from the rail, removal of velocity into it, and a positional clearance push to reduce high-speed clipping.
+- Kept spline projection and race progression logic out of physical collision response. `npm run build`, JavaScript syntax checks, and `git diff --check` passed; interactive play/visual collision verification remains pending.
+
 ## 2026-10-13 — minimap: live player position
 
 - Changed the minimap player marker to use the craft's current Three.js world position instead of only the route progress centerline.

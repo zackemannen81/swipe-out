@@ -360,8 +360,31 @@ function setScreen(screen, visible) {
 
 
 const raycaster = new THREE.Raycaster();
-
-raycaster.layers.set(1); // Sätt till samma Layer som banan
+raycaster.layers.set(1);
+const collisionRaycaster = new THREE.Raycaster();
+collisionRaycaster.layers.set(2);
+const hoverRayOrigin = new THREE.Vector3();
+const hoverRayDirection = new THREE.Vector3(0, -1, 0);
+const hoverSample = { hit: false, distance: Infinity, normal: new THREE.Vector3(0, 1, 0) };
+  const boundarySample = {
+  center: false,
+  nose: false,
+  leftWing: false,
+  rightWing: false,
+  forwardCollision: false,
+};
+const wallHits = [];
+const projectionPoint = new THREE.Vector3();
+const wallNormal = new THREE.Vector3();
+const wallPush = new THREE.Vector3();
+const instanceMatrix = new THREE.Matrix4();
+const wallWorldMatrix = new THREE.Matrix4();
+const raycastOrigin = new THREE.Vector3();
+const raycastRight = new THREE.Vector3();
+const raycastUp = new THREE.Vector3(0, 1, 0);
+const raycastDown = new THREE.Vector3(0, -1, 0);
+const raycastForward = new THREE.Vector3();
+const boundaryCorrection = new THREE.Vector3();
 
 const arrows = {
     center: new THREE.ArrowHelper(new THREE.Vector3(0, -1, 0), new THREE.Vector3(), 4.0, 0xff0000),
@@ -377,7 +400,6 @@ const arrows = {
 Object.values(arrows).forEach(arrow => scene.add(arrow));
 
 function updateCraftPose(delta = 0) {
-
   const input = {
     steer: race.steering,
     thrust: Math.max(0, race.throttleTarget),
@@ -385,11 +407,21 @@ function updateCraftPose(delta = 0) {
     brakeRight: heldKeys.has('e') || race.throttleTarget < -0.1,
     pitch: (heldKeys.has('r') ? 1 : 0) - (heldKeys.has('f') ? 1 : 0),
   };
-const pose = (race.state === 'racing' || race.state === 'finished') && delta > 0
-    ? stepShipPhysics(shipPhysics, input, delta, curve, baseSpeed)
-    : stepShipPhysics(shipPhysics, input, 0, curve, baseSpeed);
 
-  race.distance = shipPhysics.distance;
+  raycaster.set(craft.position, hoverRayDirection);
+  const groundHit = raycaster.intersectObject(track, true).find((hit) => hit.object.geometry?.attributes?.position);
+  hoverSample.hit = Boolean(groundHit);
+  hoverSample.distance = groundHit?.distance ?? Infinity;
+  if (groundHit?.face) {
+    hoverSample.normal.copy(groundHit.face.normal).transformDirection(groundHit.object.matrixWorld);
+    if (hoverSample.normal.y < 0) hoverSample.normal.negate();
+  } else {
+    hoverSample.normal.set(0, 1, 0);
+  }
+
+  const pose = (race.state === 'racing' || race.state === 'finished') && delta > 0
+    ? stepShipPhysics(shipPhysics, input, delta, curve, baseSpeed, hoverSample)
+    : stepShipPhysics(shipPhysics, input, 0, curve, baseSpeed, hoverSample);
   race.currentSpeed = shipPhysics.speed;
   race.lateralVelocity = shipPhysics.lateralVelocity;
   race.airborne = shipPhysics.airborne;
@@ -399,55 +431,139 @@ const pose = (race.state === 'racing' || race.state === 'finished') && delta > 0
   craft.position.copy(pose.position);
   craft.quaternion.copy(pose.orientation);
 
-
-// Definiera var punkterna sitter relativt skeppets mittpunkt.
-// Z är oftast framåt/bakåt och X är höger/vänster. 
-// Justera siffrorna om vingarna hamnar för långt ut eller nosen för långt bak!
-const offsets = {
-    center: new THREE.Vector3(0, 0, 0),
-    noseDown: new THREE.Vector3(0, 0, 1.6), 
-    noseForward: new THREE.Vector3(0, 0, 1.6), 
-    leftWingDown: new THREE.Vector3(-1.3, 0, 0.2),
-    rightWingDown: new THREE.Vector3(1.3, 0, 0.2),
-    leftWingOut: new THREE.Vector3(-1.3, 0, 0.2),
-    rightWingOut: new THREE.Vector3(1.3, 0, 0.2)
-};
-
-for (const [key, offset] of Object.entries(offsets)) {
-    // 1. Ta den lokala offseten
-    // 2. Rotera den så den följer skeppets aktuella vinkel
-    // 3. Addera skeppets världsposition
-   // if leftWingOut or rightWingOut, we want to check the horizontal direction instead of downwards. So we will use a different vector for those two cases.
-    const partVector = key.includes('Out') ? new THREE.Vector3(0, 0, -1)  : key.includes('Forward') ? new THREE.Vector3(0, 0, -1) : new THREE.Vector3(0, -1, 0);
-    
-
-    const worldPos = offset.clone().applyQuaternion(craft.quaternion).add(craft.position);
-    
-    // Testa gärna att höja upp hela rasket tillfälligt för att se att de slår om till rött:
-    // worldPos.y += 5.0; 
-      
-    raycaster.set(worldPos, partVector);
-
-    arrows[key].position.copy(worldPos);
-    if(key.includes('Out')) {
-        arrows[key].setDirection(offset.clone().normalize().applyQuaternion(craft.quaternion));
+  // Project world position to the nearest sampled centerline point for race logic only.
+  let closestDistance = 0;
+  let closestDistanceSq = Infinity;
+  const samples = 720;
+  for (let index = 0; index < samples; index += 1) {
+    const distance = curve.getLength() * index / samples;
+    curve.getPointAt(index / samples, projectionPoint);
+    const distanceSq = projectionPoint.distanceToSquared(craft.position);
+    if (distanceSq < closestDistanceSq) {
+      closestDistanceSq = distanceSq;
+      closestDistance = distance;
     }
-        if(key.includes('Forward')) {
-        arrows[key].setDirection(offset.clone().normalize().applyQuaternion(craft.quaternion));
+  }
+  shipPhysics.distance = closestDistance;
+  race.distance = closestDistance;
+
+  const offsets = {
+    center: new THREE.Vector3(0, 0.35, 0),
+    nose: new THREE.Vector3(0, 0.35, 1.6),
+    noseForward: new THREE.Vector3(0, 0.35, 1.6),
+    leftWing: new THREE.Vector3(-1.3, 0.35, 0.2),
+    rightWing: new THREE.Vector3(1.3, 0.35, 0.2),
+    leftWingOut: new THREE.Vector3(-1.3, 0.35, 0.2),
+    rightWingOut: new THREE.Vector3(1.3, 0.35, 0.2),
+  };
+  boundarySample.center = false;
+  boundarySample.nose = false;
+  boundarySample.leftWing = false;
+  boundarySample.rightWing = false;
+  boundarySample.forwardCollision = false;
+  wallHits.length = 0;
+
+  for (const [key, offset] of Object.entries(offsets)) {
+    raycastOrigin.copy(offset).applyQuaternion(craft.quaternion).add(craft.position);
+    const isForwardProbe = key === 'noseForward';
+    const direction = isForwardProbe
+      ? raycastForward.set(0, 0, 1).applyQuaternion(craft.quaternion).normalize()
+      : raycastDown;
+    raycaster.set(raycastOrigin, direction);
+    raycaster.far = isForwardProbe ? 3.5 : 6;
+    const hit = raycaster.intersectObject(track, true)[0];
+
+    // The wing probes also look diagonally forward and outward for the guardrail.
+    // This is separate from the road probe so a road hit cannot masquerade as a wall.
+    let wallDirection = null;
+    if (key === 'leftWingOut' || key === 'rightWingOut') {
+      wallDirection = new THREE.Vector3(key === 'leftWingOut' ? -0.72 : 0.72, 0, 0.7)
+        .applyQuaternion(craft.quaternion).normalize();
+    } else if (isForwardProbe) {
+      wallDirection = direction;
     }
-    const intersects = raycaster.intersectObject(track, true);
-    
-    // Om vi träffar banan och är närmare än 4 enheter
-    if (intersects.length > 0 && intersects[0].distance < 4.0) {
-        arrows[key].setColor(0x00ff00); // Grön = Träff
-        
-        // Spara värdena för fysiken senare (t.ex. avstånd och lutning)
-        // const distance = intersects[0].distance;
-        // const normal = intersects[0].face.normal;
-    } else {
-        arrows[key].setColor(0xff0000); // Röd = Miss
+    let wallHit = null;
+    if (wallDirection) {
+      collisionRaycaster.set(raycastOrigin, wallDirection);
+      collisionRaycaster.far = isForwardProbe ? 2.6 : 2.4;
+      wallHit = collisionRaycaster.intersectObject(track, true)[0] ?? null;
+      if (wallHit) {
+        wallNormal.copy(wallHit.face?.normal ?? new THREE.Vector3(0, 1, 0));
+        if (wallHit.object.isInstancedMesh && wallHit.instanceId !== undefined) {
+          wallHit.object.getMatrixAt(wallHit.instanceId, instanceMatrix);
+          wallWorldMatrix.multiplyMatrices(wallHit.object.matrixWorld, instanceMatrix);
+        } else {
+          wallWorldMatrix.copy(wallHit.object.matrixWorld);
+        }
+        wallNormal.transformDirection(wallWorldMatrix).normalize();
+        // A ray can hit either side of an instanced rail segment. Always orient
+        // the collision normal back toward the probe, so the response is an
+        // outward impulse instead of occasionally pushing the craft through it.
+        if (wallNormal.dot(wallDirection) > 0) wallNormal.negate();
+        if (wallNormal.y > 0.65) wallNormal.set(0, 0, 0);
+        if (wallNormal.lengthSq() > 0) {
+          wallHits.push({ hit: wallHit, normal: wallNormal.clone(), origin: raycastOrigin.clone() });
+        }
+      }
     }
-}
+
+    if (key === 'center' || key === 'nose' || key === 'leftWing' || key === 'rightWing') {
+      boundarySample[key] = Boolean(hit);
+    }
+    if (isForwardProbe && wallHit && wallHit.distance < 1.4) {
+      boundarySample.forwardCollision = true;
+    }
+    if (arrows[key]) {
+      arrows[key].position.copy(raycastOrigin);
+      arrows[key].setDirection(direction);
+      arrows[key].setColor(hit && hit.distance < 4 ? 0x00ff00 : 0xff0000);
+    }
+  }
+  raycaster.far = Infinity;
+  collisionRaycaster.far = Infinity;
+
+  // Resolve each actual rail hit in world space. The hit normal points away
+  // from the rail; reflect only velocity moving into it and push clear of it.
+  for (const { hit, normal } of wallHits) {
+    const inwardSpeed = shipPhysics.worldVelocity.dot(normal);
+    if (inwardSpeed < 0) {
+      const impulse = Math.min(42, -inwardSpeed * 1.35 + 8);
+      shipPhysics.worldVelocity.addScaledVector(normal, impulse);
+      shipPhysics.speed = Math.max(12, shipPhysics.speed * 0.82);
+    }
+    const penetration = Math.max(0, 0.72 - hit.distance);
+    wallPush.copy(normal).multiplyScalar(Math.max(0.38, penetration + 0.38));
+    shipPhysics.worldPosition.add(wallPush);
+    shipPhysics.crashTimer = Math.max(shipPhysics.crashTimer, 0.28);
+  }
+  if (wallHits.length) craft.position.copy(shipPhysics.worldPosition);
+
+  // Keep the craft free-flying: edge assistance remains a fallback only when
+  // there is no direct rail collision; it does not steer toward the spline.
+  if (!wallHits.length && boundarySample.center && (boundarySample.leftWing !== boundarySample.rightWing)) {
+    raycastRight.set(1, 0, 0).applyQuaternion(craft.quaternion).normalize();
+    boundaryCorrection.set(0, 0, 0);
+    if (!boundarySample.leftWing) boundaryCorrection.add(raycastRight);
+    if (!boundarySample.rightWing) boundaryCorrection.sub(raycastRight);
+
+    const outwardSpeed = shipPhysics.worldVelocity.dot(boundaryCorrection);
+    if (outwardSpeed < 0) {
+      shipPhysics.worldVelocity.addScaledVector(boundaryCorrection, -outwardSpeed);
+    }
+    if (boundarySample.forwardCollision) {
+      const forwardSpeed = shipPhysics.worldVelocity.dot(raycastForward);
+      if (forwardSpeed > 0) shipPhysics.worldVelocity.addScaledVector(raycastForward, -forwardSpeed);
+      shipPhysics.crashTimer = Math.max(shipPhysics.crashTimer, 0.2);
+    }
+    boundaryCorrection.multiplyScalar(Math.min(1.8, 0.65 + shipPhysics.worldVelocity.length() * 0.012));
+    shipPhysics.worldVelocity.addScaledVector(boundaryCorrection, delta > 0 ? 5.5 * delta : 0);
+    shipPhysics.worldPosition.add(boundaryCorrection);
+    craft.position.copy(shipPhysics.worldPosition);
+  } else if (boundarySample.forwardCollision) {
+    const forwardSpeed = shipPhysics.worldVelocity.dot(raycastForward);
+    if (forwardSpeed > 0) shipPhysics.worldVelocity.addScaledVector(raycastForward, -forwardSpeed);
+    shipPhysics.crashTimer = Math.max(shipPhysics.crashTimer, 0.2);
+  }
 
   return pose;
 }
@@ -482,8 +598,10 @@ const trackAssets = createTrack(trackData);
   curve = trackAssets.curve;
   race.boostPads = trackAssets.boostPads; // Hämta de slumpade positionerna från banan!
   track.traverse((child) => {
-    if (child.isMesh) {
-      child.layers.enable(1); // Aktivera lager 1 för alla banans mesh-objekt      
+    if (child.isMesh && child.userData.isTrackWall) {
+      child.layers.set(2);
+    } else if (child.isMesh) {
+      child.layers.enable(1);
     }
   });
 
@@ -520,6 +638,9 @@ const trackAssets = createTrack(trackData);
   raceAudio.play().catch((error) => console.warn('Unable to start race music.', error));
   race.state = 'racing';
 Object.assign(shipPhysics, createShipPhysics(baseSpeed));
+  const startPose = stepShipPhysics(shipPhysics, {}, 0, curve, baseSpeed);
+  craft.position.copy(startPose.position);
+  craft.quaternion.copy(startPose.orientation);
   
   // Läs av hur mycket styrhjälp spelaren vill ha
   const assistSelect = document.querySelector('#assist-select');

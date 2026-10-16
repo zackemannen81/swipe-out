@@ -2,12 +2,10 @@ import * as THREE from 'three';
 import {SPEEDCALIBRATION} from './game.js';
 
 // A scale-adapted port of the original Wipeout ship dynamics.
-// The original triangle/section collision system is replaced by the track frame
-// supplied by SwipeOut, while retaining thrust build-up, skid, differential
-// brakes, track adhesion, airborne gravity, angular inertia and edge impacts.
+// World-space motion is deliberately separate from the track projection used by race logic.
 export function createShipPhysics(baseSpeed = 65 + SPEEDCALIBRATION) {
   return {
-    boostTimer: 0,        
+    boostTimer: 0,
     distance: 0,
     speed: baseSpeed,
     lateralOffset: 0,
@@ -24,163 +22,101 @@ export function createShipPhysics(baseSpeed = 65 + SPEEDCALIBRATION) {
     airborne: false,
     jumpCooldown: 0,
     previousSlope: 0,
+    previousTangent: null,
+    assistLevel: 1.0,
     crashTimer: 0,
     crashCooldown: 0,
     lastImpact: 0,
-    // ... dina andra variabler ...
-    jumpCooldown: 0,
-    previousSlope: 0,
-    previousTangent: null, // NY: Håller koll på kurvans riktning
-    assistLevel: 1.0,      // NY: 1.0 = Ingen drift (som nu), 0.0 = Full drift
-    crashTimer: 0,
+    worldPosition: new THREE.Vector3(),
+    worldVelocity: new THREE.Vector3(),
+    worldQuaternion: new THREE.Quaternion(),
+    worldInitialized: false,
   };
 }
 
 const damp = (value, target, lambda, dt) =>
   THREE.MathUtils.damp(value, target, lambda, dt);
 
-export function stepShipPhysics(ship, input, dt, curve, baseSpeed = 65 + SPEEDCALIBRATION  ) {
+export function stepShipPhysics(ship, input, dt, curve, baseSpeed = 65 + SPEEDCALIBRATION, hoverSample = null) {
   if (dt <= 0) {
     const frame = getFrame(curve, ship.distance);
-    return makePose(ship, frame);
+    if (!ship.worldInitialized) {
+      ship.worldPosition.copy(makePose(ship, frame).position);
+      ship.worldVelocity.copy(frame.tangent).multiplyScalar(ship.speed);
+      ship.worldQuaternion.copy(frame.rotation);
+      ship.worldInitialized = true;
+    }
+    return makeFreePose(ship, frame);
   }
 
   ship.jumpCooldown = Math.max(0, ship.jumpCooldown - dt);
   ship.crashTimer = Math.max(0, ship.crashTimer - dt);
   ship.crashCooldown = Math.max(0, ship.crashCooldown - dt);
   ship.lastImpact = Math.max(0, ship.lastImpact - dt);
-ship.boostTimer = Math.max(0, ship.boostTimer - dt);
+  ship.boostTimer = Math.max(0, ship.boostTimer - dt);
 
-  // Original thrust rises while held and falls off when released.
   const thrustInput = THREE.MathUtils.clamp(input.thrust ?? 0, 0, 1);
   ship.thrust = THREE.MathUtils.clamp(
     ship.thrust + (thrustInput > 0 ? 1.75 * thrustInput : -1.1) * dt,
-    0,
-    1,
+    0, 1,
   );
   ship.brakeLeft = damp(ship.brakeLeft, input.brakeLeft ? 1 : 0, input.brakeLeft ? 5.8 : 7.5, dt);
   ship.brakeRight = damp(ship.brakeRight, input.brakeRight ? 1 : 0, input.brakeRight ? 5.8 : 7.5, dt);
   const brake = ship.brakeLeft + ship.brakeRight;
   const differentialBrake = ship.brakeLeft - ship.brakeRight;
 
-  // Angular acceleration / inertia, inspired by ship_player_update_race().
-  const steer = THREE.MathUtils.clamp(-input.steer ?? 0, -1, 1);
-  const turnAcceleration = 3.7 + brake * 1.8;
-  ship.yawVelocity += (steer * turnAcceleration - ship.yawVelocity * (steer === 0 ? 7.5 : 1.15)) * dt;
+  const steer = THREE.MathUtils.clamp(-(input.steer ?? 0), -1, 1);
+  ship.yawVelocity += (steer * (3.7 + brake * 1.8) - ship.yawVelocity * (steer === 0 ? 7.5 : 1.15)) * dt;
   ship.yawVelocity = THREE.MathUtils.clamp(ship.yawVelocity, -2.2, 2.2);
   ship.yaw = damp(ship.yaw, THREE.MathUtils.clamp(ship.yawVelocity * 0.15, -0.24, 0.24), 5.2, dt);
   ship.pitch = damp(ship.pitch, THREE.MathUtils.clamp(input.pitch ?? 0, -1, 1) * 0.09, 3.2, dt);
 
-  // Longitudinal force balance: thrust, drag and braking. Speed is in the
-  // existing SwipeOut world scale, rather than the original PS1 fixed-point scale.
   const throttleForce = ship.thrust * 28;
-  const baselineDrag = ship.speed * 0.045;
   const brakingForce = brake * 18;
-  ship.speed += (throttleForce - baselineDrag - brakingForce) * dt;
-const maxSpeed = ship.boostTimer > 0 ?baseSpeed+ 40 : baseSpeed ; // NY: Maxhastighet under boost
-  ship.speed = THREE.MathUtils.clamp(ship.speed, 12, maxSpeed);
+  ship.speed = THREE.MathUtils.clamp(ship.speed + (throttleForce - ship.speed * 0.045 - brakingForce) * dt, 12, ship.boostTimer > 0 ? baseSpeed + 40 : baseSpeed);
 
-  // Find the current local track frame and preserve the original jump response
-  // to a sharp downward change in track tangent.
-  let frame = getFrame(curve, ship.distance);
-  const slope = frame.tangent.y;
-  const slopeChange = (slope - ship.previousSlope) / Math.max(dt, 1 / 120);
-  ship.previousSlope = slope;
-  if (!ship.airborne && ship.jumpCooldown <= 0 && slopeChange < -0.18) {
-    ship.airborne = true;
-    ship.verticalVelocity = THREE.MathUtils.clamp(-slopeChange * 1.7, 2.8, 7.2);
-    ship.jumpCooldown = 0.6;
+  if (!ship.worldInitialized) {
+    const frame = getFrame(curve, ship.distance);
+    ship.worldPosition.copy(makePose(ship, frame).position);
+    ship.worldVelocity.copy(frame.tangent).multiplyScalar(ship.speed);
+    ship.worldQuaternion.copy(frame.rotation);
+    ship.worldInitialized = true;
   }
-// --- NY KOD: CENTRIFUGALKRAFT OCH DRIFT ---
-  if (!ship.previousTangent) {
-    ship.previousTangent = frame.tangent.clone();
-  }
-  
-  // Dot-produkten mellan förra framens riktning och den nya "höger"-vektorn 
-  // ger oss ett exakt mått på hur skarpt banan precis svängde.
-  const trackTurnAmount = ship.previousTangent.dot(frame.right);
-  const driftFactor = 1.0 - (ship.assistLevel ?? 1.0);
-  
-  // Omvandla svängen till en acceleration (skalad med hastighet). 0.06 är en justerbar styrkekonstant.
-  const centrifugalAccel = (trackTurnAmount / Math.max(dt, 0.001)) * ship.speed * driftFactor * 0.1;
-  ship.previousTangent.copy(frame.tangent);
-  // ------------------------------------------
 
-  // Wipeout's forward-velocity correction (skid) and weaker airborne grip.
-  const grip = ship.airborne ? 1.0 : 4.5 + brake * 1.8;
-  const speedRatio = THREE.MathUtils.clamp(ship.speed / baseSpeed, 0.35, 1.55);
-  const yawLateralForce = ship.yawVelocity * ship.speed * 0.12;
-  const brakeSteerForce = differentialBrake * ship.speed * 0.10;
-  
-  // ÄNDRING HÄR: Lägg till centrifugalAccel i beräkningen av lateralVelocity
-  ship.lateralVelocity += (
-    yawLateralForce + brakeSteerForce + centrifugalAccel - ship.lateralVelocity * grip
-  ) * dt;
+  const forward = new THREE.Vector3(0, 0, 1).applyQuaternion(ship.worldQuaternion).normalize();
+  const turnAxis = hoverSample?.normal?.lengthSq() > 0 ? hoverSample.normal : new THREE.Vector3(0, 1, 0);
+  forward.applyAxisAngle(turnAxis, ship.yawVelocity * dt);
+  const targetVelocity = forward.multiplyScalar(ship.speed);
+  ship.worldVelocity.lerp(targetVelocity, 1 - Math.exp(-(ship.airborne ? 2.0 : 7.0) * dt));
+  ship.worldVelocity.addScaledVector(new THREE.Vector3(0, -9.8, 0), dt);
 
-  ship.lateralVelocity = THREE.MathUtils.clamp(ship.lateralVelocity, -15, 15);
-  //ship.lateralOffset += ship.lateralVelocity * dt * 2;
-/*
-const centeringForce = -ship.lateralOffset * (ship.assistLevel * 5.0); 
-  ship.lateralOffset += (ship.lateralVelocity + centeringForce) * dt * 2;
-*/
-// Låt spelarens egen styrning (lateralVelocity) få motverka eller väga upp centeringForce
-const steeringInput = input.steer ?? 0;
-const centeringForce = -ship.lateralOffset * (ship.assistLevel * 2.0); 
-
-// Om spelaren styr aktivt, dämpa centreringen så man kan svänga ut!
-const effectiveCentering = THREE.MathUtils.lerp(centeringForce, 0, Math.abs(steeringInput));
-
-ship.lateralOffset += (ship.lateralVelocity + effectiveCentering) * dt * 2;
-
-
-  // Magnetic track hold: a damped spring to the road plane. In flight, gravity
-  // takes over and steering authority is reduced, as in the source physics.
-  if (ship.airborne) {
-    ship.verticalVelocity -= 8.6 * dt;
-    ship.verticalOffset += ship.verticalVelocity * dt;
-    if (ship.verticalOffset <= 0) {
-      ship.verticalOffset = 0;
-      ship.verticalVelocity = 0;
-      ship.airborne = false;
-      ship.lastImpact = 0.24;
-      ship.speed *= 0.91;
-    }
+  // Repulsive hover force acts along the measured surface normal, not world-up.
+  if (hoverSample?.hit && hoverSample.distance < 12) {
+    const error = THREE.MathUtils.clamp(1.15 - hoverSample.distance, -4, 4);
+    ship.worldVelocity.addScaledVector(hoverSample.normal, error * 18 * dt);
+    ship.airborne = hoverSample.distance > 2.8;
   } else {
-    const magneticAcceleration = -ship.verticalOffset * 24 - ship.verticalVelocity * 8;
-    ship.verticalVelocity += magneticAcceleration * dt;
-    ship.verticalOffset += ship.verticalVelocity * dt;
-    if (ship.verticalOffset < 0) {
-      ship.verticalOffset = 0;
-      ship.verticalVelocity = 0;
-    }
+    ship.airborne = true;
   }
+  if (brake > 0) ship.worldVelocity.multiplyScalar(Math.max(0, 1 - brake * 0.9 * dt));
+  ship.worldPosition.addScaledVector(ship.worldVelocity, dt);
 
-  // The original uses face collisions and track repulsion. SwipeOut's track is
-  // a smooth ribbon, so the edge is handled as a damped impact instead.
-  const edge = 4.52;
-  if (!ship.airborne && Math.abs(ship.lateralOffset) > edge && ship.crashCooldown <= 0) {
-    ship.crashTimer = 0.42;
-    ship.crashCooldown = 0.62;
-    ship.lateralOffset = Math.sign(ship.lateralOffset) * edge;
-    ship.lateralVelocity *= -0.42;
-    ship.speed *= 0.2;
-    ship.yawVelocity *= -0.28;
-    ship.lastImpact = 0.3;
-  }
-  ship.lateralOffset = THREE.MathUtils.clamp(ship.lateralOffset, -5.4, 5.4);
+  const up = hoverSample?.normal?.lengthSq() > 0 ? hoverSample.normal.clone().normalize() : new THREE.Vector3(0, 1, 0);
+  const direction = ship.worldVelocity.clone().normalize();
+  const right = new THREE.Vector3().crossVectors(up, direction).normalize();
+  if (right.lengthSq() < 1e-6) right.set(1, 0, 0);
+  const correctedForward = new THREE.Vector3().crossVectors(right, up).normalize();
+  const basis = new THREE.Matrix4().makeBasis(right, up, correctedForward);
+  ship.worldQuaternion.setFromRotationMatrix(basis);
+  ship.worldQuaternion.multiply(new THREE.Quaternion().setFromAxisAngle(up, ship.yaw));
+  ship.roll = damp(ship.roll, -steer * 0.22, 6.5, dt);
+  ship.pitch = damp(ship.pitch, THREE.MathUtils.clamp(-ship.worldVelocity.y * 0.012, -0.16, 0.16), 4, dt);
+  ship.lastImpact = hoverSample?.hit && hoverSample.distance < 0.25 ? 0.2 : ship.lastImpact;
 
-  // Track-relative bank and attitude damping.
-  const desiredRoll = THREE.MathUtils.clamp(
-    -(ship.lateralVelocity * 0.035 + ship.yawVelocity * 0.08),
-    -0.34,
-    0.34,
-  );
-  ship.roll = damp(ship.roll, desiredRoll, ship.airborne ? 4.0 : 9.6, dt);
-
-  // Progress advances with forward speed, not with steering input.
+  // This is only a fallback logical estimate; game.js replaces it with nearest-spline projection.
   ship.distance += ship.speed * dt;
-  frame = getFrame(curve, ship.distance);
-  return makePose(ship, frame);
+  const frame = getFrame(curve, ship.distance);
+  return makeFreePose(ship, frame);
 }
 
 function getFrame(curve, distance) {
@@ -194,11 +130,14 @@ function makePose(ship, frame) {
   const orientation = frame.rotation.clone();
   orientation.multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), ship.yaw));
   orientation.multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), ship.pitch));
-  orientation.multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 0, 1), ship.roll*2));
+  orientation.multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 0, 1), ship.roll * 2));
   return { frame, position, orientation };
 }
 
-// Kept local to avoid coupling this module to game.js.
+function makeFreePose(ship, frame) {
+  return { frame, position: ship.worldPosition, orientation: ship.worldQuaternion };
+}
+
 function getTrackFrame(curve, progress) {
   const u = ((progress % 1) + 1) % 1;
   const center = curve.getPointAt(u);
