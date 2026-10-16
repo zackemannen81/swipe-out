@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { load, parse } from 'opentype.js'
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
@@ -26,9 +27,23 @@ const speedDisplay = document.querySelector('#race-speed');
 const minimapRoute = document.querySelector('#minimap-route');
 const minimapStart = document.querySelector('#minimap-start');
 const minimapPlayer = document.querySelector('#minimap-player');
+// Högst upp bland DOM-elementen:
+const countdownOverlay = document.querySelector('#countdown-overlay');
+
+function triggerCountdownAnim(text, isGo = false) {
+  if (!countdownOverlay) return;
+  countdownOverlay.textContent = text;
+  countdownOverlay.classList.toggle('go-text', isGo);
+  
+  // Nollställ CSS-animationen (reflow-trick)
+  countdownOverlay.classList.remove('countdown-pop');
+  void countdownOverlay.offsetWidth;
+  countdownOverlay.classList.add('countdown-pop');
+}
 // Hämta element för meny-knapp (lägg till detta bland dina DOM-element längst upp)
 const menuButton = document.querySelector('#menu-button'); // Skapa gärna denna i HTML om den saknas
-
+const buffer = fetch('/font/Induction.otf').then(res => res.arrayBuffer());
+const font = parse(await buffer);
 if (menuButton) {
   menuButton.addEventListener('click', () => {
     race.state = 'ready';
@@ -583,8 +598,8 @@ Object.assign(shipPhysics, createShipPhysics(baseSpeed+SPEEDCALIBRATION));
   drag.throttle = 0;
   timerDisplay.textContent = '00:00.00';
   lapDisplay.textContent = `01 / ${String(totalLaps).padStart(2, '0')}`;
-  positionDisplay.textContent = '1 / 3';
-  resultPositionDisplay.textContent = '1 / 3';
+  positionDisplay.textContent = '1 / 5';
+  resultPositionDisplay.textContent = '1 / 5';
   // --- Checkpoint & Boost Setup ---
   const trackLen = curve.getLength();
   
@@ -823,18 +838,23 @@ const prevCount = Math.ceil(race.countdownTimer);
     updateCraftPose(0);
     raceAudio.updateEngine(0, false, false);
 if (countVal !== prevCount) {
-      if (countVal === 4) {
-        raceAudio.playSfx('countdownFour'); // Förutsätter att du lagt till den i loadSfx
-      } else if (countVal === 3) {
-        raceAudio.playSfx('countdownThree');
-      } else if (countVal === 2) {
-        raceAudio.playSfx('countdownTwo');
-      } else if (countVal === 1) {
-        raceAudio.playSfx('countdownOne');
-      } else if (countVal <= 0 && prevCount > 0) {
-        raceAudio.playSfx('countdownGo');
-      }
-    }
+  if (countVal === 4) {
+    raceAudio.playSfx('countdownFour');
+    triggerCountdownAnim('0100');
+  } else if (countVal === 3) {
+    raceAudio.playSfx('countdownThree');
+    triggerCountdownAnim('0011');
+  } else if (countVal === 2) {
+    raceAudio.playSfx('countdownTwo');
+    triggerCountdownAnim('0010');
+  } else if (countVal === 1) {
+    raceAudio.playSfx('countdownOne');
+    triggerCountdownAnim('0001');
+  } else if (countVal <= 0 && prevCount > 0) {
+    raceAudio.playSfx('countdownGo');
+    triggerCountdownAnim('GO!', true);
+  }
+} 
     // När räknaren når 0, startar loppet på riktigt!
     if (race.countdownTimer <= 0) {
       race.state = 'racing';
