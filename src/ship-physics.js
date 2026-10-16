@@ -1,6 +1,12 @@
 import * as THREE from 'three';
 import {SPEEDCALIBRATION} from './game.js';
 
+// Konstanter för svävaren (kan flyttas överst i filen)
+const GRAVITY = -26.0;         // Snabb arkad-gravitation i Y-led
+const HOVER_TARGET = 1.25;     // Önskad svävarhöjd över marken
+const HOVER_STRENGTH = 55.0;   // Fjäderstyrka när skeppet trycks ner
+const HOVER_DAMPING = 9.0;     // Dämpning så att skeppet inte studsar oändligt
+
 // A scale-adapted port of the original Wipeout ship dynamics.
 // The original triangle/section collision system is replaced by the track frame
 // supplied by SwipeOut, while retaining thrust build-up, skid, differential
@@ -83,13 +89,54 @@ const maxSpeed = ship.boostTimer > 0 ?baseSpeed+ 40 : baseSpeed ; // NY: Maxhast
   // Find the current local track frame and preserve the original jump response
   // to a sharp downward change in track tangent.
   let frame = getFrame(curve, ship.distance);
-  const slope = frame.tangent.y;
-  const slopeChange = (slope - ship.previousSlope) / Math.max(dt, 1 / 120);
-  ship.previousSlope = slope;
-  if (!ship.airborne && ship.jumpCooldown <= 0 && slopeChange < -0.18) {
-    ship.airborne = true;
-    ship.verticalVelocity = THREE.MathUtils.clamp(-slopeChange * 1.7, 2.8, 7.2);
-    ship.jumpCooldown = 0.6;
+  // --- 1. KANTER OCH KRÖN-DETEKTION (Tröghetsöverföring) ---
+  const currentSlope = frame.tangent.y;
+  const slopeChange = (currentSlope - ship.previousSlope) / Math.max(dt, 0.001);
+  ship.previousSlope = currentSlope;
+
+  // Om banan viker nedåt (slopeChange < -0.1) och vi kör fort:
+  // Kasta upp skeppet i luften baserat på framåthastigheten!
+  if (!ship.airborne && ship.jumpCooldown <= 0 && slopeChange < -0.12) {
+    const forwardInertia = (ship.speed / baseSpeed) * Math.abs(slopeChange) * 12.0;
+    
+    if (forwardInertia > 1.5) {
+      ship.airborne = true;
+      // Ge en vertikal stöt proportional mot hastigheten över krönet
+      ship.verticalVelocity = THREE.MathUtils.clamp(forwardInertia, 4.0, 18.0);
+      ship.jumpCooldown = 0.4; // Förhindra att den retriggerar direkt
+    }
+  }
+  // --- 2. GRAVITATION OCH LUFTKUDDE ---
+  const GRAVITY = 24.0;       // Normal tung arkadgravitation
+  const HOVER_SPRING = 90.0;  // Fjäderkraft vid markkontakt
+  const HOVER_DAMP = 10.0;    // Dämpning för mjuk landning
+
+  if (ship.airborne) {
+    // I luften: Ren gravitation drar ner skeppet
+    ship.verticalVelocity -= GRAVITY * dt;
+    ship.verticalOffset += ship.verticalVelocity * dt;
+
+    // Landningsdetektion när vi kommer ner till marknivå (verticalOffset <= 0)
+    if (ship.verticalOffset <= 0) {
+      ship.verticalOffset = 0;
+      ship.verticalVelocity = 0;
+      ship.airborne = false;
+      ship.lastImpact = 0.2;
+      ship.speed *= 0.94; // Mjuk landningsbroms
+    }
+  } else {
+    // På marken: Envägs luftkudde som håller skeppet svävande
+    const springForce = -ship.verticalOffset * HOVER_SPRING;
+    const dampForce = ship.verticalVelocity * HOVER_DAMP;
+    const hoverAccel = springForce - dampForce;
+
+    ship.verticalVelocity += hoverAccel * dt;
+    ship.verticalOffset += ship.verticalVelocity * dt;
+
+    // Om vi gungar upp över markytan lättar skeppet mjukt
+    if (ship.verticalOffset > 0.2) {
+      ship.airborne = true;
+    }
   }
 // --- NY KOD: CENTRIFUGALKRAFT OCH DRIFT ---
   if (!ship.previousTangent) {
@@ -132,28 +179,6 @@ const effectiveCentering = THREE.MathUtils.lerp(centeringForce, 0, Math.abs(stee
 
 ship.lateralOffset += (ship.lateralVelocity + effectiveCentering) * dt * 2;
 
-
-  // Magnetic track hold: a damped spring to the road plane. In flight, gravity
-  // takes over and steering authority is reduced, as in the source physics.
-  if (ship.airborne) {
-    ship.verticalVelocity -= 8.6 * dt;
-    ship.verticalOffset += ship.verticalVelocity * dt;
-    if (ship.verticalOffset <= 0) {
-      ship.verticalOffset = 0;
-      ship.verticalVelocity = 0;
-      ship.airborne = false;
-      ship.lastImpact = 0.24;
-      ship.speed *= 0.91;
-    }
-  } else {
-    const magneticAcceleration = -ship.verticalOffset * 24 - ship.verticalVelocity * 8;
-    ship.verticalVelocity += magneticAcceleration * dt;
-    ship.verticalOffset += ship.verticalVelocity * dt;
-    if (ship.verticalOffset < 0) {
-      ship.verticalOffset = 0;
-      ship.verticalVelocity = 0;
-    }
-  }
 
   // The original uses face collisions and track repulsion. SwipeOut's track is
   // a smooth ribbon, so the edge is handled as a damped impact instead.
