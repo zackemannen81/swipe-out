@@ -6,7 +6,7 @@ import { RaceAudio } from './audio.js';
 import './style.css';
 import { createCraft, loadCraftModel } from './craft.js';
 import { createTrack, getTrackFrame } from './track.js';
-import { NEON_CAUSEWAY, SYNTHETIC_DREAMS, DIGITAL_HORIZON, MOMMY_IM_SCARED } from './track-data.js';
+import { NEON_CAUSEWAY, SYNTHETIC_DREAMS, DIGITAL_HORIZON, MOMMY_IM_SCARED ,DARK_SKIES} from './track-data.js';
 import { createShipPhysics, stepShipPhysics } from './ship-physics.js';
 import { createOpponents, getPlayerPosition, resetOpponents, updateOpponents } from './opponents.js';
 import Nebula, { SpriteRenderer, Rate, Span } from 'three-nebula';
@@ -28,6 +28,7 @@ const minimapStart = document.querySelector('#minimap-start');
 const minimapPlayer = document.querySelector('#minimap-player');
 // Hämta element för meny-knapp (lägg till detta bland dina DOM-element längst upp)
 const menuButton = document.querySelector('#menu-button'); // Skapa gärna denna i HTML om den saknas
+
 if (menuButton) {
   menuButton.addEventListener('click', () => {
     race.state = 'ready';
@@ -36,6 +37,7 @@ if (menuButton) {
     setScreen(startScreen, true);
   });
 }
+
 export const SPEEDCALIBRATION = 40; // Justera detta värde för att kalibrera spelets hastighet
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x080c0a);
@@ -45,7 +47,8 @@ const TRACK_CONFIG = {
   'track1': { name: 'Neon Causeway', data: NEON_CAUSEWAY, defaultAudio: '/audio/tracks/track_001.mp3', backdrop: '/images/backdrop_track-001.jpg' },
   'track2': { name: 'Synthetic Dreams', data: SYNTHETIC_DREAMS, defaultAudio: '/audio/tracks/track_002.mp3', backdrop: '/images/backdrop_track-002.jpg' },
   'track3': { name: 'Digital Horizon', data: DIGITAL_HORIZON, defaultAudio: '/audio/tracks/track_006.mp3', backdrop: '/images/backdrop_track-003.jpg' },
-  'track4': { name: 'Mommy I\'m Scared', data: MOMMY_IM_SCARED, defaultAudio: '/audio/tracks/track_005.mp3', backdrop: '/images/backdrop_track-004.jpg' }
+  'track4': { name: 'Mommy I\'m Scared', data: MOMMY_IM_SCARED, defaultAudio: '/audio/tracks/track_005.mp3', backdrop: '/images/backdrop_track-004.jpg' },
+  'track5': { name: 'Dark skies', data: DARK_SKIES, defaultAudio: '/audio/tracks/track_004.mp3', backdrop: '/images/backdrop_track-004.jpg' }
 };
 
 let currentTrackId = 'track1'; 
@@ -155,23 +158,35 @@ const speedTrails = [-1, 1].map((side) => {
   return trail;
 });
 */
-let particleSystem = null;
-let thrusterEmitter = null;
-
-Nebula.fromJSONAsync(thrusterConfig, THREE).then(loaded => {
-  const particleRenderer = new SpriteRenderer(scene, THREE);
-  particleSystem = loaded.addRenderer(particleRenderer);
-  thrusterEmitter = particleSystem.emitters[0];
-}).catch(err => console.error("Nebula Error:", err));
+const thrusterSystems = [];
+const thrusterCrafts = [];
 
 loadCraftModel({ group: craft })
   .catch((error) => console.warn('Unable to load racer model; using procedural craft.', error));
 const opponents = createOpponents();
 for (const opponent of opponents) scene.add(opponent.group);
+thrusterCrafts.push({ group: craft, color: 0x43f6ea });
+opponents.forEach((opponent) => thrusterCrafts.push({ group: opponent.group, color: opponent.accentColor }));
+thrusterCrafts.forEach(({ group, color }) => {
+  for (const side of [-1, 1]) {
+    Nebula.fromJSONAsync(thrusterConfig, THREE).then((loaded) => {
+      const system = loaded.addRenderer(new SpriteRenderer(scene, THREE));
+      const emitter = system.emitters[0];
+      emitter.emit();
+thrusterSystems.push({
+  system,
+  emitter,
+  group,
+  color,
+  nozzleOffset: new THREE.Vector3(side * 0.38, -0.08, -1.6),
+  previousExhaustPos: new THREE.Vector3() // NY: Håller koll på förra utblåspositionen
+});
+    }).catch((error) => console.error('Nebula thruster error:', error));
+  }
+});
 
 const clock = new THREE.Clock();
 //const raceAudio = new RaceAudio(RACE_TRACK_AUDIO);
-
 // --- KAMERASYSTEM INTEGRATION (Vänd 180 grader för att titta framåt) ---
 const cameraSystem = {
   previousMode: 'external',
@@ -1051,21 +1066,57 @@ if (countVal !== prevCount) {
     );
   });
 
-// --- UPPDATERA NEBULA PARTIKLAR ---
-  if (particleSystem && thrusterEmitter) {
-    // Fäst emittern exakt vid avgasröret
-    const exhaustPos = new THREE.Vector3(0, -0.12, 1.5)
-      .applyQuaternion(craft.quaternion)
-      .add(craft.position);
-    
-    thrusterEmitter.position.x = exhaustPos.x;
-    thrusterEmitter.position.y = exhaustPos.y;
-    thrusterEmitter.position.z = exhaustPos.z;
+// Update each craft's ion exhaust behind its paired rear nozzles.
+for (const {
+  system,
+  emitter,
+  group,
+  nozzleOffset,
+  previousExhaustPos
+} of thrusterSystems) {
 
-    // Kör systemet! (Nebulas update sköter tidsberäkningen internt)
-    particleSystem.update();
+  // 1. Beräkna nuvarande utblåsposition i världsrymden
+  const exhaustPos = nozzleOffset.clone()
+    .applyQuaternion(group.quaternion)
+    .add(group.position);
+
+  // Initiera förra positionen vid start om den är tom
+  if (previousExhaustPos.lengthSq() === 0) {
+    previousExhaustPos.copy(exhaustPos);
   }
 
+  emitter.position.copy(exhaustPos);
+
+  const euler = new THREE.Euler().setFromQuaternion(group.quaternion);
+  emitter.rotation.x = euler.x;
+  emitter.rotation.y = euler.y;
+  emitter.rotation.z = euler.z;
+
+  // Spara vilka partiklar som fanns före denna frame
+  const existingParticles = new Set(emitter.particles);
+
+  // Kör partikelsimuleringen
+  system.update(delta);
+
+  // Hämta enbart de NYA partiklarna som skapades under denna frame
+  const newParticles = emitter.particles.filter(p => !existingParticles.has(p));
+  const totalNew = newParticles.length;
+
+newParticles.forEach((particle, index) => {
+    if (particle.sprite && particle.sprite.material) {
+      particle.sprite.material.depthWrite = false;
+      particle.sprite.material.blending = THREE.AdditiveBlending;
+    }
+
+    // Ren standardinterpolering från förra positionen till nuvarande (0 till 1)
+    const t = totalNew > 1 ? index / (totalNew - 1) : 1;
+    particle.position.lerpVectors(previousExhaustPos, exhaustPos, t);
+  });
+
+  // Spara nuvarande position till nästa frame
+  previousExhaustPos.copy(exhaustPos);
+}
+  
  const trailPower = race.state === 'racing' ? THREE.MathUtils.clamp(0.18 + bass.value * 0.42 + kick.hitValue * 0.35, 0.18, 0.9) : 0;
   
   // NYTT: Räkna ut en hastighetsfaktor. Är 1.0 vid normal maxfart, över 1.0 vid boost, och nära 0 vid inbromsning/krasch.
