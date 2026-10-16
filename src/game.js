@@ -848,7 +848,7 @@ if (countVal !== prevCount) {
     race.steering = THREE.MathUtils.damp(
       race.steering,
       race.targetSteering,
-      race.airborne ? 2.7 : 4.8,
+      race.airborne ? 3.8 : 9.5,
       delta,
     );
     updateCraftPose(delta);

@@ -171,11 +171,11 @@ ship.lateralOffset += (ship.lateralVelocity + effectiveCentering) * dt * 2;
 
   // Track-relative bank and attitude damping.
   const desiredRoll = THREE.MathUtils.clamp(
-    -(ship.lateralVelocity * 0.035 + ship.yawVelocity * 0.08),
-    -0.34,
-    0.34,
+    -(ship.lateralVelocity * 0.035 + ship.yawVelocity * 0.1),
+    -0.38,
+    0.38,
   );
-  ship.roll = damp(ship.roll, desiredRoll, ship.airborne ? 4.0 : 9.6, dt);
+  ship.roll = damp(ship.roll, desiredRoll, ship.airborne ? 5.5 : 10.6, dt);
 
   // Progress advances with forward speed, not with steering input.
   ship.distance += ship.speed * dt;
