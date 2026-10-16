@@ -8,7 +8,7 @@ import { createCraft, loadCraftModel } from './craft.js';
 import { createTrack, getTrackFrame } from './track.js';
 import { NEON_CAUSEWAY, SYNTHETIC_DREAMS, DIGITAL_HORIZON, MOMMY_IM_SCARED ,DARK_SKIES} from './track-data.js';
 import { createShipPhysics, stepShipPhysics } from './ship-physics.js';
-import { createOpponents, getPlayerPosition, resetOpponents, updateOpponents } from './opponents.js';
+import { createOpponents, getPlayerPosition, resetOpponents, updateOpponents,resolveCraftCollisions } from './opponents.js';
 import Nebula, { SpriteRenderer, Rate, Span } from 'three-nebula';
 import thrusterConfig from './thruster.json';
 
@@ -38,7 +38,7 @@ if (menuButton) {
   });
 }
 
-export const SPEEDCALIBRATION = 40; // Justera detta värde för att kalibrera spelets hastighet
+export const SPEEDCALIBRATION = 55; // Justera detta värde för att kalibrera spelets hastighet
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x080c0a);
 scene.fog = new THREE.FogExp2(0x080d18, 0.00065);
@@ -360,18 +360,18 @@ camera.lookAt(this.currentLook);
   this.orbitAngle = 0;
   }
 };
-
+const baseSpeed = 65; 
 const drag = { active: false, lastX: 0, pointerId: null, throttle: 0 };
 const heldKeys = new Set();
-const shipPhysics = createShipPhysics(65);
+const shipPhysics = createShipPhysics(baseSpeed+SPEEDCALIBRATION);
 const race = {
   state: 'ready', distance: 0, elapsed: 0, steering: 0, targetSteering: 0, drift: 0,
-  lateralVelocity: 0, roll: 0, currentSpeed: 65, throttleTarget: 0, keyboardThrottle: 0, playerFinishTime: null,
+  lateralVelocity: 0, roll: 0, currentSpeed: baseSpeed + SPEEDCALIBRATION, throttleTarget: 0, keyboardThrottle: 0, playerFinishTime: null,
   airborne: false, airWorldY: 0, airVelocity: 0, previousSlope: 0, jumpCooldown: 0,
   crashTimer: 0, crashCooldown: 0,
   countdownTimer: 3.0, // NY: För nedräkningen
 };
-const baseSpeed = 65+SPEEDCALIBRATION; // NY: Basfart för spelet, justeras med SPEEDCALIBRATION
+// NY: Basfart för spelet, justeras med SPEEDCALIBRATION
 const totalLaps = 3;
 let viewportWidth = window.innerWidth;
 let viewportHeight = window.innerHeight;
@@ -415,8 +415,8 @@ function updateCraftPose(delta = 0) {
     pitch: (heldKeys.has('r') ? 1 : 0) - (heldKeys.has('f') ? 1 : 0),
   };
 const pose = (race.state === 'racing' || race.state === 'finished') && delta > 0
-    ? stepShipPhysics(shipPhysics, input, delta, curve, baseSpeed)
-    : stepShipPhysics(shipPhysics, input, 0, curve, baseSpeed);
+    ? stepShipPhysics(shipPhysics, input, delta, curve, baseSpeed+SPEEDCALIBRATION)
+    : stepShipPhysics(shipPhysics, input, 0, curve, baseSpeed+SPEEDCALIBRATION);
 
   race.distance = shipPhysics.distance;
   race.currentSpeed = shipPhysics.speed;
@@ -548,7 +548,7 @@ const trackAssets = createTrack(trackData);
   
   raceAudio.play().catch((error) => console.warn('Unable to start race music.', error));
   race.state = 'racing';
-Object.assign(shipPhysics, createShipPhysics(baseSpeed));
+Object.assign(shipPhysics, createShipPhysics(baseSpeed+SPEEDCALIBRATION));
   
   // Läs av hur mycket styrhjälp spelaren vill ha
   const assistSelect = document.querySelector('#assist-select');
@@ -959,7 +959,7 @@ if (countVal !== prevCount) {
         raceAudio.playSfx('boost');
         // AKTIVERA BOOST!
         shipPhysics.boostTimer = 1.0; 
-        shipPhysics.speed = 140; 
+        shipPhysics.speed = (baseSpeed + SPEEDCALIBRATION )* 1.3;
         
         cameraSystem.shakeTimer = 0.8;
         cameraSystem.shakeIntensity = 0.65;
@@ -1029,9 +1029,10 @@ if (countVal !== prevCount) {
         race.nextCheckpointIndex++;
       }
     }
-    updateOpponents(opponents, curve, delta, race.elapsed, true);
+    updateOpponents(opponents, curve, delta, race.elapsed, true,race.distance);
+    resolveCraftCollisions(opponents, craft.position, shipPhysics.velocity, curve, race.distance, delta);
   } else {
-    updateOpponents(opponents, curve, 0, race.elapsed, false);
+    updateOpponents(opponents, curve, 0, race.elapsed, false,race.distance);
   }
   if (crossedFinish) finishRace();
   positionDisplay.textContent = `${getPlayerPosition(opponents, race.distance, race.playerFinishTime)} / 3`;

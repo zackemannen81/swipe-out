@@ -5,7 +5,7 @@ import {SPEEDCALIBRATION} from './game.js';
 // The original triangle/section collision system is replaced by the track frame
 // supplied by SwipeOut, while retaining thrust build-up, skid, differential
 // brakes, track adhesion, airborne gravity, angular inertia and edge impacts.
-export function createShipPhysics(baseSpeed = 65 + SPEEDCALIBRATION) {
+export function createShipPhysics(baseSpeed ) {
   return {
     boostTimer: 0,        
     distance: 0,
@@ -39,7 +39,7 @@ export function createShipPhysics(baseSpeed = 65 + SPEEDCALIBRATION) {
 const damp = (value, target, lambda, dt) =>
   THREE.MathUtils.damp(value, target, lambda, dt);
 
-export function stepShipPhysics(ship, input, dt, curve, baseSpeed = 65 + SPEEDCALIBRATION  ) {
+export function stepShipPhysics(ship, input, dt, curve, baseSpeed  ) {
   if (dt <= 0) {
     const frame = getFrame(curve, ship.distance);
     return makePose(ship, frame);
