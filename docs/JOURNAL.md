@@ -1,3 +1,10 @@
+## 2026-10-16 — PORT-001 initial player/opponent collision response
+
+- Inspected the reference `ship_collide_with_ship` ordering and response in `tmp/src/wipeout/ship.c`: ships are tested after updates, overlap is separated, a shared-mass velocity is computed, and collision flags suppress repeated impact handling.
+- Added a scale-adapted sphere/overlap response between the player and each CPU racer. It separates positions, applies a shared-mass impulse only while closing, and uses a short cooldown. CPU knockback is damped and briefly applied to world position so spline placement does not erase it immediately.
+- Race distance and finish progression remain based on existing logic. This is an initial collision slice, not exact reference hull geometry or full crash/rescue parity.
+- `npm run build`, JS syntax checks, and `git diff --check` passed. No browser driving check or targeted collision simulation was performed; interaction and tuning remain unverified.
+
 ## 2026-10-16 — raycast wall collision response
 
 - Separated road/hover raycasts (layer 1) from guardrail collision raycasts (layer 2); guardrail instanced meshes retain a wall marker through track setup.

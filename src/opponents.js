@@ -3,6 +3,10 @@ import { createCraft, loadCraftModel } from './craft.js';
 import { getTrackFrame } from './track.js';
 
 const TOTAL_LAPS = 3;
+const COLLISION_RADIUS = 1.65;
+const RACER_MASS = 1;
+const collisionSeparation = new THREE.Vector3();
+const collisionRelativeVelocity = new THREE.Vector3();
 
 const RACER_DEFINITIONS = [
   {
@@ -33,6 +37,8 @@ export function createOpponents() {
       glow: craft.glow ?? null,
       distance: 0,
       finishTime: null,
+      collisionVelocity: new THREE.Vector3(),
+      collisionCooldown: 0,
     };
   });
 }
@@ -41,6 +47,8 @@ export function resetOpponents(opponents) {
   for (const opponent of opponents) {
     opponent.distance = 0;
     opponent.finishTime = null;
+    opponent.collisionVelocity.set(0, 0, 0);
+    opponent.collisionCooldown = 0;
   }
 }
 
@@ -57,10 +65,15 @@ export function updateOpponents(opponents, curve, delta, elapsed, racing) {
     }
 
     const frame = getTrackFrame(curve, (opponent.distance % length) / length);
+    if (delta > 0) {
+      opponent.collisionVelocity.multiplyScalar(Math.exp(-5.5 * delta));
+      opponent.collisionCooldown = Math.max(0, opponent.collisionCooldown - delta);
+    }
     const laneMotion = Math.sin(opponent.distance * 0.003 + opponent.phase) * 0.28;
     opponent.group.position.copy(frame.center)
       .addScaledVector(frame.right, opponent.lane + laneMotion)
-      .addScaledVector(frame.normal, 0.62);
+      .addScaledVector(frame.normal, 0.62)
+      .addScaledVector(opponent.collisionVelocity, delta > 0 ? Math.min(delta, 1 / 30) : 0);
     opponent.group.quaternion.copy(frame.rotation);
     opponent.group.rotateZ(-laneMotion * 0.045);
 
@@ -83,6 +96,29 @@ export function updateOpponents(opponents, curve, delta, elapsed, racing) {
       material.opacity = racing ? THREE.MathUtils.clamp(0.42 + enginePower * 0.18, 0.42, 0.82) : 0.28;
     });
     if (opponent.glow) opponent.glow.intensity = 1.8 + pulse * 1.5;
+  }
+}
+
+export function resolveCraftCollisions(opponents, playerPosition, playerVelocity, delta) {
+  for (const opponent of opponents) {
+    collisionSeparation.copy(playerPosition).sub(opponent.group.position);
+    const distance = collisionSeparation.length();
+    if (distance >= COLLISION_RADIUS * 2 || distance < 1e-5) continue;
+
+    collisionSeparation.multiplyScalar(1 / distance);
+    const normal = collisionSeparation;
+    const penetration = COLLISION_RADIUS * 2 - distance;
+    playerPosition.addScaledVector(normal, penetration * 0.5);
+    opponent.group.position.addScaledVector(normal, -penetration * 0.5);
+
+    collisionRelativeVelocity.copy(playerVelocity).sub(opponent.collisionVelocity);
+    const closingSpeed = collisionRelativeVelocity.dot(normal);
+    if (closingSpeed >= 0 || opponent.collisionCooldown > 0) continue;
+
+    const impulse = -closingSpeed * 0.5 * RACER_MASS;
+    playerVelocity.addScaledVector(normal, impulse);
+    opponent.collisionVelocity.addScaledVector(normal, -impulse);
+    opponent.collisionCooldown = 0.18;
   }
 }
 

@@ -31,7 +31,8 @@ Port the reference game's driving behavior in six controlled steps (0–5), prio
 - Acceptance: scripted steering traces reproduce reference direction, displacement, and settling behavior within documented tolerances.
 
 ### Step 4 — Collisions, crashes, and out-of-bounds
-- Port craft/track/opponent collision tests, crash state/timers/resets, impact response, boundary recovery, and race-flow consequences.
+- [ ] Port craft/track/opponent collision tests, crash state/timers/resets, impact response, boundary recovery, and race-flow consequences.
+- [x] Add an initial player-vs-CPU overlap response based on reference `ship_collide_with_ship`: positional separation, shared-mass velocity response, and impact cooldown. This is a scale-adapted first slice; geometric hull tests and remaining crash/recovery behavior are outstanding.
 - Acceptance: scripted cases cover opponent impact, wall/track impact, crash recovery, and leaving/re-entering bounds.
 
 ### Step 5 — Verification and parity cleanup

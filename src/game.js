@@ -8,7 +8,7 @@ import { createCraft, loadCraftModel } from './craft.js';
 import { createTrack, getTrackFrame } from './track.js';
 import { NEON_CAUSEWAY, SYNTHETIC_DREAMS, DIGITAL_HORIZON, MOMMY_IM_SCARED } from './track-data.js';
 import { createShipPhysics, stepShipPhysics } from './ship-physics.js';
-import { createOpponents, getPlayerPosition, resetOpponents, updateOpponents } from './opponents.js';
+import { createOpponents, getPlayerPosition, resetOpponents, resolveCraftCollisions, updateOpponents } from './opponents.js';
 
 const canvas = document.querySelector('#game-canvas');
 const startScreen = document.querySelector('#start-screen');
@@ -1122,6 +1122,8 @@ if (countVal !== prevCount) {
       }
     }
     updateOpponents(opponents, curve, delta, race.elapsed, true);
+    resolveCraftCollisions(opponents, craft.position, shipPhysics.worldVelocity, delta);
+    shipPhysics.worldPosition.copy(craft.position);
   } else {
     updateOpponents(opponents, curve, 0, race.elapsed, false);
   }
