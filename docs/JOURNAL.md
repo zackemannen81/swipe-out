@@ -190,3 +190,9 @@
   repository status, file map, and journal to include this work.
 - Validation: checked documentation consistency and ran `git diff --check`.
   No code tests apply because the repository has no game implementation.
+
+## 2026-10-17 — Nebula ion thrusters for every craft
+
+- Connected the existing Three-nebula particle configuration to the player and all four CPU racers.
+- Added two independently rendered exhaust emitters per craft, positioned at its paired rear nozzles and transformed with the craft pose.
+- Validation: `npm run build` passed; `git diff --check` passed. No interactive browser visual verification was performed.

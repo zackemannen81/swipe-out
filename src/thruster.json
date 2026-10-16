@@ -1,5 +1,5 @@
 {
-  "preParticles": 400,
+  "preParticles": 256,
   "integrationType": "EULER",
   "emitters": [
     {
@@ -8,10 +8,10 @@
       "life": null,
       "cache": { "totalEmitTimes": null, "life": null },
       "rate": {
-        "particlesMin": 10,
-        "particlesMax": 50,
-        "perSecondMin": 0.1,
-        "perSecondMax": 0.2
+        "particlesMin": 1,
+        "particlesMax": 10,
+        "perSecondMin": 0.001,
+        "perSecondMax": 0.0002
       },
       "position": { "x": 0, "y": 0, "z": 0 },
       "rotation": { "x": 0, "y": 0, "z": 0 },
@@ -19,12 +19,12 @@
         {
           "id": "51ca9451-3d8b-11e9-a1e8-4785d9606b75",
           "type": "Mass",
-          "properties": { "min": 20, "max": 10, "isEnabled": true }
+          "properties": { "min": 0.1, "max": 0.2, "isEnabled": true }
         },
         {
           "id": "51ca9452-3d8b-11e9-a1e8-4785d9606b75",
           "type": "Life",
-          "properties": { "min": 0.05, "max": 0.1, "isEnabled": true }
+          "properties": { "min": 0.06, "max": 0.03, "isEnabled": true }
         },
         {
           "id": "51ca9453-3d8b-11e9-a1e8-4785d9606b75",
@@ -37,16 +37,16 @@
         {
           "id": "51ca9454-3d8b-11e9-a1e8-4785d9606b75",
           "type": "Radius",
-          "properties": { "width": 0.6, "height": 0.6, "isEnabled": true }
+          "properties": { "width": 1, "height": 1, "isEnabled": true }
         },
         {
           "id": "51ca9455-3d8b-11e9-a1e8-4785d9606b75",
           "type": "RadialVelocity",
           "properties": {
-            "radius": 1,
+            "radius": 0.3,
             "x": 0,
-            "y": 15,
-            "z": 0,
+            "y": 0,
+            "z": -0.15,
             "theta": 900,
             "isEnabled": true
           }
@@ -58,7 +58,7 @@
           "type": "Alpha",
           "properties": {
             "alphaA": 1,
-            "alphaB": 0,
+            "alphaB": 0.1,
             "life": null,
             "easing": "easeLinear"
           }
@@ -67,8 +67,8 @@
           "id": "51ca9457-3d8b-11e9-a1e8-4785d9606b75",
           "type": "Color",
           "properties": {
-            "colorA": "#002a4f",
-            "colorB": "#2229FF",
+              "colorA": "#00f0ff",
+              "colorB": "#0044ff",
             "life": null,
             "easing": "easeOutCubic"
           }
@@ -78,7 +78,7 @@
           "type": "Scale",
           "properties": {
             "scaleA": 1,
-            "scaleB": 0.5,
+            "scaleB": 0.3,
             "life": null,
             "easing": "easeLinear"
           }
@@ -88,7 +88,7 @@
           "type": "Force",
           "properties": {
             "fx": 0,
-            "fy": 5,
+            "fy": 0,
             "fz": 0,
             "life": null,
             "easing": "easeLinear"
@@ -98,7 +98,7 @@
           "id": "51ca945a-3d8b-11e9-a1e8-4785d9606b75",
           "type": "Rotate",
           "properties": {
-            "x": 1,
+            "x": 0,
             "y": 0,
             "z": 0,
             "life": null,
@@ -109,28 +109,15 @@
           "id": "51ca945b-3d8b-11e9-a1e8-4785d9606b75",
           "type": "RandomDrift",
           "properties": {
-            "driftX": 1,
-            "driftY": 2,
-            "driftZ": 4,
-            "delay": 1,
-            "life": null,
-            "easing": "easeLinear"
-          }
-        },
-        {
-          "id": "51ca945c-3d8b-11e9-a1e8-4785d9606b75",
-          "type": "Spring",
-          "properties": {
-            "x": 1,
-            "y": 5,
-            "z": 0,
-            "spring": 0.01,
-            "friction": 1,
+            "driftX": 0.1,
+            "driftY": 0.1,
+            "driftZ": 0.1,
+            "delay": 0.1,
             "life": null,
             "easing": "easeLinear"
           }
         }
-      ],
+        ],
       "emitterBehaviours": []
     }
   ]
