@@ -6,25 +6,25 @@ const TOTAL_LAPS = 3;
 
 const RACER_DEFINITIONS = [
   {
-    name: 'Vanta', speed: 97.5, lane: -2.95, phase: 0.4,
+    name: 'Vanta', speed: 97.5, lane: -3.35, phase: 0.4,
     modelUrl: '/models/racer_optimized-team2.glb',
     hullColor: 0x8b426c, canopyColor: 0x55132d,
     accentColor: 0xff4b91, secondaryAccentColor: 0xffb24a,
   },
   {
-    name: 'Kestrel', speed: 99, lane: 2.95, phase: 2.2,
+    name: 'Kestrel', speed: 99, lane: 3.35, phase: 2.2,
     modelUrl: '/models/racer_optimized-team3.glb',
     hullColor: 0x4c7890, canopyColor: 0x123d55,
     accentColor: 0x63f4e8, secondaryAccentColor: 0xc2ff61,
   },
     {
-    name: 'Orca', speed: 94.5, lane: -1.65, phase: 0.4,
+    name: 'Orca', speed: 94.5, lane: -1.7, phase: 0.4,
     modelUrl: '/models/racer_optimized-team4.glb',
     hullColor: 0x8b426c, canopyColor: 0x55132d,
     accentColor: 0xff4b91, secondaryAccentColor: 0xffb24a,
   },
   {
-    name: 'Nexus-9', speed: 102.5, lane: 1.65, phase: 2.2,
+    name: 'Nexus-9', speed: 102.5, lane: 1.7, phase: 2.2,
     modelUrl: '/models/racer_optimized-team5.glb',
     hullColor: 0x4c7890, canopyColor: 0x123d55,
     accentColor: 0x63f4e8, secondaryAccentColor: 0xc2ff61,

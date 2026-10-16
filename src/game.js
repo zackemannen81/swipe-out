@@ -143,8 +143,10 @@ const speedTrails = [-1, 1].map((side) => {
     blending: THREE.AdditiveBlending,
     depthWrite: false,
   });
-  const trail = new THREE.Mesh(new THREE.PlaneGeometry(0.18, 3.8), material);
-  trail.position.set(side * 0.84, -0.12, 0.78);
+  // Mycket längre grundgeometri (ändrat från 3.8 till 12.0)
+  const trail = new THREE.Mesh(new THREE.PlaneGeometry(0.18, 12.0), material);
+  // Flyttad längre bakåt (Z ändrat från 0.78 till 5.0)
+  trail.position.set(side * 0.84, -0.12, 5.0);
   trail.rotation.x = -Math.PI / 2;
   trail.visible = false;
   craft.add(trail);
@@ -1028,7 +1030,7 @@ if (countVal !== prevCount) {
   bloomPass.strength = 0.62 + kick.hitValue * 0.55 + bass.value * 0.12;
   const pulse = 0.78 + Math.sin(clock.elapsedTime * 19) * 0.12 + kick.hitValue * 0.75;
   engineMaterials.forEach((material) => material.color.setRGB(0.28 * pulse, 0.95 * pulse, 0.9 * pulse));
-  const thrusterPower = 0.72 + bass.value * 0.85 + kick.hitValue * 0.72;
+const thrusterPower = 0.72 + bass.value * 0.85 + kick.hitValue * 0.72;
   thrusters.forEach((thruster, index) => {
     thruster.visible = race.state === 'racing';
     thruster.scale.set(
@@ -1037,14 +1039,18 @@ if (countVal !== prevCount) {
       0.82 + thrusterPower * 0.22,
     );
   });
+
   const trailPower = race.state === 'racing' ? THREE.MathUtils.clamp(0.18 + bass.value * 0.42 + kick.hitValue * 0.35, 0.18, 0.9) : 0;
+  
+  // NYTT: Beräkna hastighetsfaktor baserat på aktuell fart
+  const speedFactor = race.state === 'racing' ? Math.max(0.1, race.currentSpeed / baseSpeed) : 0;
+
   speedTrails.forEach((trail, index) => {
     trail.visible = race.state === 'racing';
-    trail.scale.y = trailPower * (0.82 + Math.sin(clock.elapsedTime * 23 + index * 2.4) * 0.12);
-    trail.material.opacity = trailPower * 0.38;
-  });
-  thrusterMaterials.forEach((material) => {
-    material.opacity = race.state === 'racing' ? THREE.MathUtils.clamp(0.36 + thrusterPower * 0.14, 0.36, 0.82) : 0;
+    // Gör dem dynamiskt längre ju fortare du kör (multiplicerar med speedFactor * 1.5)
+    trail.scale.y = trailPower * speedFactor * 1.5 * (0.82 + Math.sin(clock.elapsedTime * 23 + index * 2.4) * 0.12);
+    // Tona ut dem lite om du kör långsamt
+    trail.material.opacity = trailPower * 0.38 * Math.min(speedFactor, 1.0);
   });
   glow.intensity = 2.4 + pulse * 1.2 + kick.hitValue * 5.5 + bass.value * 2.4;
   speedDisplay.textContent = race.state === 'racing'
