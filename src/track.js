@@ -226,24 +226,8 @@ export function createTrack(definition = NEON_CAUSEWAY) {
   }
   group.add(gate);
 
-  
-  const textureLoader = new THREE.TextureLoader();
-  for (const object of definition.objects ?? []) {
-    const geometry = object.type === 'box'
-      ? new THREE.BoxGeometry(2, 2, 2)
-      : object.type === 'cylinder'
-        ? new THREE.CylinderGeometry(1, 1, 2, 24)
-        : new THREE.SphereGeometry(1, 20, 14);
-    const materialOptions = { color: 0xffffff, metalness: 0.25, roughness: 0.55 };
-    if (object.texture) { materialOptions.map = textureLoader.load(object.texture); materialOptions.map.colorSpace = THREE.SRGBColorSpace; }
-    const mesh = new THREE.Mesh(geometry, new THREE.MeshStandardMaterial(materialOptions));
-    mesh.position.set(...(object.position ?? [0, 1, 0]));
-    mesh.rotation.set(...(object.rotation ?? [0, 0, 0]));
-    mesh.scale.set(...(object.scale ?? [1, 1, 1]));
-    mesh.userData.editorObjectId = object.id;
-    group.add(mesh);
-  }
 
+  
 return { group, curve, length: curve.getLength(), boostPads: boostPadPlacements };
 }
 
@@ -265,4 +249,86 @@ export function getTrackFrame(curve, progress) {
     rotation: new THREE.Quaternion().setFromRotationMatrix(rotation),
     yaw: Math.atan2(tangent.x, tangent.z),
   };
+}
+
+const textureLoader = new THREE.TextureLoader();
+
+export function spawnTrackObjects(scene, trackData) {
+  const existingGroup = scene.getObjectByName('customTrackObjects');
+  if (existingGroup) scene.remove(existingGroup);
+
+  if (!trackData || !Array.isArray(trackData.objects)) return;
+
+  const objectGroup = new THREE.Group();
+  objectGroup.name = 'customTrackObjects';
+
+  // Hämta banans horisontella skala (t.ex. 3.25)
+  const hScale = trackData.horizontalScale ?? 1;
+
+  trackData.objects.forEach((obj) => {
+    let geometry;
+
+    if (obj.type === 'cylinder') {
+      geometry = new THREE.CylinderGeometry(0.5, 0.5, 1, 32);
+    } else if (obj.type === 'sphere') {
+      geometry = new THREE.SphereGeometry(0.5, 32, 32);
+    } else {
+      geometry = new THREE.BoxGeometry(1, 1, 1);
+    }
+
+let material;
+if (obj.texture) {
+  const tex = textureLoader.load(obj.texture);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  const objectOpacity = obj.opacity ?? 1.0;
+  const isTransparent = objectOpacity < 0.99 || Boolean(obj.texture);
+
+  material = new THREE.MeshStandardMaterial({
+    map: tex,
+    emissiveMap: tex,
+    emissive: new THREE.Color(0xffffff),
+    emissiveIntensity: 0.3,
+    transparent: true,
+    opacity: objectOpacity,
+    roughness: 0.2,
+    metalness: 0.8,
+    depthWrite: objectOpacity > 0.5, // Förhindrar sorteringsfel i 3D vid överlappande glas
+  });
+} else {
+  material = new THREE.MeshStandardMaterial({
+    color: obj.type === 'cylinder' ? 0xffd166 : obj.type === 'sphere' ? 0xb58cff : 0xff7aa8,
+    transparent: isTransparent,
+    opacity: objectOpacity,
+    roughness: 0.1,
+    metalness: 0.9,
+    depthWrite: objectOpacity > 0.5,
+  });
+}
+
+    const mesh = new THREE.Mesh(geometry, material);
+
+    // KORRIGERING: Multiplicera X och Z med hScale så objekten matchar 3D-banans storlek!
+    mesh.position.set(
+      obj.position[0] * hScale,
+      obj.position[1],
+      obj.position[2] * hScale
+    );
+
+    if (obj.rotation) {
+      mesh.rotation.set(
+        (obj.rotation[0] * Math.PI) / 180,
+        (obj.rotation[1] * Math.PI) / 180,
+        (obj.rotation[2] * Math.PI) / 180
+      );
+    }
+
+    if (obj.scale) {
+      mesh.scale.set(obj.scale[0], obj.scale[1], obj.scale[2]);
+    }
+
+    mesh.userData = { animType: obj.animType || 'none' };
+    objectGroup.add(mesh);
+  });
+
+  scene.add(objectGroup);
 }

@@ -6,7 +6,7 @@ import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js'
 import { RaceAudio } from './audio.js';
 import './style.css';
 import { createCraft, loadCraftModel } from './craft.js';
-import { createTrack, getTrackFrame } from './track.js';
+import { spawnTrackObjects, createTrack, getTrackFrame } from './track.js';
 import { NEON_CAUSEWAY, SYNTHETIC_DREAMS, DIGITAL_HORIZON, MOMMY_IM_SCARED ,DARK_SKIES} from './track-data.js';
 import { createShipPhysics, stepShipPhysics } from './ship-physics.js';
 import { createOpponents, getPlayerPosition, resetOpponents, updateOpponents,resolveCraftCollisions } from './opponents.js';
@@ -29,6 +29,20 @@ const minimapStart = document.querySelector('#minimap-start');
 const minimapPlayer = document.querySelector('#minimap-player');
 // Högst upp bland DOM-elementen:
 const countdownOverlay = document.querySelector('#countdown-overlay');
+
+const STORAGE_KEY = 'swipe-out-track-definitions';
+
+function getActiveTrackData(trackId) {
+  try {
+    const savedTracks = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+    if (savedTracks[trackId]) {
+      return savedTracks[trackId];
+    }
+  } catch (err) {
+    console.warn('Kunde inte läsa från localStorage:', err);
+  }
+  return TRACK_CONFIG[trackId]?.data;
+}
 
 function triggerCountdownAnim(text, isGo = false) {
   if (!countdownOverlay) return;
@@ -491,7 +505,7 @@ for (const [key, offset] of Object.entries(offsets)) {
     } else {
         arrows[key].setColor(0xff0000); // Röd = Miss
     }
-}
+} 
 
   return pose;
 }
@@ -500,7 +514,8 @@ function beginRace() {
   // Läs av vilken bana som valts
   const trackSelect = document.querySelector('#track-select');
   currentTrackId = trackSelect.value;
-  const trackData = TRACK_CONFIG[currentTrackId].data;
+  const trackData = getActiveTrackData(currentTrackId);
+  //const trackData = TRACK_CONFIG[currentTrackId].data;
 // Hämta banans namn och gör det till stora bokstäver
   const trackName = TRACK_CONFIG[currentTrackId].name.toUpperCase();
 
@@ -530,7 +545,7 @@ const trackAssets = createTrack(trackData);
       child.layers.enable(1); // Aktivera lager 1 för alla banans mesh-objekt      
     }
   });
-
+  spawnTrackObjects(scene, trackData);
   scene.add(track);
 
   // Uppdatera minimappen för den nya banan

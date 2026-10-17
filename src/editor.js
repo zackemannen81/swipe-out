@@ -47,16 +47,23 @@ function draw() {
   const minZ = Math.min(...points.map((point) => point[2]));
   const maxZ = Math.max(...points.map((point) => point[2]));
   const padding = 58;
-  view.scale = Math.min((width - padding * 2) / Math.max(maxX - minX, 1), (height - padding * 2) / Math.max(maxZ - minZ, 1));
+
+  view.scale = Math.min(
+    (width - padding * 2) / Math.max(maxX - minX, 1),
+    (height - padding * 2) / Math.max(maxZ - minZ, 1)
+  );
   view.cx = (width - (minX + maxX) * view.scale) / 2;
   view.cy = (height - (minZ + maxZ) * view.scale) / 2;
+
   const screen = ([x, , z]) => [view.cx + x * view.scale, view.cy + z * view.scale];
 
+  // Bakgrundsrutnät
   context.strokeStyle = 'rgba(112, 157, 174, .11)';
   context.lineWidth = 1;
   for (let x = 0; x < width; x += 32) { context.beginPath(); context.moveTo(x, 0); context.lineTo(x, height); context.stroke(); }
   for (let y = 0; y < height; y += 32) { context.beginPath(); context.moveTo(0, y); context.lineTo(width, y); context.stroke(); }
 
+  // Bana (Väg)
   context.beginPath();
   points.forEach((point, index) => {
     const [x, y] = screen(point);
@@ -72,6 +79,7 @@ function draw() {
   context.lineWidth = 2;
   context.stroke();
 
+  // Banans kontrollpunkter
   points.forEach((point, index) => {
     const [x, y] = screen(point);
     context.beginPath();
@@ -82,27 +90,52 @@ function draw() {
     context.lineWidth = 2;
     context.stroke();
   });
+
+  // 3D-PRIMITIVER (Enkel, korrekt loop)
   track.objects.forEach((object, index) => {
     const [x, y] = screen([object.position[0], 0, object.position[2]]);
-    const radius = selectedObject === index ? 13 : 9;
+
+    // Beräkna storlek i canvas-pixlar baserat på objektets scale
+    const widthPx = (object.scale?.[0] ?? 1) * view.scale;
+    const heightPx = (object.scale?.[2] ?? 1) * view.scale;
+    const rotY = object.rotation ? (object.rotation[1] * Math.PI) / 180 : 0;
+    const isSelected = selectedObject === index;
+
+    context.save();
+    context.translate(x, y);
+    context.rotate(rotY);
+
     context.beginPath();
-    if (object.type === 'box') context.rect(x - radius, y - radius, radius * 2, radius * 2);
-    else context.arc(x, y, radius, 0, Math.PI * 2);
+    if (object.type === 'box') {
+      const w = Math.max(widthPx, 12); // Minst 12px så den går att klicka
+      const h = Math.max(heightPx, 12);
+      context.rect(-w / 2, -h / 2, w, h);
+    } else {
+      const rx = Math.max(widthPx / 2, 6); // Minst 6px radie
+      const ry = Math.max(heightPx / 2, 6);
+      context.ellipse(0, 0, rx, ry, 0, 0, Math.PI * 2);
+    }
+
     context.fillStyle = object.type === 'cylinder' ? '#ffd166' : object.type === 'sphere' ? '#b58cff' : '#ff7aa8';
     context.fill();
-    context.strokeStyle = selectedObject === index ? '#ffffff' : '#09121c';
-    context.lineWidth = selectedObject === index ? 3 : 2;
+    context.strokeStyle = isSelected ? '#ffffff' : '#09121c';
+    context.lineWidth = isSelected ? 3 : 2;
     context.stroke();
+
+    context.restore();
+
+    // Rita nummerlapp i mitten
     context.fillStyle = '#09121c';
-    context.font = '9px DM Mono, monospace';
+    context.font = '9px "DM Mono", monospace';
     context.textAlign = 'center';
-    context.fillText(String(index + 1), x, y + 3);
+    context.textBaseline = 'middle';
+    context.fillText(String(index + 1), x, y);
   });
+
   document.querySelector('#point-count').textContent = `${points.length} POINTS · ${track.objects.length} OBJECTS`;
   document.querySelector('#width-value').textContent = Number(track.width).toFixed(2);
   document.querySelector('#scale-value').textContent = Number(track.horizontalScale).toFixed(2);
 }
-
 function syncPointFields() {
   const point = track.centerline[selected];
   document.querySelector('#selected-point').textContent = String(selected + 1).padStart(2, '0');
@@ -135,12 +168,12 @@ function renderObjects() {
     const row = document.createElement('div');
     row.className = `primitive-row ${selectedObject === index ? 'active-row' : ''}`;
     
-    // Säkerställ att rotation och animering finns definierat
     object.rotation ||= [0, 0, 0];
-    object.animType ||= 'none'; // 'none', 'scroll-x', 'scroll-y', 'pulse'
+    object.animType ||= 'none';
+    object.opacity ||= 1;
 
     row.innerHTML = `
-      <div style="display:flex; justify-between; align-items:center;">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
         <b>${index + 1}. ${object.type.toUpperCase()}</b>
         ${object.texture ? `<img src="${object.texture}" style="width:20px; height:20px; object-fit:cover; border-radius:2px;">` : ''}
       </div>
@@ -158,13 +191,13 @@ function renderObjects() {
         <label>Z <input data-rot="2" type="number" step="15" value="${object.rotation[2]}"></label>
       </div>
 
-      <!-- DIMENSIONER -->
+      <!-- SCALE -->
       <div class="object-dimensions">
         <span>SCALE</span>
         ${['x', 'y', 'z'].map((axis, dim) => `<label>${axis.toUpperCase()} <input data-dimension="${dim}" type="number" min="0.1" step="0.5" value="${object.scale?.[dim] ?? 1}"></label>`).join('')}
       </div>
 
-      <!-- TEXTUR & ANIMERING -->
+      <!-- TEXTUR & FX -->
       <label>TEXTURE <input data-field="texture" type="file" accept="image/*"></label>
       <label>FX 
         <select data-field="animType">
@@ -174,11 +207,13 @@ function renderObjects() {
           <option value="pulse" ${object.animType === 'pulse' ? 'selected' : ''}>GLOW PULSE</option>
         </select>
       </label>
-
+      <label>OPACITY
+        <input data-field="opacity" type="number" min="0.1" max="1" step="0.05" value="${object.opacity ?? 1}">
+      </label>
       <button data-remove style="margin-top:8px;">REMOVE OBJECT</button>
     `;
 
-    // Event listeners för Position, Textur och FX
+    // Event listeners
     row.querySelectorAll('[data-field]').forEach((input) => input.addEventListener('change', () => {
       if (input.dataset.field === 'texture') {
         const file = input.files[0];
@@ -194,18 +229,21 @@ function renderObjects() {
         markChanged();
         return;
       }
+      if (input.dataset.field === 'opacity') {
+        object.opacity = Number(input.value) || 1;
+        markChanged();
+        return;
+      }
       object.position[['x', 'y', 'z'].indexOf(input.dataset.field)] = Number(input.value) || 0;
       markChanged();
     }));
 
-    // Event listeners för Rotation
     row.querySelectorAll('[data-rot]').forEach((input) => input.addEventListener('change', () => {
       const axis = Number(input.dataset.rot);
       object.rotation[axis] = Number(input.value) || 0;
       markChanged();
     }));
 
-    // Event listeners för Skala
     row.querySelectorAll('[data-dimension]').forEach((input) => input.addEventListener('change', () => {
       const dim = Number(input.dataset.dimension);
       object.scale ||= [1, 1, 1];
@@ -253,18 +291,35 @@ document.querySelector('#del-point-btn')?.addEventListener('click', () => {
 // 3. Automatisk höjdanpassning när du drar ett objekt på 2D-kartan
 canvas.addEventListener('pointermove', (event) => {
   if (draggingObject && selectedObject >= 0) {
-    const { x, z, nearest } = pointerToPoint(event);
+    const { x, z } = pointerToPoint(event);
     const obj = track.objects[selectedObject];
     obj.position[0] = Math.round(x);
     obj.position[2] = Math.round(z);
-    
-    // Auto-snap Y till närmsta banpunkts höjd
-    if (nearest >= 0 && track.centerline[nearest]) {
-      obj.position[1] = track.centerline[nearest][1] + 2; // Placera 2 enheter ovanför banan
+
+    // Hitta den banpunkt i 2D som också är närmast objektets NUVARANDE höjd (Y)
+    let bestPoint = null;
+    let minScore = Infinity;
+
+    track.centerline.forEach((pt) => {
+      const d2d = Math.hypot(pt[0] - x, pt[2] - z);
+      if (d2d < 30) { // Inom rimligt räckvidd i 2D
+        const dY = Math.abs(pt[1] - obj.position[1]);
+        const score = d2d + dY * 2; // Prioritera punkter som ligger nära i höjdled
+        if (score < minScore) {
+          minScore = score;
+          bestPoint = pt;
+        }
+      }
+    });
+
+    if (bestPoint) {
+      obj.position[1] = bestPoint[1] + 2; // Sätt Y 2 enheter ovanför rätt spårnivå
     }
+
     markChanged();
     return;
   }
+
   if (!dragging) return;
   const { x, z } = pointerToPoint(event);
   track.centerline[selected][0] = Math.round(x);
