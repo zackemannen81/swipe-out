@@ -360,3 +360,28 @@ select#track-select option {
   box-shadow: 0 0 8px rgba(93, 232, 223, 0.6);
   transition: width 0.05s ease-out;
 }
+/* Lås bredden på de sifferrutor som ändras i realtid */
+.hud-value {
+  display: inline-block;
+  font-variant-numeric: tabular-nums; /* Tvingar monospaced siffror om fonten har stöd */
+  text-align: left;
+}
+
+/* Fasta minsta-bredder för respektive mätare så att avdelarna står helt still */
+#race-time {
+  min-width: 8ch; /* Reserverar plats för 00:00.00 */
+}
+
+#race-trip {
+  min-width: 7ch; /* Reserverar plats för upp till 99999 m */
+}
+
+#race-speed {
+  min-width: 9ch; /* Reserverar plats för mätartexten och KM/H */
+}
+
+/* Lås även hela hud-gruppen om du vill ha helt symmetriska sektioner */
+.hud-group {
+  display: flex;
+  flex-direction: column;
+}

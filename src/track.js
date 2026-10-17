@@ -252,6 +252,10 @@ export function getTrackFrame(curve, progress) {
 }
 
 const textureLoader = new THREE.TextureLoader();
+// Läs av opacity och säkra variabeln
+const objectOpacity = typeof obj.opacity === 'number' ? obj.opacity : parseFloat(String(obj.opacity || 1).replace(',', '.')) || 1.0;
+const isTransparent = objectOpacity < 0.99;
+
 
 export function spawnTrackObjects(scene, trackData) {
   const existingGroup = scene.getObjectByName('customTrackObjects');
@@ -297,7 +301,7 @@ if (obj.texture) {
 } else {
   material = new THREE.MeshStandardMaterial({
     color: obj.type === 'cylinder' ? 0xffd166 : obj.type === 'sphere' ? 0xb58cff : 0xff7aa8,
-    transparent: isTransparent,
+    transparent:isTransparent|| false,
     opacity: objectOpacity,
     roughness: 0.1,
     metalness: 0.9,

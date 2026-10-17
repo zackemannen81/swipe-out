@@ -714,3 +714,96 @@ export const DARK_SKIES = {
     ]
   ]
 };
+
+export const GEMINI = {
+  id: 'gemini',
+  name: 'Gemini',
+  width: 10,
+  horizontalScale: 3.25,
+  centerline: [
+    [0, 0, 0],          // Start & Mål
+    [35, 2, 0],
+    [75, 8, -15],
+    [110, 20, -45],     // Banan stiger upp i första loopen (Cyan loop)
+    [130, 38, -90],
+    [115, 52, -135],
+    [70, 60, -155],
+    [15, 55, -140],
+    [-30, 42, -100],    // Övergång över huvudsträckan (Bro / Viadukt)
+    [-65, 30, -50],
+    [-85, 18, 0],
+    [-95, 5, 50],
+    [-90, -8, 100],     // Dyk ner i andra loopen (Amber loop)
+    [-65, -18, 140],
+    [-20, -22, 160],
+    [35, -18, 150],
+    [80, -8, 115],
+    [105, 5, 70],
+    [100, 18, 20],      // S-kurva genom energisektorn
+    [70, 28, -20],
+    [25, 32, -35],
+    [-25, 25, -25],
+    [-60, 15, 10],
+    [-75, 5, 55],
+    [-60, 0, 90],
+    [-20, 0, 80],
+    [10, 0, 45],
+    [0, 0, 0]           // Tillbaka till start
+  ],
+  objects: [
+    // 1. Start/Mål-portal (Cyan Kube)
+    {
+      id: 'gemini-gate-1',
+      type: 'box',
+      position: [15, 8, 0],
+      rotation: [0, 0, 0],
+      scale: [2, 12, 18],
+      opacity: 0.35,
+      animType: 'pulse',
+      texture: null
+    },
+    // 2. Högvattenmärke / Neonskylt på bron (Amber Kube)
+    {
+      id: 'gemini-billboard',
+      type: 'box',
+      position: [-30, 48, -100],
+      rotation: [0, 25, 0],
+      scale: [24, 8, 1],
+      opacity: 0.85,
+      animType: 'scroll-x',
+      texture: null
+    },
+    // 3. Dubbla energipelare i nedre loopen (Cylindrar)
+    {
+      id: 'gemini-pillar-1',
+      type: 'cylinder',
+      position: [-65, -10, 140],
+      rotation: [0, 0, 0],
+      scale: [6, 30, 6],
+      opacity: 0.6,
+      animType: 'pulse',
+      texture: null
+    },
+    {
+      id: 'gemini-pillar-2',
+      type: 'cylinder',
+      position: [-20, -14, 160],
+      rotation: [0, 0, 0],
+      scale: [6, 30, 6],
+      opacity: 0.6,
+      animType: 'pulse',
+      texture: null
+    },
+    // 4. Holografisk sfär i mitten av S-kurvan
+    {
+      id: 'gemini-core-sphere',
+      type: 'sphere',
+      position: [0, 15, 20],
+      rotation: [0, 0, 0],
+      scale: [16, 16, 16],
+      opacity: 0.25,
+      animType: 'pulse',
+      texture: null
+    }
+  ]
+};

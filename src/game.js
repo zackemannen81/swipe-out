@@ -7,7 +7,7 @@ import { RaceAudio } from './audio.js';
 import './style.css';
 import { createCraft, loadCraftModel } from './craft.js';
 import { spawnTrackObjects, createTrack, getTrackFrame } from './track.js';
-import { NEON_CAUSEWAY, SYNTHETIC_DREAMS, DIGITAL_HORIZON, MOMMY_IM_SCARED ,DARK_SKIES} from './track-data.js';
+import { NEON_CAUSEWAY, SYNTHETIC_DREAMS, DIGITAL_HORIZON, MOMMY_IM_SCARED ,DARK_SKIES, GEMINI} from './track-data.js';
 import { createShipPhysics, stepShipPhysics } from './ship-physics.js';
 import { createOpponents, getPlayerPosition, resetOpponents, updateOpponents,resolveCraftCollisions } from './opponents.js';
 import Nebula, { SpriteRenderer, Rate, Span } from 'three-nebula';
@@ -77,7 +77,8 @@ const TRACK_CONFIG = {
   'track2': { name: 'Synthetic Dreams', data: SYNTHETIC_DREAMS, defaultAudio: '/audio/tracks/track_002.mp3', backdrop: '/images/backdrop_track-002.jpg' },
   'track3': { name: 'Digital Horizon', data: DIGITAL_HORIZON, defaultAudio: '/audio/tracks/track_006.mp3', backdrop: '/images/backdrop_track-003.jpg' },
   'track4': { name: 'Mommy I\'m Scared', data: MOMMY_IM_SCARED, defaultAudio: '/audio/tracks/track_005.mp3', backdrop: '/images/backdrop_track-004.jpg' },
-  'track5': { name: 'Dark skies', data: DARK_SKIES, defaultAudio: '/audio/tracks/track_004.mp3', backdrop: '/images/backdrop_track-005.jpg' }
+  'track5': { name: 'Dark skies', data: DARK_SKIES, defaultAudio: '/audio/tracks/track_004.mp3', backdrop: '/images/backdrop_track-005.jpg' },
+  'track6': { name: 'Gemini', data: GEMINI, defaultAudio: '/audio/tracks/track_007.mp3', backdrop: '/images/backdrop_track-006.jpg' }
 };
 
 let currentTrackId = 'track1'; 
@@ -222,7 +223,7 @@ const cameraSystem = {
   modeTimer: 0,
   orbitAngle: 0,
   orbitSpeed: 0.55,
-  mode: 'external', // 'external' (chase-vy bakifrån) eller 'internal' (cockpit-vy)
+  mode: 'wipeoutStyle', // 'external' (chase-vy bakifrån) eller 'internal' (cockpit-vy)
   position: new THREE.Vector3(),
   velocity: new THREE.Vector3(),
   lastPosition: new THREE.Vector3(),
