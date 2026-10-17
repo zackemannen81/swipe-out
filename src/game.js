@@ -274,7 +274,7 @@ const cameraSystem = {
     };*/
 case 'wipeoutStyle': {
       // Konfiguration (dessa kan du flytta upp till state-variablerna i början av cameraSystem om du vill)
-      const distance = 3.0;      // Hur långt bakom
+      const distance = 2.0;      // Hur långt bakom
       const height = 3.0;        // Hur högt över
       const positionLerp = 5.0;  // Hur stram gummisnodden är (högre = stummare, lägre = sladdrigare)
 

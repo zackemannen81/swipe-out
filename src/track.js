@@ -250,13 +250,10 @@ export function getTrackFrame(curve, progress) {
     yaw: Math.atan2(tangent.x, tangent.z),
   };
 }
-
 const textureLoader = new THREE.TextureLoader();
 // Läs av opacity och säkra variabeln
-const objectOpacity = typeof obj.opacity === 'number' ? obj.opacity : parseFloat(String(obj.opacity || 1).replace(',', '.')) || 1.0;
-const isTransparent = objectOpacity < 0.99;
-
-
+//const objectOpacity = typeof obj.opacity === 'number' ? obj.opacity : parseFloat(String(obj.opacity || 1).replace(',', '.')) || 1.0;
+//const isTransparent = objectOpacity < 0.99;
 export function spawnTrackObjects(scene, trackData) {
   const existingGroup = scene.getObjectByName('customTrackObjects');
   if (existingGroup) scene.remove(existingGroup);
@@ -266,12 +263,10 @@ export function spawnTrackObjects(scene, trackData) {
   const objectGroup = new THREE.Group();
   objectGroup.name = 'customTrackObjects';
 
-  // Hämta banans horisontella skala (t.ex. 3.25)
   const hScale = trackData.horizontalScale ?? 1;
 
-  trackData.objects.forEach((obj) => {
+  trackData.objects.forEach((obj) => { // <-- Säkerställt att variabeln heter obj här
     let geometry;
-
     if (obj.type === 'cylinder') {
       geometry = new THREE.CylinderGeometry(0.5, 0.5, 1, 32);
     } else if (obj.type === 'sphere') {
@@ -280,38 +275,36 @@ export function spawnTrackObjects(scene, trackData) {
       geometry = new THREE.BoxGeometry(1, 1, 1);
     }
 
-let material;
-if (obj.texture) {
-  const tex = textureLoader.load(obj.texture);
-  tex.colorSpace = THREE.SRGBColorSpace;
-  const objectOpacity = obj.opacity ?? 1.0;
-  const isTransparent = objectOpacity < 0.99 || Boolean(obj.texture);
+    const rawOpacity = typeof obj.opacity === 'string' ? obj.opacity.replace(',', '.') : obj.opacity;
+    const parsedOpacity = parseFloat(rawOpacity);
+    const opacity = !isNaN(parsedOpacity) ? parsedOpacity : 1.0;
 
-  material = new THREE.MeshStandardMaterial({
-    map: tex,
-    emissiveMap: tex,
-    emissive: new THREE.Color(0xffffff),
-    emissiveIntensity: 0.3,
-    transparent: true,
-    opacity: objectOpacity,
-    roughness: 0.2,
-    metalness: 0.8,
-    depthWrite: objectOpacity > 0.5, // Förhindrar sorteringsfel i 3D vid överlappande glas
-  });
-} else {
-  material = new THREE.MeshStandardMaterial({
-    color: obj.type === 'cylinder' ? 0xffd166 : obj.type === 'sphere' ? 0xb58cff : 0xff7aa8,
-    transparent:isTransparent|| false,
-    opacity: objectOpacity,
-    roughness: 0.1,
-    metalness: 0.9,
-    depthWrite: objectOpacity > 0.5,
-  });
-}
+    let material;
+    if (obj.texture) {
+      const tex = textureLoader.load(obj.texture);
+      tex.colorSpace = THREE.SRGBColorSpace;
+      material = new THREE.MeshStandardMaterial({
+        map: tex,
+        emissiveMap: tex,
+        emissive: new THREE.Color(0xffffff),
+        emissiveIntensity: 0.2,
+        transparent: opacity < 1 || Boolean(obj.texture),
+        opacity: opacity,
+        roughness: 0.3,
+        metalness: 0.7
+      });
+    } else {
+      material = new THREE.MeshStandardMaterial({
+        color: obj.type === 'cylinder' ? 0xffd166 : obj.type === 'sphere' ? 0xb58cff : 0xff7aa8,
+        transparent: opacity < 1,
+        opacity: opacity,
+        roughness: 0.2,
+        metalness: 0.8
+      });
+    }
 
     const mesh = new THREE.Mesh(geometry, material);
 
-    // KORRIGERING: Multiplicera X och Z med hScale så objekten matchar 3D-banans storlek!
     mesh.position.set(
       obj.position[0] * hScale,
       obj.position[1],
