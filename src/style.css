@@ -171,3 +171,192 @@ h2 { font-size: clamp(48px, 6vw, 76px); }
 }
 
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; } }
+
+/* --- MINIMALIST MODERN HUD --- */
+.hud-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  display: flex;
+  justify-content: space-between;
+  padding: 20px 28px;
+  box-sizing: border-box;
+  z-index: 10;
+}
+
+/* Glassmorphism Paneler */
+.hud-card {
+  display: flex;
+  align-items: center;
+  background: rgba(6, 12, 18, 0.55);
+  border: 1px solid rgba(93, 232, 223, 0.2);
+  border-top: 2px solid #5de8df;
+  padding: 10px 18px;
+  border-radius: 4px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.hud-left {
+  gap: 16px;
+  height: max-content;
+}
+
+.hud-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.hud-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.15em;
+  color: #708e9b;
+  margin-bottom: 2px;
+}
+
+.hud-value {
+  font-family: 'Induction', 'Barlow Condensed', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: #eaf3f5;
+  letter-spacing: 0.05em;
+  line-height: 1;
+}
+
+.hud-value small {
+  font-size: 11px;
+  color: #5de8df;
+  font-weight: 400;
+}
+
+.hud-value.accent-pink {
+  color: #ff397b;
+}
+
+.hud-divider {
+  width: 1px;
+  height: 24px;
+  background: rgba(112, 142, 155, 0.25);
+}
+
+/* Minimap Modernisering */
+.hud-right {
+  padding: 6px;
+  width: 100px;
+  height: 100px;
+}
+
+.minimap-wrapper {
+  width: 100%;
+  height: 100%;
+}
+
+#minimap-svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+#minimap-route {
+  fill: none;
+  stroke: rgba(93, 232, 223, 0.35);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+#minimap-start {
+  fill: #ff397b;
+}
+
+#minimap-player {
+  fill: #5de8df;
+  filter: drop-shadow(0 0 4px #5de8df);
+}
+
+/* Mobil-Anpassning: Kompaktare vy på mindre skärmar */
+@media (max-width: 768px) {
+  .hud-container {
+    padding: 12px;
+  }
+  
+  .hud-card {
+    padding: 8px 12px;
+  }
+
+  .hud-value {
+    font-size: 16px;
+  }
+
+  .hud-right {
+    width: 75px;
+    height: 75px;
+  }
+}
+
+/* Minimalistisk Track & Settings-väljare */
+.track-select-wrapper {
+  display: flex;
+  gap: 12px;
+  margin: 16px 0;
+}
+
+select#track-select, select#assist-select {
+  appearance: none;
+  background: rgba(10, 20, 30, 0.65);
+  border: 1px solid rgba(93, 232, 223, 0.3);
+  color: #5de8df;
+  font-family: 'Induction', 'DM Mono', monospace;
+  font-size: 13px;
+  letter-spacing: 0.1em;
+  padding: 10px 18px;
+  border-radius: 3px;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(8px);
+}
+
+select#track-select:hover, select#assist-select:hover {
+  border-color: #5de8df;
+  box-shadow: 0 0 12px rgba(93, 232, 223, 0.25);
+  background: rgba(15, 28, 42, 0.85);
+}
+
+select#track-select option {
+  background: #080d14;
+  color: #eaf3f5;
+}
+/* Sub-text för MAX SPEED */
+.hud-subvalue {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  color: #5de8df;
+  letter-spacing: 0.08em;
+  opacity: 0.85;
+  margin-top: 1px;
+}
+
+/* THRUST METER BAR */
+.thrust-meter-bg {
+  width: 64px;
+  height: 8px;
+  background: rgba(10, 25, 35, 0.8);
+  border: 1px solid rgba(93, 232, 223, 0.3);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-top: 4px;
+  position: relative;
+}
+
+.thrust-meter-fill {
+  width: 0%;
+  height: 100%;
+  background: linear-gradient(90deg, #5de8df 0%, #ff397b 100%);
+  box-shadow: 0 0 8px rgba(93, 232, 223, 0.6);
+  transition: width 0.05s ease-out;
+}

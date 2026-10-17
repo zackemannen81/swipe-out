@@ -394,6 +394,7 @@ const drag = { active: false, lastX: 0, pointerId: null, throttle: 0 };
 const heldKeys = new Set();
 const shipPhysics = createShipPhysics(baseSpeed+SPEEDCALIBRATION);
 const race = {
+  topSpeed: 0,
   state: 'ready', distance: 0, elapsed: 0, steering: 0, targetSteering: 0, drift: 0,
   lateralVelocity: 0, roll: 0, currentSpeed: baseSpeed + SPEEDCALIBRATION, throttleTarget: 0, keyboardThrottle: 0, playerFinishTime: null,
   airborne: false, airWorldY: 0, airVelocity: 0, previousSlope: 0, jumpCooldown: 0,
@@ -868,6 +869,7 @@ if (countVal !== prevCount) {
   } else if (countVal <= 0 && prevCount > 0) {
     raceAudio.playSfx('countdownGo');
     triggerCountdownAnim('GO!', true);
+    race.topSpeed = 0;
   }
 } 
     // När räknaren når 0, startar loppet på riktigt!
@@ -1081,6 +1083,40 @@ if (countVal !== prevCount) {
     }
   }
   
+  // 1. Beräkna nuvarande hastighet i KM/H
+const displaySpeed = Math.round(race.currentSpeed * 3.6 * 3.25);
+
+// 2. Uppdatera högsta hastighet om nuvarande är högre
+if (displaySpeed > race.topSpeed) {
+  race.topSpeed = displaySpeed;
+}
+
+// 3. Uppdatera text element
+document.querySelector('#race-speed').innerHTML = `${displaySpeed} <small>KM/H</small>`;
+document.querySelector('#race-top-speed').textContent = `MAX ${race.topSpeed} KM/H`;
+
+// 4. Trip-meter (Distans i meter)
+const tripMeter = document.querySelector('#race-trip');
+if (tripMeter) {
+  const meters = Math.floor(race.distance * 3.25); // Skala till meter
+  tripMeter.innerHTML = `${meters} <small>M</small>`;
+}
+
+// 5. Thrust-meter (Gasmätare i %)
+const thrustFill = document.querySelector('#thrust-meter-fill');
+if (thrustFill) {
+  // Räkna ut gaspådrag (0 till 100%) baserat på throttleTarget eller hastighetsförhållande
+  const thrustPercent = Math.max(0, Math.min(100, race.throttleTarget * 100));
+  thrustFill.style.width = `${thrustPercent}%`;
+  
+  // Byta färg om spelaren boostar
+  if (shipPhysics.boostTimer > 0) {
+    thrustFill.style.width = '100%';
+    thrustFill.style.background = '#58f442'; // Neongrön vid boost
+  } else {
+    thrustFill.style.background = 'linear-gradient(90deg, #5de8df 0%, #ff397b 100%)';
+  }
+}
 
   // Kör det nya integrerade kamerapasset
   cameraSystem.update(craft.position, craft.quaternion, shipPhysics.velocity, delta, trackFrame);
