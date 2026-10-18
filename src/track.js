@@ -10,6 +10,7 @@ function addInstances(group, geometry, material, transforms) {
     mesh.setMatrixAt(index, matrix);
   });
   group.add(mesh);
+  mesh.renderOrder = 4;
 }
 
 export function createTrack(definition = NEON_CAUSEWAY) {
@@ -21,6 +22,7 @@ export function createTrack(definition = NEON_CAUSEWAY) {
   const roadMaterial = new THREE.MeshStandardMaterial({
     color: 0x182234, metalness: 0.35, roughness: 0.48,
     emissive: 0x06121c, emissiveIntensity: 0.8,
+    transparent: true, opacity: 0.75, depthWrite: false,
   });
   const cyanMaterial = new THREE.MeshStandardMaterial({
     color: 0x58f4e8, emissive: 0x23dace, emissiveIntensity: 7.1,
@@ -74,6 +76,17 @@ export function createTrack(definition = NEON_CAUSEWAY) {
   ribbon(trackWidth / 2 + 0.15, 0.1, transparentDarkMaterial, 0.14);
 
   // Floating neon guardrails make the road edge readable at race speed.
+  const railMaterial = new THREE.MeshStandardMaterial({
+    color: 0x101827, metalness: 0.7, roughness: 0.38,
+  });
+  const pinkRailMaterial = new THREE.MeshStandardMaterial({
+    color: 0xff4b91, emissive: 0xff2678, emissiveIntensity: 8.5,
+    metalness: 0.05, roughness: 0.3,
+  });
+  const cyanRailMaterial = new THREE.MeshStandardMaterial({
+    color: 0x58f4e8, emissive: 0x23dace, emissiveIntensity: 8.5,
+    metalness: 0.05, roughness: 0.3,
+  });
   const railGeometry = new THREE.CylinderGeometry(0.07, 0.07, 8.5, 8);
   const railTransforms = [];
   for (let distance = 4.25; distance < curve.getLength(); distance += 8.5) {
@@ -89,7 +102,7 @@ export function createTrack(definition = NEON_CAUSEWAY) {
       railTransforms.push({ position, quaternion });
     }
   }
-  addInstances(group, railGeometry, darkMaterial, railTransforms);
+  addInstances(group, railGeometry, railMaterial, railTransforms);
   const railLightGeometry = new THREE.CylinderGeometry(0.045, 0.045, 8.5, 6);
   const pinkRailTransforms = [];
   const cyanRailTransforms = [];
@@ -106,8 +119,8 @@ export function createTrack(definition = NEON_CAUSEWAY) {
       (side < 0 ? pinkRailTransforms : cyanRailTransforms).push({ position, quaternion });
     }
   }
-  addInstances(group, railLightGeometry, pinkMaterial, pinkRailTransforms);
-  addInstances(group, railLightGeometry, cyanMaterial, cyanRailTransforms);
+  addInstances(group, railLightGeometry, pinkRailMaterial, pinkRailTransforms);
+  addInstances(group, railLightGeometry, cyanRailMaterial, cyanRailTransforms);
 
   // Directional chevrons sit just above the road and point into the flow of the course.
   const arrowGeometry = new THREE.BoxGeometry(0.5, 0.06, 0.86);
