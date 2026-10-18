@@ -14,6 +14,14 @@
 * { box-sizing: border-box; }
 html, body { width: 100%; min-width: 320px; min-height: 100%; margin: 0; overflow: hidden; }
 body { min-height: 100vh; }
+body.fullscreen-fallback {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100dvh;
+  min-height: 100dvh;
+  background: #070912;
+}
 button { font: inherit; }
 
 @font-face {
@@ -173,11 +181,10 @@ h2 { font-size: clamp(48px, 6vw, 76px); }
 
 /* Dedicated mobile touch controls. They are hidden on mouse/keyboard devices. */
 .mobile-only { display: none; }
+#rotate-device-overlay { display: none; }
 
 @media (pointer: coarse), (max-width: 820px) {
   html, body, .experience { touch-action: none; user-select: none; -webkit-user-select: none; overscroll-behavior: none; }
-  /* Meny- och resultatskärmarna måste ligga över den osynliga styrzonen.
-     Annars fångar #touch-steering-zone touch-eventen före select/knappar. */
   .screen-card { z-index: 30; }
   .mobile-only { position: absolute; inset: 0; z-index: 20; display: block; pointer-events: none; }
   #touch-steering-zone { position: absolute; inset: 30% 50% 0 0; pointer-events: auto; touch-action: none; }
@@ -187,10 +194,36 @@ h2 { font-size: clamp(48px, 6vw, 76px); }
   .brake-btn { border-color: #ff397b; color: #ff9bbd; }
   .touch-btn:active, .touch-btn.active { background: rgba(92,245,236,.28); transform: scale(.97); }
   .brake-btn:active, .brake-btn.active { background: rgba(255,57,123,.25); }
-  #btn-gyro-toggle { position: absolute; top: max(76px, calc(env(safe-area-inset-top) + 54px)); left: 50%; min-width: 108px; min-height: 36px; padding: 7px 10px; transform: translateX(-50%); pointer-events: auto; }
-  .hud-container { top: env(safe-area-inset-top); transform: scale(.85); transform-origin: top left; width: 117.65%; }
+  #mobile-top-bar { position: absolute; top: max(8px, env(safe-area-inset-top)); right: max(8px, env(safe-area-inset-right)); display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 5px; max-width: min(70vw, 390px); pointer-events: auto; }
+  #mobile-top-bar .hud-chip { min-width: 0; min-height: 32px; padding: 5px 7px; font-size: 9px; letter-spacing: .04em; }
+  .hud-container { top: env(safe-area-inset-top); transform: scale(.5); transform-origin: top left; width: 200%; }
   .topbar { padding-top: max(22px, calc(env(safe-area-inset-top) + 10px)); }
 }
+
+@media (pointer: coarse) and (max-height: 500px), (max-width: 820px) and (max-height: 500px) {
+  #mobile-top-bar { top: max(4px, env(safe-area-inset-top)); right: max(6px, env(safe-area-inset-right)); gap: 4px; max-width: 76vw; }
+  #mobile-top-bar .hud-chip { min-height: 28px; padding: 4px 6px; font-size: 8px; }
+  #touch-pedals { bottom: max(8px, env(safe-area-inset-bottom)); }
+  #steering-indicator { bottom: 8%; }
+  .hud-container { top: max(42px, calc(env(safe-area-inset-top) + 34px)); padding: 6px; }
+  .hud-left { gap: 7px; padding: 6px 8px; }
+  .hud-group { gap: 1px; }
+  .hud-label { font-size: 7px; margin-bottom: 0; }
+  .hud-value { font-size: 14px; }
+  .hud-value small { font-size: 9px; }
+  .hud-subvalue { font-size: 7px; }
+  .thrust-meter-bg { width: 42px; height: 6px; }
+  .hud-divider { height: 18px; }
+  .hud-right { width: 56px; height: 56px; padding: 4px; }
+}
+
+
+@media screen and (orientation: portrait) and (max-width: 900px) {
+  #rotate-device-overlay { position: fixed; inset: 0; z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 32px; background: rgba(8, 12, 10, .96); backdrop-filter: blur(12px); color: #5cf5ec; text-align: center; font-family: inherit; letter-spacing: 2px; }
+  .phone-icon { font-size: 3rem; margin-bottom: 1rem; animation: rotate-anim 2s infinite ease-in-out; }
+}
+
+@keyframes rotate-anim { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(-90deg); } }
 
 
 /* --- MINIMALIST MODERN HUD --- */
