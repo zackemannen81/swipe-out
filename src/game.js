@@ -7,7 +7,7 @@ import { RaceAudio } from './audio.js';
 import './style.css';
 import { createCraft, loadCraftModel } from './craft.js';
 import { spawnTrackObjects, createTrack, getTrackFrame } from './track.js';
-import { NEON_CAUSEWAY, SYNTHETIC_DREAMS, DIGITAL_HORIZON, MOMMY_IM_SCARED ,DARK_SKIES, GEMINI,THE_JOKER} from './track-data.js';
+import { NEON_CAUSEWAY, SYNTHETIC_DREAMS, DIGITAL_HORIZON, MOMMY_IM_SCARED ,DARK_SKIES, GEMINI,THE_JOKER,THE_VOID} from './track-data.js';
 import { createShipPhysics, stepShipPhysics } from './ship-physics.js';
 import { createOpponents, getPlayerPosition, resetOpponents, updateOpponents,resolveCraftCollisions } from './opponents.js';
 import Nebula, { SpriteRenderer, Rate, Span } from 'three-nebula';
@@ -132,7 +132,8 @@ const TRACK_CONFIG = {
   'track4': { name: 'Mommy I\'m Scared', data: MOMMY_IM_SCARED, defaultAudio: '/audio/tracks/track_005.mp3', backdrop: '/images/backdrop_track-004.jpg' },
   'track5': { name: 'Dark skies', data: DARK_SKIES, defaultAudio: '/audio/tracks/track_004.mp3', backdrop: '/images/backdrop_track-005.jpg' },
   'track6': { name: 'Gemini', data: GEMINI, defaultAudio: '/audio/tracks/track_007.mp3', backdrop: '/images/backdrop_track-006.jpg' },
-  'track7': { name: 'The Joker', data: THE_JOKER, defaultAudio: '/audio/tracks/track_009.mp3', backdrop: '/images/backdrop_track-007.jpg' } 
+  'track7': { name: 'The Joker', data: THE_JOKER, defaultAudio: '/audio/tracks/track_009.mp3', backdrop: '/images/backdrop_track-007.jpg' } ,
+  'track8': { name: 'The Void', data: THE_VOID, defaultAudio: '/audio/tracks/track_010.mp3', backdrop: '/images/backdrop_track-009.jpg' } 
 };
 
 let currentTrackId = 'track1'; 
@@ -140,29 +141,37 @@ let currentTrackId = 'track1';
 let raceAudio = new RaceAudio(TRACK_CONFIG[currentTrackId].defaultAudio);
 
 const panoramaTexture = new THREE.TextureLoader().load(
-  '/images/backdrop_track-001.jpg',
+  TRACK_CONFIG[currentTrackId].backdrop,
   (texture) => {
     texture.colorSpace = THREE.SRGBColorSpace;
+    
+    // 1. Tvinga bort mipmapping så WebGL alltid ritar full 4K/8K-upplösning
+    texture.generateMipmaps = false;
+    texture.minFilter = THREE.LinearFilter;
+    texture.magFilter = THREE.LinearFilter;
+    
+    // 2. Maximal skärpa i vinklar
+    texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
+    
     texture.needsUpdate = true;
-  },
-  undefined,
-  (error) => console.warn('Unable to load panorama backdrop.', error),
+  }
 );
-panoramaTexture.colorSpace = THREE.SRGBColorSpace;
+
+// Skapa cylindern med stängda ändar
 const panoramaBackdrop = new THREE.Mesh(
-  new THREE.CylinderGeometry(196, 196, 376, 128, 4, true),
+  new THREE.CylinderGeometry(192, 192, 392, 128, 2, false),
   new THREE.MeshBasicMaterial({
     map: panoramaTexture,
     side: THREE.BackSide,
     depthWrite: false,
     depthTest: false,
-    fog: true,
-  }),
+    fog: true, // Gör att inte fog/dimma bleker ur färgerna i fjärran
+  })
 );
 panoramaBackdrop.renderOrder = -10;
 scene.add(panoramaBackdrop);
 
-const camera = new THREE.PerspectiveCamera(53, 1, 0.1, 220);
+const camera = new THREE.PerspectiveCamera(53, 1, 0.1, 400);
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
 renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -170,7 +179,7 @@ renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.25;
 const composer = new EffectComposer(renderer);
 composer.addPass(new RenderPass(scene, camera));
-const bloomPass = new UnrealBloomPass(new THREE.Vector2(1, 1), 0.78, 0.7, 0.78);
+const bloomPass = new UnrealBloomPass(new THREE.Vector2(1, 1), 0.6, 0.7, 0.78);
 composer.addPass(bloomPass);
 
 scene.add(new THREE.HemisphereLight(0x98c8ff, 0x111421, 1.8));
@@ -223,25 +232,7 @@ function updateMinimap(position) {
 setupMinimap();
 const { group: craft, engineMaterials, thrusterMaterials, thrusters, glow } = createCraft();
 scene.add(craft);
-/*
-const speedTrails = [-1, 1].map((side) => {
-  const material = new THREE.MeshBasicMaterial({
-    color: side < 0 ? 0xff4388 : 0x5cf5ec,
-    transparent: true,
-    opacity: 0.28,
-    blending: THREE.AdditiveBlending,
-    depthWrite: false,
-  });
-  // Mycket längre grundgeometri (ändrat från 3.8 till 12.0)
-  const trail = new THREE.Mesh(new THREE.PlaneGeometry(0.18, 12.0), material);
-  // Flyttad längre bakåt (Z ändrat från 0.78 till 5.0)
-  trail.position.set(side * 0.84, -0.12, 5.0);
-  trail.rotation.x = -Math.PI / 2;
-  trail.visible = false;
-  craft.add(trail);
-  return trail;
-});
-*/
+
 const thrusterSystems = [];
 const thrusterCrafts = [];
 
@@ -268,7 +259,7 @@ thrusterSystems.push({
   emitter,
   group,
   color,
-  nozzleOffset: new THREE.Vector3(side * 0.38, -0.08, -1.6),
+  nozzleOffset: new THREE.Vector3(side * 0.38, -0.08, -1.8),
   previousExhaustPos: new THREE.Vector3() // NY: Håller koll på förra utblåspositionen
 });
     }).catch((error) => console.error('Nebula thruster error:', error));
@@ -364,9 +355,9 @@ const cameraSystem = {
  
 case 'wipeoutStyle': {
       // Konfiguration (dessa kan du flytta upp till state-variablerna i början av cameraSystem om du vill)
-      const distance = 2.0;      // Hur långt bakom
-      const height = 3.0;        // Hur högt över
-      const positionLerp = 5.0;  // Hur stram gummisnodden är (högre = stummare, lägre = sladdrigare)
+      const distance = 1.2;      // Hur långt bakom
+      const height = 2.8;        // Hur högt över
+      const positionLerp = 5.5;  // Hur stram gummisnodden är (högre = stummare, lägre = sladdrigare)
 
       // 1. Skapa offset utifrån skeppets lokala rotation. 
       // Eftersom Z=1 verkar vara framåt i din motor, sätter vi Z till -distance för att hamna bakom.
@@ -381,7 +372,7 @@ case 'wipeoutStyle': {
       // 4. Sätt vad vi vill titta på (en bit framför skeppet in i kurvan)
       const forwardDir = new THREE.Vector3(0, 0, 1).applyQuaternion(craftQuaternion);
       this.lookTarget.copy(craftPosition).add(forwardDir.multiplyScalar(8));
-      this.lookTarget.y += 1.0; // Lyft blicken lite så vi inte tittar rakt ner i marken
+      this.lookTarget.y += 0.8; // Lyft blicken lite så vi inte tittar rakt ner i marken
 
       break;
     }
@@ -1302,7 +1293,7 @@ if (thrustFill) {
   bloomPass.strength = 0.62 + kick.hitValue * 0.55 + bass.value * 0.12;
   const pulse = 0.78 + Math.sin(clock.elapsedTime * 19) * 0.12 + kick.hitValue * 0.75;
   engineMaterials.forEach((material) => material.color.setRGB(0.28 * pulse, 0.95 * pulse, 0.9 * pulse));
-  const thrusterPower = 0.72 + bass.value * 0.85 + kick.hitValue * 0.72;
+  const thrusterPower = 1;//0.72 + bass.value * 0.85 + kick.hitValue * 0.72;
   thrusters.forEach((thruster, index) => {
     thruster.visible = race.state === 'racing';
     thruster.scale.set(
@@ -1373,26 +1364,14 @@ for (const {
   previousExhaustPos.copy(exhaustPos);
 }
   
- const trailPower = race.state === 'racing' ? THREE.MathUtils.clamp(0.18 + bass.value * 0.42 + kick.hitValue * 0.35, 0.18, 0.9) : 0;
-  
+ 
   // NYTT: Räkna ut en hastighetsfaktor. Är 1.0 vid normal maxfart, över 1.0 vid boost, och nära 0 vid inbromsning/krasch.
   const speedFactor = race.state === 'racing' ? THREE.MathUtils.clamp(race.currentSpeed / baseSpeed, 0.1, 1.8) : 0;
-/*
-  speedTrails.forEach((trail, index) => {
-    trail.visible = race.state === 'racing';
-    
-    // ÄNDRING: Multiplicera in speedFactor i Y-skalan. Detta sträcker ut spåret!
-    // Siffran 1.2 här nedanför är en bas-förlängare. Öka den om du vill ha ÄNNU längre spår vid hög fart.
-    trail.scale.y = trailPower * speedFactor * 1.2 * (0.82 + Math.sin(clock.elapsedTime * 23 + index * 2.4) * 0.12);
-    
-    // ÄNDRING: Gör spåren lite tydligare/starkare när man kör fort
-    trail.material.opacity = trailPower * 0.38 * Math.min(speedFactor, 1.2);
-  });
-  */
-  thrusterMaterials.forEach((material) => {
+  
+ /* thrusterMaterials.forEach((material) => {
     material.opacity = race.state === 'racing' ? THREE.MathUtils.clamp(0.36 + thrusterPower * 0.14, 0.36, 0.82) : 0;
-  });
-  glow.intensity = 2.4 + pulse * 1.2 + kick.hitValue * 5.5 + bass.value * 2.4;
+  });*/
+  //glow.intensity = 2.4 + pulse * 1.2 + kick.hitValue * 5.5 + bass.value * 2.4;
   speedDisplay.textContent = race.state === 'racing'
     ? `${race.airborne ? 'AIR' : race.throttleTarget > 0.1 ? 'THRUST' : race.throttleTarget < -0.1 ? 'BRAKE' : 'AUTO'} · ${Math.round(race.currentSpeed * 36)} KM/H`
     : 'AUTO · READY';

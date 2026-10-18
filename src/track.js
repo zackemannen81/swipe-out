@@ -20,21 +20,21 @@ export function createTrack(definition = NEON_CAUSEWAY) {
   curve.arcLengthDivisions = 1800;
   const group = new THREE.Group();
   const roadMaterial = new THREE.MeshStandardMaterial({
-    color: 0x182234, metalness: 0.35, roughness: 0.48,
-    emissive: 0x06121c, emissiveIntensity: 0.8,
+    color: 0x182234, metalness: 0.0, roughness: 0.48,
+    emissive: 0x06121c, emissiveIntensity: 0.1,
     transparent: true, opacity: 0.75, depthWrite: false,
   });
   const cyanMaterial = new THREE.MeshStandardMaterial({
-    color: 0x58f4e8, emissive: 0x23dace, emissiveIntensity: 7.1,
+    color: 0x58f4e8, emissive: 0x23dace, emissiveIntensity: 6.1,
     metalness: 0.25, roughness: 0.32,
   });
   const pinkMaterial = new THREE.MeshStandardMaterial({
-    color: 0xff4b91, emissive: 0xd51e63, emissiveIntensity: 9.5,
+    color: 0xff4b91, emissive: 0xd51e63, emissiveIntensity: 7.5,
     metalness: 0.2, roughness: 0.36,
   });
-  const darkMaterial = new THREE.MeshStandardMaterial({ color: 0x101827, metalness: 0.7, roughness: 0.38 });
+  const darkMaterial = new THREE.MeshStandardMaterial({ color: 0x101827, metalness: 0.0, roughness: 0.38 });
   const transparentDarkMaterial = new THREE.MeshStandardMaterial({
-    color: 0x101827, metalness: 0.7, roughness: 0.38,
+    color: 0x101827, metalness: 0.0, roughness: 0.38,
     transparent: true, opacity: 0.85, depthWrite: false,
   });
 
@@ -72,15 +72,15 @@ export function createTrack(definition = NEON_CAUSEWAY) {
   ribbon(0, trackWidth, roadMaterial, 0, 900);
   ribbon(-edgeOffset, 0.19, pinkMaterial, 0.075);
   ribbon(edgeOffset, 0.19, cyanMaterial, 0.075);
-  ribbon(-trackWidth / 2 - 0.15, 0.1, transparentDarkMaterial, 0.14);
-  ribbon(trackWidth / 2 + 0.15, 0.1, transparentDarkMaterial, 0.14);
+  //ribbon(-trackWidth / 2 - 0.15, 0.1, transparentDarkMaterial, 0.14);
+  //ribbon(trackWidth / 2 + 0.15, 0.1, transparentDarkMaterial, 0.14);
 
   // Floating neon guardrails make the road edge readable at race speed.
   const railMaterial = new THREE.MeshStandardMaterial({
     color: 0x101827, metalness: 0.7, roughness: 0.38,
   });
   const pinkRailMaterial = new THREE.MeshStandardMaterial({
-    color: 0xff4b91, emissive: 0xff2678, emissiveIntensity: 8.5,
+    color: 0xff4b91, emissive: 0xff2678, emissiveIntensity: 7.5,
     metalness: 0.05, roughness: 0.3,
   });
   const cyanRailMaterial = new THREE.MeshStandardMaterial({
@@ -89,7 +89,7 @@ export function createTrack(definition = NEON_CAUSEWAY) {
   });
   const railGeometry = new THREE.CylinderGeometry(0.07, 0.07, 8.5, 8);
   const railTransforms = [];
-  for (let distance = 4.25; distance < curve.getLength(); distance += 8.5) {
+  for (let distance = 4.25; distance < curve.getLength(); distance += 34) {
     const frame = getTrackFrame(curve, distance / curve.getLength());
     for (const side of [-1, 1]) {
       const position = frame.center.clone()
@@ -106,7 +106,7 @@ export function createTrack(definition = NEON_CAUSEWAY) {
   const railLightGeometry = new THREE.CylinderGeometry(0.045, 0.045, 8.5, 6);
   const pinkRailTransforms = [];
   const cyanRailTransforms = [];
-  for (let distance = 4.25; distance < curve.getLength(); distance += 17) {
+  for (let distance = 4.25; distance < curve.getLength(); distance += 8.5) {
     const frame = getTrackFrame(curve, distance / curve.getLength());
     for (const side of [-1, 1]) {
       const position = frame.center.clone()
@@ -180,7 +180,7 @@ export function createTrack(definition = NEON_CAUSEWAY) {
   addInstances(group, arrowGeometry, greenMaterial, greenArrowTransforms);
 
 
-  const laneMaterial = new THREE.MeshBasicMaterial({ color: 0x182234 });
+  const laneMaterial = new THREE.MeshBasicMaterial({ color: 0x182234 , transparent: true, opacity: 0.5, depthWrite: false });
   const dash = new THREE.BoxGeometry(3.565, 0.045, 5.05,2);
   const markerTransforms = [];
   for (let distance = 4.5; distance < curve.getLength(); distance += 9) {

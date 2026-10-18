@@ -11,7 +11,7 @@ export function createCraft({
   secondaryAccentColor = 0xff4388,
   engineColor = 0x75fff4,
   glowColor = 0x43f6ea,
-  showGlow = true,
+  showGlow = false,
 } = {}) {
   const craft = new THREE.Group();
   const hullMaterial = new THREE.MeshStandardMaterial({
@@ -66,17 +66,17 @@ export function createCraft({
     const thruster = new THREE.Mesh(new THREE.ConeGeometry(0.28, 1.55, 12), thrusterMaterial);
     thruster.rotation.x = -Math.PI / 2;
     thruster.position.set(side * 0.38, -0.08, -1.82);
-    thruster.visible = showGlow;
+    thruster.visible = true;
     craft.add(thruster);
     thrusterMaterials.push(thrusterMaterial);
     thrusters.push(thruster);
   }
-
+/*
   if (showGlow) {
     const glow = new THREE.PointLight(glowColor, 3, 7);
     glow.position.set(0, 0.25, -1.1);
     craft.add(glow);
-  }
+  }*/
 
   return {
     group: craft, engineMaterials, thrusterMaterials, thrusters,
