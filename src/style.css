@@ -176,6 +176,9 @@ h2 { font-size: clamp(48px, 6vw, 76px); }
 
 @media (pointer: coarse), (max-width: 820px) {
   html, body, .experience { touch-action: none; user-select: none; -webkit-user-select: none; overscroll-behavior: none; }
+  /* Meny- och resultatskärmarna måste ligga över den osynliga styrzonen.
+     Annars fångar #touch-steering-zone touch-eventen före select/knappar. */
+  .screen-card { z-index: 30; }
   .mobile-only { position: absolute; inset: 0; z-index: 20; display: block; pointer-events: none; }
   #touch-steering-zone { position: absolute; inset: 30% 50% 0 0; pointer-events: auto; touch-action: none; }
   #steering-indicator { position: absolute; left: 50%; bottom: 12%; width: 46px; height: 46px; border: 1px solid var(--cyan); border-radius: 50%; opacity: .72; transform: translateX(-50%); box-shadow: 0 0 18px rgba(102,243,237,.35), inset 0 0 14px rgba(102,243,237,.16); transition: transform .08s ease-out; }
