@@ -191,8 +191,14 @@ const speedTrails = [-1, 1].map((side) => {
 const thrusterSystems = [];
 const thrusterCrafts = [];
 
-loadCraftModel({ group: craft })
-  .catch((error) => console.warn('Unable to load racer model; using procedural craft.', error));
+try {
+  await loadCraftModel({ group: craft });
+} catch (error) {
+  console.warn(
+    'Unable to load racer model; using procedural craft.',
+    error
+  );
+}
 const opponents = createOpponents();
 for (const opponent of opponents) scene.add(opponent.group);
 thrusterCrafts.push({ group: craft, color: 0x43f6ea });
@@ -215,6 +221,57 @@ thrusterSystems.push({
   }
 });
 
+const ghostPool = [];
+const GHOST_POOL_SIZE = 8;
+
+function createGhostPool() {
+  for (let i = 0; i < GHOST_POOL_SIZE; i++) {
+    const group = craft.clone(true);
+
+    // Ett material per ghost, delat mellan dess mesh-objekt.
+    const material = new THREE.MeshBasicMaterial({
+      color: 0x58f442,
+      transparent: true,
+      opacity: 0,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+      wireframe: true,
+      toneMapped: false
+    });
+
+    group.traverse((child) => {
+      if (child.isMesh) {
+        child.material = material;
+      }
+    });
+
+    group.visible = false;
+    scene.add(group);
+
+    ghostPool.push({
+      group,
+      material,
+      life: 0,
+      active: false
+    });
+  }
+}
+
+createGhostPool();
+
+function spawnGhost() {
+  const ghost = ghostPool.find(g => !g.active);
+  if (!ghost) return;
+
+  ghost.group.position.copy(craft.position);
+  ghost.group.quaternion.copy(craft.quaternion);
+  ghost.group.scale.copy(craft.scale);
+
+  ghost.life = 0.7;
+  ghost.active = true;
+  ghost.group.visible = true;
+  ghost.material.opacity = 0.25;
+}
 const clock = new THREE.Clock();
 //const raceAudio = new RaceAudio(RACE_TRACK_AUDIO);
 // --- KAMERASYSTEM INTEGRATION (Vänd 180 grader för att titta framåt) ---
@@ -250,28 +307,7 @@ const cameraSystem = {
       this.lookTarget.copy(this.position).add(forwardDir.multiplyScalar(10));
       break;
     }
- /*   case 'external':
-      {
-      // Extern / Chase-vy (Vänd 180 grader: Z är nu positivt bakåt, så kameran hamnar bakom skeppet)
-      const idealOffset = new THREE.Vector3(0, 3.3, -11.2).applyQuaternion(craftQuaternion);
-      const desiredPos = craftPosition.clone().add(idealOffset);
-
-      // Tröghet och studs
-      const displacement = desiredPos.clone().sub(this.position);
-      this.velocity.addScaledVector(displacement, delta * 15.0);
-      this.velocity.multiplyScalar(Math.max(0, 1 - delta * 8.0));
-      this.position.addScaledVector(this.velocity, delta * 30.0);
-
-      this.position.lerp(desiredPos, 1 - Math.exp(-4.5 * delta));
-
-      // Titta framåt i skeppets riktning istället för bakåt
-      const forwardDir = new THREE.Vector3(0, 0, 1).applyQuaternion(craftQuaternion);
-      this.lookTarget.copy(craftPosition).add(forwardDir.multiplyScalar(12));
-  
-  this.lookTarget.y += 0.3;
-  break;
-
-    };*/
+ 
 case 'wipeoutStyle': {
       // Konfiguration (dessa kan du flytta upp till state-variablerna i början av cameraSystem om du vill)
       const distance = 2.0;      // Hur långt bakom
@@ -487,7 +523,7 @@ for (const [key, offset] of Object.entries(offsets)) {
     // worldPos.y += 5.0; 
       
     raycaster.set(worldPos, partVector);
-
+/*
     arrows[key].position.copy(worldPos);
     if(key.includes('Out')) {
         arrows[key].setDirection(offset.clone().normalize().applyQuaternion(craft.quaternion));
@@ -507,6 +543,7 @@ for (const [key, offset] of Object.entries(offsets)) {
     } else {
         arrows[key].setColor(0xff0000); // Röd = Miss
     }
+*/        
 } 
 
   return pose;
@@ -859,6 +896,8 @@ if (countVal !== prevCount) {
     raceAudio.playSfx('countdownFour');
     triggerCountdownAnim('0100');
   } else if (countVal === 3) {
+    shipPhysics.boostTimer = 0.5; // Ge spelaren en liten boost när nedräkningen börjar
+    spawnGhost();
     raceAudio.playSfx('countdownThree');
     triggerCountdownAnim('0011');
   } else if (countVal === 2) {
@@ -930,15 +969,16 @@ if (countVal !== prevCount) {
   }
 // --- GHOSTING EFFEKT ---
     race.ghostTimer = (race.ghostTimer || 0) + delta;
-    race.ghosts = race.ghosts || [];
+   // race.ghosts = race.ghosts || [];
 
     // Skapa ett nytt "eftersken" var 50:e millisekund under boosten
-    if (shipPhysics.boostTimer > 0 && race.ghostTimer > 0.1) {
-      race.ghostTimer = 0;
       
-      const ghostGroup = craft.clone(); // Klona skeppet på dess exakta position och vinkel
+if (shipPhysics.boostTimer > 0 && race.ghostTimer > 0.05) {
+  race.ghostTimer = 0;
+  spawnGhost();
+}
       
-      // Byt ut alla material på klonen mot ett glödande wireframe-material
+  /*    // Byt ut alla material på klonen mot ett glödande wireframe-material
       ghostGroup.traverse((child) => {
         if (child.isMesh) {
           child.material = new THREE.MeshBasicMaterial({
@@ -951,29 +991,26 @@ if (countVal !== prevCount) {
           });
         }
       });
-      
-      scene.add(ghostGroup);
-      race.ghosts.push({ group: ghostGroup, life: 1.0 });
-    }
+    */  
+     /* scene.add(ghostGroup);
+      race.ghosts.push({ group: ghostGroup, life: 1.0 });*/
+
 
     // Tona ut och städa bort gamla ghosts så vi inte kraschar minnet
-    for (let i = race.ghosts.length - 1; i >= 0; i--) {
-      const ghost = race.ghosts[i];
-      ghost.life -= delta * 4.5; // Fade-hastighet. Högre siffra = försvinner snabbare.
-      
-      if (ghost.life <= 0) {
-        scene.remove(ghost.group);
-        ghost.group.traverse((child) => {
-          // Viktigt att frigöra materialet från grafikkortet!
-          if (child.isMesh) child.material.dispose(); 
-        });
-        race.ghosts.splice(i, 1);
-      } else {
-        ghost.group.traverse((child) => {
-          if (child.isMesh) child.material.opacity = ghost.life * 0.5;
-        });
-      }
-    }
+for (const ghost of ghostPool) {
+  if (!ghost.active) continue;
+
+  ghost.life -= delta * 4.5;
+
+  if (ghost.life <= 0) {
+    ghost.active = false;
+    ghost.group.visible = false;
+    ghost.material.opacity = 0;
+  } else {
+    ghost.material.opacity = ghost.life * 0.5;
+  }
+}
+
   updateMinimap(craft.position);
   const trackFrame = getTrackFrame(curve, race.distance / curve.getLength());
 
@@ -1167,10 +1204,21 @@ for (const {
 
   // Spara vilka partiklar som fanns före denna frame
   const existingParticles = new Set(emitter.particles);
-
+existingParticles.forEach(p => {
+    if (p.sprite && p.sprite.material) {
+      p.sprite.material.depthWrite = false;
+      p.sprite.material.renderOrder = 10;
+      p.sprite.material.blending = THREE.AdditiveBlending;
+      p.sprite.material.transparent = true;
+      
+    }
+  });
   // Kör partikelsimuleringen
+  //THREE.
+  //gl.depthMask(false);
+  
   system.update(delta);
-
+//gl.depthMask(true);
   // Hämta enbart de NYA partiklarna som skapades under denna frame
   const newParticles = emitter.particles.filter(p => !existingParticles.has(p));
   const totalNew = newParticles.length;
@@ -1178,8 +1226,10 @@ for (const {
 newParticles.forEach((particle, index) => {
     if (particle.sprite && particle.sprite.material) {
       particle.sprite.material.depthWrite = false;
+      particle.sprite.material.renderOrder = 10;
       particle.sprite.material.blending = THREE.AdditiveBlending;
-    }
+      particle.sprite.material.transparent = true;
+  }
 
     // Ren standardinterpolering från förra positionen till nuvarande (0 till 1)
     const t = totalNew > 1 ? index / (totalNew - 1) : 1;
