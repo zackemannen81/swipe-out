@@ -9,6 +9,16 @@
   </head>
   <body>
     <main class="experience">
+      <div id="mobile-controls" class="mobile-only" aria-label="Mobilkontroller">
+        <div id="touch-steering-zone" aria-label="Styrning">
+          <div id="steering-indicator"></div>
+        </div>
+        <div id="touch-pedals">
+          <button id="btn-brake" class="touch-btn brake-btn" type="button">BRAKE</button>
+          <button id="btn-thrust" class="touch-btn thrust-btn" type="button">THRUST</button>
+        </div>
+        <button id="btn-gyro-toggle" class="hud-chip" type="button" aria-pressed="false">GYRO: OFF</button>
+      </div>
       <!-- Lägg detta någonstans inuti <main class="experience"> -->
 <div id="race-messages" style="position: absolute; top: 30%; width: 100%; text-align: center; color: white; pointer-events: none; opacity: 0; transition: opacity 0.2s; z-index: 100;">
   <div style="font-family: monospace; font-size: 1.5rem; font-style: italic; color: #5cf5ec; text-shadow: 0 0 10px #5cf5ec;">CHECKPOINT</div>
