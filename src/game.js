@@ -429,6 +429,14 @@ camera.lookAt(this.currentLook);
 const baseSpeed = 65; 
 const drag = { active: false, lastX: 0, pointerId: null, throttle: 0 };
 const heldKeys = new Set();
+const mobileSteering = { pointerId: null, startX: 0 };
+const mobileInput = { throttle: 0, gyroEnabled: false, gyroSteering: 0, orientationHandler: null };
+const mobileControls = document.querySelector('#mobile-controls');
+const steeringZone = document.querySelector('#touch-steering-zone');
+const steeringIndicator = document.querySelector('#steering-indicator');
+const gyroToggle = document.querySelector('#btn-gyro-toggle');
+const thrustButton = document.querySelector('#btn-thrust');
+const brakeButton = document.querySelector('#btn-brake');
 const shipPhysics = createShipPhysics(baseSpeed+SPEEDCALIBRATION);
 const race = {
   topSpeed: 0,
@@ -766,6 +774,60 @@ canvas.addEventListener('pointerup', releasePointer);
 canvas.addEventListener('pointercancel', releasePointer);
 canvas.addEventListener('lostpointercapture', releasePointer);
 
+function updateMobileSteering(clientX) {
+  if (!steeringZone || mobileSteering.pointerId === null || mobileInput.gyroEnabled) return;
+  const rect = steeringZone.getBoundingClientRect();
+  const offset = clientX - mobileSteering.startX;
+  const range = Math.max(72, rect.width * 0.36);
+  const value = THREE.MathUtils.clamp(offset / range, -1, 1);
+  race.targetSteering = value;
+  if (steeringIndicator) steeringIndicator.style.transform = `translateX(calc(-50% + ${value * range}px))`;
+}
+steeringZone?.addEventListener('pointerdown', (event) => {
+  if (race.state !== 'racing' || mobileSteering.pointerId !== null) return;
+  event.preventDefault(); mobileSteering.pointerId = event.pointerId; mobileSteering.startX = event.clientX;
+  steeringZone.setPointerCapture(event.pointerId); updateMobileSteering(event.clientX);
+});
+steeringZone?.addEventListener('pointermove', (event) => { if (event.pointerId === mobileSteering.pointerId) { event.preventDefault(); updateMobileSteering(event.clientX); } });
+function releaseMobileSteering(event) {
+  if (event.pointerId !== mobileSteering.pointerId) return;
+  mobileSteering.pointerId = null; race.targetSteering = 0;
+  if (steeringIndicator) steeringIndicator.style.transform = 'translateX(-50%)';
+}
+steeringZone?.addEventListener('pointerup', releaseMobileSteering);
+steeringZone?.addEventListener('pointercancel', releaseMobileSteering);
+steeringZone?.addEventListener('lostpointercapture', releaseMobileSteering);
+
+function setMobileThrottle(value, button) { mobileInput.throttle = value; button?.classList.toggle('active', value !== 0); }
+function bindPedal(button, value) {
+  if (!button) return;
+  button.addEventListener('pointerdown', (event) => { if (race.state === 'racing') { event.preventDefault(); button.setPointerCapture(event.pointerId); setMobileThrottle(value, button); } });
+  const release = () => setMobileThrottle(0, button);
+  button.addEventListener('pointerup', release); button.addEventListener('pointercancel', release); button.addEventListener('lostpointercapture', release);
+}
+bindPedal(thrustButton, 1); bindPedal(brakeButton, -1);
+
+function orientationSteering(event) {
+  const portrait = window.matchMedia('(orientation: portrait)').matches;
+  const angle = portrait ? event.gamma : event.beta;
+  if (typeof angle !== 'number' || !Number.isFinite(angle)) return;
+  const adjusted = Math.abs(angle) <= 3 ? 0 : Math.sign(angle) * (Math.abs(angle) - 3);
+  mobileInput.gyroSteering = THREE.MathUtils.clamp(adjusted / 27, -1, 1);
+}
+async function toggleGyro() {
+  if (mobileInput.gyroEnabled) {
+    window.removeEventListener('deviceorientation', orientationSteering); mobileInput.gyroEnabled = false; mobileInput.gyroSteering = 0;
+    gyroToggle.textContent = 'GYRO: OFF'; gyroToggle.setAttribute('aria-pressed', 'false'); return;
+  }
+  try {
+    if (typeof DeviceOrientationEvent === 'undefined') throw new Error('Orientation sensors unavailable');
+    if (typeof DeviceOrientationEvent.requestPermission === 'function' && await DeviceOrientationEvent.requestPermission() !== 'granted') throw new Error('Orientation permission denied');
+    window.addEventListener('deviceorientation', orientationSteering); mobileInput.gyroEnabled = true;
+    gyroToggle.textContent = 'GYRO: ON'; gyroToggle.setAttribute('aria-pressed', 'true');
+  } catch (error) { console.warn('Gyro steering could not be enabled.', error); gyroToggle.textContent = 'GYRO: N/A'; window.setTimeout(() => { if (!mobileInput.gyroEnabled) gyroToggle.textContent = 'GYRO: OFF'; }, 1400); }
+}
+gyroToggle?.addEventListener('click', toggleGyro);
+
 window.addEventListener('keydown', (event) => {
   const key = event.key.toLowerCase();
   
@@ -921,7 +983,8 @@ if (countVal !== prevCount) {
   } else if (race.state === 'racing') {
     race.elapsed += delta;
     raceAudio.update(delta);
-    race.throttleTarget = drag.active ? drag.throttle : race.keyboardThrottle;
+    race.throttleTarget = mobileInput.throttle !== 0 ? mobileInput.throttle : drag.active ? drag.throttle : race.keyboardThrottle;
+    if (mobileInput.gyroEnabled) race.targetSteering = mobileInput.gyroSteering;
     race.steering = THREE.MathUtils.damp(
       race.steering,
       race.targetSteering,
@@ -1207,9 +1270,12 @@ for (const {
 existingParticles.forEach(p => {
     if (p.sprite && p.sprite.material) {
       p.sprite.material.depthWrite = false;
+      p.sprite.material.depthTest = true;
+      p.sprite.material.alphaTest = 0.02;
       p.sprite.material.renderOrder = 10;
       p.sprite.material.blending = THREE.AdditiveBlending;
       p.sprite.material.transparent = true;
+      p.sprite.renderOrder = 10;
       
     }
   });
@@ -1226,9 +1292,12 @@ existingParticles.forEach(p => {
 newParticles.forEach((particle, index) => {
     if (particle.sprite && particle.sprite.material) {
       particle.sprite.material.depthWrite = false;
+      particle.sprite.material.depthTest = true;
+      particle.sprite.material.alphaTest = 0.02;
       particle.sprite.material.renderOrder = 10;
       particle.sprite.material.blending = THREE.AdditiveBlending;
       particle.sprite.material.transparent = true;
+      particle.sprite.renderOrder = 10;
   }
 
     // Ren standardinterpolering från förra positionen till nuvarande (0 till 1)

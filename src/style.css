@@ -170,7 +170,25 @@ h2 { font-size: clamp(48px, 6vw, 76px); }
   .race-hud { top: 75px; }
 }
 
-@media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; } }
+
+/* Dedicated mobile touch controls. They are hidden on mouse/keyboard devices. */
+.mobile-only { display: none; }
+
+@media (pointer: coarse), (max-width: 820px) {
+  html, body, .experience { touch-action: none; user-select: none; -webkit-user-select: none; overscroll-behavior: none; }
+  .mobile-only { position: absolute; inset: 0; z-index: 20; display: block; pointer-events: none; }
+  #touch-steering-zone { position: absolute; inset: 30% 50% 0 0; pointer-events: auto; touch-action: none; }
+  #steering-indicator { position: absolute; left: 50%; bottom: 12%; width: 46px; height: 46px; border: 1px solid var(--cyan); border-radius: 50%; opacity: .72; transform: translateX(-50%); box-shadow: 0 0 18px rgba(102,243,237,.35), inset 0 0 14px rgba(102,243,237,.16); transition: transform .08s ease-out; }
+  #touch-pedals { position: absolute; right: max(18px, env(safe-area-inset-right)); bottom: max(22px, env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 10px; pointer-events: auto; }
+  .touch-btn, .hud-chip { min-width: 116px; min-height: 58px; border: 1px solid #5cf5ec; border-radius: 6px; color: #eaffff; background: rgba(8, 20, 30, .52); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); box-shadow: 0 0 16px rgba(92,245,236,.18); font: 700 12px 'DM Mono', monospace; letter-spacing: .12em; touch-action: none; }
+  .brake-btn { border-color: #ff397b; color: #ff9bbd; }
+  .touch-btn:active, .touch-btn.active { background: rgba(92,245,236,.28); transform: scale(.97); }
+  .brake-btn:active, .brake-btn.active { background: rgba(255,57,123,.25); }
+  #btn-gyro-toggle { position: absolute; top: max(76px, calc(env(safe-area-inset-top) + 54px)); left: 50%; min-width: 108px; min-height: 36px; padding: 7px 10px; transform: translateX(-50%); pointer-events: auto; }
+  .hud-container { top: env(safe-area-inset-top); transform: scale(.85); transform-origin: top left; width: 117.65%; }
+  .topbar { padding-top: max(22px, calc(env(safe-area-inset-top) + 10px)); }
+}
+
 
 /* --- MINIMALIST MODERN HUD --- */
 .hud-container {
