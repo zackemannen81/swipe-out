@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="theme-color" content="#080d18" />
     <meta name="description" content="Race the Neon Causeway in Swipe-out: an original touch-steered anti-gravity racer." />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Swipe-out" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="apple-touch-icon" href="/images/image_a065ae51b4253904bf2f2d0797f8f395.png" />
     <title>Swipe-out — Neon Causeway</title>
   </head>
   <body>
@@ -17,7 +23,18 @@
           <button id="btn-brake" class="touch-btn brake-btn" type="button">BRAKE</button>
           <button id="btn-thrust" class="touch-btn thrust-btn" type="button">THRUST</button>
         </div>
-        <button id="btn-gyro-toggle" class="hud-chip" type="button" aria-pressed="false">GYRO: OFF</button>
+        <div id="mobile-top-bar">
+          <button id="btn-fullscreen-toggle" class="hud-chip" type="button">FULLSCREEN ⛶</button>
+          <button id="btn-pause-toggle" class="hud-chip" type="button" aria-pressed="false">PAUSE ⏸</button>
+          <button id="btn-camera-cycle" class="hud-chip" type="button">CAMERA ◉</button>
+          <button id="btn-gyro-toggle" class="hud-chip" type="button" aria-pressed="false">GYRO: OFF</button>
+        </div>
+      </div>
+      <div id="rotate-device-overlay" aria-hidden="true">
+        <div class="rotate-content">
+          <div class="phone-icon" aria-hidden="true">📱</div>
+          <p>VÄNLIGEN ROTERA ENHETEN TILL LIGGANDE LÄGE</p>
+        </div>
       </div>
       <!-- Lägg detta någonstans inuti <main class="experience"> -->
 <div id="race-messages" style="position: absolute; top: 30%; width: 100%; text-align: center; color: white; pointer-events: none; opacity: 0; transition: opacity 0.2s; z-index: 100;">
@@ -164,5 +181,10 @@
       </footer>
     </main>
     <script type="module" src="/src/game.js"></script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js'));
+      }
+    </script>
   </body>
 </html>

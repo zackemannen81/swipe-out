@@ -41,7 +41,49 @@ async function lockMobileLandscape() {
 }
 
 
-const STORAGE_KEY = 'swipe-out-track-definitions';
+const fullscreenButton = document.querySelector('#btn-fullscreen-toggle');
+const fullscreenElement = () => document.fullscreenElement || document.webkitFullscreenElement || document.webkitCurrentFullScreenElement;
+
+function syncFullscreenButton() {
+  const active = Boolean(fullscreenElement()) || document.body.classList.contains('fullscreen-fallback');
+  fullscreenButton?.setAttribute('aria-pressed', String(active));
+  if (fullscreenButton) fullscreenButton.textContent = active ? 'EXIT FULLSCREEN ⛶' : 'FULLSCREEN ⛶';
+}
+
+async function toggleFullscreenAndLock() {
+  const docEl = document.documentElement;
+  const active = Boolean(fullscreenElement()) || document.body.classList.contains('fullscreen-fallback');
+  if (active && document.body.classList.contains('fullscreen-fallback')) {
+    document.body.classList.remove('fullscreen-fallback');
+    syncFullscreenButton();
+    return;
+  }
+  try {
+    if (!active) {
+      const request = docEl.requestFullscreen || docEl.webkitRequestFullscreen || docEl.webkitRequestFullScreen;
+      if (!request) {
+        document.body.classList.add('fullscreen-fallback');
+      } else {
+        await request.call(docEl);
+        try { await screen.orientation?.lock?.('landscape'); } catch { /* Browser/device limitation. */ }
+      }
+    } else {
+      const exit = document.exitFullscreen || document.webkitExitFullscreen || document.webkitCancelFullScreen;
+      if (exit) await exit.call(document);
+      screen.orientation?.unlock?.();
+    }
+  } catch (error) {
+    console.warn('Fullscreen/Orientation Lock begränsning:', error);
+    document.body.classList.toggle('fullscreen-fallback', !active);
+  }
+  syncFullscreenButton();
+}
+
+fullscreenButton?.addEventListener('click', toggleFullscreenAndLock);
+document.addEventListener('fullscreenchange', syncFullscreenButton);
+document.addEventListener('webkitfullscreenchange', syncFullscreenButton);
+
+
 
 function getActiveTrackData(trackId) {
   try {
@@ -447,6 +489,8 @@ const mobileControls = document.querySelector('#mobile-controls');
 const steeringZone = document.querySelector('#touch-steering-zone');
 const steeringIndicator = document.querySelector('#steering-indicator');
 const gyroToggle = document.querySelector('#btn-gyro-toggle');
+const pauseToggleButton = document.querySelector('#btn-pause-toggle');
+const cameraCycleButton = document.querySelector('#btn-camera-cycle');
 const thrustButton = document.querySelector('#btn-thrust');
 const brakeButton = document.querySelector('#btn-brake');
 const shipPhysics = createShipPhysics(baseSpeed+SPEEDCALIBRATION);
@@ -720,11 +764,11 @@ function finishRace() {
 }
 
 startButton.addEventListener('click', () => {
-  lockMobileLandscape();
+  toggleFullscreenAndLock();
   beginRace();
 });
 retryButton.addEventListener('click', () => {
-  lockMobileLandscape();
+  toggleFullscreenAndLock();
   beginRace();
 });
 
@@ -826,11 +870,18 @@ function bindPedal(button, value) {
 bindPedal(thrustButton, 1); bindPedal(brakeButton, -1);
 
 function orientationSteering(event) {
-  const portrait = window.matchMedia('(orientation: portrait)').matches;
-  const angle = portrait ? event.gamma : event.beta;
-  if (typeof angle !== 'number' || !Number.isFinite(angle)) return;
-  const adjusted = Math.abs(angle) <= 3 ? 0 : Math.sign(angle) * (Math.abs(angle) - 3);
-  mobileInput.gyroSteering = THREE.MathUtils.clamp(adjusted / 27, -1, 1);
+  const angle = screen.orientation?.angle ?? window.orientation ?? 0;
+  let tilt = Number.isFinite(event.beta) ? event.beta : event.gamma;
+  if (angle === 90) tilt = event.beta;
+  else if (angle === 270 || angle === -90) tilt = -event.beta;
+  else if (window.matchMedia('(orientation: portrait)').matches) tilt = event.gamma;
+  if (typeof tilt !== 'number' || !Number.isFinite(tilt)) return;
+  const deadzone = 3;
+  const maxTilt = 15;
+  const magnitude = Math.abs(tilt);
+  mobileInput.gyroSteering = magnitude <= deadzone
+    ? 0
+    : THREE.MathUtils.clamp((magnitude - deadzone) / (maxTilt - deadzone), 0, 1) * Math.sign(tilt);
 }
 async function toggleGyro() {
   if (mobileInput.gyroEnabled) {
@@ -899,10 +950,14 @@ window.addEventListener('keydown', (event) => {
 });
 
 resumeButton.addEventListener('click', togglePause);
+pauseToggleButton?.addEventListener('click', togglePause);
+cameraCycleButton?.addEventListener('click', () => cameraSystem.cycleMode());
 
 function togglePause() {
   isPaused = !isPaused;
   setScreen(pauseScreen, isPaused);
+  pauseToggleButton?.setAttribute('aria-pressed', String(isPaused));
+  if (pauseToggleButton) pauseToggleButton.textContent = isPaused ? 'RESUME ▶' : 'PAUSE ⏸';
   
   if (isPaused) {
     raceAudio.audio.pause();
