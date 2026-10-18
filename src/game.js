@@ -30,6 +30,17 @@ const minimapPlayer = document.querySelector('#minimap-player');
 // Högst upp bland DOM-elementen:
 const countdownOverlay = document.querySelector('#countdown-overlay');
 
+// Prefer landscape on mobile; browsers and Capacitor may require a user gesture.
+async function lockMobileLandscape() {
+  if (!window.matchMedia('(pointer: coarse)').matches) return;
+  try {
+    await screen.orientation?.lock?.('landscape');
+  } catch {
+    // Web browsers commonly permit orientation lock only in fullscreen or installed apps.
+  }
+}
+
+
 const STORAGE_KEY = 'swipe-out-track-definitions';
 
 function getActiveTrackData(trackId) {
@@ -707,8 +718,14 @@ function finishRace() {
   retryButton.focus({ preventScroll: true });
 }
 
-startButton.addEventListener('click', beginRace);
-retryButton.addEventListener('click', beginRace);
+startButton.addEventListener('click', () => {
+  lockMobileLandscape();
+  beginRace();
+});
+retryButton.addEventListener('click', () => {
+  lockMobileLandscape();
+  beginRace();
+});
 
 canvas.addEventListener('pointerdown', (event) => {
   if (race.state !== 'racing' || event.button !== 0) return;
@@ -1267,38 +1284,29 @@ for (const {
 
   // Spara vilka partiklar som fanns före denna frame
   const existingParticles = new Set(emitter.particles);
-existingParticles.forEach(p => {
-    if (p.sprite && p.sprite.material) {
-      p.sprite.material.depthWrite = false;
-      p.sprite.material.depthTest = true;
-      p.sprite.material.alphaTest = 0.02;
-      p.sprite.material.renderOrder = 10;
-      p.sprite.material.blending = THREE.AdditiveBlending;
-      p.sprite.material.transparent = true;
-      p.sprite.renderOrder = 10;
-      
-    }
-  });
-  // Kör partikelsimuleringen
-  //THREE.
-  //gl.depthMask(false);
-  
+  const configureParticle = (particle) => {
+    if (!particle.sprite || !particle.sprite.material) return;
+    const material = particle.sprite.material;
+    material.depthWrite = false;
+    material.depthTest = true;
+    material.alphaTest = 0.02;
+    material.renderOrder = 10;
+    material.blending = THREE.AdditiveBlending;
+    material.transparent = true;
+    particle.sprite.renderOrder = 10;
+  };
+
+  // Configure existing sprites before simulation and newly spawned sprites after it.
+  emitter.particles.forEach(configureParticle);
   system.update(delta);
-//gl.depthMask(true);
-  // Hämta enbart de NYA partiklarna som skapades under denna frame
+  emitter.particles.forEach(configureParticle);
+
+  // Interpolate only particles spawned during this frame.
   const newParticles = emitter.particles.filter(p => !existingParticles.has(p));
   const totalNew = newParticles.length;
 
-newParticles.forEach((particle, index) => {
-    if (particle.sprite && particle.sprite.material) {
-      particle.sprite.material.depthWrite = false;
-      particle.sprite.material.depthTest = true;
-      particle.sprite.material.alphaTest = 0.02;
-      particle.sprite.material.renderOrder = 10;
-      particle.sprite.material.blending = THREE.AdditiveBlending;
-      particle.sprite.material.transparent = true;
-      particle.sprite.renderOrder = 10;
-  }
+  newParticles.forEach((particle, index) => {
+    configureParticle(particle);
 
     // Ren standardinterpolering från förra positionen till nuvarande (0 till 1)
     const t = totalNew > 1 ? index / (totalNew - 1) : 1;
