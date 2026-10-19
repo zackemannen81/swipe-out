@@ -1209,3 +1209,122 @@ export const AGENT_008_STAGE = {
   ],
   objects: []
 };
+
+
+export const ION_CATHEDRAL = {
+  id: 'ion-cathedral',
+  name: 'Ion Cathedral',
+  width: 12,
+  horizontalScale: 4,
+  centerline: [
+    [0, 0, 150], [55, 4, 170], [100, 15, 150], [125, 25, 105],
+    [112, 38, 50], [70, 46, 12], [20, 40, -12], [-34, 28, -20],
+    [-75, 18, -4], [-105, 8, 34], [-110, 0, 82], [-82, -8, 125],
+    [-28, -12, 145], [20, -5, 120], [48, 8, 75], [38, 24, 30],
+    [0, 42, 8], [-40, 62, 6], [-60, 78, -30], [-36, 66, -76],
+    [10, 48, -100], [58, 30, -90], [90, 15, -55], [96, 2, -8],
+    [66, -8, 28], [22, -15, 40], [-26, -12, 24], [-60, 0, -10],
+    [-48, 12, -48], [-10, 24, -60], [36, 36, -42], [72, 28, 0],
+    [52, 14, 48], [8, 0, 68], [-36, -10, 54], [-72, -4, 15],
+    [-45, 0, -20], [0, 0, 0]
+  ],
+objects: [
+    /* =========================================================
+       1. THE VIOLET OCEAN (Botten av världen)
+       ========================================================= */
+    { 
+      type: "box", 
+      position: [0, -105, 350], 
+      scale: [1500, 2, 1500], 
+      color: 0x11021c, 
+      emissive: 0x1a0528, 
+      opacity: 0.55 
+    },
+    /* =========================================================
+       2. THE APPROACH (Obsidian Towers längs startsträckan)
+       ========================================================= */
+    // Vänster sida
+    { type: "box", position: [-18, 15, 40], scale: [5, 30, 5], color: 0x080a12 },
+    { type: "sphere", position: [-18, 30, 40], scale: [1.5, 1.5, 1.5], emissive: 0xff397b, animType: "pulse" },
+    
+    { type: "box", position: [-25, 25, 100], scale: [8, 50, 8], color: 0x080a12 },
+    { type: "sphere", position: [-25, 50, 100], scale: [2, 2, 2], emissive: 0x32f4e8, animType: "pulse" },
+
+    // Höger sida
+    { type: "box", position: [18, 12, 60], scale: [4, 24, 4], color: 0x080a12 },
+    { type: "sphere", position: [18, 24, 60], scale: [1.2, 1.2, 1.2], emissive: 0x32f4e8, animType: "pulse" },
+
+    { type: "box", position: [22, 20, 130], scale: [6, 40, 6], color: 0x080a12 },
+    { type: "sphere", position: [22, 40, 130], scale: [1.8, 1.8, 1.8], emissive: 0xff397b, animType: "pulse" },
+
+    /* =========================================================
+       3. TOWER GATE (Första maffiga portalen vid Z=200)
+       ========================================================= */
+    // Mörka pelare
+    { type: "box", position: [-14, 12, 200], scale: [4, 24, 4], color: 0x080a12 },
+    { type: "box", position: [14, 12, 200], scale: [4, 24, 4], color: 0x080a12 },
+    { type: "box", position: [0, 24, 200], scale: [32, 4, 4], color: 0x080a12 },
+    // Lysande Cyan-neon inuti portalen
+    { type: "box", position: [-11.5, 12, 200], scale: [0.5, 20, 4.5], emissive: 0x32f4e8 },
+    { type: "box", position: [11.5, 12, 200], scale: [0.5, 20, 4.5], emissive: 0x32f4e8 },
+    { type: "box", position: [0, 21.5, 200], scale: [23, 0.5, 4.5], emissive: 0x32f4e8 },
+
+    /* =========================================================
+       4. MAGNET TUNNEL (Fyrkantiga neonringar, Z=300 till 450)
+       ========================================================= */
+    // Ring 1 (Rosa)
+    { type: "box", position: [0, -3, 300], scale: [34, 2, 2], color: 0x000000, emissive: 0xff397b },
+    { type: "box", position: [0, 18, 300], scale: [34, 2, 2], color: 0x000000, emissive: 0xff397b },
+    { type: "box", position: [-16, 7.5, 300], scale: [2, 20, 2], color: 0x000000, emissive: 0xff397b },
+    { type: "box", position: [16, 7.5, 300], scale: [2, 20, 2], color: 0x000000, emissive: 0xff397b },
+
+    // Ring 2 (Cyan)
+    { type: "box", position: [0, -3, 350], scale: [34, 2, 2], color: 0x000000, emissive: 0x32f4e8 },
+    { type: "box", position: [0, 18, 350], scale: [34, 2, 2], color: 0x000000, emissive: 0x32f4e8 },
+    { type: "box", position: [-16, 7.5, 350], scale: [2, 20, 2], color: 0x000000, emissive: 0x32f4e8 },
+    { type: "box", position: [16, 7.5, 350], scale: [2, 20, 2], color: 0x000000, emissive: 0x32f4e8 },
+
+    // Ring 3 (Rosa)
+    { type: "box", position: [0, -3, 400], scale: [34, 2, 2], color: 0x000000, emissive: 0xff397b },
+    { type: "box", position: [0, 18, 400], scale: [34, 2, 2], color: 0x000000, emissive: 0xff397b },
+    { type: "box", position: [-16, 7.5, 400], scale: [2, 20, 2], color: 0x000000, emissive: 0xff397b },
+    { type: "box", position: [16, 7.5, 400], scale: [2, 20, 2], color: 0x000000, emissive: 0xff397b },
+
+    /* =========================================================
+       5. SPIRAL REACTOR (Banans massiva centrum vid Z=600)
+       ========================================================= */
+    // Pulserande Reaktorkärna
+    { type: "sphere", position: [0, 25, 600], scale: [16, 16, 16], color: 0x000000, emissive: 0x32f4e8, animType: "pulse" },
+    
+    // Yttre skelett (4 massiva pelare)
+    { type: "box", position: [-22, 25, 600], scale: [6, 70, 6], color: 0x080a12 },
+    { type: "box", position: [22, 25, 600], scale: [6, 70, 6], color: 0x080a12 },
+    { type: "box", position: [0, 25, 578], scale: [6, 70, 6], color: 0x080a12 },
+    { type: "box", position: [0, 25, 622], scale: [6, 70, 6], color: 0x080a12 },
+
+    // Horisontella stabiliserings-cylindrar
+    { type: "cylinder", position: [0, 8, 600], scale: [26, 2, 26], color: 0x080a12 },
+    { type: "cylinder", position: [0, 42, 600], scale: [26, 2, 26], color: 0x080a12 },
+    
+    // Spiralrampen (Kuber som skruvar sig upp runt reaktorn)
+    { type: "box", position: [-18, 5, 585], rotation: [0, 45, 0], scale: [10, 1, 10], color: 0x000000, emissive: 0xff397b },
+    { type: "box", position: [-24, 12, 600], rotation: [0, 90, 0], scale: [10, 1, 10], color: 0x000000, emissive: 0xff397b },
+    { type: "box", position: [-18, 19, 615], rotation: [0, 135, 0], scale: [10, 1, 10], color: 0x000000, emissive: 0xff397b },
+    { type: "box", position: [0, 26, 624], rotation: [0, 180, 0], scale: [10, 1, 10], color: 0x000000, emissive: 0xff397b },
+    { type: "box", position: [18, 33, 615], rotation: [0, 225, 0], scale: [10, 1, 10], color: 0x000000, emissive: 0xff397b },
+    { type: "box", position: [24, 40, 600], rotation: [0, 270, 0], scale: [10, 1, 10], color: 0x000000, emissive: 0xff397b },
+
+    /* =========================================================
+       6. FLOATING OUTPOSTS (Svävande stationer i bakgrunden)
+       ========================================================= */
+    // Outpost 1 (Vänster fjärran)
+    { type: "cylinder", position: [-90, -5, 450], scale: [20, 2, 20], color: 0x080a12 }, // Landningsplatta
+    { type: "cone", position: [-90, -25, 450], scale: [20, 40, 20], color: 0x080a12 },    // Undre kon
+    { type: "cylinder", position: [-90, -5, 450], scale: [20.5, 0.5, 20.5], emissive: 0x32f4e8 }, // Neonring
+
+    // Outpost 2 (Höger högt upp)
+    { type: "cylinder", position: [120, 30, 650], scale: [30, 3, 30], color: 0x080a12 }, 
+    { type: "cone", position: [120, 0, 650], scale: [30, 60, 30], color: 0x080a12 },    
+    { type: "cylinder", position: [120, 30, 650], scale: [30.5, 0.5, 30.5], emissive: 0xff397b }  
+  ]
+};

@@ -7,7 +7,7 @@ import { RaceAudio } from './audio.js';
 import './style.css';
 import { createCraft, loadCraftModel } from './craft.js';
 import { spawnTrackObjects, createTrack, getTrackFrame } from './track.js';
-import { NEON_CAUSEWAY, SYNTHETIC_DREAMS, DIGITAL_HORIZON, MOMMY_IM_SCARED ,DARK_SKIES, GEMINI,THE_JOKER,THE_VOID, AGENT_008_STAGE} from './track-data.js';
+import { NEON_CAUSEWAY, SYNTHETIC_DREAMS, DIGITAL_HORIZON, MOMMY_IM_SCARED ,DARK_SKIES, GEMINI,THE_JOKER,THE_VOID, AGENT_008_STAGE,ION_CATHEDRAL} from './track-data.js';
 import { createShipPhysics, stepShipPhysics } from './ship-physics.js';
 import { createOpponents, getPlayerPosition, resetOpponents, updateOpponents,resolveCraftCollisions } from './opponents.js';
 import Nebula, { SpriteRenderer, Rate, Span } from 'three-nebula';
@@ -124,8 +124,8 @@ if (menuButton) {
 export const SPEEDCALIBRATION = 58; // Justera detta värde för att kalibrera spelets hastighe
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x080c0a);
-//scene.fog = new THREE.FogExp2(0x080d18, 0.0035);
-scene.fog = new THREE.Fog(0x080c0a,350,420);
+scene.fog = new THREE.FogExp2(0x080d18, 0.0035);
+//scene.fog = new THREE.Fog(0x080c0a,350,420);
 
 const TRACK_CONFIG = {
   'track1': { name: 'Neon Causeway', data: NEON_CAUSEWAY, defaultAudio: '/audio/tracks/track_001.mp3', backdrop: '/images/backdrop_track-001.jpg' },
@@ -136,7 +136,8 @@ const TRACK_CONFIG = {
   'track6': { name: 'Gemini', data: GEMINI, defaultAudio: '/audio/tracks/track_007.mp3', backdrop: '/images/backdrop_track-006.jpg' },
   'track7': { name: 'The Joker', data: THE_JOKER, defaultAudio: '/audio/tracks/track_009.mp3', backdrop: '/images/backdrop_track-007.jpg' } ,
   'track8': { name: 'The Void', data: THE_VOID, defaultAudio: '/audio/tracks/track_010.mp3', backdrop: '/images/backdrop_track-009.jpg' } ,
-  'track9': { name: 'Agent 008 Stage: Obsidian Relay', data: AGENT_008_STAGE, defaultAudio: '/audio/tracks/track_011.mp3', backdrop: '/images/backdrop_track-010.jpg' }
+  'track9': { name: 'Agent 008 Stage: Obsidian Relay', data: AGENT_008_STAGE, defaultAudio: '/audio/tracks/track_011.mp3', backdrop: '/images/backdrop_track-010.jpg' },
+  'track10': { name: 'Ion Cathedral', data: ION_CATHEDRAL, defaultAudio: '/audio/tracks/track_012.mp3', backdrop: '/images/backdrop_track-013.png' },  
 
 };
 
@@ -163,19 +164,21 @@ const panoramaTexture = new THREE.TextureLoader().load(
 
 // Skapa cylindern med stängda ändar
 const panoramaBackdrop = new THREE.Mesh(
-  new THREE.CylinderGeometry(384,374, 256, 64, 8, false),
+
+  //new THREE.CylinderGeometry(384,374, 256, 64, 8, false),
+  new THREE.SphereGeometry(392,128,64),
   new THREE.MeshBasicMaterial({
     map: panoramaTexture,
     side: THREE.BackSide,
     depthWrite: false,
     depthTest: false,
-    fog: true, // Gör att inte fog/dimma bleker ur färgerna i fjärran
+    fog:true, // Gör att inte fog/dimma bleker ur färgerna i fjärran
   })
 );
 panoramaBackdrop.renderOrder = -10;
 scene.add(panoramaBackdrop);
 
-const camera = new THREE.PerspectiveCamera(53, 1, 0.1, 400);
+const camera = new THREE.PerspectiveCamera(53, 1, 0.1, 512);
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
 //renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.25));
 renderer.setPixelRatio(window.devicePixelRatio);
@@ -350,7 +353,7 @@ const cameraSystem = {
     case 'cockpit':
     {  
     // Cockpit-vy
-      const cockpitOffset = new THREE.Vector3(0, 0.4, 0.2);
+      const cockpitOffset = new THREE.Vector3(0, 0.6, -1.2);
       this.position.copy(craftPosition).add(cockpitOffset.applyQuaternion(craftQuaternion));
       
       const forwardDir = new THREE.Vector3(0, 0, 1).applyQuaternion(craftQuaternion);
@@ -360,7 +363,7 @@ const cameraSystem = {
         case 'internal':
     {  
     // Cockpit-vy
-      const cockpitOffset = new THREE.Vector3(0, 0.4, 0.2);
+      const cockpitOffset = new THREE.Vector3(0, 0.4, -0.2);
       this.position.copy(craftPosition).add(cockpitOffset.applyQuaternion(craftQuaternion));
       
       const forwardDir = new THREE.Vector3(0, 0, 1).applyQuaternion(craftQuaternion);
@@ -466,15 +469,24 @@ if (this.mode === 'circle' || this.mode === 'static' || this.mode === 'wipeoutSt
     this.lookTarget.y += 0.5;
   this.currentLook.copy(this.lookTarget); // Titta direkt på skeppet
 } else if(this.mode === 'cockpit'){
-  this.currentLook.copy(this.lookTarget); // Titta direkt på skeppet
-
+  const rotate180 = new THREE.Vector3(0.01,0,1);
+  
+  this.currentLook.copy(this.lookTarget).add(rotate180 );//Titta direkt på skeppet
+  
 }
 else {
   this.currentLook.lerp(this.lookTarget, 1 - Math.exp(-3.0 * delta)); // Behåll mjukheten i andra lägen
 }
 
-camera.lookAt(this.currentLook);
 
+
+camera.lookAt(this.currentLook);
+// Lägg på extra dynamisk hjälmlutning i cockpit/internal
+if (this.mode === 'cockpit' || this.mode === 'internal') {
+  // race.roll eller shipPhysics.roll ger lutningen när du svänger
+  const extraHeadRoll = (race.roll || 0) * 0.5; // Justera 0.4 för mer/mindre lutning
+  camera.rotateZ(extraHeadRoll);
+}
 
   },
 
@@ -504,7 +516,7 @@ const pauseToggleButton = document.querySelector('#btn-pause-toggle');
 const cameraCycleButton = document.querySelector('#btn-camera-cycle');
 const thrustButton = document.querySelector('#btn-thrust');
 const brakeButton = document.querySelector('#btn-brake');
-const shipPhysics = createShipPhysics(baseSpeed+SPEEDCALIBRATION);
+const shipPhysics = createShipPhysics((baseSpeed+SPEEDCALIBRATION)*1.5);
 const race = {
   topSpeed: 0,
   state: 'ready', distance: 0, elapsed: 0, steering: 0, targetSteering: 0, drift: 0,
@@ -808,32 +820,61 @@ canvas.addEventListener('pointermove', (event) => {
   );
 });
 function handleGamepadInput() {
-    const gamepads = navigator.getGamepads();
-    const gp = gamepads[0]; 
+  const gamepads = navigator.getGamepads();
+  const gp = gamepads[0]; 
 
-    if (!gp) return; 
+  if (!gp || race.state !== 'racing') return; 
 
-    // Styrning (vänster spak i sidled)
-    const steeringAxis = gp.axes[0];
-    if (Math.abs(steeringAxis) > 0.1) {
-        race.targetSteering = steeringAxis; // Invertera eventuellt med minus (-) om det känns tvärtom
-    }
+  // --- 1. DÖDZON & KÄNSLIGHETSKURVA ---
+  const applyDeadzone = (value, threshold = 0.12) => {
+    if (Math.abs(value) < threshold) return 0;
+    const sign = Math.sign(value);
+    const scaled = (Math.abs(value) - threshold) / (1 - threshold);
+    // Exponentiell kurva (1.3) ger fin precision i mitten och max effekt längst ut
+    return sign * Math.pow(scaled, 1.3); 
+  };
 
-    // Gas (t.ex. höger trigger R2 / RT eller A-knappen)
-    const gasTrigger = gp.buttons[7] ? gp.buttons[7].value : 0;
-    const isAccelerating = gp.buttons[0].pressed || gasTrigger > 0.1;
-    
-    // Broms (t.ex. vänster trigger L2 / LT)
-    const brakeTrigger = gp.buttons[6] ? gp.buttons[6].value : 0;
+  // --- 2. STYRNING (Vänster spak X-axel + D-Pad) ---
+  const stickX = applyDeadzone(gp.axes[0]);
+  const dpadLeft = gp.buttons[14]?.pressed ? -1 : 0;
+  const dpadRight = gp.buttons[15]?.pressed ? 1 : 0;
+  
+  const rawSteer = stickX !== 0 ? stickX : (dpadLeft + dpadRight);
+  race.targetSteering = rawSteer;
 
-    // Sätt gas/broms-mål baserat på handkontrollen
-    if (brakeTrigger > 0.1) {
-        race.throttleTarget = -brakeTrigger; // Backa / bromsa
-    } else if (isAccelerating) {
-        race.throttleTarget = Math.max(gasTrigger, 1.0); // Full gas (eller variabel gas med trigger)
-    } else if (!drag.active && heldKeys.size === 0) {
-        race.throttleTarget = 0; // Släpp gasen om inget trycks in
-    }
+  // --- 3. PITCH / NOS-LUTNING (Vänster spak Y-axel) ---
+  // Dra spaken bakåt (Y > 0) -> Nos UPÅT ('r')
+  // Tryck spaken framåt (Y < 0) -> Nos NEDÅT ('f')
+  const stickY = applyDeadzone(gp.axes[1]);
+  if (stickY < -0.35) {
+    heldKeys.add('f');
+    heldKeys.delete('r');
+  } else if (stickY > 0.35) {
+    heldKeys.add('r');
+    heldKeys.delete('f');
+  } else {
+    heldKeys.delete('f');
+    heldKeys.delete('r');
+  }
+
+  // --- 4. WIPEOUT LUFTBROMSAR (L1 / R1 eller L2 / R2) ---
+  // Aktiverar dina befintliga 'q' (vänster) och 'e' (höger) bromsar i shipPhysics
+  const leftAirbrake = (gp.buttons[4]?.pressed || (gp.buttons[6] && gp.buttons[6].value > 0.15));
+  const rightAirbrake = (gp.buttons[5]?.pressed || (gp.buttons[7] && gp.buttons[7].value > 0.15));
+
+  if (leftAirbrake) heldKeys.add('q'); else heldKeys.delete('q');
+  if (rightAirbrake) heldKeys.add('e'); else heldKeys.delete('e');
+
+  // --- 5. GAS (A / Kryss-knappen [0] eller R2-trigger [7]) ---
+// --- 5. GAS (A / Kryss-knappen [0] eller R2-trigger [7]) ---
+  const isGasButtonPressed = gp.buttons[0]?.pressed || gp.buttons[7]?.value > 0.2;
+
+  // Spara gasen i race.gamepadThrottle istället för direkt i throttleTarget
+  if (isGasButtonPressed) {
+    race.gamepadThrottle = Math.max(gp.buttons[7]?.value || 0, 1.0);
+  } else {
+    race.gamepadThrottle = 0;
+  }
 }
 
 function releasePointer(event) {
@@ -1024,6 +1065,35 @@ function render() {
   }
   const delta = Math.min(clock.getDelta(), 0.05);
   let crossedFinish = false;
+  // --- ANIMERA BANE-OBJEKT ---
+  const customObjects = scene.getObjectByName('customTrackObjects');
+  if (customObjects && !isPaused) {
+    const time = clock.elapsedTime;
+    
+    customObjects.children.forEach(mesh => {
+      const anim = mesh.userData.animType;
+      
+      // 1. Skala upp och ner pulserande objekt
+      if (anim === 'pulse') {
+        const s = 1 + Math.sin(time * 3.5) * 0.15; // Pulserar +/- 15%
+        mesh.scale.set(
+          mesh.userData.baseScale[0] * s,
+          mesh.userData.baseScale[1] * s,
+          mesh.userData.baseScale[2] * s
+        );
+      }
+      
+      // 2. Scrolla texturer om materialet har en map
+      if (mesh.material.map) {
+        if (anim === 'scroll-y') {
+          mesh.material.map.offset.y = (time * -0.6) % 1; // Hastighet -0.6
+        } else if (anim === 'scroll-x') {
+          mesh.material.map.offset.x = (time * -0.6) % 1;
+        }
+      }
+    });
+  }
+
   if (race.state === 'countdown') {
    
     // Uppdatera timer-displayen med nedräkning (t.ex. 3, 2, 1 eller GO!)
@@ -1067,7 +1137,13 @@ if (countVal !== prevCount) {
   } else if (race.state === 'racing') {
     race.elapsed += delta;
     raceAudio.update(delta);
-    race.throttleTarget = mobileInput.throttle !== 0 ? mobileInput.throttle : drag.active ? drag.throttle : race.keyboardThrottle;
+// KORRIGERAD RAD: Inkluderar nu race.gamepadThrottle
+    race.throttleTarget = mobileInput.throttle !== 0 
+      ? mobileInput.throttle 
+      : drag.active 
+        ? drag.throttle 
+        : (race.gamepadThrottle || race.keyboardThrottle);
+
     if (mobileInput.gyroEnabled) race.targetSteering = mobileInput.gyroSteering;
     race.steering = THREE.MathUtils.damp(
       race.steering,

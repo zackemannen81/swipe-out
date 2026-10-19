@@ -79,11 +79,11 @@ ship.boostTimer = Math.max(0, ship.boostTimer - dt);
 
   // Longitudinal force balance: thrust, drag and braking. Speed is in the
   // existing SwipeOut world scale, rather than the original PS1 fixed-point scale.
-  const throttleForce = ship.thrust * 28;
+  const throttleForce = ship.thrust * 8;
   const baselineDrag = ship.speed * 0.045;
   const brakingForce = brake * 18;
   ship.speed += (throttleForce - baselineDrag - brakingForce) * dt;
-const maxSpeed = ship.boostTimer > 0 ?baseSpeed+ 40 : baseSpeed ; // NY: Maxhastighet under boost
+const maxSpeed = ship.boostTimer > 0 ?baseSpeed*1.5 : baseSpeed ; // NY: Maxhastighet under boost
   ship.speed = THREE.MathUtils.clamp(ship.speed, 12, maxSpeed);
 
   // Find the current local track frame and preserve the original jump response

@@ -271,7 +271,7 @@ const textureLoader = new THREE.TextureLoader();
 // Läs av opacity och säkra variabeln
 //const objectOpacity = typeof obj.opacity === 'number' ? obj.opacity : parseFloat(String(obj.opacity || 1).replace(',', '.')) || 1.0;
 //const isTransparent = objectOpacity < 0.99;
-export function spawnTrackObjects(scene, trackData) {
+/*export function spawnTrackObjects(scene, trackData) {
   const existingGroup = scene.getObjectByName('customTrackObjects');
   if (existingGroup) scene.remove(existingGroup);
 
@@ -284,10 +284,13 @@ export function spawnTrackObjects(scene, trackData) {
 
   trackData.objects.forEach((obj) => { // <-- Säkerställt att variabeln heter obj här
     let geometry;
-    if (obj.type === 'cylinder') {
+if (obj.type === 'cylinder') {
       geometry = new THREE.CylinderGeometry(0.5, 0.5, 1, 32);
     } else if (obj.type === 'sphere') {
       geometry = new THREE.SphereGeometry(0.5, 32, 32);
+    } else if (obj.type === 'cone') {
+      // En cylinder med radie 0 i toppen blir en kon i Three.js
+      geometry = new THREE.CylinderGeometry(0, 0.5, 1, 32); 
     } else {
       geometry = new THREE.BoxGeometry(1, 1, 1);
     }
@@ -343,6 +346,103 @@ export function spawnTrackObjects(scene, trackData) {
     }
 
     mesh.userData = { animType: obj.animType || 'none' };
+    objectGroup.add(mesh);
+  });
+
+  scene.add(objectGroup);
+}*/
+export function spawnTrackObjects(scene, trackData) {
+  const existingGroup = scene.getObjectByName('customTrackObjects');
+  if (existingGroup) scene.remove(existingGroup);
+
+  if (!trackData || !Array.isArray(trackData.objects)) return;
+
+  const objectGroup = new THREE.Group();
+  objectGroup.name = 'customTrackObjects';
+
+  const hScale = trackData.horizontalScale ?? 1;
+
+  trackData.objects.forEach((obj) => {
+    let geometry;
+    if (obj.type === 'cylinder') {
+      geometry = new THREE.CylinderGeometry(0.5, 0.5, 1, 32);
+    } else if (obj.type === 'sphere') {
+      geometry = new THREE.SphereGeometry(0.5, 32, 32);
+    } else if (obj.type === 'cone') {
+      // En cylinder med radie 0 i toppen blir en kon i Three.js
+      geometry = new THREE.CylinderGeometry(0, 0.5, 1, 32); 
+    } else {
+      geometry = new THREE.BoxGeometry(1, 1, 1);
+    }
+
+    const rawOpacity = typeof obj.opacity === 'string' ? obj.opacity.replace(',', '.') : obj.opacity;
+    const parsedOpacity = parseFloat(rawOpacity);
+    const opacity = !isNaN(parsedOpacity) ? parsedOpacity : 1.0;
+
+    let material;
+    if (obj.texture) {
+      const tex = textureLoader.load(obj.texture);
+      tex.colorSpace = THREE.SRGBColorSpace;
+      
+      // TILLÄGG 1: Säger åt Three.js att texturen får repeteras, vilket krävs för scroll-animationer
+      tex.wrapS = THREE.RepeatWrapping;
+      tex.wrapT = THREE.RepeatWrapping;
+
+      material = new THREE.MeshStandardMaterial({
+        map: tex,
+        emissiveMap: tex,
+        emissive: new THREE.Color(0xffffff),
+        emissiveIntensity: 0.2,
+        transparent: opacity < 1,
+        opacity: opacity,
+        depthWrite: opacity >= 1,
+        roughness: 0.3,
+        metalness: 0.7
+      });
+    } else {
+      // TILLÄGG 2: Tillåter egna färger och neonglöd från JSON-filen (bra för Abyssal Circuit)
+      const colorHex = obj.color !== undefined ? obj.color : 
+        (obj.type === 'cylinder' ? 0xffd166 : obj.type === 'sphere' ? 0xb58cff : 0xff7aa8);
+      const isNeon = obj.emissive !== undefined;
+
+      material = new THREE.MeshStandardMaterial({
+        color: colorHex,
+        emissive: isNeon ? obj.emissive : 0x000000,
+        emissiveIntensity: isNeon ? 4.0 : 0,
+        transparent: opacity < 1,
+        opacity: opacity,
+        depthWrite: opacity >= 1,
+        roughness: isNeon ? 0.1 : 0.2,
+        metalness: isNeon ? 0.1 : 0.8
+      });
+    }
+
+    const mesh = new THREE.Mesh(geometry, material);
+
+    mesh.position.set(
+      obj.position[0] * hScale,
+      obj.position[1],
+      obj.position[2] * hScale
+    );
+
+    if (obj.rotation) {
+      mesh.rotation.set(
+        (obj.rotation[0] * Math.PI) / 180,
+        (obj.rotation[1] * Math.PI) / 180,
+        (obj.rotation[2] * Math.PI) / 180
+      );
+    }
+
+    if (obj.scale) {
+      mesh.scale.set(obj.scale[0], obj.scale[1], obj.scale[2]);
+    }
+
+    // TILLÄGG 3: Spara baseScale så 'pulse' kan räkna ut rätt storlek i render-loopen
+    mesh.userData = { 
+      animType: obj.animType || 'none',
+      baseScale: obj.scale ? [...obj.scale] : [1, 1, 1]
+    };
+    
     objectGroup.add(mesh);
   });
 
