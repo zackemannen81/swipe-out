@@ -346,7 +346,17 @@ const cameraSystem = {
     this.lastPosition.copy(this.position);
 
     switch (this.mode) {
-    case 'internal':
+    case 'cockpit':
+    {  
+    // Cockpit-vy
+      const cockpitOffset = new THREE.Vector3(0, 0.4, 0.2);
+      this.position.copy(craftPosition).add(cockpitOffset.applyQuaternion(craftQuaternion));
+      
+      const forwardDir = new THREE.Vector3(0, 0, 1).applyQuaternion(craftQuaternion);
+      this.lookTarget.copy(this.position).add(forwardDir.multiplyScalar(10));
+      break;
+    }
+        case 'internal':
     {  
     // Cockpit-vy
       const cockpitOffset = new THREE.Vector3(0, 0.4, 0.2);
@@ -454,7 +464,10 @@ case 'circle': {
 if (this.mode === 'circle' || this.mode === 'static' || this.mode === 'wipeoutStyle') {
     this.lookTarget.y += 0.5;
   this.currentLook.copy(this.lookTarget); // Titta direkt på skeppet
-} else {
+} else if(this.mode === 'cockpit'){
+  this.currentLook.copy(this.lookTarget); // Titta direkt på skeppet
+}
+else {
   this.currentLook.lerp(this.lookTarget, 1 - Math.exp(-3.0 * delta)); // Behåll mjukheten i andra lägen
 }
 
@@ -467,7 +480,7 @@ camera.lookAt(this.currentLook);
     this.mode = this.mode === 'external' ? 'internal' : 'external';
   },
   cycleMode() {
-  const modes = ['external', 'internal', 'circle', 'static', 'wipeoutStyle'];
+  const modes = ['external', 'internal', 'circle', 'static', 'wipeoutStyle','cockpit'];
   const index = modes.indexOf(this.mode);
   this.mode = modes[(index + 1) % modes.length];
 

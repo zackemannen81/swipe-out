@@ -3,7 +3,7 @@ import * as THREE from 'three';
 // @ts-ignore -- track.js does not currently provide a declaration file.
 import type { Section, TrackFace } from './track.js';
 // @ts-ignore -- audio.js does not currently provide a declaration file.
-import type { Sfx } from './audio';
+import type { Sfx } from './audio.js';
 
 // Ship state flags
 export enum ShipFlags {

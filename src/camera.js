@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { Ship } from './ship'; // Byt ut mot din path
+import { Ship } from './ship'; 
 
 export class ChaseCamera {
     camera: THREE.PerspectiveCamera;
