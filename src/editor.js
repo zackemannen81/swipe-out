@@ -1,8 +1,8 @@
-import { NEON_CAUSEWAY, SYNTHETIC_DREAMS, DIGITAL_HORIZON, MOMMY_IM_SCARED } from './track-data.js';
+import { NEON_CAUSEWAY, SYNTHETIC_DREAMS, DIGITAL_HORIZON, MOMMY_IM_SCARED ,DARK_SKIES, GEMINI,THE_JOKER,THE_VOID, AGENT_008_STAGE} from './track-data.js';
 import './editor.css';
 
 const STORAGE_KEY = 'swipe-out-track-definitions';
-const TRACKS = { track1: NEON_CAUSEWAY, track2: SYNTHETIC_DREAMS, track3: DIGITAL_HORIZON, track4: MOMMY_IM_SCARED };
+const TRACKS = { track1: NEON_CAUSEWAY, track2: SYNTHETIC_DREAMS, track3: DIGITAL_HORIZON, track4: MOMMY_IM_SCARED, track5:DARK_SKIES, track6: GEMINI,track7:THE_JOKER,track8:THE_VOID, track9: AGENT_008_STAGE };
 const canvas = document.querySelector('#editor-canvas');
 const context = canvas.getContext('2d');
 const savedTracks = (() => { try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); } catch { return {}; } })();

@@ -27,6 +27,7 @@ const speedDisplay = document.querySelector('#race-speed');
 const minimapRoute = document.querySelector('#minimap-route');
 const minimapStart = document.querySelector('#minimap-start');
 const minimapPlayer = document.querySelector('#minimap-player');
+const STORAGE_KEY = 'swipe-out-track-definitions';
 // Högst upp bland DOM-elementen:
 const countdownOverlay = document.querySelector('#countdown-overlay');
 
@@ -466,6 +467,7 @@ if (this.mode === 'circle' || this.mode === 'static' || this.mode === 'wipeoutSt
   this.currentLook.copy(this.lookTarget); // Titta direkt på skeppet
 } else if(this.mode === 'cockpit'){
   this.currentLook.copy(this.lookTarget); // Titta direkt på skeppet
+
 }
 else {
   this.currentLook.lerp(this.lookTarget, 1 - Math.exp(-3.0 * delta)); // Behåll mjukheten i andra lägen
