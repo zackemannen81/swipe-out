@@ -7,7 +7,7 @@ import { RaceAudio } from './audio.js';
 import './style.css';
 import { createCraft, loadCraftModel } from './craft.js';
 import { spawnTrackObjects, createTrack, getTrackFrame } from './track.js';
-import { NEON_CAUSEWAY, SYNTHETIC_DREAMS, DIGITAL_HORIZON, MOMMY_IM_SCARED ,DARK_SKIES, GEMINI,THE_JOKER,THE_VOID} from './track-data.js';
+import { NEON_CAUSEWAY, SYNTHETIC_DREAMS, DIGITAL_HORIZON, MOMMY_IM_SCARED ,DARK_SKIES, GEMINI,THE_JOKER,THE_VOID, AGENT_008_STAGE} from './track-data.js';
 import { createShipPhysics, stepShipPhysics } from './ship-physics.js';
 import { createOpponents, getPlayerPosition, resetOpponents, updateOpponents,resolveCraftCollisions } from './opponents.js';
 import Nebula, { SpriteRenderer, Rate, Span } from 'three-nebula';
@@ -120,10 +120,11 @@ if (menuButton) {
   });
 }
 
-export const SPEEDCALIBRATION = 55; // Justera detta värde för att kalibrera spelets hastighet
+export const SPEEDCALIBRATION = 58; // Justera detta värde för att kalibrera spelets hastighe
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x080c0a);
-scene.fog = new THREE.FogExp2(0x080d18, 0.00065);
+//scene.fog = new THREE.FogExp2(0x080d18, 0.0035);
+scene.fog = new THREE.Fog(0x080c0a,350,420);
 
 const TRACK_CONFIG = {
   'track1': { name: 'Neon Causeway', data: NEON_CAUSEWAY, defaultAudio: '/audio/tracks/track_001.mp3', backdrop: '/images/backdrop_track-001.jpg' },
@@ -133,7 +134,9 @@ const TRACK_CONFIG = {
   'track5': { name: 'Dark skies', data: DARK_SKIES, defaultAudio: '/audio/tracks/track_004.mp3', backdrop: '/images/backdrop_track-005.jpg' },
   'track6': { name: 'Gemini', data: GEMINI, defaultAudio: '/audio/tracks/track_007.mp3', backdrop: '/images/backdrop_track-006.jpg' },
   'track7': { name: 'The Joker', data: THE_JOKER, defaultAudio: '/audio/tracks/track_009.mp3', backdrop: '/images/backdrop_track-007.jpg' } ,
-  'track8': { name: 'The Void', data: THE_VOID, defaultAudio: '/audio/tracks/track_010.mp3', backdrop: '/images/backdrop_track-009.jpg' } 
+  'track8': { name: 'The Void', data: THE_VOID, defaultAudio: '/audio/tracks/track_010.mp3', backdrop: '/images/backdrop_track-009.jpg' } ,
+  'track9': { name: 'Agent 008 Stage: Obsidian Relay', data: AGENT_008_STAGE, defaultAudio: '/audio/tracks/track_011.mp3', backdrop: '/images/backdrop_track-010.jpg' }
+
 };
 
 let currentTrackId = 'track1'; 
@@ -159,7 +162,7 @@ const panoramaTexture = new THREE.TextureLoader().load(
 
 // Skapa cylindern med stängda ändar
 const panoramaBackdrop = new THREE.Mesh(
-  new THREE.CylinderGeometry(192, 192, 392, 128, 2, false),
+  new THREE.CylinderGeometry(384,374, 256, 64, 8, false),
   new THREE.MeshBasicMaterial({
     map: panoramaTexture,
     side: THREE.BackSide,
@@ -173,7 +176,8 @@ scene.add(panoramaBackdrop);
 
 const camera = new THREE.PerspectiveCamera(53, 1, 0.1, 400);
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
-renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
+//renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.25));
+renderer.setPixelRatio(window.devicePixelRatio);
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.25;
