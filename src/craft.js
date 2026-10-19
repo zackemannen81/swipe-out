@@ -55,17 +55,17 @@ export function createCraft({
     const engineMaterial = new THREE.MeshBasicMaterial({ color: engineColor });
     const engine = new THREE.Mesh(new THREE.ConeGeometry(0.23, 0.82, 12), engineMaterial);
     engine.rotation.x = -Math.PI / 2;
-    engine.position.set(side * 0.38, -0.08, -1.28);
+    engine.position.set(side * 0.38, -0.08, -1.7);
     craft.add(engine);
     engineMaterials.push(engineMaterial);
 
     const thrusterMaterial = new THREE.MeshBasicMaterial({
-      color: glowColor, transparent: true, opacity: 0.5,
+      color: glowColor, transparent: true, opacity: 0.38,
       blending: THREE.AdditiveBlending, depthWrite: false,
     });
-    const thruster = new THREE.Mesh(new THREE.ConeGeometry(0.28, 1.55, 12), thrusterMaterial);
+    const thruster = new THREE.Mesh(new THREE.ConeGeometry(0.08, 2.1, 12), thrusterMaterial);
     thruster.rotation.x = -Math.PI / 2;
-    thruster.position.set(side * 0.38, -0.08, -1.82);
+    thruster.position.set(side * 0.38, 0.0, -2.4);
     thruster.visible = true;
     craft.add(thruster);
     thrusterMaterials.push(thrusterMaterial);

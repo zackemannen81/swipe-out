@@ -259,7 +259,7 @@ thrusterSystems.push({
   emitter,
   group,
   color,
-  nozzleOffset: new THREE.Vector3(side * 0.38, -0.08, -1.8),
+  nozzleOffset: new THREE.Vector3(side * 0.38, -0.00, -1.65),
   previousExhaustPos: new THREE.Vector3() // NY: Håller koll på förra utblåspositionen
 });
     }).catch((error) => console.error('Nebula thruster error:', error));
@@ -372,7 +372,7 @@ case 'wipeoutStyle': {
       // 4. Sätt vad vi vill titta på (en bit framför skeppet in i kurvan)
       const forwardDir = new THREE.Vector3(0, 0, 1).applyQuaternion(craftQuaternion);
       this.lookTarget.copy(craftPosition).add(forwardDir.multiplyScalar(8));
-      this.lookTarget.y += 0.8; // Lyft blicken lite så vi inte tittar rakt ner i marken
+      this.lookTarget.y += 1.2; // Lyft blicken lite så vi inte tittar rakt ner i marken
 
       break;
     }
@@ -448,6 +448,7 @@ case 'circle': {
     camera.position.copy(this.position);
 
 if (this.mode === 'circle' || this.mode === 'static' || this.mode === 'wipeoutStyle') {
+    this.lookTarget.y += 0.5;
   this.currentLook.copy(this.lookTarget); // Titta direkt på skeppet
 } else {
   this.currentLook.lerp(this.lookTarget, 1 - Math.exp(-3.0 * delta)); // Behåll mjukheten i andra lägen
