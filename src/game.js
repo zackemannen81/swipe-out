@@ -121,7 +121,7 @@ if (menuButton) {
   });
 }
 
-export const SPEEDCALIBRATION = 58; // Justera detta värde för att kalibrera spelets hastighe
+export const SPEEDCALIBRATION = 68; // Justera detta värde för att kalibrera spelets hastighe
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x080c0a);
 scene.fog = new THREE.FogExp2(0x080d18, 0.0035);
@@ -846,10 +846,11 @@ function handleGamepadInput() {
   // Dra spaken bakåt (Y > 0) -> Nos UPÅT ('r')
   // Tryck spaken framåt (Y < 0) -> Nos NEDÅT ('f')
   const stickY = applyDeadzone(gp.axes[1]);
-  if (stickY < -0.35) {
+  
+  if (stickY < -0.25) {
     heldKeys.add('f');
     heldKeys.delete('r');
-  } else if (stickY > 0.35) {
+  } else if (stickY > 0.25) {
     heldKeys.add('r');
     heldKeys.delete('f');
   } else {
@@ -867,11 +868,11 @@ function handleGamepadInput() {
 
   // --- 5. GAS (A / Kryss-knappen [0] eller R2-trigger [7]) ---
 // --- 5. GAS (A / Kryss-knappen [0] eller R2-trigger [7]) ---
-  const isGasButtonPressed = gp.buttons[0]?.pressed || gp.buttons[7]?.value > 0.2;
+  const isGasButtonPressed = gp.buttons[0]?.pressed || gp.buttons[7]?.value > 0.2 || stickY>0.3;
 
   // Spara gasen i race.gamepadThrottle istället för direkt i throttleTarget
   if (isGasButtonPressed) {
-    race.gamepadThrottle = Math.max(gp.buttons[7]?.value || 0, 1.0);
+    race.gamepadThrottle = Math.max(gp.buttons[7]?.value || stickY|| 0, 1.0);
   } else {
     race.gamepadThrottle = 0;
   }
@@ -1379,7 +1380,11 @@ segments.forEach((seg, index) => {
   document.querySelector('#gyro-meter-needle').style.left = `${50 + THREE.MathUtils.clamp(race.steering, -1, 1) * 46}%`;
   const playerProgress = ((race.distance / curve.getLength()) % 1) * 100;
   document.querySelector('#minimap-progress').textContent = playerProgress < 1 ? 'START' : `${Math.floor(playerProgress)}%`;
-
+const tripMeter = document.querySelector('#race-trip');
+if (tripMeter) {
+  const meters = Math.floor(race.distance * 3.25); // Skala till meter
+  tripMeter.innerHTML = `${meters} <small>M</small>`;
+}
   // Kör det nya integrerade kamerapasset
   cameraSystem.update(craft.position, craft.quaternion, shipPhysics.velocity, delta, trackFrame);
   
