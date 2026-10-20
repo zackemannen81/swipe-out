@@ -1349,10 +1349,26 @@ const displaySpeed = Math.round(race.currentSpeed * 3.6 * 3.25);
   race.topSpeed = Math.max(race.topSpeed, displaySpeed);
   speedDisplay.textContent = String(displaySpeed);
   document.querySelector('#race-top-speed').textContent = `MAX ${race.topSpeed} KM/H`;
+  
+  const thrustPercent = THREE.MathUtils.clamp(Math.max(0, race.throttleTarget), 0, 1);
+const segments = document.querySelectorAll('.thrust-segment');
+const activeCount = Math.round(thrustPercent * segments.length);
+
+segments.forEach((seg, index) => {
+  if (shipPhysics.boostTimer > 0 || index < activeCount) {
+    seg.classList.add('active');
+  } else {
+    seg.classList.remove('active');
+  }
+});
+
+/*
   const thrustPercent = THREE.MathUtils.clamp(Math.max(0, race.throttleTarget) * 100, 0, 100);
   const thrustFill = document.querySelector('#thrust-meter-fill');
   thrustFill.style.width = `${shipPhysics.boostTimer > 0 ? 100 : thrustPercent}%`;
   thrustFill.style.background = shipPhysics.boostTimer > 0 ? '#58f442' : 'linear-gradient(90deg, #5de8df 0%, #ff397b 100%)';
+
+  */
   const braking = race.throttleTarget < -0.1;
   const thrusting = race.throttleTarget > 0.1 || shipPhysics.boostTimer > 0;
   document.querySelector('.brake-status').classList.toggle('active', braking);
