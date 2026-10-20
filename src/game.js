@@ -1346,38 +1346,23 @@ for (const ghost of ghostPool) {
   
   // 1. Beräkna nuvarande hastighet i KM/H
 const displaySpeed = Math.round(race.currentSpeed * 3.6 * 3.25);
-
-// 2. Uppdatera högsta hastighet om nuvarande är högre
-if (displaySpeed > race.topSpeed) {
-  race.topSpeed = displaySpeed;
-}
-
-// 3. Uppdatera text element
-document.querySelector('#race-speed').innerHTML = `${displaySpeed} <small>KM/H</small>`;
-document.querySelector('#race-top-speed').textContent = `MAX ${race.topSpeed} KM/H`;
-
-// 4. Trip-meter (Distans i meter)
-const tripMeter = document.querySelector('#race-trip');
-if (tripMeter) {
-  const meters = Math.floor(race.distance * 3.25); // Skala till meter
-  tripMeter.innerHTML = `${meters} <small>M</small>`;
-}
-
-// 5. Thrust-meter (Gasmätare i %)
-const thrustFill = document.querySelector('#thrust-meter-fill');
-if (thrustFill) {
-  // Räkna ut gaspådrag (0 till 100%) baserat på throttleTarget eller hastighetsförhållande
-  const thrustPercent = Math.max(0, Math.min(100, race.throttleTarget * 100));
-  thrustFill.style.width = `${thrustPercent}%`;
-  
-  // Byta färg om spelaren boostar
-  if (shipPhysics.boostTimer > 0) {
-    thrustFill.style.width = '100%';
-    thrustFill.style.background = '#58f442'; // Neongrön vid boost
-  } else {
-    thrustFill.style.background = 'linear-gradient(90deg, #5de8df 0%, #ff397b 100%)';
-  }
-}
+  race.topSpeed = Math.max(race.topSpeed, displaySpeed);
+  speedDisplay.textContent = String(displaySpeed);
+  document.querySelector('#race-top-speed').textContent = `MAX ${race.topSpeed} KM/H`;
+  const thrustPercent = THREE.MathUtils.clamp(Math.max(0, race.throttleTarget) * 100, 0, 100);
+  const thrustFill = document.querySelector('#thrust-meter-fill');
+  thrustFill.style.width = `${shipPhysics.boostTimer > 0 ? 100 : thrustPercent}%`;
+  thrustFill.style.background = shipPhysics.boostTimer > 0 ? '#58f442' : 'linear-gradient(90deg, #5de8df 0%, #ff397b 100%)';
+  const braking = race.throttleTarget < -0.1;
+  const thrusting = race.throttleTarget > 0.1 || shipPhysics.boostTimer > 0;
+  document.querySelector('.brake-status').classList.toggle('active', braking);
+  document.querySelector('.thrust-status').classList.toggle('active', thrusting);
+  document.querySelector('#hud-brake-state').textContent = braking ? 'ENGAGED' : 'OFF';
+  document.querySelector('#hud-thrust-state').textContent = shipPhysics.boostTimer > 0 ? 'BOOST' : thrusting ? `${Math.round(thrustPercent)}%` : 'IDLE';
+  document.querySelector('#hud-gyro-state').textContent = mobileInput.gyroEnabled ? 'GYRO ACTIVE' : 'TOUCH / PAD';
+  document.querySelector('#gyro-meter-needle').style.left = `${50 + THREE.MathUtils.clamp(race.steering, -1, 1) * 46}%`;
+  const playerProgress = ((race.distance / curve.getLength()) % 1) * 100;
+  document.querySelector('#minimap-progress').textContent = playerProgress < 1 ? 'START' : `${Math.floor(playerProgress)}%`;
 
   // Kör det nya integrerade kamerapasset
   cameraSystem.update(craft.position, craft.quaternion, shipPhysics.velocity, delta, trackFrame);

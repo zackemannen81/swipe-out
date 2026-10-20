@@ -2,6 +2,10 @@
 
 Last verified: 2026-10-13
 
+## Recent change — telemetry HUD redesign
+
+Replaced the broken legacy HUD markup with responsive telemetry panels in the existing cyan/magenta visual profile. The race HUD now shows lap time, lap count, player position, live speed/max speed, active-course minimap/progress, gyro/touch steering state, a steering meter, thrust/boost meter, and an active brake indicator. Values are connected to existing race/input state; no physics or controls were changed. `npm run build`, `node --check src/game.js`, and `git diff --check` pass. Browser/device visual verification remains pending.
+
 ## Recent change — live minimap position
 
 The minimap player marker now follows the player's actual craft world position and is updated each render frame, including lateral movement from steering. The route and start marker remain derived from the active track. This is presentation-only: no physics, input, race progression, opponent, or finish logic was changed. Production build passed; interactive browser verification is still pending.

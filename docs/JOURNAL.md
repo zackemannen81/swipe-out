@@ -196,3 +196,10 @@
 - Connected the existing Three-nebula particle configuration to the player and all four CPU racers.
 - Added two independently rendered exhaust emitters per craft, positioned at its paired rear nozzles and transformed with the craft pose.
 - Validation: `npm run build` passed; `git diff --check` passed. No interactive browser visual verification was performed.
+
+## 2026-10-19 - Responsive telemetry HUD redesign
+
+- Replaced the mismatched legacy HUD markup with a responsive layout inspired by the supplied futuristic dashboard image, retaining Swipe-out's cyan/magenta palette and glass panels.
+- Added live lap time, lap number, player position, speed/max speed, course minimap/progress, steering/gyro state and meter, thrust/boost meter, and brake indicators, connected to existing race and input state.
+- Preserved race controls and physics. Updated current status and file map.
+- Validation: `npm run build`, `node --check src/game.js`, and `git diff --check` passed. Browser and physical-device visual/input verification were not performed. `npm ci` installed dependencies; npm reported 3 moderate audit vulnerabilities.

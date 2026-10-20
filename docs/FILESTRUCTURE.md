@@ -7,7 +7,7 @@ Verified 2026-10-11 after IMPLEMENT-008. The project implements the competitive 
 - `package.json` / `package-lock.json` — npm scripts and pinned dependency graph
 - `.gitignore` — generated and local-only files excluded from version control
 - `vite.config.js` — multi-page Vite build entries for the race and editor
-- `index.html` — game canvas, start/results overlay, race HUD, read-only minimap, and module entry
+- `index.html` — game canvas, start/results overlay, telemetry race HUD, read-only minimap, and module entry
 - `editor.html` — standalone developer track editor page
 - `src/editor.js` — draggable route editor, local save/load, copy, and JSON download
 - `src/editor.css` — responsive editor presentation
