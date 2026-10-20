@@ -1385,6 +1385,23 @@ if (tripMeter) {
   const meters = Math.floor(race.distance * 3.25); // Skala till meter
   tripMeter.innerHTML = `${meters} <small>M</small>`;
 }
+
+  // Byta färg om spelaren boostar
+const thrustFill = document.querySelector('#thrust-meter-fill');
+if (thrustFill) {
+  // Räkna ut gaspådrag (0 till 100%) baserat på throttleTarget eller hastighetsförhållande
+  const thrustPercent = Math.max(0, Math.min(100, race.throttleTarget * 100));
+  thrustFill.style.width = `${thrustPercent}%`;
+  
+  // Byta färg om spelaren boostar
+  if (shipPhysics.boostTimer > 0) {
+    thrustFill.style.width = '100%';
+    thrustFill.style.background = '#58f442'; // Neongrön vid boost
+  } else {
+    thrustFill.style.background = 'linear-gradient(90deg, #5de8df 0%, #ff397b 100%)';
+  }
+}
+
   // Kör det nya integrerade kamerapasset
   cameraSystem.update(craft.position, craft.quaternion, shipPhysics.velocity, delta, trackFrame);
   
