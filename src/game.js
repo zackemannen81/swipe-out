@@ -10,7 +10,7 @@ import { spawnTrackObjects, createTrack, getTrackFrame } from './track.js';
 import { NEON_CAUSEWAY, SYNTHETIC_DREAMS, DIGITAL_HORIZON, MOMMY_IM_SCARED ,DARK_SKIES, GEMINI,THE_JOKER,THE_VOID, AGENT_008_STAGE,ION_CATHEDRAL} from './track-data.js';
 import { createShipPhysics, stepShipPhysics } from './ship-physics.js';
 import { createOpponents, getPlayerPosition, resetOpponents, updateOpponents,resolveCraftCollisions } from './opponents.js';
-import Nebula, { SpriteRenderer, Rate, Span } from 'three-nebula';
+import Nebula, { SpriteRenderer, Rate, Span, Particle, FollowEmitter } from 'three-nebula';
 import thrusterConfig from './thruster.json';
 
 const canvas = document.querySelector('#game-canvas');
@@ -123,7 +123,8 @@ if (menuButton) {
 
 export const SPEEDCALIBRATION = 68; // Justera detta värde för att kalibrera spelets hastighe
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x080c0a);
+//scene.background = new THREE.Color(0x080c0a);
+scene.background = new THREE.Color(0x000000);
 scene.fog = new THREE.FogExp2(0x080d18, 0.0035);
 //scene.fog = new THREE.Fog(0x080c0a,350,420);
 
@@ -151,14 +152,14 @@ const panoramaTexture = new THREE.TextureLoader().load(
     texture.colorSpace = THREE.SRGBColorSpace;
     
     // 1. Tvinga bort mipmapping så WebGL alltid ritar full 4K/8K-upplösning
-    texture.generateMipmaps = false;
-    texture.minFilter = THREE.LinearFilter;
-    texture.magFilter = THREE.LinearFilter;
+    //texture.generateMipmaps = false;
+   // texture.minFilter = THREE.LinearFilter;
+   // texture.magFilter = THREE.LinearFilter;
     
     // 2. Maximal skärpa i vinklar
-    texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
+//    texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
     
-    texture.needsUpdate = true;
+  //  texture.needsUpdate = true;
   }
 );
 
@@ -1364,11 +1365,9 @@ segments.forEach((seg, index) => {
 });
 
 /*
-  const thrustPercent = THREE.MathUtils.clamp(Math.max(0, race.throttleTarget) * 100, 0, 100);
-  const thrustFill = document.querySelector('#thrust-meter-fill');
+
   thrustFill.style.width = `${shipPhysics.boostTimer > 0 ? 100 : thrustPercent}%`;
   thrustFill.style.background = shipPhysics.boostTimer > 0 ? '#58f442' : 'linear-gradient(90deg, #5de8df 0%, #ff397b 100%)';
-
   */
   const braking = race.throttleTarget < -0.1;
   const thrusting = race.throttleTarget > 0.1 || shipPhysics.boostTimer > 0;
@@ -1423,6 +1422,10 @@ if (thrustFill) {
   });
 
 // Update each craft's ion exhaust behind its paired rear nozzles.
+//const speedFactor = race.state === 'racing' ? THREE.MathUtils.clamp(race.currentSpeed / baseSpeed, 0.1, 1.8) : 0;
+
+
+/*
 for (const {
   system,
   emitter,
@@ -1482,10 +1485,165 @@ for (const {
   // Spara nuvarande position till nästa frame
   previousExhaustPos.copy(exhaustPos);
 }
+  */
+ // Hämta in Rate och Span från Nebula längst upp i filen om du inte redan har det:
+// import Nebula, { SpriteRenderer, Rate, Span, Color } from 'three-nebula';
+
+const thrustFactor = Math.max(0, race.throttleTarget);
+const speedFactor = race.state === 'racing' ? THREE.MathUtils.clamp(race.currentSpeed / baseSpeed, 0.0, 1.8) : 0;
+const isBoosting = shipPhysics.boostTimer > 0;
+
+for (const { system, emitter, group, nozzleOffset, previousExhaustPos } of thrusterSystems) {
   
+  // 1. Positionera emittern i världsrymden (bakom skeppet)
+  const exhaustPos = nozzleOffset.clone()
+    .applyQuaternion(group.quaternion)
+    .add(group.position);
+    
+  if (previousExhaustPos.lengthSq() === 0) previousExhaustPos.copy(exhaustPos);
+  
+  emitter.position.copy(exhaustPos);
+
+  // 2. Rotera emittern exakt som skeppet så att RadialVelocity-konen pekar bakåt
+  emitter.rotation.copy(new THREE.Euler().setFromQuaternion(group.quaternion));
+  //Lägg på "opposing particle speed" negativt skeppets hastighet för att kompensera krafterna.
+
+
+  // 3. Dynamisk partikelmängd (Rate) baserad på gas och boost
+  if (isBoosting) {
+    emitter.setRate(new Rate(new Span(6, 10), new Span(0.01)));
+  } else if (thrustFactor > 0.1) {
+    emitter.setRate(new Rate(new Span(2, 5), new Span(0.01, 0.02)));
+  } else {
+    // Tomgång (Idle)
+    emitter.setRate(new Rate(new Span(1, 2), new Span(0.05, 0.1)));
+  }
+
+  // 4. Hitta behaviours & initializers för att modifiera kraft och färg i realtid
+  const velocityInit = emitter.initializers.find(i => i.type === 'RadialVelocity');
+  const colorBehavior = emitter.behaviours.find(b => b.type === 'Color');
+
+if (velocityInit) {
+  // 1. Räkna ut grundkraften från motorn baserat på gas/boost
+  const thrustPower = isBoosting ? 45.0 : 15.0 + (thrustFactor * 20.0);
+  
+  // 2. Lägg till skeppets hastighet (eller en justerad faktor av den) 
+  // så att partiklarna skjuts ut hårdare bakåt när du kör fort.
+  velocityInit.radius = thrustPower - (race.currentSpeed * 1000.5); 
+}
+
+  if (colorBehavior) {
+    // 5. Minst tre färgnivåer för Ion-effekten beroende på fart/boost
+    if (isBoosting) {
+      // Nivå 3: Boost (Neongrön / Vit)
+      colorBehavior.colorA.colors = ['#58f442']; 
+      colorBehavior.colorB.colors = ['#ffffff'];
+    } else if (speedFactor > 1.05) {
+      // Nivå 2: Hög fart (Rosa / Cyan)
+      colorBehavior.colorA.colors = ['#ff397b'];
+      colorBehavior.colorB.colors = ['#5cf5ec'];
+    } else if (thrustFactor > 0.1) {
+      // Nivå 1: Normal gas (Cyan / Blå)
+      colorBehavior.colorA.colors = ['#5cf5ec'];
+      colorBehavior.colorB.colors = ['#0044ff'];
+    } else {
+      // Nivå 0: Idle (Mörkblå)
+      colorBehavior.colorA.colors = ['#0044ff'];
+      colorBehavior.colorB.colors = ['#050a1f'];
+    }
+  }
+
+  // 1. Räkna ut skeppets framåtvektor och hastighetsvektor i världsrymden
+const forwardDir = new THREE.Vector3(0, 0, 1).applyQuaternion(group.quaternion).normalize();
+const shipVelocityVector = forwardDir.clone().multiplyScalar(shipPhysics.speed);
+
+// 2. Räkna ut utblåsets kraft riktad bakåt (-forwardDir)
+const thrustPower = isBoosting ? 90.0 : 20.0 + (thrustFactor * 40.0);
+const exhaustVelocityVector = forwardDir.clone().multiplyScalar(-thrustPower);
+
+// 3. Totalkraft i världsrymden: V_partikel = V_skepp + V_utblås
+const totalParticleVelocity = shipVelocityVector.clone().add(exhaustVelocityVector);
+
+// --- Partikelsimulering ---
+const existingParticles = new Set(emitter.particles);
+
+const configureParticle = (particle) => {
+  if (!particle.sprite || !particle.sprite.material) return;
+  const material = particle.sprite.material;
+  material.depthWrite = false;
+  material.alphaTest = 0.02;
+  material.renderOrder = -220;
+  material.blending = THREE.AdditiveBlending;
+  material.transparent = true;
+  particle.sprite.renderOrder = 10;
+};
+
+emitter.particles.forEach(configureParticle);
+
+// Uppdatera Nebulas system
+system.update(delta);
+
+emitter.particles.forEach(configureParticle);
+
+// 4. Applicera position och kompensera hastigheten för nya partiklar
+const newParticles = emitter.particles.filter(p => !existingParticles.has(p));
+const totalNew = newParticles.length;
+
+newParticles.forEach((particle, index) => {
+  configureParticle(particle);
+  
+  // Mjuka ut spridningen längs sträckan skeppet färdats denna frame
+  const t = totalNew > 1 ? index / (totalNew - 1) : 1;
+  particle.position.lerpVectors(previousExhaustPos, exhaustPos, t);
+
+  // Tilldela den komprimerade hastighetsvektorn till partikeln i Nebula
+  if (particle.velocity) {
+    particle.velocity.x = totalParticleVelocity.x + (Math.random() - 0.5) * 1.5;
+    particle.velocity.y = totalParticleVelocity.y + (Math.random() - 0.5) * 1.5;
+    particle.velocity.z = totalParticleVelocity.z + (Math.random() - 0.5) * 1.5;
+  }
+});
+
+previousExhaustPos.copy(exhaustPos);
+}
+/*
+  // Spara partikeltillstånd innan uppdatering
+  const existingParticles = new Set(emitter.particles);
+  const configureParticle = (particle) => {
+    if (!particle.sprite || !particle.sprite.material) return;
+    const material = particle.sprite.material;
+    material.depthWrite = false;
+    //material.depthTest = true;
+    material.alphaTest = 0.02;
+    material.renderOrder = -220;
+    material.blending = THREE.AdditiveBlending;
+    material.transparent = true;
+    particle.sprite.renderOrder = 10;
+  };
+
+  emitter.particles.forEach(configureParticle);
+  
+  // Kör partikelsimuleringen
+  system.update(delta);
+  
+  emitter.particles.forEach(configureParticle);
+
+  // Mjuka ut spawnpunkten för nya partiklar (förhindrar "prickiga" spår vid hög fart)
+  const newParticles = emitter.particles.filter(p => !existingParticles.has(p));
+  const totalNew = newParticles.length;
+
+  newParticles.forEach((particle, index) => {
+    configureParticle(particle);
+    const t = totalNew > 1 ? index / (totalNew - 1) : 1;
+FollowEmitter
+    particle.position.lerpVectors(previousExhaustPos, exhaustPos, t);
+  });
+
+  previousExhaustPos.copy(exhaustPos);
+}
  
   // NYTT: Räkna ut en hastighetsfaktor. Är 1.0 vid normal maxfart, över 1.0 vid boost, och nära 0 vid inbromsning/krasch.
-  const speedFactor = race.state === 'racing' ? THREE.MathUtils.clamp(race.currentSpeed / baseSpeed, 0.1, 1.8) : 0;
+  
   
  /* thrusterMaterials.forEach((material) => {
     material.opacity = race.state === 'racing' ? THREE.MathUtils.clamp(0.36 + thrusterPower * 0.14, 0.36, 0.82) : 0;
