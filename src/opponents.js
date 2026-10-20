@@ -1,7 +1,6 @@
 import * as THREE from 'three';
-import { createCraft, loadCraftModel } from './craft.js';
 import { getTrackFrame } from './track.js';
-
+import { loadCraftModel, createCraft } from './craft.js';
 const TOTAL_LAPS = 3;
 const COLLISION_RADIUS = 1.65;
 const RACER_MASS = 1;
@@ -34,19 +33,19 @@ const RACER_DEFINITIONS = [
     accentColor: 0x63f4e8, secondaryAccentColor: 0xc2ff61,
   },
 ];
-
-export function createOpponents() {
-  return RACER_DEFINITIONS.map((definition) => {
-    const craft = createCraft({ ...definition, showGlow: true });
-    loadCraftModel({ group: craft.group }, definition.modelUrl)
-      .catch((error) => console.warn(`Unable to load ${definition.name} racer model; using procedural craft.`, error));
+// Gör createOpponents async
+export async function createOpponents() {
+  
+  // Vänta tills ALLA skepp har laddats in
+  const opponentsData = await Promise.all(RACER_DEFINITIONS.map(async (definition) => {
+    
+    // Await:a vår nya async createCraft
+    const craftObj = await createCraft(definition);
+    
     return {
       ...definition,
-      group: craft.group,
-      engineMaterials: craft.engineMaterials ?? [],
-      thrusterMaterials: craft.thrusterMaterials ?? [],
-      thrusters: craft.thrusters ?? [],
-      glow: craft.glow ?? null,
+      craft: craftObj,          
+      group: craftObj.group,    
       distance: 0,
       finishTime: null,
       currentSpeed: definition.speed,
@@ -54,9 +53,12 @@ export function createOpponents() {
       targetLane: definition.lane,
       currentLane: definition.lane,
       decisionTimer: Math.random() * 2.0,
-      strategy: 'hold_default'
+      strategy: 'hold_default',
+      collisionCooldown: 0
     };
-  });
+  }));
+
+  return opponentsData;
 }
 
 export function resetOpponents(opponents) {
@@ -141,25 +143,7 @@ export function updateOpponents(opponents, curve, delta, elapsed, racing, player
     opponent.group.quaternion.copy(frame.rotation);
     opponent.group.rotateZ(-laneMotion * 0.045);
 
-    // Visuella effekter (thrusters & glow)
-    const pulse = 0.82 + Math.sin(elapsed * 19 + opponent.phase) * 0.16;
-    for (const material of opponent.engineMaterials) {
-      material.color.setHex(opponent.accentColor);
-      material.emissive?.setHex(opponent.accentColor);
-    }
-    const enginePower = racing ? 0.9 + Math.sin(elapsed * 27 + opponent.phase) * 0.22 : 0.25;
-    opponent.thrusters.forEach((thruster, index) => {
-      thruster.visible = true;
-      thruster.scale.set(
-        0.82 + enginePower * 0.22,
-        enginePower * (1 + Math.sin(elapsed * 31 + index * 2.1 + opponent.phase) * 0.1),
-        0.82 + enginePower * 0.22,
-      );
-    });
-    opponent.thrusterMaterials.forEach((material) => {
-      material.opacity = racing ? THREE.MathUtils.clamp(0.42 + enginePower * 0.18, 0.42, 0.82) : 0.28;
-    });
-    if (opponent.glow) opponent.glow.intensity = 1.8 + pulse * 1.5;
+   
   }
 }
 
@@ -235,50 +219,3 @@ export function resolveCraftCollisions(opponents, playerPosition, playerVelocity
     opponent.collisionCooldown = 0.18;
   }
 }
-/*
-export function resolveCraftCollisions(opponents, playerPosition, playerVelocity, trackCurve, playerDistance, delta) {
-  const length = trackCurve.getLength();
-
-  for (const opponent of opponents) {
-    // 1. Räkna ner cooldown
-    if (opponent.collisionCooldown > 0) {
-      opponent.collisionCooldown -= delta;
-    }
-
-    // 2. Vektorseparering
-    collisionSeparation.copy(playerPosition).sub(opponent.group.position);
-    const distance = collisionSeparation.length();
-
-    if (distance >= COLLISION_RADIUS * 2 || distance < 1e-5) continue;
-
-    collisionSeparation.multiplyScalar(1 / distance);
-    const normal = collisionSeparation;
-    const penetration = COLLISION_RADIUS * 2 - distance;
-
-    // 3. Separera spelaren i 3D-rymden
-    playerPosition.addScaledVector(normal, penetration * 0.5);
-
-    // 4. Knuffa motståndaren i sidled på sin fil (currentLane)
-    // Vi kollar om spelaren är till höger eller vänster om motståndaren
-    const frame = getTrackFrame(trackCurve, (opponent.distance % length) / length);
-    const sideDot = normal.dot(frame.right); // > 0 betyder att spelaren är till höger
-    
-    // Flytta motståndarens fil bort från spelaren
-    opponent.currentLane -= Math.sign(sideDot) * penetration * 0.5;
-
-    // 5. Impuls & Cooldown
-    collisionRelativeVelocity.copy(playerVelocity).sub(opponent.collisionVelocity || new THREE.Vector3());
-    const closingSpeed = collisionRelativeVelocity.dot(normal);
-
-    if (closingSpeed >= 0 || opponent.collisionCooldown > 0) continue;
-
-    const impulse = -closingSpeed * 0.5 * RACER_MASS;
-    
-    // Ge spelaren sin stöt
-    playerVelocity.addScaledVector(normal, impulse);
-    
-    // Bromsa eller accelerera motståndaren lite beroende på krockvinkeln
-    opponent.currentSpeed -= Math.sign(normal.z) * impulse * 0.1;
-    opponent.collisionCooldown = 0.18;
-  }
-}*/
