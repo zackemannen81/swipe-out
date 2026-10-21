@@ -30,7 +30,7 @@ export async function createCraft(definition = {}) {
         const exhaustPos = offset.clone().applyQuaternion(this.group.quaternion).add(this.group.position);
         const shipBackward = new THREE.Vector3(0, 0, -1).applyQuaternion(this.group.quaternion);
         
-        const emitForce = boostActive ? 65.0 : 30.0;
+        const emitForce = 0;//boostActive ? 65.0 : 30.0;
         const velocity = shipBackward.multiplyScalar(emitForce);
         
         for (let i = 0; i < 3; i++) {

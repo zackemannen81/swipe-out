@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 
 export class ThrusterParticles {
-  constructor(scene, maxParticles = 2000) {
+  constructor(scene, maxParticles = 3000) {
     this.maxParticles = maxParticles;
     this.currentIndex = 0;
 
@@ -68,8 +68,8 @@ export class ThrusterParticles {
     const ctx = canvas.getContext('2d');
     const grad = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
     grad.addColorStop(0, 'rgba(255, 255, 255, 1)');
-    grad.addColorStop(0.3, 'rgba(255, 255, 255, 0.8)');
-    grad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+    grad.addColorStop(0.3, 'rgba(71, 255, 246, 0.8)');
+    grad.addColorStop(1, 'rgba(137, 222, 229, 0.79)');
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, 64, 64);
     const texture = new THREE.CanvasTexture(canvas);
