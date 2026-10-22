@@ -2,7 +2,7 @@ import * as THREE from 'three';
 
     export const shader_material_001 = new THREE.ShaderMaterial({
       uniforms: {
-        pointTexture: { value: this.createGlowTexture() }
+          pointTexture: { value: createGlowTexture() } 
       },
       vertexShader: `
         attribute float aLife;
@@ -105,20 +105,95 @@ fragmentShader: `
   // Generera en mjuk glöd-textur direkt i minnet
 export function createGlowTexture() {
     const canvas = document.createElement('canvas');
-    canvas.width = 64; canvas.height = 64;
+    canvas.width = 128; canvas.height = 128;
     const ctx = canvas.getContext('2d');
     
     // Mjukare övergångar skapar illusionen av gas/plasma
     const grad = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
     grad.addColorStop(0, 'rgba(255, 255, 255, 1)');
-    grad.addColorStop(0.15, 'rgba(113, 77, 108, 0.8)');
-    grad.addColorStop(0.4, 'rgba(47, 223, 254, 0.15)');
-    grad.addColorStop(1, 'rgb(245, 243, 194)');
+    grad.addColorStop(0.15, 'rgba(233, 199, 229, 0.8)');
+    grad.addColorStop(0.4, 'rgba(239, 172, 241, 0.81)');
+    grad.addColorStop(1, 'rgb(240, 195, 230)');
     
     ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, 64, 64);
+    ctx.fillRect(0, 0, 128, 128);
     
     const texture = new THREE.CanvasTexture(canvas);
     texture.needsUpdate = true;
     return texture;
   }
+
+
+  export const thruster_materialOne = new THREE.ShaderMaterial({
+      uniforms: {
+          pointTexture: { value: createGlowTexture() } 
+      },
+      vertexShader: `
+          attribute float size;
+          varying vec2 vUv;
+          void main() {
+              vUv = uv;
+              vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+              gl_PointSize = size * (300.0 / -mvPosition.z);
+              gl_Position = projectionMatrix * mvPosition;
+          }
+      `,
+      fragmentShader: `
+          uniform sampler2D pointTexture;
+          varying vec2 vUv;
+          void main() {
+              gl_FragColor = texture2D(pointTexture, gl_PointCoord);
+          // 1. Skapa en perfekt rund form matematiskt istället för en bild
+          vec2 pt = gl_PointCoord - vec2(0.5);
+          float sqDist = dot(pt, pt);
+          
+          // Klipp bort allt som är utanför cirkeln (tar bort fyrkanterna helt!)
+          if (sqDist > 0.25) discard; 
+              // Lägg till extra eld-färg/logik här om det behövs
+          }
+      `,
+      blending: THREE.AdditiveBlending, // VIKTIGT: Förhindrar att elden blir mörk/fyrkantig
+      depthWrite: false,
+      transparent: true
+  });
+  export const thruster_material = new THREE.ShaderMaterial({
+      uniforms: {
+          pointTexture: { value: createGlowTexture() } 
+      },
+      vertexShader: `
+          attribute float size;
+          attribute float alpha; // NYTT: Ta emot alpha från partikelsystemet
+          
+          varying vec2 vUv;
+          varying float vAlpha;  // NYTT: Skicka vidare till fragment shadern
+          
+          void main() {
+              vUv = uv;
+              vAlpha = alpha;    // NYTT: Sätt värdet
+              
+              vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+              gl_PointSize = size * (300.0 / -mvPosition.z);
+              gl_Position = projectionMatrix * mvPosition;
+          }
+      `,
+      fragmentShader: `
+          uniform sampler2D pointTexture;
+          varying vec2 vUv;
+          varying float vAlpha; // NYTT: Ta emot alpha från vertex shadern
+          
+          void main() {
+              vec2 pt = gl_PointCoord - vec2(0.5);
+              float sqDist = dot(pt, pt);
+              
+              if (sqDist > 0.25) discard; 
+              
+              vec4 texColor = texture2D(pointTexture, gl_PointCoord);
+              
+              // NYTT: Multiplicera färgen med vår alpha för att tona ut den (viktigt för AdditiveBlending)
+              gl_FragColor = texColor * vAlpha;
+          }
+      `,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+      transparent: true
+  });

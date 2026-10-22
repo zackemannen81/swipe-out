@@ -11,7 +11,8 @@ import { NEON_CAUSEWAY, SYNTHETIC_DREAMS, DIGITAL_HORIZON, MOMMY_IM_SCARED ,DARK
 import { createShipPhysics, stepShipPhysics } from './ship-physics.js';
 import { createOpponents, getPlayerPosition, resetOpponents, updateOpponents,resolveCraftCollisions } from './opponents.js';
 import { createCraft } from './craft.js';
-import { ThrusterParticles } from './particle-system.js'; // Vårt nya partikelsystem
+import { ParticleSystem } from './ParticleSystem.js'; // Vårt nya partikelsystem
+
 
 const canvas = document.querySelector('#game-canvas');
 const startScreen = document.querySelector('#start-screen');
@@ -229,8 +230,8 @@ function updateMinimap(position) {
 
 setupMinimap();
 
-// Skapa partikelsystemet
-const globalThrusterSystem = new ThrusterParticles(scene, 4000); 
+export const particleSystem = new ParticleSystem(5000, scene);
+particleSystem.initParticleSystem();
 
 // 1. Invänta spelarens skepp
 const playerCraft = await createCraft({ accentColor: 0x43f6ea, modelUrl: '/models/racer_optimized.glb' });
@@ -1328,7 +1329,18 @@ if (thrustFill) {
   const bass = race.state === 'racing' ? raceAudio.channels.bass : { value: 0 };
   bloomPass.strength = 0.62 + kick.hitValue * 0.55 + bass.value * 0.12;
 
+// --- UPPDATERA PARTIKLAR & THRUSTERS ---
+  const isRacing = (race.state === 'racing' || race.state === 'finished');
+  const throttle = Math.max(0, race.throttleTarget);
+  const boostActive = shipPhysics.boostTimer > 0;
 
+  // Uppdatera spelarens thruster-emittrar med aktuell position, rotation, hastighet och gaspådrag
+  playerCraft.updateThrusters(craft.position, craft.quaternion, shipPhysics.velocity, throttle, isRacing && boostActive);
+  
+  // Kör det centrala uppdateringssteget för partikelsystemet
+  particleSystem.updateSystem(delta);
+
+/*
 // --- UPPDATERA PARTIKLAR & MOTORER ---
   const isRacing = (race.state === 'racing' || race.state === 'finished');
   
@@ -1341,7 +1353,7 @@ if (thrustFill) {
   // 3. Få partikelsystemet att röra sig framåt i tiden
   globalThrusterSystem.update(delta);
 
-
+*/
   speedDisplay.textContent = race.state === 'racing'
     ? `${race.airborne ? 'AIR' : race.throttleTarget > 0.1 ? 'THRUST' : race.throttleTarget < -0.1 ? 'BRAKE' : 'AUTO'} · ${Math.round(race.currentSpeed * 36)} KM/H`
     : 'AUTO · READY';
