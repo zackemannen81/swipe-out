@@ -194,7 +194,7 @@ export class ThrusterSystem {
           sample.velocity.copy(this._direction).multiplyScalar(7 + power * 8);
           // Different birth ages within a frame prevent synchronized fading in groups.
           sample.age = Math.max(0, delta - birth);
-          sample.lifetime = 0.12 + power * 0.22;
+          sample.lifetime = 0.06 + power * 0.05;
           sample.width = 0.19 + power * 0.23;
           sample.power = power;
           nozzle.cursor = (nozzle.cursor + 1) % HISTORY_SIZE;
