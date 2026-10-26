@@ -78,10 +78,29 @@ Magnetic craft adhere to continuous road. Missing road launches player and CPU
 with world momentum into `gap-flight.js`, with world gravity, limited air steering,
 surface landing and recovery before the failed gap. Local projection tracks race
 progress without snapping flight onto the spline or another nearby floor. This
-does not yet provide arbitrary surface collisions or route branching. Magnetic
+does not provide arbitrary surface landing. Magnetic
 motion substeps at at most 1/120 second; camera orientation follows local up through
 loops and rolls. Decorative scenery retains authored world transforms; road rails,
 markers and boost pads follow the shared frame and are omitted inside gaps.
+
+Version 3 adds sequential alternative-route intervals on magnetic tracks. Each
+open spline attaches to a main-road start/end with matching orientation. Racer
+state locks its choice at entry according to approach lane and clears it at the
+merge. Canonical main-road distance represents common race progress; route-length
+conversion preserves physical speed and lets shorter routes save time. Ordered
+shared sector/merge gates validate laps. Geometry, pads, contacts, local-width
+walls, camera and minimap follow the selected route. The first format supports
+four non-overlapping branches, without gaps inside them.
+
+Optional combat is owned by `combat.js`: a shared player/CPU simulation with
+bounded projectiles/effects, clip/reload/cooldown state, forward lock acquisition,
+limited-turn homing, swept relative hull intersections and persistent impacts.
+The game supplies road/scenery visibility queries and input. Presentation uses
+instanced effects, target reticle, threat warnings and short synthesized sounds.
+Combat defaults off and adds no health/elimination. Minigun is an experimental
+third weapon; balance and device budgets remain subject to playtesting. Editor
+scenery clones copy data independently, assign new IDs and use existing history
+and storage workflows.
 
 Player and CPU motion now share `ship-physics.js`. CPU profiles and route/traffic
 decisions belong to `opponents.js`; shared boost-pad, wall and craft contact rules

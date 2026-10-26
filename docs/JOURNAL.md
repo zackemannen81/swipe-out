@@ -311,3 +311,31 @@
 - Updated roadmap/status/system/design/file-map/README. Human balance, comfort
   and physical-device performance remain open. Alternative routes are next in
   the roadmap, after feedback on these prototypes; weapons remain a later stage.
+
+## 2026-10-26 — TRACK-003: approved routes/combat and editor cloning
+
+- Archived TRACK-002 after positive user feedback and implemented the final two
+  roadmap stages plus requested scenery-object cloning (button and Ctrl/Cmd+D).
+  Clones preserve texture/material/transform/animation data independently, with
+  new identity, visible offset, selection and normal history/storage behavior.
+- Added v3 branch definitions and editor connection/width/side/point controls.
+  Open route splines join main-road frames; physical length controls travel time,
+  shared section distance controls rank/catch-up, and ordered gates validate laps.
+  Pads, local-width walls, contacts, CPU decisions, minimap and camera honor routes.
+  Safe gap recovery after a fork uses the common road beyond its merge.
+- Added Split Decision (track13) and Crossfire Circuit (track14). CPU profiles use
+  both route options across three laps; narrow shortcut trades width for time.
+- Added optional shared rocket, homing and minigun combat with clip/reload and fire
+  limits, 0.9-second visible lock, target/threat indicators, swept moving-hull hits,
+  real speed/lateral impulses, hit protection, bounded effects and firing sounds.
+  Combat defaults off; pause/retry/finish lifecycle is integrated.
+- All 44 Node tests pass. Browser checks pass cloning/history/sharing, branch
+  editing and controlled traversal, actual key/pointer fire, homing lock/hit,
+  CPU damage, pause, finish/retry and landscape layout. Existing editor acceptance
+  also passes. No JS/request errors. Inspected screenshots and moved the desktop
+  weapon panel off the craft; added the visible target reticle and smaller bursts.
+- Build/syntax/diff checks pass with existing bundle-size warning. Final branch
+  fixtures are bounded/instanced, with affected tests and build passing again.
+- Updated roadmap, README and continuity docs. No nested routes/gaps on branches,
+  weapon pickups, health or elimination. Minigun is a playable prototype; balance,
+  sound mix, touch comfort and physical-device performance need human evaluation.

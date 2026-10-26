@@ -25,6 +25,7 @@ export function createEditorView(canvas, { onSelect, onMove, onCommit }) {
   const anchor = new THREE.Object3D();
   scene.add(anchor);
   const markers = new THREE.Group();
+  let markerSelections = [];
   scene.add(markers);
   const markerGeometry = new THREE.SphereGeometry(1, 12, 8);
   const markerMaterial = new THREE.MeshBasicMaterial({ color: '#b6ffff', depthTest: false });
@@ -68,8 +69,8 @@ export function createEditorView(canvas, { onSelect, onMove, onCommit }) {
   }
 
   function syncSelection() {
-    markers.children.forEach((mesh, i) => { mesh.material = selection.kind === 'point' && selection.index === i ? selectedMaterial : markerMaterial; });
-    const source = selection.kind === 'point' ? track.centerline[selection.index] : track.objects[selection.index]?.position;
+    markers.children.forEach((mesh, i) => { const s=markerSelections[i]; mesh.material = s.kind===selection.kind && s.index===selection.index && s.branch===selection.branch ? selectedMaterial : markerMaterial; });
+    const source = selection.kind === 'point' ? track.centerline[selection.index] : selection.kind === 'branch' ? track.branches?.[selection.branch]?.points[selection.index] : track.objects[selection.index]?.position;
     if (!source) { transform.detach(); return; }
     if (!transform.dragging) anchor.position.set(source[0] * track.horizontalScale, source[1], source[2] * track.horizontalScale);
     transform.attach(anchor);
@@ -96,21 +97,24 @@ export function createEditorView(canvas, { onSelect, onMove, onCommit }) {
     const pointHit = raycaster.intersectObjects(markers.children)[0];
     const scenery = scene.getObjectByName('customTrackObjects');
     const objectHit = scenery && raycaster.intersectObjects(scenery.children)[0];
-    if (pointHit) onSelect({ kind: 'point', index: markers.children.indexOf(pointHit.object) });
+    if (pointHit) onSelect({ ...markerSelections[markers.children.indexOf(pointHit.object)] });
     else if (objectHit) onSelect({ kind: 'object', index: scenery.children.indexOf(objectHit.object) });
   });
 
   function setTrack(value, nextSelection = selection) {
     track = value;
     selection = nextSelection;
-    while (markers.children.length < track.centerline.length) {
+    const sources = track.centerline.map((p,index)=>({p,selection:{kind:'point',index}}));
+    (track.branches??[]).forEach((b,branch)=>b.points.forEach((p,index)=>sources.push({p,selection:{kind:'branch',branch,index}})));
+    markerSelections = sources.map(s=>s.selection);
+    while (markers.children.length < sources.length) {
       const mesh = new THREE.Mesh(markerGeometry, markerMaterial);
       mesh.renderOrder = 10;
       markers.add(mesh);
     }
-    while (markers.children.length > track.centerline.length) markers.remove(markers.children.at(-1));
+    while (markers.children.length > sources.length) markers.remove(markers.children.at(-1));
     bounds.makeEmpty();
-    track.centerline.forEach((p, i) => {
+    sources.forEach(({p}, i) => {
       markers.children[i].position.set(p[0] * track.horizontalScale, p[1], p[2] * track.horizontalScale);
       bounds.expandByPoint(markers.children[i].position);
     });

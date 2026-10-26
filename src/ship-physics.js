@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { BOOST, resolveWallImpact } from './race-interactions.js';
 import { getRacerTopSpeed } from './catch-up.js';
-import { getTrackFrame, gapAt, nextGap } from './track-path.js';
+import { getRacerFrame, getRacerWidth, advanceRouteDistance, recordRaceProgress, gapAt, nextGap } from './track-path.js';
 import { launchAcrossGap, stepGapFlight, flightPose } from './gap-flight.js';
 
 // Konstanter för svävaren (kan flyttas överst i filen)
@@ -16,6 +16,7 @@ const HOVER_DAMPING = 9.0;     // Dämpning så att skeppet inte studsar oändli
 // brakes, track adhesion, airborne gravity, angular inertia and edge impacts.
 export function createShipPhysics(baseSpeed, tuning = {}) {
   return {
+    route: null, routeDecision: '', routeEntries: 0, routeMerges: 0, gatesPassed: 0, completedLaps: 0, pendingFlightFrom: null,
     flight: null, recoveryTimer: 0, recoveries: 0, respawnSerial: 0, launches: 0, landings: 0,
     boostTimer: 0,        
     catchUpBonus: 0,
@@ -65,6 +66,16 @@ const damp = (value, target, lambda, dt) =>
   THREE.MathUtils.damp(value, target, lambda, dt);
 
 export function stepShipPhysics(ship, input, dt, curve, baseSpeed, trackWidth = 10) {
+  const from = ship.distance;
+  const pose = stepRoutePhysics(ship, input, dt, curve, baseSpeed, trackWidth);
+  if (dt > 0) {
+    recordRaceProgress(curve, ship, ship.pendingFlightFrom ?? from);
+    if (!ship.flight) ship.pendingFlightFrom = null;
+  }
+  return pose;
+}
+
+function stepRoutePhysics(ship, input, dt, curve, baseSpeed, trackWidth) {
   if (!curve.track?.magnetic || dt <= 1 / 120) return stepShipSubstep(ship, input, dt, curve, baseSpeed, trackWidth);
   const previous = { distance: ship.distance, lane: ship.lateralOffset, height: ship.verticalOffset,
     position: stepShipSubstep(ship, input, 0, curve, baseSpeed, trackWidth).position, serial: ship.respawnSerial };
@@ -79,19 +90,20 @@ export function stepShipPhysics(ship, input, dt, curve, baseSpeed, trackWidth = 
 }
 
 function stepShipSubstep(ship, input, dt, curve, baseSpeed, trackWidth) {
+  trackWidth = getRacerWidth(curve, ship, trackWidth);
   if (dt <= 0) {
-    const frame = getFrame(curve, ship.distance);
+    const frame = getFrame(curve, ship.distance, ship);
     return makePose(ship, frame, curve);
   }
 
   ship.previousDistance = ship.distance;
   ship.previousLateralOffset = ship.lateralOffset;
   ship.previousVerticalOffset = ship.verticalOffset;
-  ship.previousPosition.copy(makePose(ship, getFrame(curve, ship.distance), curve).position);
+  ship.previousPosition.copy(makePose(ship, getFrame(curve, ship.distance, ship), curve).position);
 
   if (ship.recoveryTimer > 0) {
     ship.recoveryTimer = Math.max(0, ship.recoveryTimer - dt);
-    return makePose(ship, getFrame(curve, ship.distance), curve);
+    return makePose(ship, getFrame(curve, ship.distance, ship), curve);
   }
   ship.jumpCooldown = Math.max(0, ship.jumpCooldown - dt);
   ship.crashTimer = Math.max(0, ship.crashTimer - dt);
@@ -104,7 +116,7 @@ ship.boostTimer = Math.max(0, ship.boostTimer - dt);
   if (!ship.flight && gap) launchAcrossGap(ship, curve, gap);
   if (ship.flight) {
     stepGapFlight(ship, input, dt, curve, baseSpeed, trackWidth);
-    return makePose(ship, getFrame(curve, ship.distance), curve);
+    return makePose(ship, getFrame(curve, ship.distance, ship), curve);
   }
 
   // Original thrust rises while held and falls off when released.
@@ -140,7 +152,7 @@ ship.boostTimer = Math.max(0, ship.boostTimer - dt);
 
   // Find the current local track frame and preserve the original jump response
   // to a sharp downward change in track tangent.
-  let frame = getFrame(curve, ship.distance);
+  let frame = getFrame(curve, ship.distance, ship);
   // --- 1. KANTER OCH KRÖN-DETEKTION (Tröghetsöverföring) ---
   const currentSlope = frame.tangent.y;
   const slopeChange = (currentSlope - ship.previousSlope) / Math.max(dt, 0.001);
@@ -256,13 +268,13 @@ ship.lateralOffset += (ship.lateralVelocity + effectiveCentering) * dt * 2;
     ship.distance = boundary.start;
     launchAcrossGap(ship, curve, boundary);
     stepGapFlight(ship, input, remaining, curve, baseSpeed, trackWidth);
-  } else ship.distance = targetDistance;
-  frame = getFrame(curve, ship.distance);
+  } else advanceRouteDistance(curve, ship, ship.speed * dt);
+  frame = getFrame(curve, ship.distance, ship);
   return makePose(ship, frame, curve);
 }
 
-function getFrame(curve, distance) {
-  return getTrackFrame(curve, distance / curve.getLength());
+function getFrame(curve, distance, ship) {
+  return getRacerFrame(curve, ship, distance / curve.getLength());
 }
 
 function makePose(ship, frame, curve) {

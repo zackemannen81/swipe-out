@@ -218,6 +218,19 @@ updateEngine(speed, isBoosting, isRacing) {
     }
   }
 
+  playWeapon(type, volume = 1) {
+    if (!this.context || this.context.state !== 'running') return;
+    const t=this.context.currentTime, duration=type==='minigun'?0.055:0.18;
+    const oscillator=this.context.createOscillator(), gain=this.context.createGain();
+    oscillator.type=type==='minigun'?'triangle':'sawtooth';
+    oscillator.frequency.setValueAtTime(type==='homing'?680:type==='minigun'?320:210,t);
+    oscillator.frequency.exponentialRampToValueAtTime(55,t+duration);
+    gain.gain.setValueAtTime(0.065*volume,t);gain.gain.exponentialRampToValueAtTime(0.001,t+duration);
+    oscillator.connect(gain);gain.connect(this.context.destination);
+    oscillator.onended=()=>{oscillator.disconnect();gain.disconnect();};
+    oscillator.start(t);oscillator.stop(t+duration);
+  }
+
   stop() {
     this.audio.pause();
     this.audio.currentTime = 0;

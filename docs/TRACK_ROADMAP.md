@@ -10,8 +10,8 @@ dess kontroller är verifierade. Körkänsla, CPU-profiler och thrusters bevaras
 | 2 | Första användbara 3D-editorn | Klar — TRACK-001 (2026-10-26) |
 | 3 | Gaps med avstamp, luftfärd och landning | Implementerad — TRACK-002, redo för provkörning |
 | 4 | Dosering, twists och loopar | Implementerad — TRACK-002, komforttest återstår |
-| 5 | Alternativa vägar och shortcuts | Planerad |
-| 6 | Valbart vapensystem | Planerad |
+| 5 | Alternativa vägar och shortcuts | Implementerad — TRACK-003, redo för provkörning |
+| 6 | Valbart vapensystem | Spelbar prototyp — TRACK-003, balansutvärdering återstår |
 
 ## 1. Banformat och import/export
 
@@ -29,11 +29,13 @@ dess kontroller är verifierade. Körkänsla, CPU-profiler och thrusters bevaras
 - [x] Lägg till/ta bort punkter och behåll stöd för scenery.
 - [x] Ångra/gör om ändringar och spara/provkör med ett tydligt arbetsflöde.
 - [x] Kontrollera export/import och provkörning genom editorns faktiska UI.
+- [x] Klona scenery med egen identitet, alla egenskaper/texturer, ångra/gör om och sparning.
 
-Editorn har nu gapmarkeringar, bank/roll och sidovy. Vägförgreningar och
-vapenpickups läggs till när respektive spelfunktion finns. Checkpointbaserad
+Editorn har nu gapmarkeringar, bank/roll, sidovy och vägförgreningar. Checkpointbaserad
 sektionsprovning och avancerade sceneryverktyg är senare förbättringar;
-Save & Test provkör ett normalt lopp från start.
+Save & Test provkör ett normalt lopp från start. TRACK-003 lägger till route-
+anslutningar och redigering av genvägens 3D-punkter. Vapen använder för närvarande
+magasin och automatisk omladdning; vapenpickups är inte implementerade.
 
 ## 3. Gaps
 
@@ -62,21 +64,34 @@ redigerbara världskoordinater. De tio ursprungliga banornas fysik ändras inte.
 
 ## 5. Alternativa vägar / shortcuts
 
-- [ ] Bansektioner kan dela sig och återförenas; en första testbana med ett vägval.
-- [ ] Kortare väg kräver mer skicklighet; längre väg är tryggare.
-- [ ] Gemensamma checkpoints ger rättvis placering, varv, mål och catch-up
+- [x] Bansektioner kan dela sig och återförenas; en första testbana med ett vägval.
+- [x] Kortare väg kräver mer skicklighet; längre väg är tryggare.
+- [x] Gemensamma checkpoints ger rättvis placering, varv, mål och catch-up
       trots olika faktisk färdsträcka. Ingen vinst genom att hoppa över checkpoints.
-- [ ] CPU väljer och kör båda vägarna; minimap och återställning följer vägvalet.
-- [ ] Editorn visar och redigerar anslutningarna.
+- [x] CPU väljer och kör båda vägarna; minimap och återställning respekterar vägvalet.
+- [x] Editorn visar och redigerar anslutningarna.
+
+Provkör **TEST · Split Decision** (`track13`). Vänster inför förgreningen väljer
+Needle Shortcut: cirka 535 längdenheter och 7 bred, jämfört med huvudsträckans
+687 och 20. Vägvalet låses vid infarten och släpps vid återanslutningen. Första
+versionen tillåter fyra separata förgreningar, utan nästlade vägar eller gaps i
+genvägen. Balans och tydlighet behöver mänsklig provkörning.
 
 ## 6. Vapensystem
 
-- [ ] Strid kan slås av/på; börja med en framåtriktad raket.
-- [ ] Tydlig projektil, träff, knuff och kort fartförlust för både spelare och CPU.
-- [ ] Begränsad ammunition/eldtakt och skydd mot upprepad låsning i träffreaktion.
-- [ ] Testa undanmanöver, kollision, paus, omstart och loppets slut.
-- [ ] Därefter prova målsökande missil med låstid, siktkrav och målvarning.
+- [x] Strid kan slås av/på; börja med en framåtriktad raket.
+- [x] Tydlig projektil, träff, knuff och fartförlust för både spelare och CPU.
+- [x] Begränsad ammunition/eldtakt och skydd mot upprepad låsning i träffreaktion.
+- [x] Testa undanmanöver, kollision, paus, omstart och loppets slut.
+- [x] Målsökande missil med låstid, siktkrav, målmarkering och målvarning.
+- [x] Spelbar minigun-prototyp med magasin, omladdning och begränsade effekter.
 - [ ] Utvärdera minigun sist utifrån spelkänsla, läsbarhet och mobilprestanda.
+
+Provkör **TEST · Crossfire Circuit** (`track14`) med **COMBAT MODE** påslaget före
+start. Space/FIRE skjuter; 1/2/3 eller knapparna väljer vapen. Alla CPU:er använder
+samma regler. Homing kräver 0,9 sekunders fri sikt. Strid är avstängt som standard;
+inga livspoäng eller eliminering. Balansering av skada, omladdning och CPU-eld
+återstår efter den mänskliga provkörningen.
 
 ## Leveransregler
 
@@ -84,5 +99,5 @@ redigerbara världskoordinater. De tio ursprungliga banornas fysik ändras inte.
 - Dokumentera faktisk verifiering i CURRENT_STATUS; skilj kodtester från
   visuell kontroll, spelbalans och mätning på fysisk telefon.
 - Uppdatera denna checklista efter varje etapp. Nya idéer får egna öppna punkter.
-- Nästa planerade mekanik efter TRACK-002 är alternativa vägar. Ta först in
-  återkoppling från gap-/loop-provkörningen och justera körkänsla/komfort.
+- Efter TRACK-003: samla återkoppling om vägval, vapenkänsla och editorflöde.
+  Finjustera balans/komfort och mät mobilprestanda före fler stora system.

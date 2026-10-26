@@ -58,7 +58,7 @@ try {
   const dlPromise = editor.waitForEvent('download'); await editor.locator('#download-button').click();
   const dl = await dlPromise, file = join(output, 'gap-v2.json'); await dl.saveAs(file);
   const json = JSON.parse(await readFile(file, 'utf8'));
-  assert.equal(json.version, 2); assert.equal(json.track.gaps.length, 1); assert.equal(json.track.magnetic, true);
+  assert.equal(json.version, 3); assert.equal(json.track.gaps.length, 1); assert.equal(json.track.magnetic, true);
   await editor.locator('#import-file').setInputFiles(file);
   await editor.waitForFunction(() => document.querySelector('#status').textContent.startsWith('Imported as a new draft'));
   assert.equal(await editor.locator('#gap-count').innerText(), '1');

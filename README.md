@@ -1,8 +1,8 @@
 # Swipe-out
 
 Swipe-out is a Three.js anti-gravity racing prototype with three-lap races against
-four CPU opponents, twelve built-in circuits, custom track import/export and a
-3D editor. The newest two circuits test real gaps and magnetic loops/barrel-rolls.
+four CPU opponents, fourteen built-in circuits, custom track import/export and a
+3D editor. Test circuits cover gaps, loops, alternative routes and optional combat.
 
 ## Requirements and run
 
@@ -26,15 +26,20 @@ to a point or scenery object. Numeric coordinates, width/scale and insert/delete
 remain available. Undo/redo also supports Ctrl/Cmd+Z and Ctrl/Cmd+Shift+Z outside
 text fields. Switching tracks retains each draft until the editor is closed.
 
-**Download** and **Copy JSON** produce version 2 `swipe-out-track` JSON files.
-**Import JSON as New Track** accepts these files, version 1 and older plain JSON exports,
+Select scenery and use **CLONE OBJECT** or Ctrl/Cmd+D outside text fields. The
+copy gets a new ID and a small sideways offset, preserves all properties/textures,
+and is selected for moving. Editing it does not change the source. Cloning works
+with undo/redo, save/reload and import/export.
+
+**Download** and **Copy JSON** produce version 3 `swipe-out-track` JSON files.
+**Import JSON as New Track** accepts these files, versions 1/2 and older plain JSON exports,
 validates before changing the editor, and creates a separate unsaved custom track.
 The imported file never replaces an existing track. Embedded image textures travel
 with the JSON; local image paths and HTTPS URLs remain references to those assets.
 Import supports files up to 16 MB; browser storage may fill sooner. If saving
-fails, download the draft to keep it. Version 2 adds magnetic road, bank angles
-and gaps. Version 1 and legacy tracks keep their original behavior until magnetic
-road is explicitly enabled. Branches are a later stage.
+fails, download the draft to keep it. Version 2 added magnetic road, bank angles
+and gaps; version 3 adds connected alternative routes. Version 1 and legacy tracks
+keep their original behavior until magnetic road is explicitly enabled.
 
 **Save to Game** stores this track in this browser. **Save & Test** saves and opens
 a game tab with that exact track selected; press Start Race to begin. Saved custom
@@ -45,7 +50,7 @@ kept. The editor preview uses game geometry with editing lights/guide lines, not
 the game's bloom/audio animation. Scenery remains decorative, as before.
 
 The agreed development sequence and completion checklists live in
-[docs/TRACK_ROADMAP.md](docs/TRACK_ROADMAP.md). Stages 3 and 4 now have playable test tracks.
+[docs/TRACK_ROADMAP.md](docs/TRACK_ROADMAP.md). All six stages now have playable implementations; human balance/comfort checks remain open.
 Run `node --test tests/*.test.js` for regression checks. The optional browser
 acceptance script `node tools/verify-track-editor.mjs` requires Playwright, a local
 Chrome installation and a running Vite server. Set `PLAYWRIGHT_MODULE` to an
@@ -83,6 +88,52 @@ Flight tuning is in `src/gap-flight.js` (`FLIGHT`), magnetic camera offsets in
 same browser prerequisites as above; captures go to temporary `swipe-out-track002`.
 
 ## Play
+
+### Alternative routes
+
+Choose **TEST · Split Decision** (`/?track=track13`). Before the amber junction,
+move to the side indicated by the route hint: **LEFT** selects Needle Shortcut on
+this circuit. Stay on the other side or near the center for the wider main road.
+Once you enter, steer normally and center on the narrower deck. The shortcut is
+about 535 world units versus the main section's 687; its seven-unit width makes
+clean steering more demanding. HUD/minimap highlight the route until the merge.
+CPU drivers use both routes across laps. Actual physical route length determines
+travel time; common section progress determines rank, checkpoints and catch-up.
+
+In the editor, select a main-road point with magnetic road enabled and use
+**+ BRANCH AT SELECTED POINT**. Choose the route in the inspector, edit START/END
+percentages, approach side and width, and drag its intermediate points with the
+same XYZ handles. Numeric point coordinates and insert/delete work on the selected
+route. Endpoints attach automatically to the main road, including their orientation.
+Save & Test and v3 sharing preserve all of it. The first version supports up to four
+separate split/merge intervals; nested routes and gaps within branches are rejected.
+
+### Optional combat
+
+Enable **COMBAT MODE** before starting a race; it defaults off. Try
+**TEST · Crossfire Circuit** (`/?track=track14`) for open sightlines. All tracks
+can use the mode. **Space** or hold **FIRE** shoots; **1 / 2 / 3** or the HUD
+buttons choose rocket, homing missile or minigun. On touch, FIRE is independent
+of the steering/throttle controls.
+
+| Weapon | Clip | Fire interval | Empty-clip reload |
+| --- | ---: | ---: | ---: |
+| Rocket | 6 | 0.7 s | 5 s |
+| Homing | 4 | 1.1 s | 7 s |
+| Minigun prototype | 50 | 0.11 s | 4 s |
+
+Homing requires 0.9 seconds of continuous forward aim, clear sight and a target
+within 280 world units. The reticle and lock meter show the selected target;
+ENEMY LOCK / INCOMING MISSILE warns of threats. Steering out of the firing line
+or breaking sight can avoid shots. Road/scenery block projectiles. Hits reduce
+actual speed and apply lateral impulse, with short shared hit protection.
+CPU craft use the same ammunition, locking and hit rules. There is no elimination
+or health bar. Pause freezes combat; retry refills clips and clears shots/locks.
+Weapons and effects are a playable balancing prototype, not final competitive tuning.
+
+Weapon values live in `src/combat.js`; route/combat circuits in `src/track-labs.js`.
+`node tools/verify-routes-combat.mjs` checks clone/route authoring and race/combat
+flows with the browser prerequisites above; captures go to temporary `swipe-out-track003`.
 
 Choose a track and press **Start Race**. After the countdown, use up/down arrows
 or W/S for throttle/braking and left/right arrows or A/D to steer. Q/E apply the

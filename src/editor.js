@@ -2,7 +2,7 @@ import { BUILTIN_TRACKS, readTrackLibrary, saveTrack, resetTrack } from './track
 import { normalizeTrack, parseTrack, serializeTrack, MAX_TRACK_BYTES } from './track-format.js';
 import { createHistory } from './editor-history.js';
 import { createEditorView } from './editor-view.js';
-import { createTrackCurve, progressAtControlPoint } from './track-path.js';
+import { createTrackCurve, getTrackFrame, progressAtControlPoint } from './track-path.js';
 import './editor.css';
 
 const $ = selector => document.querySelector(selector);
@@ -24,6 +24,7 @@ const view = createEditorView($('#editor-canvas'), {
   onMove(value, position) {
     edit(next => {
       if (value.kind === 'point') next.centerline[value.index].splice(0, 3, ...position);
+      else if (value.kind === 'branch') next.branches[value.branch].points[value.index] = position;
       else next.objects[value.index].position = position;
     }, false);
   },
@@ -50,7 +51,8 @@ function setValue(selector, value) {
   if (document.activeElement !== input) input.value = value;
 }
 function clampSelection() {
-  const count = selection.kind === 'point' ? track().centerline.length : track().objects.length;
+  if (selection.kind === 'branch' && !track().branches?.[selection.branch]) selection = {kind:'point',index:0};
+  const count = selection.kind === 'point' ? track().centerline.length : selection.kind === 'branch' ? track().branches[selection.branch].points.length : track().objects.length;
   if (!count) selection = { kind: 'point', index: 0 };
   else selection.index = Math.max(0, Math.min(selection.index, count - 1));
 }
@@ -76,19 +78,61 @@ function render() {
   $('#redo-button').disabled = !current().history.canRedo;
   $('#reset-button').textContent = BUILTIN_TRACKS[currentKey] ? 'RESTORE BUILT-IN' : 'REMOVE CUSTOM';
   const pointIndex = selection.kind === 'point' ? selection.index : 0;
-  const point = value.centerline[pointIndex];
+  const point = selection.kind === 'branch' ? value.branches[selection.branch].points[selection.index] : value.centerline[pointIndex];
   setValue('#point-bank', point[3] ?? 0);
   $('#point-bank').disabled = selection.kind !== 'point' || !value.magnetic;
-  $('#selected-point').textContent = selection.kind === 'point' ? String(pointIndex + 1).padStart(2, '0') : 'OBJECT SELECTED';
+  $('#selected-point').textContent = selection.kind === 'point' ? String(pointIndex + 1).padStart(2, '0') : selection.kind === 'branch' ? `ROUTE POINT ${selection.index+1}` : 'OBJECT SELECTED';
   for (const [axis, name] of ['x', 'y', 'z'].entries()) {
     setValue(`#point-${name}`, point[axis]);
-    $(`#point-${name}`).disabled = selection.kind !== 'point';
+    $(`#point-${name}`).disabled = selection.kind === 'object';
   }
-  $('#add-point-btn').disabled = selection.kind !== 'point' || value.centerline.length >= 512;
-  $('#del-point-btn').disabled = selection.kind !== 'point' || value.centerline.length <= 4;
+  $('#add-point-btn').disabled = selection.kind === 'object' || (selection.kind==='branch' ? pointCollection(value).length>=64 : value.centerline.length>=512);
+  $('#del-point-btn').disabled = selection.kind === 'object' || pointCollection(value).length <= (selection.kind==='branch'?1:4);
   renderObjectInspector();
   renderGaps();
+  renderBranches();
 }
+
+function pointCollection(value) { return selection.kind==='branch' ? value.branches[selection.branch].points : value.centerline; }
+
+function renderBranches() {
+  const branches=track().branches??[], select=$('#branch-select');
+  select.replaceChildren(new Option('Main road',''),...branches.map((b,i)=>new Option(b.name,String(i))));
+  select.value=selection.kind==='branch'?String(selection.branch):'';
+  $('#add-branch-button').disabled=!track().magnetic || selection.kind!=='point' || branches.length>=4;
+  const panel=$('#branch-inspector'); if(panel.contains(document.activeElement)) return;
+  panel.replaceChildren(); if(selection.kind!=='branch') return;
+  const branch=branches[selection.branch];
+  for(const [key,labelText,min,max] of [['name','NAME'],['start','START %',8,80],['end','END %',12,92],['width','WIDTH',4,track().width]]) {
+    const label=document.createElement('label'); label.className='branch-field'; label.textContent=labelText;
+    const input=document.createElement('input'); input.type=key==='name'?'text':'number';
+    if(min!==undefined) {input.min=min;input.max=max;input.step=0.1;}
+    input.value=['start','end'].includes(key)?(branch[key]*100).toFixed(3):branch[key];
+    input.setAttribute('aria-label',`Route ${labelText}`);
+    input.addEventListener('change',()=>{ const value=key==='name'?input.value:input.valueAsNumber/(['start','end'].includes(key)?100:1); input.blur(); edit(next=>{next.branches[selection.branch][key]=value;}); });
+    label.append(input); panel.append(label);
+  }
+  const side=document.createElement('select'); side.setAttribute('aria-label','Route approach side');
+  side.add(new Option('Approach LEFT','1'));side.add(new Option('Approach RIGHT','-1')); side.value=String(branch.side);
+  side.addEventListener('change',()=>{const value=Number(side.value);side.blur();edit(next=>{next.branches[selection.branch].side=value;});});panel.append(side);
+  const remove=document.createElement('button'); remove.textContent='REMOVE ROUTE'; remove.id='remove-branch-button';
+  remove.addEventListener('click',()=>{const index=selection.branch;selection={kind:'point',index:0};edit(next=>next.branches.splice(index,1));});panel.append(remove);
+}
+
+$('#branch-select').addEventListener('change',event=>{
+  selection=event.target.value===''?{kind:'point',index:0}:{kind:'branch',branch:Number(event.target.value),index:0};
+  render();view.select(selection);view.focus();
+});
+$('#add-branch-button').addEventListener('click',()=>{
+  const curve=createTrackCurve(track()), start=Math.max(0.08,Math.min(0.72,progressAtControlPoint(curve,selection.index))), end=start+0.16;
+  const points=[0.25,0.5,0.75].map(u=>{
+    const f=getTrackFrame(curve,start+(end-start)*u), p=f.center.addScaledVector(f.right,track().width*2*Math.sin(u*Math.PI));
+    return [p.x/track().horizontalScale,p.y,p.z/track().horizontalScale];
+  });
+  const id=crypto.randomUUID();edit(next=>{next.branches??=[];next.branches.push({id,name:'Alternative route',start,end,side:1,width:Math.max(4,next.width*0.5),points});});
+  const index=track().branches?.findIndex(b=>b.id===id)??-1;
+  if(index>=0){selection={kind:'branch',branch:index,index:0};render();view.select(selection);view.fit();}
+});
 
 function renderGaps() {
   const gaps = track().gaps ?? [];
@@ -185,6 +229,20 @@ function renderObjectInspector() {
     edit(next => { next.objects.splice(index, 1); });
   });
   row.append(remove); panel.append(row);
+  const clone = document.createElement('button'); clone.textContent = 'CLONE OBJECT';
+  clone.id = 'clone-object-button'; clone.disabled = track().objects.length >= 1024;
+  clone.addEventListener('click', cloneSelectedObject); row.prepend(clone);
+}
+
+function cloneSelectedObject() {
+  if (selection.kind !== 'object' || track().objects.length >= 1024) return;
+  const copy = structuredClone(track().objects[selection.index]);
+  copy.id = crypto.randomUUID();
+  const offset=Math.min(100,Math.max(2,copy.scale[0]+1));
+  copy.position[0] += copy.position[0]+offset<=10000?offset:-offset;
+  edit(next => { next.objects.push(copy); });
+  selection = { kind: 'object', index: track().objects.length - 1 };
+  render(); view.select(selection); view.focus();
 }
 
 function activate(key) {
@@ -213,7 +271,7 @@ $('#add-gap-button').addEventListener('click', () => {
 for (const [axis, name] of ['x', 'y', 'z'].entries()) {
   $(`#point-${name}`).addEventListener('change', event => {
     const value = event.target.valueAsNumber; event.target.blur();
-    edit(next => { next.centerline[selection.index][axis] = value; });
+    edit(next => { pointCollection(next)[selection.index][axis] = value; });
   });
 }
 for (const [selector, key] of [['#width-input', 'width'], ['#scale-input', 'horizontalScale']]) {
@@ -223,14 +281,17 @@ for (const [selector, key] of [['#width-input', 'width'], ['#scale-input', 'hori
 $('#add-point-btn').addEventListener('click', () => {
   const index = selection.index;
   edit(next => {
-    const a = next.centerline[index], b = next.centerline[(index + 1) % next.centerline.length];
+    const points=pointCollection(next);
+    const a = points[index];
+    let b = points[(index + 1) % points.length];
+    if(selection.kind==='branch' && index===points.length-1){const p=getTrackFrame(createTrackCurve(next),next.branches[selection.branch].end).center;b=[p.x/next.horizontalScale,p.y,p.z/next.horizontalScale];}
     const point = a.slice(0, 3).map((n, axis) => (n + b[axis]) / 2);
     if (a.length === 4) point.push(a[3]);
-    next.centerline.splice(index + 1, 0, point);
+    points.splice(index + 1, 0, point);
   });
   selection.index = index + 1; render(); view.select(selection);
 });
-$('#del-point-btn').addEventListener('click', () => edit(next => { next.centerline.splice(selection.index, 1); }));
+$('#del-point-btn').addEventListener('click', () => edit(next => { pointCollection(next).splice(selection.index, 1); }));
 for (const button of document.querySelectorAll('[data-primitive]')) {
   button.addEventListener('click', () => {
     const position = track().centerline[selection.kind === 'point' ? selection.index : 0].slice(0, 3);
@@ -249,6 +310,7 @@ $('#undo-button').addEventListener('click', () => historyAction('undo'));
 $('#redo-button').addEventListener('click', () => historyAction('redo'));
 window.addEventListener('keydown', event => {
   if (event.target.matches('input, textarea, select') || !(event.ctrlKey || event.metaKey)) return;
+  if (event.code === 'KeyD' && selection.kind === 'object') { event.preventDefault(); cloneSelectedObject(); return; }
   if (event.code === 'KeyZ' || event.code === 'KeyY') {
     event.preventDefault(); historyAction(event.shiftKey || event.code === 'KeyY' ? 'redo' : 'undo');
   }

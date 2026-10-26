@@ -1,6 +1,6 @@
-// Version 2 adds magnetic road, authored bank angles and normalized gap intervals.
+// Version 3 adds connected alternative routes; versions 1/2 remain readable.
 export const TRACK_FORMAT = 'swipe-out-track';
-export const TRACK_VERSION = 2;
+export const TRACK_VERSION = 3;
 export const MAX_TRACK_BYTES = 16 * 1024 * 1024;
 
 function fail(path, reason) { throw new Error(`${path}: ${reason}`); }
@@ -41,7 +41,7 @@ function texture(value, path) {
 
 export function normalizeTrack(input) {
   record(input, 'track');
-  knownFields(input, ['id', 'name', 'width', 'horizontalScale', 'centerline', 'objects', 'magnetic', 'gaps'], 'track');
+  knownFields(input, ['id', 'name', 'width', 'horizontalScale', 'centerline', 'objects', 'magnetic', 'gaps', 'branches'], 'track');
   const id = text(input.id, 'track.id');
   const name = text(input.name, 'track.name');
   const width = number(input.width, 'track.width', 4, 100);
@@ -110,6 +110,34 @@ export function normalizeTrack(input) {
     }
     result.gaps = gaps;
   }
+  if (input.branches !== undefined) {
+    if (!Array.isArray(input.branches) || input.branches.length > 4) fail('track.branches', 'expected at most four branches.');
+    if (input.branches.length && !result.magnetic) fail('track.branches', 'enable magnetic road before adding branches.');
+    const ids = new Set();
+    result.branches = input.branches.map((branch, i) => {
+      const path = `track.branches[${i}]`; record(branch, path);
+      knownFields(branch, ['id', 'name', 'start', 'end', 'side', 'width', 'points'], path);
+      const id = text(branch.id, `${path}.id`, 80);
+      if (ids.has(id)) fail(path, 'branch ids must be unique.'); ids.add(id);
+      const start = number(branch.start, `${path}.start`, 0.08, 0.8);
+      const end = number(branch.end, `${path}.end`, 0.12, 0.92);
+      if (end - start < 0.04 || end - start > 0.6) fail(path, 'branch must span 4–60% of the lap.');
+      if (![-1, 1].includes(branch.side)) fail(`${path}.side`, 'expected -1 (right) or 1 (left).');
+      if (!Array.isArray(branch.points) || branch.points.length < 1 || branch.points.length > 64) fail(`${path}.points`, 'expected 1–64 intermediate points.');
+      const points=branch.points.map((p,j)=>vector(p,`${path}.points[${j}]`));
+      let branchLength=0;
+      for(let j=1;j<points.length;j++)branchLength+=Math.hypot((points[j][0]-points[j-1][0])*horizontalScale,points[j][1]-points[j-1][1],(points[j][2]-points[j-1][2])*horizontalScale);
+      if(branchLength>50000)fail(`${path}.points`,'branch control-polygon length must not exceed 50,000 world units.');
+      return { id, name: text(branch.name, `${path}.name`), start, end, side: branch.side,
+        width: number(branch.width, `${path}.width`, 4, width),
+        points };
+    }).sort((a, b) => a.start - b.start);
+    for (let i = 0; i < result.branches.length; i++) {
+      const b = result.branches[i];
+      if (i && b.start - result.branches[i - 1].end < 0.04) fail('track.branches', 'leave 4% between branches; nested/overlapping routes are unsupported.');
+      if ((result.gaps ?? []).some(g => g.start < b.end + 0.02 && g.end > b.start - 0.02)) fail('track.branches', 'leave 2% between gaps and branch junctions; branches must have continuous road.');
+    }
+  }
   return result;
 }
 
@@ -117,9 +145,10 @@ export function decodeTrack(value) {
   record(value, 'file');
   if ('format' in value || 'version' in value || 'track' in value) {
     if (value.format !== TRACK_FORMAT) fail('file.format', `expected ${TRACK_FORMAT}.`);
-    if (![1, TRACK_VERSION].includes(value.version)) fail('file.version', `unsupported version ${String(value.version)}; this editor supports versions 1 and ${TRACK_VERSION}.`);
+    if (![1, 2, TRACK_VERSION].includes(value.version)) fail('file.version', `unsupported version ${String(value.version)}; this editor supports versions 1–${TRACK_VERSION}.`);
     knownFields(value, ['format', 'version', 'track'], 'file');
     if (value.version === 1 && (value.track?.magnetic !== undefined || value.track?.gaps !== undefined)) fail('file.version', 'magnetic road and gaps require version 2.');
+    if (value.version < 3 && value.track?.branches !== undefined) fail('file.version', 'branches require version 3.');
     return normalizeTrack(value.track);
   }
   return normalizeTrack(value);

@@ -29,3 +29,19 @@ export const LOOP_LAB = {
   id: 'loop-lab', name: 'TEST · Loop & Roll', width: 18, horizontalScale: 1,
   magnetic: true, centerline: loopPoints, objects: [], gaps: [],
 };
+
+export const ROUTE_LAB = {
+  id:'route-lab', name:'TEST · Split Decision', width:20, horizontalScale:1, magnetic:true,
+  centerline:[[0,0,-300],[0,0,-150],[0,0,0],[0,0,100],[-100,0,220],[-230,0,350],
+    [-100,0,500],[0,0,600],[0,0,720],[150,0,850],[350,0,700],[400,0,400],[400,0,0],[300,0,-300],[120,0,-450]],
+  objects:[], gaps:[],
+};
+const routeCurve = createTrackCurve(ROUTE_LAB);
+ROUTE_LAB.branches=[{id:'shortcut',name:'Needle Shortcut',start:progressAtControlPoint(routeCurve,3),end:progressAtControlPoint(routeCurve,7),side:1,width:7,
+  points:[[35,8,230],[65,12,350],[35,8,480]]}];
+
+export const COMBAT_LAB = {
+  id:'combat-lab',name:'TEST · Crossfire Circuit',width:24,horizontalScale:1,magnetic:true,
+  centerline:[[0,0,-220],[0,0,0],[0,0,250],[0,0,500],[120,0,650],[300,0,500],[300,0,250],[300,0,0],[300,0,-220],[150,0,-370]],
+  objects:[],gaps:[],
+};

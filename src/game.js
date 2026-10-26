@@ -15,6 +15,8 @@ import { collectBoostPad, createCollisionState, resolveRacerCollisions, resolveW
 import { updateCatchUp } from './catch-up.js';
 import { ThrusterSystem } from './thrusters.js';
 import { createTrackCamera } from './track-camera.js';
+import { getRacerWidth, nextBranch, canFinishRace } from './track-path.js';
+import { createCombat, createCombatView, WEAPONS, COMBAT } from './combat.js';
 
 
 const canvas = document.querySelector('#game-canvas');
@@ -196,13 +198,17 @@ function setupMinimap() {
     const frame = getTrackFrame(curve, index / samples);
     return { x: frame.center.x, z: frame.center.z };
   });
-  const minX = Math.min(...points.map(({ x }) => x));
-  const maxX = Math.max(...points.map(({ x }) => x));
-  const minZ = Math.min(...points.map(({ z }) => z));
-  const maxZ = Math.max(...points.map(({ z }) => z));
+  const branchPoints=(curve.track.branches??[]).map(b=>Array.from({length:80},(_,i)=>{const p=b.path.getPointAt(i/79);return {x:p.x,z:p.z};}));
+  const allPoints=points.concat(...branchPoints);
+  const minX = Math.min(...allPoints.map(({ x }) => x));
+  const maxX = Math.max(...allPoints.map(({ x }) => x));
+  const minZ = Math.min(...allPoints.map(({ z }) => z));
+  const maxZ = Math.max(...allPoints.map(({ z }) => z));
   const scale = Math.min(84 / Math.max(maxX - minX, 1), 84 / Math.max(maxZ - minZ, 1));
   const toMapPoint = ({ x, z }) => `${50 + (x - (minX + maxX) / 2) * scale},${50 + (z - (minZ + maxZ) / 2) * scale}`;
   minimapRoute.setAttribute('points', points.map(toMapPoint).join(' '));
+  document.querySelectorAll('.minimap-branch').forEach(node=>node.remove());
+  branchPoints.forEach((points,i)=>{const line=document.createElementNS('http://www.w3.org/2000/svg','polyline');line.classList.add('minimap-branch');line.dataset.routeId=curve.track.branches[i].id;line.setAttribute('points',points.map(toMapPoint).join(' '));minimapRoute.after(line);});
   minimapStart.setAttribute('cx', 50 + (points[0].x - (minX + maxX) / 2) * scale);
   minimapStart.setAttribute('cy', 50 + (points[0].z - (minZ + maxZ) / 2) * scale);
   minimapPlayer.dataset.mapBounds = JSON.stringify({ minX, maxX, minZ, maxZ, scale });
@@ -493,6 +499,53 @@ const brakeButton = document.querySelector('#btn-brake');
 const shipPhysics = createShipPhysics((baseSpeed+SPEEDCALIBRATION)*1.5);
 const collisionState = createCollisionState();
 const playerRacer = { id: 'player', physics: shipPhysics, group: craft };
+const combat = createCombat(), combatView = createCombatView(scene);
+let firing = false, touchFiring = false;
+const combatRay = new THREE.Raycaster(), combatSightCache = new Map();
+const combatHud = document.querySelector('#combat-hud');
+const targetReticle = document.querySelector('#target-reticle');
+function combatRacers() {
+  return [{...playerRacer,player:true,finished:race.state==='finished'},...opponents.map(o=>({id:o.name,physics:o.physics,group:o.group,finished:o.finishTime!==null}))];
+}
+function combatBlocked(from,to) {
+  const key=from.toArray().concat(to.toArray()).map(n=>n.toFixed(2)).join(',');
+  if(combatSightCache.has(key))return combatSightCache.get(key);
+  const delta=to.clone().sub(from),distance=delta.length();if(distance<0.3)return false;
+  combatRay.set(from,delta.divideScalar(distance));combatRay.near=0.15;combatRay.far=distance;
+  const objects=scene.getObjectByName('customTrackObjects');
+  const blocked=combatRay.intersectObjects(objects?[track,objects]:[track],true).some(hit=>hit.object.visible && (hit.object.material?.opacity??1)>0.3);
+  combatSightCache.set(key,blocked);return blocked;
+}
+function updateCombatHud() {
+  combatHud.hidden=!combat.enabled || !['racing','countdown'].includes(race.state);
+  targetReticle.hidden=true;
+  const state=combat.states.get('player');if(!state)return;
+  const weapon=WEAPONS[state.weapon];
+  document.querySelector('#weapon-status').textContent=`${weapon.name} · ${state.reload[state.weapon]>0?`RELOAD ${state.reload[state.weapon].toFixed(1)}s`:`${state.ammo[state.weapon]} / ${weapon.clip}`}`;
+  document.querySelector('#lock-status').textContent=state.incoming?'INCOMING MISSILE!':state.targeted?'ENEMY LOCK!':state.weapon==='homing'?(state.lockTarget?`${state.lockTime>=COMBAT.lockSeconds?'LOCKED':'LOCKING'} · ${Math.round(state.lockTime/COMBAT.lockSeconds*100)}%`:'KEEP TARGET IN FRONT'):'SPACE / FIRE';
+  combatHud.classList.toggle('incoming',state.incoming||state.targeted);
+  const target=opponents.find(o=>o.name===state.lockTarget);
+  if(!combatHud.hidden && target){
+    const position=target.group.position.clone().project(camera);
+    if(position.z>-1 && position.z<1 && Math.abs(position.x)<1 && Math.abs(position.y)<1){
+      targetReticle.hidden=false;targetReticle.style.left=`${(position.x+1)*50}%`;targetReticle.style.top=`${(1-position.y)*50}%`;
+      targetReticle.classList.toggle('locked',state.lockTime>=COMBAT.lockSeconds);
+    }
+  }
+  document.querySelectorAll('[data-weapon]').forEach(button=>button.classList.toggle('active',button.dataset.weapon===state.weapon));
+}
+document.querySelectorAll('[data-weapon]').forEach(button=>button.addEventListener('click',()=>combat.select('player',button.dataset.weapon)));
+const fireButton=document.querySelector('#fire-button');
+fireButton.addEventListener('pointerdown',event=>{event.preventDefault();event.stopPropagation();fireButton.setPointerCapture(event.pointerId);touchFiring=true;});
+for(const type of ['pointerup','pointercancel','lostpointercapture'])fireButton.addEventListener(type,()=>{touchFiring=false;});
+combatHud.addEventListener('pointerdown',event=>event.stopPropagation());
+window.addEventListener('keydown',event=>{
+  if(event.target.matches('input,select,textarea')||race.state!=='racing'||!combat.enabled)return;
+  if(event.code==='Space'){event.preventDefault();firing=true;}
+  if(['Digit1','Digit2','Digit3'].includes(event.code))combat.select('player',['rocket','homing','minigun'][Number(event.code.at(-1))-1]);
+});
+window.addEventListener('keyup',event=>{if(event.code==='Space')firing=false;});
+window.addEventListener('blur',()=>{firing=touchFiring=false;});
 const race = {
   lastImpactSerial: 0, finishElapsed: 0,
   topSpeed: 0,
@@ -678,6 +731,9 @@ Object.assign(shipPhysics, createShipPhysics(baseSpeed+SPEEDCALIBRATION));
   race.keyboardThrottle = 0;
   race.playerFinishTime = null;
   resetOpponents(opponents);
+  firing=touchFiring=false;
+  combat.reset(document.querySelector('#combat-enabled').checked,combatRacers());
+  combatView.update(combat);updateCombatHud();
   collisionState.cooldowns.clear();
   race.lastImpactSerial = 0;
   race.finishElapsed = 0;
@@ -722,6 +778,7 @@ Object.assign(shipPhysics, createShipPhysics(baseSpeed+SPEEDCALIBRATION));
 }
 
 function finishRace() {
+  firing=touchFiring=false;combat.projectiles.length=0;
   // VIKTIGT: Ta bort raceAudio.stop() så musiken spelar under ärovarvet!
   
   race.state = 'finished';
@@ -1129,7 +1186,7 @@ if (countVal !== prevCount) {
     lapDisplay.textContent = `${String(currentLap).padStart(2, '0')} / ${String(totalLaps).padStart(2, '0')}${currentLap === totalLaps && lapProgress >= 0.72 ? ' · FINAL' : ''}`;
     //crossedFinish = race.distance >= curve.getLength() * totalLaps;
     raceAudio.updateEngine(race.currentSpeed, shipPhysics.boostTimer > 0, true);
-    crossedFinish = !shipPhysics.flight && race.distance >= curve.getLength() * totalLaps;
+    crossedFinish = canFinishRace(curve, shipPhysics, totalLaps);
 
   } else if (race.state === 'finished') {
     race.finishElapsed += delta;
@@ -1201,9 +1258,9 @@ for (const ghost of ghostPool) {
       finished: opponent.finishTime !== null,
     }))];
     resolveRacerCollisions(racers, curve, delta, collisionState);
-    for (const racer of racers) if (!racer.finished) resolveWallImpact(racer.physics, trackWidth);
+    for (const racer of racers) if (!racer.finished) resolveWallImpact(racer.physics, getRacerWidth(curve,racer.physics,trackWidth));
     updateCraftPose(0);
-    crossedFinish ||= !shipPhysics.flight && race.distance >= curve.getLength() * totalLaps;
+    crossedFinish ||= canFinishRace(curve, shipPhysics, totalLaps);
     for (const opponent of opponents) syncOpponentPose(opponent, curve, trackWidth);
 
     // --- CHECKPOINT LOGIK (Motståndare) ---
@@ -1272,6 +1329,16 @@ for (const ghost of ghostPool) {
     });
   }
   if (crossedFinish) finishRace();
+  combatSightCache.clear();
+  combat.step(delta,combatRacers(),curve,{active:race.state==='racing',fire:firing||touchFiring,blocked:combatBlocked});
+  for(const event of combat.events){
+    const owner=event.owner==='player'?craft:opponents.find(o=>o.name===event.owner)?.group;
+    if(owner && owner.position.distanceTo(craft.position)<180)raceAudio.playWeapon(event.weapon,event.owner==='player'?1:0.22);
+  }
+  if(combat.enabled && race.state==='racing') {
+    updateCraftPose(0);for(const opponent of opponents)syncOpponentPose(opponent,curve,trackWidth);
+  }
+  combatView.update(combat);
   positionDisplay.textContent = `${getPlayerPosition(opponents, race.distance, race.playerFinishTime)} / ${opponents.length + 1}`;
 
   if (shipPhysics.impactSerial !== race.lastImpactSerial) {
@@ -1309,6 +1376,10 @@ segments.forEach((seg, index) => {
   document.querySelector('#gyro-meter-needle').style.left = `${50 + THREE.MathUtils.clamp(race.steering, -1, 1) * 46}%`;
   const playerProgress = ((race.distance / curve.getLength()) % 1) * 100;
   document.querySelector('#minimap-progress').textContent = playerProgress < 1 ? 'START' : `${Math.floor(playerProgress)}%`;
+  const junction=nextBranch(curve,shipPhysics.distance), routeHint=document.querySelector('#route-hint');
+  routeHint.textContent=shipPhysics.route ? `ROUTE · ${curve.track.branches.find(b=>b.id===shipPhysics.route.id)?.name ?? ''}` :
+    junction && junction.distance-shipPhysics.distance < 180 ? `${junction.branch.side===1?'← LEFT':'RIGHT →'} · ${junction.branch.name} · ${Math.ceil(junction.distance-shipPhysics.distance)} M` : '';
+  document.querySelectorAll('.minimap-branch').forEach(node=>node.classList.toggle('active',node.dataset.routeId===shipPhysics.route?.id));
 const tripMeter = document.querySelector('#race-trip');
 if (tripMeter) {
   const meters = Math.floor(race.distance * 3.25); // Skala till meter
@@ -1333,6 +1404,7 @@ if (thrustFill) {
 
   // Kör det nya integrerade kamerapasset
   cameraSystem.update(craft.position, craft.quaternion, shipPhysics.velocity, delta, trackFrame);
+  updateCombatHud();
   
   panoramaBackdrop.position.copy(camera.position);
 

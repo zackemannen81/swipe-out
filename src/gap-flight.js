@@ -6,6 +6,7 @@ export const FLIGHT = { gravity: 24, airSteering: 9, maxSeconds: 5, recoverySeco
 const HOVER = 0.62;
 
 export function launchAcrossGap(ship, curve, gap) {
+  ship.pendingFlightFrom = ship.distance;
   const frame = getTrackFrame(curve, ship.distance / curve.getLength());
   const position = frame.center.clone().addScaledVector(frame.right, ship.lateralOffset).addScaledVector(frame.normal, HOVER + ship.verticalOffset);
   const velocity = frame.tangent.clone().multiplyScalar(ship.speed)
@@ -34,8 +35,17 @@ export function recoverBeforeGap(ship, curve, baseSpeed) {
   let safeDistance = Math.max(0, ship.flight.gap.start - FLIGHT.recoveryRunup);
   const earlierGap = gapAt(curve, safeDistance);
   if (earlierGap) safeDistance = earlierGap.end + Math.min(5, (ship.flight.gap.start - earlierGap.end) / 2);
+  // A completed fork may lie inside the nominal run-up. Recover on the shared
+  // road after its merge, never silently switch a racer to its unchosen route.
+  const length=curve.getLength(),lap=Math.floor(safeDistance/length);
+  for(const branch of curve.track?.branches??[]) {
+    const start=(lap+branch.start)*length,end=(lap+branch.end)*length;
+    if(safeDistance>=start && safeDistance<end) safeDistance=end+Math.min(5,(ship.flight.gap.start-end)/2);
+  }
+  ship.route=null;
   ship.distance = safeDistance;
   ship.flight = null;
+  ship.pendingFlightFrom = null;
   ship.airborne = false;
   ship.lateralOffset = ship.lateralVelocity = ship.verticalOffset = ship.verticalVelocity = 0;
   ship.yaw = ship.yawVelocity = ship.roll = ship.pitch = 0;

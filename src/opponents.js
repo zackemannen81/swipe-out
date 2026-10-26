@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { getTrackFrame, nextGap } from './track-path.js';
+import { getRacerFrame, getRacerWidth, nextBranch, canFinishRace, nextGap } from './track-path.js';
 import { createCraft } from './craft.js';
 import { createShipPhysics, stepShipPhysics } from './ship-physics.js';
 import { collectBoostPad } from './race-interactions.js';
@@ -66,8 +66,9 @@ function decide(opponent, opponents, player, curve, pads, trackWidth, elapsed) {
   const length = curve.getLength();
   const ship = opponent.physics;
   const lookDistance = Math.max(18, ship.speed * (0.4 + opponent.reaction));
-  const here = getTrackFrame(curve, ship.distance / length);
-  const ahead = getTrackFrame(curve, (ship.distance + lookDistance) / length);
+  trackWidth = getRacerWidth(curve, ship, trackWidth);
+  const here = getRacerFrame(curve, ship);
+  const ahead = getRacerFrame(curve, ship, (ship.distance + lookDistance) / length);
   const turn = here.tangent.dot(ahead.right);
   const edge = Math.max(0.4, trackWidth / 2 - 1.2);
   const cornerSlowdown = Math.abs(turn) * (0.7 - opponent.cornering * 0.3);
@@ -79,6 +80,7 @@ function decide(opponent, opponents, player, curve, pads, trackWidth, elapsed) {
   let nextPad = null;
   let nearestPad = Infinity;
   for (const pad of pads) {
+    if ((pad.routeId ?? null) !== (ship.route?.id ?? null)) continue;
     const aheadDistance = (pad.d - ship.distance % length + length) % length;
     if (aheadDistance < nearestPad && aheadDistance < Math.max(45, ship.speed * 1.15)) {
       nearestPad = aheadDistance;
@@ -95,6 +97,7 @@ function decide(opponent, opponents, player, curve, pads, trackWidth, elapsed) {
   let nearest = 24;
   for (const other of [...opponents, ...(player ? [player] : [])]) {
     if (other === opponent || other.finishTime != null) continue;
+    if ((other.physics.route?.id ?? null) !== (ship.route?.id ?? null)) continue;
     const gap = ((other.physics.distance - ship.distance + length * 1.5) % length) - length * 0.5;
     if (gap > 0 && gap < nearest && Math.abs(other.physics.lateralOffset - ship.lateralOffset) < 2.4) {
       blocker = other;
@@ -111,6 +114,13 @@ function decide(opponent, opponents, player, curve, pads, trackWidth, elapsed) {
   }
   // Smooth driver error and finite reaction time can produce imperfect lines and wall scrapes.
   opponent.targetLane += Math.sin(elapsed * 1.7 + opponent.phase) * opponent.precision;
+  const junction = nextBranch(curve, ship.distance);
+  if (junction && junction.distance - ship.distance < Math.max(220, ship.speed * 2.2)) {
+    const takeBranch = (Math.floor(opponent.phase) + junction.lap) % 2 === 0;
+    opponent.targetLane = junction.branch.side * curve.track.width * (takeBranch ? 0.3 : -0.2);
+    opponent.strategy = takeBranch ? 'shortcut-entry' : 'main-route';
+  }
+  if (ship.route) opponent.targetLane = clamp(opponent.targetLane, -edge * 0.65, edge * 0.65);
   const gap = ship.flight?.gap ?? nextGap(curve, ship.distance);
   if (gap && (ship.flight || gap.start - ship.distance < Math.max(110, ship.speed * 1.1))) {
     opponent.targetLane = 0;
@@ -123,7 +133,7 @@ function decide(opponent, opponents, player, curve, pads, trackWidth, elapsed) {
 
 function drive(opponent, curve, dt) {
   const ship = opponent.physics;
-  const frame = getTrackFrame(curve, ship.distance / curve.getLength());
+  const frame = getRacerFrame(curve, ship);
   const turn = ship.previousTangent ? ship.previousTangent.dot(frame.right) : 0;
   const centrifugal = turn / dt * ship.speed * 0.75 * 0.1;
   const desiredLateral = clamp((opponent.targetLane - ship.lateralOffset) * 1.9, -4.5, 4.5);
@@ -174,7 +184,7 @@ export function updateOpponents(opponents, curve, delta, elapsed, racing, {
       drive(opponent, curve, dt);
       stepShipPhysics(ship, opponent.input, dt, curve, opponent.topSpeed, trackWidth);
       collectBoostPad(ship, boostPads, length, opponent.topSpeed);
-      if (!ship.flight && ship.distance >= totalDistance) {
+      if (canFinishRace(curve, ship, TOTAL_LAPS)) {
         opponent.finishTime = now - (ship.distance - totalDistance) / Math.max(1, ship.speed);
         ship.distance = totalDistance;
         ship.boostTimer = 0;

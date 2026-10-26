@@ -1,5 +1,19 @@
 # File Structure
 
+## 2026-10-26 — TRACK-003 routes, combat and cloning
+
+- `docs/archive/TRACK-002.md` — completed gaps/magnetic-track task
+- `docs/CURRENT_TASK.md` — TRACK-003 scope and verification
+- `src/branch-geometry.js` — branch deck, amber edges/rails, junction beacons and route-owned pads
+- `src/combat.js` — shared weapon simulation, aim/locks, ammo, hits and instanced presentation
+- `tests/routes-combat.test.js` — topology, physical/canonical progress, gates, CPU routes and combat regressions
+- `tools/verify-routes-combat.mjs` — browser cloning, route authoring/traversal and weapon controls/lifecycle
+
+`track-path.js` now owns branch runtime frames and progress mapping; v3 format,
+editor/view, physics, race interactions, AI, minimap and game integrate it.
+`track-labs.js` adds Split Decision (track13) and Crossfire Circuit (track14).
+`audio.js` adds bounded-duration synthesized firing sounds.
+
 ## 2026-10-26 — TRACK-002 gaps and magnetic track
 
 - `docs/CURRENT_TASK.md` — active TRACK-002 acceptance and verification

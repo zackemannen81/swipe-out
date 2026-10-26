@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { NEON_CAUSEWAY } from './track-data.js';
 import { createTrackCurve, getTrackFrame, hasSurface } from './track-path.js';
+import { addBranchGeometry } from './branch-geometry.js';
 export { getTrackFrame } from './track-path.js';
 
 function addInstances(group, geometry, material, transforms) {
@@ -17,6 +18,7 @@ function addInstances(group, geometry, material, transforms) {
 
 export function createTrack(definition = NEON_CAUSEWAY) {
   const curve = createTrackCurve(definition);
+  const junctionClear = d => !curve.track.branches.some(b => [b.start,b.end].some(u => Math.abs(d-u*curve.getLength()) < 35));
   const group = new THREE.Group();
   const roadMaterial = new THREE.MeshStandardMaterial({
     color: curve.track.magnetic ? 0x24374b : 0x182234, metalness: 0.0, roughness: 0.48,
@@ -95,6 +97,7 @@ export function createTrack(definition = NEON_CAUSEWAY) {
   const railGeometry = new THREE.CylinderGeometry(0.07, 0.07, 8.5, 8);
   const railTransforms = [];
   for (let distance = 4.25; distance < curve.getLength(); distance += 34) {
+    if (!junctionClear(distance)) continue;
     if (!hasSurface(curve, distance, 5)) continue;
     const frame = getTrackFrame(curve, distance / curve.getLength());
     for (const side of [-1, 1]) {
@@ -113,6 +116,7 @@ export function createTrack(definition = NEON_CAUSEWAY) {
   const pinkRailTransforms = [];
   const cyanRailTransforms = [];
   for (let distance = 4.25; distance < curve.getLength(); distance += 8.5) {
+    if (!junctionClear(distance)) continue;
     if (!hasSurface(curve, distance, 5)) continue;
     const frame = getTrackFrame(curve, distance / curve.getLength());
     for (const side of [-1, 1]) {
@@ -208,6 +212,7 @@ export function createTrack(definition = NEON_CAUSEWAY) {
   const pinkBeaconTransforms = [];
   const cyanBeaconTransforms = [];
   for (let distance = 5.5; distance < curve.getLength(); distance += 11) {
+    if (!junctionClear(distance)) continue;
     if (!hasSurface(curve, distance, 1)) continue;
     const frame = getTrackFrame(curve, distance / curve.getLength());
     for (const side of [-1, 1]) {
@@ -274,6 +279,7 @@ export function createTrack(definition = NEON_CAUSEWAY) {
 
 
   
+  addBranchGeometry(group, curve, boostPadPlacements);
 return { group, curve, length: curve.getLength(), boostPads: boostPadPlacements };
 }
 

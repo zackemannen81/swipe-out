@@ -15,7 +15,128 @@ export function createTrackCurve(definition) {
     width: definition.width,
   };
   if (curve.track.magnetic) buildFrames(curve);
+  curve.track.branches = (definition.branches ?? []).map(branch => buildBranch(curve, branch, scale));
   return curve;
+}
+
+function buildBranch(base, definition, scale) {
+  const startFrame = getTrackFrame(base, definition.start), endFrame = getTrackFrame(base, definition.end);
+  const handle = Math.min(25, startFrame.center.distanceTo(endFrame.center) * 0.12);
+  const points = [startFrame.center.clone(), startFrame.center.clone().addScaledVector(startFrame.tangent, handle),
+    ...definition.points.map(([x,y,z]) => new THREE.Vector3(x * scale,y,z * scale)),
+    endFrame.center.clone().addScaledVector(endFrame.tangent, -handle), endFrame.center.clone()];
+  const path = new THREE.CatmullRomCurve3(points, false, 'centripetal');
+  path.arcLengthDivisions = 1200;
+  const frames = [], tangents = [], rights = [];
+  for (let i = 0; i <= 512; i++) {
+    const t = path.getTangentAt(i / 512).normalize(); tangents.push(t);
+    const r = i ? rights[i - 1].clone().applyQuaternion(new THREE.Quaternion().setFromUnitVectors(tangents[i - 1], t)) : startFrame.right.clone();
+    rights.push(r.addScaledVector(t, -r.dot(t)).normalize());
+  }
+  const endRight = endFrame.right.clone();
+  const correction = Math.atan2(rights.at(-1).clone().cross(endRight).dot(tangents.at(-1)), rights.at(-1).dot(endRight));
+  rights.forEach((r, i) => {
+    r.applyAxisAngle(tangents[i], correction * i / 512);
+    frames.push(new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().makeBasis(r, tangents[i].clone().cross(r), tangents[i])));
+  });
+  const branch = { ...definition, path, length: path.getLength(), span: (definition.end - definition.start) * base.getLength() };
+  branch.frame = u => {
+    u = THREE.MathUtils.clamp(u, 0, 1);
+    if (u <= 1e-8) return getTrackFrame(base, definition.start);
+    if (u >= 1 - 1e-8) return getTrackFrame(base, definition.end);
+    const at = u * 512, i = Math.min(511, Math.floor(at));
+    const q = frames[i].clone().slerp(frames[i + 1], at - i);
+    const tangent = path.getTangentAt(u).normalize();
+    const right = new THREE.Vector3(1,0,0).applyQuaternion(q);
+    right.addScaledVector(tangent, -right.dot(tangent)).normalize();
+    const normal = tangent.clone().cross(right).normalize();
+    return { center: path.getPointAt(u), tangent, right, normal,
+      rotation: new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().makeBasis(right,normal,tangent)) };
+  };
+  branch.widthAt = u => THREE.MathUtils.lerp(base.track.width, branch.width, Math.min(1, Math.max(0, Math.min(u, 1-u) / 0.1)));
+  return branch;
+}
+
+export function activeBranch(curve, ship, distance = ship.distance) {
+  if (!ship.route) return null;
+  const branch = curve.track?.branches?.find(b => b.id === ship.route.id);
+  const u = distance / curve.getLength() - ship.route.lap;
+  return branch && u >= branch.start - 1e-8 && u <= branch.end + 1e-8 ? branch : null;
+}
+
+export function getRacerFrame(curve, ship, progress = ship.distance / curve.getLength()) {
+  const branch = activeBranch(curve, ship, progress * curve.getLength());
+  return branch ? branch.frame((progress - ship.route.lap - branch.start) / (branch.end - branch.start)) : getTrackFrame(curve, progress);
+}
+
+export function getRacerWidth(curve, ship, fallback = curve.track?.width ?? 10) {
+  const branch = activeBranch(curve, ship);
+  return branch ? branch.widthAt((ship.distance / curve.getLength() - ship.route.lap - branch.start) / (branch.end - branch.start)) : fallback;
+}
+
+export function routeMetric(curve, ship) {
+  const branch = activeBranch(curve, ship);
+  return branch ? branch.span / branch.length : 1;
+}
+
+export function nextBranch(curve, distance) {
+  const length = curve.getLength(), lap = Math.floor(distance / length);
+  for (const branch of curve.track?.branches ?? []) {
+    if ((lap + branch.start) * length >= distance - 1e-7) return { branch, lap, distance: (lap + branch.start) * length };
+  }
+  return null;
+}
+
+// Distance remains a common course coordinate. Speed remains real world units/s.
+// Consume physical distance on each section, including exact fork/merge boundaries.
+export function advanceRouteDistance(curve, ship, travel) {
+  const length = curve.getLength();
+  for (let guard = 0; travel > 1e-8 && guard < 16; guard++) {
+    const branch = activeBranch(curve, ship);
+    if (branch) {
+      const end = (ship.route.lap + branch.end) * length;
+      const remaining = Math.max(0, end - ship.distance) / (branch.span / branch.length);
+      const used = Math.min(travel, remaining);
+      ship.distance += used * branch.span / branch.length; travel -= used;
+      if (remaining <= used + 1e-7) { ship.distance = end; ship.route = null; ship.routeMerges++; }
+      continue;
+    }
+    const junction = nextBranch(curve, ship.distance);
+    if (!junction || junction.distance > ship.distance + travel) { ship.distance += travel; break; }
+    const used = Math.max(0, junction.distance - ship.distance);
+    ship.distance = junction.distance; travel -= used;
+    const { branch: b, lap } = junction;
+    if (ship.routeDecision !== `${lap}:${b.id}`) {
+      ship.routeDecision = `${lap}:${b.id}`;
+      if (!ship.flight && ship.lateralOffset * b.side > curve.track.width * 0.12) {
+        ship.route = { id: b.id, lap }; ship.routeEntries++;
+        continue;
+      }
+    }
+    // Step over a declined fork without re-evaluating it later in the same lap.
+    const epsilon = Math.min(travel, 1e-5); ship.distance += epsilon; travel -= epsilon;
+    if (!epsilon) break;
+  }
+}
+
+// Ordered shared gates prevent a jump/teleport over a mandatory sector from
+// earning a lap. Branches use the same gates regardless of their physical length.
+export function recordRaceProgress(curve, ship, from) {
+  if (!curve.track?.branches?.length || ship.flight || ship.recoveryTimer > 0) return;
+  const gates = [...new Set([0.33, 0.66, ...curve.track.branches.map(b => b.end), 1])].sort((a,b) => a-b);
+  const length = curve.getLength();
+  while (true) {
+    const lap = Math.floor(ship.gatesPassed / gates.length), i = ship.gatesPassed % gates.length;
+    const next = (lap + gates[i]) * length;
+    if (from > next + 1e-6 || ship.distance < next) break;
+    ship.gatesPassed++;
+    if (i === gates.length - 1) ship.completedLaps++;
+  }
+}
+
+export function canFinishRace(curve, ship, laps = 3) {
+  return !ship.flight && ship.distance >= curve.getLength() * laps &&
+    (!curve.track?.branches?.length || ship.completedLaps >= laps);
 }
 
 function buildFrames(curve) {

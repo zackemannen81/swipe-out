@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { getTrackFrame } from './track-path.js';
+import { getRacerFrame, routeMetric, activeBranch, recordRaceProgress } from './track-path.js';
 import { getRacerTopSpeed } from './catch-up.js';
 
 export const BOOST = { duration: 1, entryMultiplier: 1.3, maxMultiplier: 1.5, halfWidth: 1.2 };
@@ -44,6 +44,7 @@ export function collectBoostPad(ship, pads, trackLength, topSpeed) {
   for (let lap = Math.floor(start / trackLength); lap <= Math.floor(end / trackLength); lap++) {
     for (let i = 0; i < pads.length; i++) {
       const pad = pads[i];
+      if ((pad.routeId ?? null) !== (ship.route?.id ?? null)) continue;
       const entry = lap * trackLength + pad.d - 5;
       const exit = lap * trackLength + pad.d + 1;
       if (end < entry || start > exit) continue;
@@ -64,9 +65,12 @@ export function collectBoostPad(ship, pads, trackLength, topSpeed) {
 }
 
 // Track-relative state is authoritative: impulses and separation survive the next pose update.
-function moveBy(ship, frame, correction) {
+function moveBy(ship, frame, correction, curve) {
   if (ship.flight) { ship.flight.position.add(correction); return; }
-  ship.distance = Math.max(0, ship.distance + correction.dot(frame.tangent));
+  const from=ship.distance,branch=activeBranch(curve,ship);
+  ship.distance = Math.max(0, ship.distance + correction.dot(frame.tangent) * routeMetric(curve,ship));
+  if(branch)ship.distance=clamp(ship.distance,(ship.route.lap+branch.start)*curve.getLength()+1e-7,(ship.route.lap+branch.end)*curve.getLength()-1e-7);
+  recordRaceProgress(curve,ship,from);
   ship.lateralOffset += correction.dot(frame.right);
 }
 
@@ -94,8 +98,8 @@ export function resolveRacerCollisions(racers, curve, delta, state) {
     const sa = a.physics;
     const sb = b.physics;
     if (sa.recoveryTimer > 0 || sb.recoveryTimer > 0) continue;
-    const frameA = getTrackFrame(curve, sa.distance / length);
-    const frameB = getTrackFrame(curve, sb.distance / length);
+    const frameA = getRacerFrame(curve, sa);
+    const frameB = getRacerFrame(curve, sb);
     const separation = a.group.position.clone().sub(b.group.position);
     const radius = 2.2;
     let normal = separation.clone();
@@ -122,8 +126,8 @@ export function resolveRacerCollisions(racers, curve, delta, state) {
     // Also rewind a swept crossing to the contact side, avoiding pass-through.
     const penetration = swept ? radius - separation.dot(normal) : radius - separation.length();
     const correction = normal.clone().multiplyScalar(Math.max(0, penetration) + 0.005);
-    moveBy(sa, frameA, correction.clone().multiplyScalar(invA / inverseMass));
-    moveBy(sb, frameB, correction.clone().multiplyScalar(-invB / inverseMass));
+    moveBy(sa, frameA, correction.clone().multiplyScalar(invA / inverseMass), curve);
+    moveBy(sb, frameB, correction.clone().multiplyScalar(-invB / inverseMass), curve);
     a.group.position.addScaledVector(correction, invA / inverseMass);
     b.group.position.addScaledVector(correction, -invB / inverseMass);
     const closingSpeed = sa.velocity.clone().sub(sb.velocity).dot(normal);

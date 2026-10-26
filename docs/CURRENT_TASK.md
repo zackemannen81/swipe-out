@@ -1,51 +1,53 @@
 # Current Task
 
-Task ID: TRACK-002
+Task ID: TRACK-003
 Status: Complete
 Created: 2026-10-26
 
 ## Scope
 
-Deliver approved roadmap stages 3 and 4: real road gaps with world-space flight,
-landing and safe recovery, plus magnetic banked/twisted/looped track with shared
-stable orientation. Extend the editor and versioned format, add separate playable
-test circuits, and preserve original tracks/handling. Player and CPU use the same
-surface/flight rules. Branches and weapons remain later stages.
+Deliver approved stages 5 and 6 (alternative routes and optional combat) plus
+scenery-object cloning requested by the user after their positive gap/loop test.
 
 ## Definition of done
 
-- [x] Version 2 adds validated gap intervals and magnetic/bank authoring; legacy
-      and v1 imports retain their original geometry/behavior.
-- [x] Shared continuous frames drive geometry, physics, AI, pads and race camera.
-      No singularity or sudden flips at vertical/inverted track or closed seams.
-- [x] Gaps remove road, rails, markers and pads; craft launch with world momentum,
-      limited air control, swept landing and safe pre-gap recovery on a miss.
-- [x] Magnetic road holds player and CPU through bank, inversion, barrel roll and
-      a vertical loop; flight detaches only at missing road, not loop crests.
-- [x] Editor supports gap placement and bank/roll settings with undo/export/test.
-- [x] Separate clearly named test tracks available in game and editor.
-- [x] Tests cover low/high speed, lane misses, landing/respawn, interactions,
-      pause/reset and 30/60/120 Hz; CPU field can complete both test tracks.
-- [x] Build, browser rendering/control/race integration and continuity docs checked.
+- [x] Clone scenery with independent data, new ID, visible offset, all properties,
+      undo/redo, save and export.
+- [x] Version 3 validates branches and migrates v1/v2/legacy files.
+- [x] Continuous route splits/merges; actual route length controls travel time,
+      shared progress/checkpoints control rank, laps, finish and catch-up.
+- [x] Player approach-lane choice and CPU use of both routes; geometry, pads,
+      walls, collisions, minimap, camera and reset respect route selection.
+- [x] Editor creates/removes branches and edits connections, width and 3D points.
+- [x] Optional combat defaults off; shared player/CPU ammunition, cooldowns,
+      swept projectile hits, knockback, speed loss and brief hit protection.
+- [x] Rockets, lock-on missiles with sight/lock/warning, and a bounded minigun
+      trial; keyboard/touch controls; pause/retry/finish lifecycle.
+- [x] Separate playable route/combat test circuits, readable HUD and effects.
+- [x] Node/browser verification, production build and continuity docs complete.
 
 ## Verification
 
-35 Node tests pass, including nine new feature regressions. All four CPUs finish
-three laps on both test tracks with actual pads/collisions. Flight/landing and
-magnetic traversal agree at 30/60/120 Hz; 8,192 frame samples check continuity.
+44 Node tests pass, including nine new route/combat regressions. All four CPUs
+finish three validated laps using both paths with contacts and boost pads. Tests
+check real route-time savings at 30/60/120 Hz, equal-progress catch-up, ordered
+gates, route pads, safe recovery after merges, swept weapon hits, dodges/occlusion,
+homing lock/warnings, ammo/reload/cooldowns, protection and lifecycle/air impulses.
 
-Chromium WebGL: gap/bank/side-view editing, undo and v2 export/import; player and
-all CPUs complete the jump; pause freezes flight; a controlled low-speed miss
-recovers before the ramp; reload clears flight state. Actual loop traversal and
-an inverted roll pose render with local-up camera. Inspected screenshots, then
-made the magnetic deck opaque/emissive and repeated feature browser verification.
-Existing editor acceptance also passes 3D drag/history, custom save-and-test,
-invalid-file preservation, scoped reset, reload and landscape layout.
-Both scripts report no JS errors or failed requests. Build, syntax and diff checks
-pass; Vite's existing large-chunk advisory remains. Final local-axis impact shake
-integration is syntax/build checked; camera physics remains covered by Node tests.
+Chromium WebGL passes cloning identity/properties/textures/independence,
+undo/redo/save/reload/export, branch editing/creation/removal and v3 import/export.
+A controlled player approach takes and traverses the shortcut, merges, and updates
+the minimap/HUD. Actual keyboard and pointer controls fire rockets, homing missiles
+and minigun; player and CPU hits, lock reticle, paused shots, finish/retry and
+landscape layout pass. The existing editor browser suite also passes. No JS errors
+or failed requests. Inspected screenshots in temporary swipe-out-track003.
 
-Playtest: /?track=track11 (Gap Run), /?track=track12 (Loop & Roll).
-Hold throttle after countdown for the gap. Orange marks takeoff, green landing.
-Editor and JSON preserve authored magnetic/gap/bank data. Human comfort, balancing
-and physical phone performance remain explicitly open in TRACK_ROADMAP.md.
+Production build, syntax and diff checks pass; existing Vite chunk warning.
+Final bounded/instanced branch-fixture and validation changes pass the affected
+16 route/combat/format tests and a fresh build. Accepted speed, CPU and thruster
+tuning is retained. Human balance/fun, sound mix, touch comfort and physical-device
+performance remain explicit playtest items in the roadmap.
+
+Try track13 (Split Decision, approach LEFT for Needle Shortcut) and track14
+(Crossfire Circuit, enable COMBAT MODE before start). Space/FIRE shoots; 1/2/3
+select weapons. Editor CLONE OBJECT / Ctrl/Cmd+D duplicates selected scenery.

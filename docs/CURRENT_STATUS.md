@@ -1,5 +1,62 @@
 # Current Status
 
+## 2026-10-26 — TRACK-003: scenery cloning, alternative routes and optional combat
+
+The user gave positive feedback on gaps/loops and authorized the final two roadmap
+stages plus object cloning. Fourteen built-ins now include TEST · Split Decision
+(track13) and TEST · Crossfire Circuit (track14). The previous twelve remain.
+
+Editor CLONE OBJECT / Ctrl/Cmd+D creates an independent scenery copy with a new ID,
+visible offset, retained texture/transform/animation/material properties and normal
+undo/redo/save/export. Version 3 adds validated sequential split/merge branches;
+v1/v2/plain legacy files still load. The branch inspector authors start/end lap
+percentages, name, side and width. Intermediate points use the 3D gizmo, numeric
+coordinates and insert/delete; endpoints follow the main road automatically.
+
+Racers choose a branch by approach lane, lock it until merge, and use the branch's
+actual world length for travel. Common section distance drives rank, checkpoints
+and catch-up. Ordered shared gates prevent skipped sectors from awarding a finish.
+The approximately 535-unit, seven-wide Needle Shortcut replaces a 687-unit,
+twenty-wide main section. Each CPU uses both routes across the three laps. Route
+pads, local-width walls, world contacts, magnetic camera and minimap/HUD respect
+the choice. Gaps cannot overlap branches; recovery after a recent fork uses the
+shared road after the merge if the nominal run-up would land inside the fork.
+
+COMBAT MODE defaults off and works on any circuit. Rocket/homing/minigun share
+clip/cooldown/reload rules across player and CPU; clips are 6/4/50 and empty-clip
+reloads 5/7/4 seconds. Homing needs 0.9 s of continuous forward visibility within
+280 world units, uses a limited turn rate, and displays target reticle plus lock
+and incoming warnings. Swept projectile/hull tests include target motion. Road
+and scenery obstruct sight/shots. Hits persist in speed/lateral velocity (including
+flight); short hit protection limits repeated stagger. No health or elimination.
+Space/hold FIRE shoots; 1/2/3 and buttons select weapons. Effects use fixed-capacity
+instancing (48 projectiles, 24 bursts), with synthesized firing sounds. Pause
+freezes simulation; finish clears shots and retry resets ammo, locks and impacts.
+
+Verification: all 44 Node tests pass. Nine new tests cover v3 topology/migration,
+frame-continuous endpoints, real route-time savings at 30/60/120 Hz, route pad
+ownership, gate rejection, equal-progress catch-up, safe recovery after merges,
+all four CPUs completing three laps on both paths with contacts/pads, swept hits,
+dodges/occlusion, sustained homing lock, warning, clip/reload/rate limits,
+hit protection, bounded resources and combat pause/finish/reset/airborne impulses.
+Chromium WebGL verifies cloning properties/textures/identity and independence,
+undo/redo/save/reload/export, branch editing/creation/removal/import/export,
+a controlled player fork-to-merge traversal and matching minimap/HUD, actual
+keyboard rocket fire/hit, homing lock/fire/hit, pointer-held minigun, CPU firing
+and player damage, pause, finish/retry and landscape layout. The existing editor
+acceptance suite passes its real mouse gizmo and custom-track save/test flow too.
+Final browser runs report no JS errors or failed requests. Inspected desktop and
+landscape captures in temporary swipe-out-track003. Build/syntax/diff checks pass;
+the existing Vite large-chunk warning remains.
+
+Limits: at most four separate, non-nested branches, without gaps inside branches.
+Branch bank angles are transported from its attachments; explicit per-branch bank
+authoring is not included. Canonical catch-up is still an estimated leader gap,
+not a true timing split. Weapon clips reload automatically; there are no pickups.
+Minigun/effects are playable prototypes. Human weapon/shortcut balance, sound mix,
+touch comfort and physical-device performance remain unverified. The positive
+user feedback does not establish those new checks or a physical mobile test.
+
 ## 2026-10-26 — TRACK-002: gaps, magnetic banks, barrel-rolls and loops
 
 Roadmap stages 3 and 4 are implemented for playtesting. The catalog now has twelve

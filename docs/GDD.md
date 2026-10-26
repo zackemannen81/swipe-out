@@ -304,7 +304,15 @@ TRACK-002 delivers separate Gap Run and Loop & Roll prototypes with shared
 player/CPU flight, pre-gap recovery and magnetic adhesion. The editor authors gap
 intervals and per-point bank angles in version 2 files. Technical verification is
 recorded in CURRENT_STATUS; human comfort, mobile performance and final tuning
-remain playtest gates. Alternative routes and combat remain future stages.
+remain playtest gates.
+
+TRACK-003 adds a first split/merge circuit and optional combat, plus scenery
+cloning in the editor. Shorter routes trade time savings for narrower road;
+canonical section progress and ordered shared gates preserve race accounting.
+Combat is off by default: rockets, a visible-lock homing missile and a minigun
+trial share clip/reload limits and brief impact protection across player and CPU.
+There is no elimination/health system. Gameplay balance, the minigun's long-term
+inclusion and physical-device comfort/performance remain evaluation decisions.
 
 - What mobile runtime and minimum device/browser targets will be supported?
 - Which swipe mapping and orientation feel best in player tests?

@@ -1,10 +1,10 @@
 import { NEON_CAUSEWAY, SYNTHETIC_DREAMS, DIGITAL_HORIZON, MOMMY_IM_SCARED, DARK_SKIES, GEMINI, THE_JOKER, THE_VOID, AGENT_008_STAGE, ION_CATHEDRAL } from './track-data.js';
 import { decodeTrack, normalizeTrack, trackDocument } from './track-format.js';
-import { GAP_LAB, LOOP_LAB } from './track-labs.js';
+import { GAP_LAB, LOOP_LAB, ROUTE_LAB, COMBAT_LAB } from './track-labs.js';
 
 export const STORAGE_KEY = 'swipe-out-track-definitions';
 export const LEGACY_STORAGE_KEY = 'swipe-out-track-definition';
-const definitions = [NEON_CAUSEWAY, SYNTHETIC_DREAMS, DIGITAL_HORIZON, MOMMY_IM_SCARED, DARK_SKIES, GEMINI, THE_JOKER, THE_VOID, AGENT_008_STAGE, ION_CATHEDRAL, GAP_LAB, LOOP_LAB];
+const definitions = [NEON_CAUSEWAY, SYNTHETIC_DREAMS, DIGITAL_HORIZON, MOMMY_IM_SCARED, DARK_SKIES, GEMINI, THE_JOKER, THE_VOID, AGENT_008_STAGE, ION_CATHEDRAL, GAP_LAB, LOOP_LAB, ROUTE_LAB, COMBAT_LAB];
 const audio = ['001', '002', '006', '005', '004', '007', '009', '010', '011', '012'];
 const backgrounds = ['001.jpg', '002.jpg', '003.jpg', '004.jpg', '005.jpg', '006.jpg', '007.jpg', '009.jpg', '010.jpg', '013.png'];
 export const BUILTIN_TRACKS = Object.fromEntries(definitions.map((data, i) => [`track${i + 1}`, {
