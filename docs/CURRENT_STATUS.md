@@ -1,6 +1,51 @@
 # Current Status
 
-Last verified: 2026-10-26 (thruster scope below; older sections retain their historical verification limits)
+Last verified: 2026-10-26 (CPU/interaction and thruster scopes below; older sections retain their historical verification limits)
+
+## 2026-10-26 — CPU driving and persistent race impacts
+
+The later RACE-003 catch-up addition below supersedes the no-distance-assistance
+description in this historical RACE-002 record.
+
+All four CPU craft now use `ship-physics.js` with individual engine force, mass,
+reaction time, cornering and steering precision. Their normal speed caps are
+126/130/136/140 world units/s (Vanta/Kestrel/Orca/Nexus-9), with acceleration
+settings of 24/31/21/27 units/s². The player's existing cap is 133. Normal player
+throttle and steering coefficients are unchanged. CPU steering uses inertia,
+route lookahead, corner braking, nearby traffic/overtaking and physical pad
+targeting. Player-distance speed multipliers were removed. A staggered flying
+start and full state reset replace the old four-craft overlap.
+
+`race-interactions.js` owns shared swept boost-pad detection, wall response and
+mass-weighted ship collisions. Pads require correct lane and near-road height;
+crossing between frames and subsequent laps are handled. CPU boost uses the same
+one-second duration, 1.3x entry speed and 1.5x speed cap as the player, and drives
+the accepted thruster effect. The existing shorter thruster tuning is preserved.
+
+Collisions affect authoritative speed, lateral velocity and track-relative
+position on both hulls, including CPU/CPU pairs. Swept contact prevents fast
+crossings from skipping each other; separated airborne craft do not hit ground
+craft. Pair cooldowns avoid repeated impact notifications. Wall contact uses the
+active track width, pushes inward and loses about 15–45% speed based on severity,
+replacing the former flat 80% player speed loss. Banking, camera shake and sound
+respond to new impact events rather than being retriggered every frame.
+
+CPU finish times update before player placement, HUD/results use five racers,
+and unfinished CPUs continue to the finish during the player's celebration.
+Restart clears engine, motion, pad, impact, decision, checkpoint and finish state.
+
+Verification: 12 Node tests pass (eight racing and four existing thruster tests).
+They cover distinct acceleration/caps, no distance-based speed advantage, pad
+lane/height/sweep/lap rules, walls/width, rear/side/mass/swept/airborne collisions,
+30/60/120 Hz CPU behavior, pause/reset/finish and a complete four-CPU Neon Causeway
+simulation with collisions, boosts and wall recovery. Chromium WebGL checks
+verified real start, driving, boost, collisions, pause/reset and a controlled
+same-frame finish (player second of five); all remaining CPUs finished, then the
+actual retry button cleared their state. Controlled rear impact changed player
+speed 133 to about 52 and CPU speed 35 to about 90, persisting across later frames.
+Browser runs had no console errors or failed requests. Build, syntax and whitespace
+checks pass; Vite's existing large-chunk advisory remains. Difficulty/fun balance
+across all ten tracks and physical-device performance still need playtesting.
 
 ## 2026-10-26 — continuous exhaust for all five craft
 
@@ -58,3 +103,26 @@ The intended product is a fast-paced mobile 3D anti-gravity racer inspired by Wi
 ## Next work
 
 `docs/CURRENT_TASK.md` records completed IMPLEMENT-004, the small deterministic CPU competition prototype. The accepted player drive feel remains closed. Interactive browser/device verification is still the next release-readiness check; audio, pause/resume, content expansion, and broad visual polish remain later work.
+
+## 2026-10-26 — RACE-003: shared mild catch-up
+
+Player and all four CPU craft receive the same smoothed leader-relative top-speed
+allowance from src/catch-up.js. Target bonus is zero at gaps up to 2 seconds and
+reaches 8% at 8 seconds, with smoothstep interpolation and a 1.5-second exponential
+time constant. One pre-movement snapshot supplies all racers. Estimated time gap
+uses accumulated distance / the leader's nominal top speed, so laps count and
+instantaneous braking or boost cannot distort the conversion. Finished distances
+are capped at the finish line; non-racing/finished bonuses decay to zero.
+
+The allowance raises shared physics caps, CPU driving demand and physical pad
+entry/cap speeds. It does not directly assign speed, override braking or erase
+collision loss. CPU traffic speed limits still take priority. Pausing freezes
+values; restart clears them. The user's current CPU caps (129/130/135/136) and
+shorter thruster tuning are preserved. README documents the four tuning settings.
+
+Verification: 19 tests pass, including seven new catch-up regressions. Real
+Chromium WebGL racing showed matching ~6.5% player/CPU bonuses at large gaps,
+zero for the leader, and a decay from ~6.5% to ~4.9% after the player took the lead.
+Pause preserved all values; restart cleared all five. No console errors or failed
+requests. Build, syntax and whitespace checks pass; existing bundle-size warning
+remains. Human balance testing and physical-device performance remain unverified.

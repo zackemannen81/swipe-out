@@ -1,221 +1,186 @@
 import * as THREE from 'three';
 import { getTrackFrame } from './track.js';
-import { loadCraftModel, createCraft } from './craft.js';
+import { createCraft } from './craft.js';
+import { createShipPhysics, stepShipPhysics } from './ship-physics.js';
+import { collectBoostPad } from './race-interactions.js';
+import { getRacerTopSpeed } from './catch-up.js';
+
 const TOTAL_LAPS = 3;
-const COLLISION_RADIUS = 1.65;
-const RACER_MASS = 1;
-const collisionSeparation = new THREE.Vector3();
-const collisionRelativeVelocity = new THREE.Vector3();
+const clamp = THREE.MathUtils.clamp;
 
-const RACER_DEFINITIONS = [
-  {
-    name: 'Vanta', speed: 97.5, lane: -3.35, phase: 0.4,
-    modelUrl: '/models/racer_optimized-team2.glb',
-    hullColor: 0x8b426c, canopyColor: 0x55132d,
-    accentColor: 0xff4b91, secondaryAccentColor: 0xffb24a,
-  },
-  {
-    name: 'Kestrel', speed: 99, lane: 3.35, phase: 2.2,
-    modelUrl: '/models/racer_optimized-team3.glb',
-    hullColor: 0x4c7890, canopyColor: 0x123d55,
-    accentColor: 0x63f4e8, secondaryAccentColor: 0xc2ff61,
-  },
-  {
-    name: 'Orca', speed: 104.5, lane: -1.7, phase: 0.4,
-    modelUrl: '/models/racer_optimized-team4.glb',
-    hullColor: 0x8b426c, canopyColor: 0x55132d,
-    accentColor: 0xff4b91, secondaryAccentColor: 0xffb24a,
-  },
-  {
-    name: 'Nexus-9', speed: 112.5, lane: 1.7, phase: 2.2,
-    modelUrl: '/models/racer_optimized-team5.glb',
-    hullColor: 0x4c7890, canopyColor: 0x123d55,
-    accentColor: 0x63f4e8, secondaryAccentColor: 0xc2ff61,
-  },
+// World units/second and world units/second². Player's normal speed cap is 133.
+export const RACER_DEFINITIONS = [
+  { name: 'Vanta', topSpeed: 129, acceleration: 24, mass: 1.05, reaction: 0.34,
+    cornering: 0.76, precision: 0.3, lane: -2.4, gridDistance: 6, phase: 0.4,
+    modelUrl: '/models/racer_optimized-team2.glb', accentColor: 0xff4b91 },
+  { name: 'Kestrel', topSpeed: 130, acceleration: 31, mass: 0.9, reaction: 0.23,
+    cornering: 0.9, precision: 0.18, lane: 2.4, gridDistance: 6, phase: 2.2,
+    modelUrl: '/models/racer_optimized-team3.glb', accentColor: 0x63f4e8 },
+  { name: 'Orca', topSpeed: 135, acceleration: 21, mass: 1.3, reaction: 0.4,
+    cornering: 0.72, precision: 0.38, lane: -2.4, gridDistance: 12, phase: 4.1,
+    modelUrl: '/models/racer_optimized-team4.glb', accentColor: 0xff4b91 },
+  { name: 'Nexus-9', topSpeed: 136, acceleration: 27, mass: 1.0, reaction: 0.3,
+    cornering: 0.82, precision: 0.28, lane: 2.4, gridDistance: 12, phase: 5.8,
+    modelUrl: '/models/racer_optimized-team5.glb', accentColor: 0x63f4e8 },
 ];
-// Gör createOpponents async
-export async function createOpponents() {
-  
-  // Vänta tills ALLA skepp har laddats in
-  const opponentsData = await Promise.all(RACER_DEFINITIONS.map(async (definition) => {
-    
-    // Await:a vår nya async createCraft
-    const craftObj = await createCraft(definition);
-    
-    return {
-      ...definition,
-      craft: craftObj,          
-      group: craftObj.group,    
-      distance: 0,
-      finishTime: null,
-      currentSpeed: definition.speed,
-      baseSpeed: definition.speed,
-      targetLane: definition.lane,
-      currentLane: definition.lane,
-      decisionTimer: Math.random() * 2.0,
-      strategy: 'hold_default',
-      collisionCooldown: 0
-    };
-  }));
 
-  return opponentsData;
+export function createOpponentState(definition, craft = { group: new THREE.Group() }) {
+  const opponent = { ...definition, craft, group: craft.group };
+  // Keep existing HUD/checkpoint callers connected to the authoritative physics.
+  Object.defineProperties(opponent, {
+    distance: { get() { return this.physics.distance; }, set(v) { this.physics.distance = v; } },
+    currentSpeed: { get() { return this.physics.speed; }, set(v) { this.physics.speed = v; } },
+    currentLane: { get() { return this.physics.lateralOffset; }, set(v) { this.physics.lateralOffset = v; } },
+  });
+  resetOpponents([opponent]);
+  return opponent;
+}
+
+export async function createOpponents() {
+  return Promise.all(RACER_DEFINITIONS.map(async definition =>
+    createOpponentState(definition, await createCraft(definition))));
 }
 
 export function resetOpponents(opponents) {
   for (const opponent of opponents) {
-    opponent.distance = 0;
-    opponent.finishTime = null;
+    opponent.physics = createShipPhysics(opponent.topSpeed * 0.8, {
+      engineForce: opponent.acceleration + opponent.topSpeed * 0.045,
+      brakeForce: 32, mass: opponent.mass, centeringStrength: 0,
+    });
+    opponent.physics.assistLevel = 0.25;
+    opponent.distance = opponent.gridDistance;
     opponent.currentLane = opponent.lane;
+    opponent.finishTime = null;
     opponent.targetLane = opponent.lane;
+    opponent.targetSpeed = opponent.topSpeed;
+    opponent.trafficSpeedLimit = Infinity;
+    opponent.decisionTimer = 0;
+    opponent.strategy = 'race';
+    opponent.input = { steer: 0, thrust: 1, brakeLeft: false, brakeRight: false };
+    opponent.nextCheckpointIndex = 0;
+    opponent.checkpointTimes = [];
   }
 }
 
-export function updateOpponents(opponents, curve, delta, elapsed, racing, playerDistance = 0) {
+function decide(opponent, opponents, player, curve, pads, trackWidth, elapsed) {
+  const length = curve.getLength();
+  const ship = opponent.physics;
+  const lookDistance = Math.max(18, ship.speed * (0.4 + opponent.reaction));
+  const here = getTrackFrame(curve, ship.distance / length);
+  const ahead = getTrackFrame(curve, (ship.distance + lookDistance) / length);
+  const turn = here.tangent.dot(ahead.right);
+  const edge = Math.max(0.4, trackWidth / 2 - 1.2);
+  const cornerSlowdown = Math.abs(turn) * (0.7 - opponent.cornering * 0.3);
+  opponent.targetSpeed = opponent.topSpeed * clamp(1 - cornerSlowdown, 0.65, 1);
+  opponent.targetLane = clamp(opponent.lane * 0.35 - turn * 2.4, -edge, edge);
+  opponent.strategy = 'race';
+  opponent.trafficSpeedLimit = Infinity;
+
+  let nextPad = null;
+  let nearestPad = Infinity;
+  for (const pad of pads) {
+    const aheadDistance = (pad.d - ship.distance % length + length) % length;
+    if (aheadDistance < nearestPad && aheadDistance < Math.max(45, ship.speed * 1.15)) {
+      nearestPad = aheadDistance;
+      nextPad = pad;
+    }
+  }
+  if (nextPad && Math.abs(turn) < 0.8) {
+    opponent.targetLane = clamp(nextPad.offset, -edge, edge);
+    opponent.strategy = 'boost-pad';
+  }
+
+  // Traffic decisions are separate from the shared, leader-relative catch-up.
+  let blocker = null;
+  let nearest = 24;
+  for (const other of [...opponents, ...(player ? [player] : [])]) {
+    if (other === opponent || other.finishTime != null) continue;
+    const gap = ((other.physics.distance - ship.distance + length * 1.5) % length) - length * 0.5;
+    if (gap > 0 && gap < nearest && Math.abs(other.physics.lateralOffset - ship.lateralOffset) < 2.4) {
+      blocker = other;
+      nearest = gap;
+    }
+  }
+  if (blocker) {
+    const lane = blocker.physics.lateralOffset;
+    const leftSpace = lane + edge;
+    const rightSpace = edge - lane;
+    opponent.targetLane = clamp(lane + (rightSpace >= leftSpace ? 2.6 : -2.6), -edge, edge);
+    opponent.strategy = 'overtake';
+    if (nearest < 7) opponent.trafficSpeedLimit = blocker.physics.speed * 0.94;
+  }
+  // Smooth driver error and finite reaction time can produce imperfect lines and wall scrapes.
+  opponent.targetLane += Math.sin(elapsed * 1.7 + opponent.phase) * opponent.precision;
+  opponent.decisionTimer += opponent.reaction;
+}
+
+function drive(opponent, curve, dt) {
+  const ship = opponent.physics;
+  const frame = getTrackFrame(curve, ship.distance / curve.getLength());
+  const turn = ship.previousTangent ? ship.previousTangent.dot(frame.right) : 0;
+  const centrifugal = turn / dt * ship.speed * 0.75 * 0.1;
+  const desiredLateral = clamp((opponent.targetLane - ship.lateralOffset) * 1.9, -4.5, 4.5);
+  const grip = ship.airborne ? 1 : 4.5;
+  const desiredYawRate = clamp(((desiredLateral - ship.lateralVelocity) * 4 + ship.lateralVelocity * grip - centrifugal)
+    / Math.max(4, ship.speed * 0.12), -1.7, 1.7);
+  const steer = -clamp(((desiredYawRate - ship.yawVelocity) * 5 + ship.yawVelocity * 1.15) / 3.7, -1, 1);
+  const topSpeed = getRacerTopSpeed(ship, opponent.topSpeed);
+  const cornerTarget = opponent.targetSpeed * topSpeed / opponent.topSpeed;
+  const speedTarget = Math.min(opponent.trafficSpeedLimit,
+    ship.boostTimer > 0 ? Math.max(cornerTarget, topSpeed * 1.3) : cornerTarget);
+  const braking = ship.speed > speedTarget + 3;
+  opponent.input = {
+    steer, thrust: braking ? 0 : clamp((speedTarget - ship.speed) / 12 + 0.3, 0.15, 1),
+    brakeLeft: braking, brakeRight: braking,
+  };
+}
+
+export function syncOpponentPose(opponent, curve, trackWidth = 10) {
+  const pose = stepShipPhysics(opponent.physics, opponent.input, 0, curve, opponent.topSpeed, trackWidth);
+  opponent.group.position.copy(pose.position);
+  opponent.group.quaternion.copy(pose.orientation);
+}
+
+export function updateOpponents(opponents, curve, delta, elapsed, racing, {
+  player = null, boostPads = [], trackWidth = 10,
+} = {}) {
   const length = curve.getLength();
   const totalDistance = length * TOTAL_LAPS;
-
   for (const opponent of opponents) {
-    if (racing && opponent.distance < totalDistance) {
-
-      // --- A. AI-BESLUTSMOTOR ---
-      opponent.decisionTimer -= delta;
-
-      if (opponent.decisionTimer <= 0) {
-        opponent.decisionTimer = 1.5 + Math.random() * 1.0;
-
-        const distToPlayer = opponent.distance - playerDistance;
-
-        if (distToPlayer > 120) {
-          // Långt före -> Sakta ner och håll sin fil
-          opponent.currentSpeed = opponent.baseSpeed * 0.8;
-          opponent.strategy = 'hold_default';
-        } else if (distToPlayer > 0 && distToPlayer <= 40) {
-          // Strax framför -> Blockera spelaren!
-          opponent.currentSpeed = opponent.baseSpeed * 1.05;
-          opponent.strategy = 'block';
-        } else if (distToPlayer < 0 && distToPlayer >= -50) {
-          // Strax bakom -> Försök köra om!
-          opponent.currentSpeed = opponent.baseSpeed * 1.15;
-          opponent.strategy = 'avoid';
-        } else if (distToPlayer < -50) {
-          // Långt bakom -> Ge dem en boost ikapp
-          opponent.currentSpeed = opponent.baseSpeed * 1.25;
-          opponent.strategy = 'hold_default';
-        } else {
-          // Normal lucka (40 till 120m framför)
-          opponent.currentSpeed = opponent.baseSpeed;
-          opponent.strategy = 'hold_default';
-        }
-
-        // Räkna ut målfil baserat på strategi
-        const maxLane = 3.0;
-        if (opponent.strategy === 'avoid') {
-          // Korsa över banan för att köra om
-          opponent.targetLane = opponent.lane > 0 ? -maxLane * 0.7 : maxLane * 0.7;
-        } else if (opponent.strategy === 'block') {
-          // Lägg sig i vägen
-          opponent.targetLane = (Math.random() > 0.5 ? 1 : -1) * 1.2;
-        } else {
-          // Gå tillbaka till sin egen unika startfil (definition.lane)
-          opponent.targetLane = opponent.lane;
-        }
-      }
-
-      // --- B. MJUK FÖRFLYTTNING ---
-      opponent.currentLane = THREE.MathUtils.damp(opponent.currentLane, opponent.targetLane, 2.0, delta);
-      
-      const nextDistance = opponent.distance + opponent.currentSpeed * delta;
-      if (nextDistance >= totalDistance && opponent.finishTime === null) {
-        opponent.finishTime = elapsed - (nextDistance - totalDistance) / opponent.currentSpeed;
-      }
-      opponent.distance = Math.min(nextDistance, totalDistance);
+    if (!racing || delta <= 0 || opponent.finishTime !== null) {
+      syncOpponentPose(opponent, curve, trackWidth);
+      continue;
     }
-
-    // --- C. POSITIONERING OCH LEVANDE MOTION ---
-    const frame = getTrackFrame(curve, (opponent.distance % length) / length);
-    const laneMotion = Math.sin(opponent.distance * 0.003 + opponent.phase) * 0.28;
-    const finalLane = opponent.currentLane + laneMotion;
-
-    opponent.group.position.copy(frame.center)
-      .addScaledVector(frame.right, finalLane)
-      .addScaledVector(frame.normal, 0.62);
-
-    opponent.group.quaternion.copy(frame.rotation);
-    opponent.group.rotateZ(-laneMotion * 0.045);
-
-   
+    const ship = opponent.physics;
+    const initialPose = stepShipPhysics(ship, opponent.input, 0, curve, opponent.topSpeed, trackWidth);
+    if (!ship.previousTangent) {
+      ship.previousSlope = initialPose.frame.tangent.y;
+      ship.previousTangent = initialPose.frame.tangent.clone();
+    }
+    const steps = Math.ceil(delta / (1 / 120));
+    const dt = delta / steps;
+    for (let step = 0; step < steps; step++) {
+      const now = elapsed - delta + (step + 1) * dt;
+      opponent.decisionTimer -= dt;
+      if (opponent.decisionTimer <= 0) decide(opponent, opponents, player, curve, boostPads, trackWidth, now);
+      drive(opponent, curve, dt);
+      stepShipPhysics(ship, opponent.input, dt, curve, opponent.topSpeed, trackWidth);
+      collectBoostPad(ship, boostPads, length, opponent.topSpeed);
+      if (ship.distance >= totalDistance) {
+        opponent.finishTime = now - (ship.distance - totalDistance) / Math.max(1, ship.speed);
+        ship.distance = totalDistance;
+        ship.boostTimer = 0;
+        ship.speed = 0;
+        break;
+      }
+    }
+    ship.previousPosition.copy(initialPose.position);
+    syncOpponentPose(opponent, curve, trackWidth);
   }
 }
 
 export function getPlayerPosition(opponents, playerDistance, playerFinishTime = null) {
-  const ahead = opponents.filter((opponent) => {
-    if (playerFinishTime !== null) {
-      return opponent.finishTime !== null && opponent.finishTime < playerFinishTime;
-    }
-    return opponent.distance > playerDistance;
-  }).length;
-  return ahead + 1;
-}
-export function resolveCraftCollisions(opponents, playerPosition, playerVelocity, trackCurve, playerDistance, delta) {
-  // Säkerhetskontroller för indata
-  if (!playerPosition || !opponents) return;
-
-  const actualCurve = trackCurve?.curve || trackCurve;
-  if (!actualCurve || typeof actualCurve.getLength !== 'function') return;
-
-  const length = actualCurve.getLength();
-  
-  // Skapa en säker fallback om playerVelocity saknas eller inte är en Vector3
-  const safePlayerVel = (playerVelocity && typeof playerVelocity.x === 'number')
-    ? playerVelocity
-    : new THREE.Vector3();
-
-  for (const opponent of opponents) {
-    if (!opponent.group) continue;
-
-    // 1. Räkna ner cooldown
-    if (opponent.collisionCooldown > 0) {
-      opponent.collisionCooldown -= delta;
-    }
-
-    // 2. Vektorseparering
-    collisionSeparation.copy(playerPosition).sub(opponent.group.position);
-    const distance = collisionSeparation.length();
-
-    if (distance >= COLLISION_RADIUS * 2 || distance < 1e-5) continue;
-
-    collisionSeparation.multiplyScalar(1 / distance);
-    const normal = collisionSeparation;
-    const penetration = COLLISION_RADIUS * 2 - distance;
-
-    // 3. Separera spelaren i 3D-rymden
-    playerPosition.addScaledVector(normal, penetration * 0.5);
-
-    // 4. Knuffa motståndaren i sidled på sin fil (currentLane)
-    const frame = getTrackFrame(actualCurve, (opponent.distance % length) / length);
-    const sideDot = normal.dot(frame.right);
-    
-    opponent.currentLane -= Math.sign(sideDot) * penetration * 0.5;
-
-    // 5. Impuls & Cooldown
-    const safeOpponentVel = (opponent.collisionVelocity && typeof opponent.collisionVelocity.x === 'number')
-      ? opponent.collisionVelocity
-      : new THREE.Vector3();
-
-    collisionRelativeVelocity.copy(safePlayerVel).sub(safeOpponentVel);
-    const closingSpeed = collisionRelativeVelocity.dot(normal);
-
-    if (closingSpeed >= 0 || opponent.collisionCooldown > 0) continue;
-
-    const impulse = -closingSpeed * 0.5 * RACER_MASS;
-    
-    // Ge spelaren sin stöt om vektorn är giltig
-    if (typeof playerVelocity?.addScaledVector === 'function') {
-      playerVelocity.addScaledVector(normal, impulse);
-    }
-    
-    // Bromsa eller accelerera motståndaren lite beroende på krockvinkeln
-    opponent.currentSpeed -= Math.sign(normal.z) * impulse * 0.1;
-    opponent.collisionCooldown = 0.18;
-  }
+  return opponents.filter(opponent => playerFinishTime !== null
+    ? opponent.finishTime !== null && opponent.finishTime < playerFinishTime
+    : opponent.distance > playerDistance).length + 1;
 }

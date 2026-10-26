@@ -25,6 +25,49 @@ Press **Start Race** to begin. The race starts the bundled custom techno track `
 
 This extended/elevated layout has not yet been exercised through an interactive browser race. The earlier touch-emulation checks apply to the baseline 0.1 build only; steering, course readability, finish/results/retry, and representative physical-device feel on the new layout still need playtesting. The chase camera now follows closely (3.6 units behind, 1.72 above) and aims 9 units ahead, with a slightly wider view on mobile. Its visual framing still needs interactive browser/device playtesting. See `docs/CURRENT_STATUS.md` for the current verification boundary and `docs/CURRENT_TASK.md` for the remaining check.
 
+## CPU driving and collisions
+
+The four opponents now accelerate, brake, steer through inertia, seek boost pads
+and react to traffic. Each uses its own profile in `src/opponents.js`:
+
+| Driver | Normal speed cap | Acceleration setting | Mass | Character |
+| --- | ---: | ---: | ---: | --- |
+| Vanta | 129 | 24 | 1.05 | Moderate speed and precision |
+| Kestrel | 130 | 31 | 0.90 | Quick acceleration and reactions |
+| Orca | 135 | 21 | 1.30 | Heavy, slower recovery and wider lines |
+| Nexus-9 | 136 | 27 | 1.00 | Highest top speed, less precise than Kestrel |
+
+Speed is in world units/s; acceleration in world units/s² before throttle/drag.
+The player's normal speed cap is 133. The current user-tuned CPU profiles above
+combine with the shared mild catch-up described below. These are tuning values for
+playtesting, not a claim of final difficulty balance.
+
+All racers use the same physical boost-pad, wall and collision rules in
+`src/race-interactions.js`. Impacts change both craft's real motion and persist
+after the next render. Normal player controls and accepted thruster tuning remain.
+Run `node --test tests/*.test.js` for racing and exhaust regression checks.
+
+## Catch-up tuning
+
+Edit `CATCH_UP` at the top of `src/catch-up.js`:
+
+- `startGapSeconds: 2` — no target bonus within this estimated gap to the leader
+- `fullGapSeconds: 8` — full target bonus at this gap or farther behind
+- `maxBonus: 0.08` — up to 8% additional top speed, for player and CPU alike
+- `smoothingSeconds: 1.5` — exponential response time; about 95% of a change in 4.5 seconds
+
+Gap is accumulated race-distance difference divided by the leader's unboosted
+normal top speed, an estimate rather than a measured timing split. Laps count;
+instantaneous leader braking/boost does not change that reference speed. The
+target uses a smooth curve between 2 and 8 seconds, and its rise/fall is damped.
+A former leader/follower can retain a fading bonus briefly when positions change.
+
+Catch-up raises the attainable cap and CPU speed demand; acceleration still builds
+the actual speed. Normal braking, cornering, traffic limits and collision losses
+apply. Physical boost-pad multipliers combine with the adjusted cap. There is no
+negative leader penalty. Pause freezes the bonus, restart clears it, and outside
+active racing it fades out. Set `maxBonus` to `0` to disable the speed allowance.
+
 ## Thruster effects
 
 All five craft use paired white/cyan plasma exhaust with fine particles and a

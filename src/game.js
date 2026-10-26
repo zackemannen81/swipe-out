@@ -9,8 +9,10 @@ import './style.css';
 import { spawnTrackObjects, createTrack, getTrackFrame } from './track.js';
 import { NEON_CAUSEWAY, SYNTHETIC_DREAMS, DIGITAL_HORIZON, MOMMY_IM_SCARED ,DARK_SKIES, GEMINI,THE_JOKER,THE_VOID, AGENT_008_STAGE,ION_CATHEDRAL} from './track-data.js';
 import { createShipPhysics, stepShipPhysics } from './ship-physics.js';
-import { createOpponents, getPlayerPosition, resetOpponents, updateOpponents,resolveCraftCollisions } from './opponents.js';
+import { createOpponents, getPlayerPosition, resetOpponents, updateOpponents, syncOpponentPose } from './opponents.js';
 import { createCraft } from './craft.js';
+import { collectBoostPad, createCollisionState, resolveRacerCollisions, resolveWallImpact } from './race-interactions.js';
+import { updateCatchUp } from './catch-up.js';
 import { ThrusterSystem } from './thrusters.js';
 
 
@@ -122,7 +124,7 @@ if (menuButton) {
   });
 }
 
-export const SPEEDCALIBRATION = 68; // Justera detta värde för att kalibrera spelets hastighe
+export const SPEEDCALIBRATION = 73; // Justera detta värde för att kalibrera spelets hastighe
 const scene = new THREE.Scene();
 //scene.background = new THREE.Color(0x080c0a);
 scene.background = new THREE.Color(0x000000);
@@ -202,6 +204,7 @@ const savedTrack = (() => {
   }
 })();
 let { group: track, curve } = createTrack(savedTrack);
+let trackWidth = savedTrack.width ?? 10;
 scene.add(track);
 
 function setupMinimap() {
@@ -492,7 +495,10 @@ const cameraCycleButton = document.querySelector('#btn-camera-cycle');
 const thrustButton = document.querySelector('#btn-thrust');
 const brakeButton = document.querySelector('#btn-brake');
 const shipPhysics = createShipPhysics((baseSpeed+SPEEDCALIBRATION)*1.5);
+const collisionState = createCollisionState();
+const playerRacer = { id: 'player', physics: shipPhysics, group: craft };
 const race = {
+  lastImpactSerial: 0, finishElapsed: 0,
   topSpeed: 0,
   state: 'ready', distance: 0, elapsed: 0, steering: 0, targetSteering: 0, drift: 0,
   lateralVelocity: 0, roll: 0, currentSpeed: baseSpeed + SPEEDCALIBRATION, throttleTarget: 0, keyboardThrottle: 0, playerFinishTime: null,
@@ -544,8 +550,8 @@ function updateCraftPose(delta = 0) {
     pitch: (heldKeys.has('r') ? 1 : 0) - (heldKeys.has('f') ? 1 : 0),
   };
 const pose = (race.state === 'racing' || race.state === 'finished') && delta > 0
-    ? stepShipPhysics(shipPhysics, input, delta, curve, baseSpeed+SPEEDCALIBRATION)
-    : stepShipPhysics(shipPhysics, input, 0, curve, baseSpeed+SPEEDCALIBRATION);
+    ? stepShipPhysics(shipPhysics, input, delta, curve, baseSpeed+SPEEDCALIBRATION, trackWidth)
+    : stepShipPhysics(shipPhysics, input, 0, curve, baseSpeed+SPEEDCALIBRATION, trackWidth);
 
   race.distance = shipPhysics.distance;
   race.currentSpeed = shipPhysics.speed;
@@ -609,6 +615,7 @@ function beginRace() {
 const trackAssets = createTrack(trackData);
   track = trackAssets.group;
   curve = trackAssets.curve;
+  trackWidth = trackData.width ?? 10;
   race.boostPads = trackAssets.boostPads; // Hämta de slumpade positionerna från banan!
   track.traverse((child) => {
     if (child.isMesh) {
@@ -671,6 +678,9 @@ Object.assign(shipPhysics, createShipPhysics(baseSpeed+SPEEDCALIBRATION));
   race.keyboardThrottle = 0;
   race.playerFinishTime = null;
   resetOpponents(opponents);
+  collisionState.cooldowns.clear();
+  race.lastImpactSerial = 0;
+  race.finishElapsed = 0;
   thrusters.reset();
   race.airborne = false;
   race.airWorldY = 0;
@@ -715,8 +725,8 @@ function finishRace() {
   // VIKTIGT: Ta bort raceAudio.stop() så musiken spelar under ärovarvet!
   
   race.state = 'finished';
-  race.playerFinishTime = race.elapsed;
-  positionDisplay.textContent = `${getPlayerPosition(opponents, race.distance, race.playerFinishTime)} / 3`;
+  race.playerFinishTime = race.elapsed - Math.max(0, race.distance - curve.getLength() * totalLaps) / Math.max(1, race.currentSpeed);
+  positionDisplay.textContent = `${getPlayerPosition(opponents, race.distance, race.playerFinishTime)} / ${opponents.length + 1}`;
   resultPositionDisplay.textContent = positionDisplay.textContent;
   drag.active = false;
   
@@ -726,7 +736,7 @@ function finishRace() {
   shipPhysics.speed = 65;        // Sätt farten till basfarten
   cameraSystem.mode = 'circle';  // Byt till snurrande kameran
 
-  resultDisplay.textContent = formatTime(race.elapsed);
+  resultDisplay.textContent = formatTime(race.playerFinishTime);
   setScreen(resultsScreen, true);
   retryButton.focus({ preventScroll: true });
 }
@@ -1040,6 +1050,13 @@ function render() {
     });
   }
 
+  updateCatchUp([
+    { physics: shipPhysics, topSpeed: baseSpeed + SPEEDCALIBRATION, finished: race.playerFinishTime !== null },
+    ...opponents.map(opponent => ({
+      physics: opponent.physics, topSpeed: opponent.topSpeed, finished: opponent.finishTime !== null,
+    })),
+  ], delta, curve.getLength() * totalLaps, race.state === 'racing');
+
   if (race.state === 'countdown') {
    
     // Uppdatera timer-displayen med nedräkning (t.ex. 3, 2, 1 eller GO!)
@@ -1108,11 +1125,10 @@ if (countVal !== prevCount) {
     lapDisplay.textContent = `${String(currentLap).padStart(2, '0')} / ${String(totalLaps).padStart(2, '0')}${currentLap === totalLaps && lapProgress >= 0.72 ? ' · FINAL' : ''}`;
     //crossedFinish = race.distance >= curve.getLength() * totalLaps;
     raceAudio.updateEngine(race.currentSpeed, shipPhysics.boostTimer > 0, true);
-    if (race.distance >= curve.getLength() * totalLaps) {
-        finishRace();
-    }
+    crossedFinish = race.distance >= curve.getLength() * totalLaps;
 
   } else if (race.state === 'finished') {
+    race.finishElapsed += delta;
     // --- ÄROVARV (AUTOPILOT) ---
     raceAudio.update(delta); // Låt musiken fortsätta driva bloom-effekterna
     
@@ -1166,35 +1182,25 @@ for (const ghost of ghostPool) {
   const trackFrame = getTrackFrame(curve, race.distance / curve.getLength());
 
   if (race.state === 'racing') {
-// --- SPEEDBOOST LOGIK ---
-    const trackLen = curve.getLength();
-    const lapDistance = race.distance % trackLen;
-    
-    // 1. Hitta först om vi är över en pad i längdled
-    const currentPadIndex = race.boostPads.findIndex(pad => lapDistance >= pad.d && lapDistance < pad.d + 10);
-    
-    if (currentPadIndex !== -1) {
-      // 2. Om vi är vid en pad, kolla om vi prickar den i sidled!
-      // Vi krymper träffytan från 2.8 till 1.2 (mycket striktare)
-      const currentPad = race.boostPads[currentPadIndex];
-      const inWidth = Math.abs(shipPhysics.lateralOffset - currentPad.offset) < 1.2;
-      
-      // 3. Bara ge boost om vi prickar rätt och inte redan tagit just denna pad
-      if (inWidth && race.lastBoostIndex !== currentPadIndex) {
-        race.lastBoostIndex = currentPadIndex;
-        raceAudio.playSfx('boost');
-        // AKTIVERA BOOST!
-        shipPhysics.boostTimer = 1.0; 
-        shipPhysics.speed = (baseSpeed + SPEEDCALIBRATION )* 1.3;
-        
-        cameraSystem.shakeTimer = 0.8;
-        cameraSystem.shakeIntensity = 0.65;
-        bloomPass.strength = 0.6;
-      }
-    } else {
-      // Återställ när vi har åkt förbi paden, så den kan tas nästa varv
-      race.lastBoostIndex = -1;
+    if (collectBoostPad(shipPhysics, race.boostPads, curve.getLength(), baseSpeed + SPEEDCALIBRATION)) {
+      raceAudio.playSfx('boost');
+      cameraSystem.shakeTimer = 0.3;
+      cameraSystem.shakeIntensity = 0.35;
     }
+    updateCraftPose(0); // Publish a newly collected boost to the collision velocity.
+    updateOpponents(opponents, curve, delta, race.elapsed, true, {
+      player: playerRacer, boostPads: race.boostPads, trackWidth,
+    });
+    playerRacer.finished = crossedFinish;
+    const racers = [playerRacer, ...opponents.map(opponent => ({
+      id: opponent.name, physics: opponent.physics, group: opponent.group,
+      finished: opponent.finishTime !== null,
+    }))];
+    resolveRacerCollisions(racers, curve, delta, collisionState);
+    for (const racer of racers) if (!racer.finished) resolveWallImpact(racer.physics, trackWidth);
+    updateCraftPose(0);
+    crossedFinish ||= race.distance >= curve.getLength() * totalLaps;
+    for (const opponent of opponents) syncOpponentPose(opponent, curve, trackWidth);
 
     // --- CHECKPOINT LOGIK (Motståndare) ---
     // Motståndarnas checkpoint-tider uppdateras
@@ -1255,23 +1261,22 @@ for (const ghost of ghostPool) {
         race.nextCheckpointIndex++;
       }
     }
-    updateOpponents(opponents, curve, delta, race.elapsed, true,race.distance);
-    resolveCraftCollisions(opponents, craft.position, shipPhysics.velocity, curve, race.distance, delta);
+
   } else {
-    updateOpponents(opponents, curve, 0, race.elapsed, false,race.distance);
+    updateOpponents(opponents, curve, delta, race.elapsed + race.finishElapsed, race.state === 'finished', {
+      boostPads: race.boostPads, trackWidth,
+    });
   }
   if (crossedFinish) finishRace();
-  positionDisplay.textContent = `${getPlayerPosition(opponents, race.distance, race.playerFinishTime)} / 3`;
+  positionDisplay.textContent = `${getPlayerPosition(opponents, race.distance, race.playerFinishTime)} / ${opponents.length + 1}`;
 
-  // Aktivera kameraskakning om skeppet kraschar
-    if (race.crashTimer > 0) {
-    cameraSystem.setShake(0.3);
-    // Spela bara ljudet i exakt samma frame som kraschen startar (0.42 är startvärdet i ship-physics)
-    if (Math.abs(race.crashTimer - 0.42) < 0.02) {
-      raceAudio.playSfx('crash');
-    }
+  if (shipPhysics.impactSerial !== race.lastImpactSerial) {
+    race.lastImpactSerial = shipPhysics.impactSerial;
+    cameraSystem.shakeIntensity = 0.12 + shipPhysics.impactStrength * 0.55;
+    cameraSystem.setShake(0.16 + shipPhysics.impactStrength * 0.25);
+    raceAudio.playSfx('crash');
   }
-  
+
   // 1. Beräkna nuvarande hastighet i KM/H
 const displaySpeed = Math.round(race.currentSpeed * 3.6 * 3.25);
   race.topSpeed = Math.max(race.topSpeed, displaySpeed);
@@ -1336,11 +1341,9 @@ if (thrustFill) {
   thrusters.updateCraft(playerThrusters, delta, Math.max(0, race.throttleTarget),
     race.state === 'racing' && shipPhysics.boostTimer > 0, enginesRunning);
   for (const opponent of opponents) {
-    const moving = (race.state === 'racing' || race.state === 'countdown') && opponent.finishTime === null;
-    // CPU strategy already controls speed: map that demand onto the same engine effect.
-    const demand = race.state === 'countdown' ? 0
-      : THREE.MathUtils.clamp((opponent.currentSpeed / opponent.baseSpeed - 0.75) / 0.5, 0, 1);
-    thrusters.updateCraft(opponent.thrusters, delta, demand, false, moving);
+    const moving = enginesRunning && opponent.finishTime === null;
+    const demand = race.state === 'countdown' ? 0 : opponent.physics.thrust;
+    thrusters.updateCraft(opponent.thrusters, delta, demand, opponent.physics.boostTimer > 0, moving);
   }
   thrusters.update(delta, camera, renderer.domElement.height);
 

@@ -223,3 +223,40 @@
   Inspected desktop, close camera and 844x390 renders. Final browser run: no JS,
   shader or request errors. Vite's existing large-chunk warning remains.
 - Physical-device performance and subjective art approval are still unverified.
+
+## 2026-10-26 — RACE-002: CPU driving profiles and persistent impacts
+
+- Replaced distance-based CPU speed jumps and lane interpolation with distinct
+  top-speed/acceleration/mass/reaction profiles driving the shared ship physics.
+  Added corner lookahead/braking, overtaking, pad targeting and steering error.
+- Added shared swept boost-pad and craft-contact rules. Pads require actual lane
+  and height contact; all craft use the same boost duration/multipliers. Collision
+  impulses and separation persist in authoritative speed/lateral/track state for
+  player/CPU and CPU/CPU, with mass, restitution, loss and pair cooldowns.
+- Reworked walls to use track width, inward bounce and severity-dependent speed
+  loss; impact events trigger bank, camera and sound. Preserved normal player
+  input/engine coefficients and the user's shortened thruster tuning.
+- Added staggered starts, complete CPU resets, same-frame finish ordering,
+  five-racer placement and CPU completion during the celebration lap.
+- Verified 12 Node tests, production build, JS syntax and whitespace. Full CPU
+  simulation on Neon Causeway completed with boosts, wall recovery and collisions.
+  Chromium WebGL confirmed actual start/driving, a persistent rear collision
+  (player 133 to ~52; CPU 35 to ~90), pause/reset, a controlled simultaneous
+  finish (player second of five), remaining CPU finishes and actual retry.
+  Browser runs had no console/request errors. Existing build size warning remains.
+- Recorded tuning in README and current status; archived VFX-001. Balance across
+  all ten tracks and physical-device performance require human playtesting.
+
+## 2026-10-26 — RACE-003: approved catch-up for player and CPU
+
+- Added src/catch-up.js with the agreed 2–8-second estimated gap range, maximum
+  8% cap bonus, shared leader snapshot and 1.5-second smoothing time constant.
+- Integrated the same allowance into player/CPU physics, CPU driving demand and
+  real boost pads. Acceleration, braking, traffic safety and impact loss remain.
+- Added lap/finish-aware distance limits, pause preservation and fresh-race reset.
+  Preserved the user's newer CPU caps and shortened thruster settings.
+- Passed all 19 tests, production build, syntax and whitespace checks. Chromium
+  WebGL verified shared bonuses, unchanged leader, smooth lead-change decay,
+  pause and reset, with no console/request errors. Existing size warning remains.
+- Updated README tuning guidance, GDD accepted direction and system/status/file map.
+  Archived RACE-002. Gap is an estimate, and final balance needs human playtesting.

@@ -1,5 +1,6 @@
 import * as THREE from 'three';
-import {SPEEDCALIBRATION} from './game.js';
+import { BOOST, resolveWallImpact } from './race-interactions.js';
+import { getRacerTopSpeed } from './catch-up.js';
 
 // Konstanter för svävaren (kan flyttas överst i filen)
 const GRAVITY = -26.0;         // Snabb arkad-gravitation i Y-led
@@ -11,9 +12,24 @@ const HOVER_DAMPING = 9.0;     // Dämpning så att skeppet inte studsar oändli
 // The original triangle/section collision system is replaced by the track frame
 // supplied by SwipeOut, while retaining thrust build-up, skid, differential
 // brakes, track adhesion, airborne gravity, angular inertia and edge impacts.
-export function createShipPhysics(baseSpeed ) {
+export function createShipPhysics(baseSpeed, tuning = {}) {
   return {
     boostTimer: 0,        
+    catchUpBonus: 0,
+    catchUpGap: 0,
+    tuning,
+    mass: tuning.mass ?? 1,
+    velocity: new THREE.Vector3(),
+    previousPosition: new THREE.Vector3(),
+    previousDistance: 0,
+    previousLateralOffset: 0,
+    previousVerticalOffset: 0,
+    lastBoostKey: null,
+    boostCount: 0,
+    wallHits: 0,
+    craftHits: 0,
+    impactSerial: 0,
+    impactStrength: 0,
     distance: 0,
     speed: baseSpeed,
     lateralOffset: 0,
@@ -45,21 +61,29 @@ export function createShipPhysics(baseSpeed ) {
 const damp = (value, target, lambda, dt) =>
   THREE.MathUtils.damp(value, target, lambda, dt);
 
-export function stepShipPhysics(ship, input, dt, curve, baseSpeed  ) {
+export function stepShipPhysics(ship, input, dt, curve, baseSpeed, trackWidth = 10) {
   if (dt <= 0) {
     const frame = getFrame(curve, ship.distance);
     return makePose(ship, frame);
   }
 
+  ship.previousDistance = ship.distance;
+  ship.previousLateralOffset = ship.lateralOffset;
+  ship.previousVerticalOffset = ship.verticalOffset;
+  ship.previousPosition.copy(makePose(ship, getFrame(curve, ship.distance)).position);
+
   ship.jumpCooldown = Math.max(0, ship.jumpCooldown - dt);
   ship.crashTimer = Math.max(0, ship.crashTimer - dt);
   ship.crashCooldown = Math.max(0, ship.crashCooldown - dt);
   ship.lastImpact = Math.max(0, ship.lastImpact - dt);
+  ship.impactStrength = Math.max(0, ship.impactStrength - dt * 2.5);
 ship.boostTimer = Math.max(0, ship.boostTimer - dt);
 
   // Original thrust rises while held and falls off when released.
   const thrustInput = THREE.MathUtils.clamp(input.thrust ?? 0, 0, 1);
-  ship.thrust = THREE.MathUtils.clamp(
+  ship.thrust = ship.tuning.engineForce !== undefined
+    ? damp(ship.thrust, thrustInput, 6, dt)
+    : THREE.MathUtils.clamp(
     ship.thrust + (thrustInput > 0 ? 1.75 * thrustInput : -1.1) * dt,
     0,
     1,
@@ -70,7 +94,7 @@ ship.boostTimer = Math.max(0, ship.boostTimer - dt);
   const differentialBrake = ship.brakeLeft - ship.brakeRight;
 
   // Angular acceleration / inertia, inspired by ship_player_update_race().
-  const steer = THREE.MathUtils.clamp(-input.steer ?? 0, -1, 1);
+  const steer = THREE.MathUtils.clamp(-(input.steer ?? 0), -1, 1);
   const turnAcceleration = 3.7 + brake * 1.8;
   ship.yawVelocity += (steer * turnAcceleration - ship.yawVelocity * (steer === 0 ? 7.5 : 1.15)) * dt;
   ship.yawVelocity = THREE.MathUtils.clamp(ship.yawVelocity, -2.2, 2.2);
@@ -79,11 +103,11 @@ ship.boostTimer = Math.max(0, ship.boostTimer - dt);
 
   // Longitudinal force balance: thrust, drag and braking. Speed is in the
   // existing SwipeOut world scale, rather than the original PS1 fixed-point scale.
-  const throttleForce = ship.thrust * 8;
+  const throttleForce = ship.thrust * (ship.tuning.engineForce ?? 8);
   const baselineDrag = ship.speed * 0.045;
-  const brakingForce = brake * 18;
+  const brakingForce = brake * (ship.tuning.brakeForce ?? 18);
   ship.speed += (throttleForce - baselineDrag - brakingForce) * dt;
-const maxSpeed = ship.boostTimer > 0 ?baseSpeed*1.5 : baseSpeed ; // NY: Maxhastighet under boost
+  const maxSpeed = getRacerTopSpeed(ship, baseSpeed) * (ship.boostTimer > 0 ? BOOST.maxMultiplier : 1);
   ship.speed = THREE.MathUtils.clamp(ship.speed, 12, maxSpeed);
 
   // Find the current local track frame and preserve the original jump response
@@ -172,7 +196,7 @@ const centeringForce = -ship.lateralOffset * (ship.assistLevel * 5.0);
 */
 // Låt spelarens egen styrning (lateralVelocity) få motverka eller väga upp centeringForce
 const steeringInput = input.steer ?? 0;
-const centeringForce = -ship.lateralOffset * (ship.assistLevel * 2.0); 
+const centeringForce = -ship.lateralOffset * (ship.assistLevel * (ship.tuning.centeringStrength ?? 2.0));
 
 // Om spelaren styr aktivt, dämpa centreringen så man kan svänga ut!
 const effectiveCentering = THREE.MathUtils.lerp(centeringForce, 0, Math.abs(steeringInput));
@@ -182,17 +206,9 @@ ship.lateralOffset += (ship.lateralVelocity + effectiveCentering) * dt * 2;
 
   // The original uses face collisions and track repulsion. SwipeOut's track is
   // a smooth ribbon, so the edge is handled as a damped impact instead.
-  const edge = 4.52;
-  if (!ship.airborne && Math.abs(ship.lateralOffset) > edge && ship.crashCooldown <= 0) {
-    ship.crashTimer = 0.42;
-    ship.crashCooldown = 0.62;
-    ship.lateralOffset = Math.sign(ship.lateralOffset) * edge;
-    ship.lateralVelocity *= -0.42;
-    ship.speed *= 0.2;
-    ship.yawVelocity *= -0.28;
-    ship.lastImpact = 0.3;
-  }
-  ship.lateralOffset = THREE.MathUtils.clamp(ship.lateralOffset, -5.4, 5.4);
+  resolveWallImpact(ship, trackWidth);
+  const outerLimit = trackWidth / 2 + 0.4;
+  ship.lateralOffset = THREE.MathUtils.clamp(ship.lateralOffset, -outerLimit, outerLimit);
 
   // Track-relative bank and attitude damping.
   const desiredRoll = THREE.MathUtils.clamp(
@@ -213,6 +229,9 @@ function getFrame(curve, distance) {
 }
 
 function makePose(ship, frame) {
+  ship.velocity.copy(frame.tangent).multiplyScalar(ship.speed)
+    .addScaledVector(frame.right, ship.lateralVelocity * 2)
+    .addScaledVector(frame.normal, ship.verticalVelocity);
   const position = frame.center.clone()
     .addScaledVector(frame.right, ship.lateralOffset)
     .addScaledVector(frame.normal, 0.62 + ship.verticalOffset);

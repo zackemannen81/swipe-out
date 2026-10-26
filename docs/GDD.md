@@ -110,8 +110,11 @@ practical, and present distinct positions and motion so the field is legible.
 Difficulty should be tunable and fair: opponents may challenge the player but
 must not appear to teleport, ignore the track, or make placement feel arbitrary.
 
-Prototype a small field first. Opponent count, named personalities, catch-up
-assistance, collision rules, and difficulty selection remain to be tested.
+The user approved mild catch-up on 2026-10-26: both player and CPU receive a
+smooth top-speed allowance from zero within an estimated two seconds of the
+leader to a maximum of 8% at eight seconds. Acceleration and physical consequences
+remain active. These are starting balance values to playtest; current implementation
+and verification are recorded in CURRENT_STATUS. Difficulty selection remains open.
 
 ## 8. Launch tracks (three distinct levels)
 

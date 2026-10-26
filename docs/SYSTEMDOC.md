@@ -56,6 +56,17 @@ architecture or behavior.
 
 ## Documentation truth boundary
 
+Player and CPU motion now share `ship-physics.js`. CPU profiles and route/traffic
+decisions belong to `opponents.js`; shared boost-pad, wall and craft contact rules
+belong to `race-interactions.js`. Collision impulses modify authoritative motion
+state rather than only visual transforms. Rival difficulty comes from explicit
+driving profiles and physical track interactions. The user-approved mild catch-up
+in `catch-up.js` applies equally to all five racers: a smoothed 0–8% top-speed
+allowance based on estimated 2–8-second leader gaps, using accumulated distance
+and nominal leader speed. It adjusts caps/demand rather than assigning velocity;
+normal acceleration, braking and impact consequences remain. Current profile
+values and verification boundaries are in CURRENT_STATUS.
+
 Thruster presentation is owned by `src/thrusters.js` and orchestrated by the game
 after player and CPU transforms are finalized. All five craft share procedural
 plasma and particle materials. Fixed-rate world-space history supplies continuous

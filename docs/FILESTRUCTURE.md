@@ -33,6 +33,16 @@ Verified 2026-10-11 after IMPLEMENT-008. The project implements the competitive 
 Update this map when files or directories are added, removed, or reorganized.
 Do not list planned paths as if they already exist.
 
+## 2026-10-26 — CPU and interaction implementation
+
+- `src/opponents.js` — four tunable driver profiles, shared-physics CPU driving,
+  route/traffic/pad decisions, pose synchronization, finish and full reset
+- `src/ship-physics.js` — player and CPU motion, tuning, persistent velocity and impact state
+- `src/race-interactions.js` — shared swept pad detection, wall response and bilateral craft collisions
+- `tests/racing.test.js` — acceleration, pads, wall/contact/lifecycle tests and a full CPU race simulation
+- `docs/archive/VFX-001.md` — completed thruster task record
+- `docs/CURRENT_TASK.md` — RACE-002 scope and verification record
+
 ## 2026-10-26 — thruster implementation additions
 
 - `src/thrusters.js` — world-space plasma wakes, pooled glint particles, throttle
@@ -44,3 +54,12 @@ Do not list planned paths as if they already exist.
   throttle, lifecycle and fixed resource budgets
 - `docs/archive/PORT-001-paused.md` — previous unfinished task record preserved
 - `docs/CURRENT_TASK.md` — VFX-001 scope and verification record
+
+## 2026-10-26 — catch-up implementation additions
+
+- `src/catch-up.js` — shared leader-gap calculation, configurable bonus curve,
+  smoothing and effective top-speed helper for player and CPU
+- `tests/catch-up.test.js` — thresholds, fairness, frame rates, lifecycle,
+  attainable speed, physical consequences, pad stacking and traffic regressions
+- `docs/archive/RACE-002.md` — completed CPU/interaction task record
+- `docs/CURRENT_TASK.md` — RACE-003 catch-up scope and verification
