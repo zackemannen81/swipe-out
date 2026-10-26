@@ -282,6 +282,30 @@ unless explicitly added later.
 
 ## 14. Open design questions
 
+### Approved expansion sequence — 2026-10-26
+
+The user approved the staged plan in [TRACK_ROADMAP.md](TRACK_ROADMAP.md):
+track import/export and a growing 3D editor, followed by gaps, banked/twisted/looped
+track, alternative routes and optional weapons. This extends the earlier scope;
+it does not establish that those gameplay mechanics are already implemented.
+
+Gaps should detach craft into momentum-based flight with generous landing and
+quick checkpoint recovery. Player and CPU share the rules. Continuous inverted
+road uses magnetic adhesion; camera and controls must stay readable throughout.
+Shortcuts trade difficulty for time saved and require shared checkpoints for
+fair placement, laps and catch-up across unequal route lengths. Combat starts
+as a toggleable mode with a forward rocket, impact and temporary speed loss;
+homing with lock time/warning follows, and miniguns are evaluated last.
+
+Each mechanic is first proven on a small test track before expanding content.
+Exact tuning remains subject to playtesting; acceptance checks are in the roadmap.
+
+TRACK-002 delivers separate Gap Run and Loop & Roll prototypes with shared
+player/CPU flight, pre-gap recovery and magnetic adhesion. The editor authors gap
+intervals and per-point bank angles in version 2 files. Technical verification is
+recorded in CURRENT_STATUS; human comfort, mobile performance and final tuning
+remain playtest gates. Alternative routes and combat remain future stages.
+
 - What mobile runtime and minimum device/browser targets will be supported?
 - Which swipe mapping and orientation feel best in player tests?
 - What are the final ship roster, field size, lap count, race duration, and

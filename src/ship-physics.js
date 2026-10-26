@@ -1,6 +1,8 @@
 import * as THREE from 'three';
 import { BOOST, resolveWallImpact } from './race-interactions.js';
 import { getRacerTopSpeed } from './catch-up.js';
+import { getTrackFrame, gapAt, nextGap } from './track-path.js';
+import { launchAcrossGap, stepGapFlight, flightPose } from './gap-flight.js';
 
 // Konstanter för svävaren (kan flyttas överst i filen)
 const GRAVITY = -26.0;         // Snabb arkad-gravitation i Y-led
@@ -14,6 +16,7 @@ const HOVER_DAMPING = 9.0;     // Dämpning så att skeppet inte studsar oändli
 // brakes, track adhesion, airborne gravity, angular inertia and edge impacts.
 export function createShipPhysics(baseSpeed, tuning = {}) {
   return {
+    flight: null, recoveryTimer: 0, recoveries: 0, respawnSerial: 0, launches: 0, landings: 0,
     boostTimer: 0,        
     catchUpBonus: 0,
     catchUpGap: 0,
@@ -62,22 +65,47 @@ const damp = (value, target, lambda, dt) =>
   THREE.MathUtils.damp(value, target, lambda, dt);
 
 export function stepShipPhysics(ship, input, dt, curve, baseSpeed, trackWidth = 10) {
+  if (!curve.track?.magnetic || dt <= 1 / 120) return stepShipSubstep(ship, input, dt, curve, baseSpeed, trackWidth);
+  const previous = { distance: ship.distance, lane: ship.lateralOffset, height: ship.verticalOffset,
+    position: stepShipSubstep(ship, input, 0, curve, baseSpeed, trackWidth).position, serial: ship.respawnSerial };
+  const steps = Math.ceil(dt / (1 / 120));
+  let pose;
+  for (let i = 0; i < steps; i++) pose = stepShipSubstep(ship, input, dt / steps, curve, baseSpeed, trackWidth);
+  if (ship.respawnSerial === previous.serial) {
+    ship.previousDistance = previous.distance; ship.previousLateralOffset = previous.lane;
+    ship.previousVerticalOffset = previous.height; ship.previousPosition.copy(previous.position);
+  }
+  return pose;
+}
+
+function stepShipSubstep(ship, input, dt, curve, baseSpeed, trackWidth) {
   if (dt <= 0) {
     const frame = getFrame(curve, ship.distance);
-    return makePose(ship, frame);
+    return makePose(ship, frame, curve);
   }
 
   ship.previousDistance = ship.distance;
   ship.previousLateralOffset = ship.lateralOffset;
   ship.previousVerticalOffset = ship.verticalOffset;
-  ship.previousPosition.copy(makePose(ship, getFrame(curve, ship.distance)).position);
+  ship.previousPosition.copy(makePose(ship, getFrame(curve, ship.distance), curve).position);
 
+  if (ship.recoveryTimer > 0) {
+    ship.recoveryTimer = Math.max(0, ship.recoveryTimer - dt);
+    return makePose(ship, getFrame(curve, ship.distance), curve);
+  }
   ship.jumpCooldown = Math.max(0, ship.jumpCooldown - dt);
   ship.crashTimer = Math.max(0, ship.crashTimer - dt);
   ship.crashCooldown = Math.max(0, ship.crashCooldown - dt);
   ship.lastImpact = Math.max(0, ship.lastImpact - dt);
   ship.impactStrength = Math.max(0, ship.impactStrength - dt * 2.5);
 ship.boostTimer = Math.max(0, ship.boostTimer - dt);
+
+  const gap = gapAt(curve, ship.distance);
+  if (!ship.flight && gap) launchAcrossGap(ship, curve, gap);
+  if (ship.flight) {
+    stepGapFlight(ship, input, dt, curve, baseSpeed, trackWidth);
+    return makePose(ship, getFrame(curve, ship.distance), curve);
+  }
 
   // Original thrust rises while held and falls off when released.
   const thrustInput = THREE.MathUtils.clamp(input.thrust ?? 0, 0, 1);
@@ -120,7 +148,7 @@ ship.boostTimer = Math.max(0, ship.boostTimer - dt);
 
   // Om banan viker nedåt (slopeChange < -0.1) och vi kör fort:
   // Kasta upp skeppet i luften baserat på framåthastigheten!
-  if (!ship.airborne && ship.jumpCooldown <= 0 && slopeChange < -0.12) {
+  if (!curve.track?.magnetic && !ship.airborne && ship.jumpCooldown <= 0 && slopeChange < -0.12) {
     const forwardInertia = (ship.speed / baseSpeed) * Math.abs(slopeChange) * 12.0;
     
     if (forwardInertia > 1.5) {
@@ -135,7 +163,9 @@ ship.boostTimer = Math.max(0, ship.boostTimer - dt);
   const HOVER_SPRING = 90.0;  // Fjäderkraft vid markkontakt
   const HOVER_DAMP = 10.0;    // Dämpning för mjuk landning
 
-  if (ship.airborne) {
+  if (curve.track?.magnetic) {
+    ship.airborne = false; ship.verticalOffset = ship.verticalVelocity = 0;
+  } else if (ship.airborne) {
     // I luften: Ren gravitation drar ner skeppet
     ship.verticalVelocity -= GRAVITY * dt;
     ship.verticalOffset += ship.verticalVelocity * dt;
@@ -219,16 +249,24 @@ ship.lateralOffset += (ship.lateralVelocity + effectiveCentering) * dt * 2;
   ship.roll = damp(ship.roll, desiredRoll, ship.airborne ? 5.5 : 10.6, dt);
 
   // Progress advances with forward speed, not with steering input.
-  ship.distance += ship.speed * dt;
+  const boundary = nextGap(curve, ship.distance);
+  const targetDistance = ship.distance + ship.speed * dt;
+  if (boundary && boundary.start <= targetDistance) {
+    const remaining = (targetDistance - boundary.start) / ship.speed;
+    ship.distance = boundary.start;
+    launchAcrossGap(ship, curve, boundary);
+    stepGapFlight(ship, input, remaining, curve, baseSpeed, trackWidth);
+  } else ship.distance = targetDistance;
   frame = getFrame(curve, ship.distance);
-  return makePose(ship, frame);
+  return makePose(ship, frame, curve);
 }
 
 function getFrame(curve, distance) {
   return getTrackFrame(curve, distance / curve.getLength());
 }
 
-function makePose(ship, frame) {
+function makePose(ship, frame, curve) {
+  if (ship.flight) return flightPose(ship, curve);
   ship.velocity.copy(frame.tangent).multiplyScalar(ship.speed)
     .addScaledVector(frame.right, ship.lateralVelocity * 2)
     .addScaledVector(frame.normal, ship.verticalVelocity);
@@ -240,17 +278,4 @@ function makePose(ship, frame) {
   orientation.multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), ship.pitch));
   orientation.multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 0, 1), ship.roll*2));
   return { frame, position, orientation };
-}
-
-// Kept local to avoid coupling this module to game.js.
-function getTrackFrame(curve, progress) {
-  const u = ((progress % 1) + 1) % 1;
-  const center = curve.getPointAt(u);
-  const tangent = curve.getTangentAt(u).normalize();
-  const right = new THREE.Vector3().crossVectors(new THREE.Vector3(0, 1, 0), tangent);
-  if (right.lengthSq() < 1e-8) right.set(1, 0, 0);
-  else right.normalize();
-  const normal = new THREE.Vector3().crossVectors(tangent, right).normalize();
-  const rotation = new THREE.Matrix4().makeBasis(right, normal, tangent);
-  return { center, tangent, right, normal, rotation: new THREE.Quaternion().setFromRotationMatrix(rotation) };
 }

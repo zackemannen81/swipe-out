@@ -1,413 +1,314 @@
-import { NEON_CAUSEWAY, SYNTHETIC_DREAMS, DIGITAL_HORIZON, MOMMY_IM_SCARED ,DARK_SKIES, GEMINI,THE_JOKER,THE_VOID, AGENT_008_STAGE,ION_CATHEDRAL} from './track-data.js';
+import { BUILTIN_TRACKS, readTrackLibrary, saveTrack, resetTrack } from './track-library.js';
+import { normalizeTrack, parseTrack, serializeTrack, MAX_TRACK_BYTES } from './track-format.js';
+import { createHistory } from './editor-history.js';
+import { createEditorView } from './editor-view.js';
+import { createTrackCurve, progressAtControlPoint } from './track-path.js';
 import './editor.css';
 
-const STORAGE_KEY = 'swipe-out-track-definitions';
-const TRACKS = { track1: NEON_CAUSEWAY, track2: SYNTHETIC_DREAMS, track3: DIGITAL_HORIZON, track4: MOMMY_IM_SCARED, track5:DARK_SKIES, track6: GEMINI,track7:THE_JOKER,track8:THE_VOID, track9: AGENT_008_STAGE,track10:ION_CATHEDRAL };
-const canvas = document.querySelector('#editor-canvas');
-const context = canvas.getContext('2d');
-const savedTracks = (() => { try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); } catch { return {}; } })();
-let currentTrackId = document.querySelector('#track-select').value;
-function loadTrack(id) { return savedTracks[id] ? structuredClone(savedTracks[id]) : { ...structuredClone(TRACKS[id]), objects: [] }; }
-let track = loadTrack(currentTrackId);
-const widthInput = document.querySelector('#width-input');
-const scaleInput = document.querySelector('#scale-input');
-const pointX = document.querySelector('#point-x');
-const pointY = document.querySelector('#point-y');
-const pointZ = document.querySelector('#point-z');
-const status = document.querySelector('#status');
-let selected = 0;
-let selectedObject = -1;
-let dragging = false;
-let draggingObject = false;
-let view = { scale: 1, cx: 0, cy: 0 };
+const $ = selector => document.querySelector(selector);
+const library = readTrackLibrary(localStorage);
+const drafts = new Map();
+for (const [key, entry] of Object.entries(library.entries)) {
+  drafts.set(key, { track: entry.data, saved: JSON.stringify(entry.data), history: createHistory(entry.data) });
+}
+const requestedKey = new URLSearchParams(location.search).get('track');
+let currentKey = drafts.has(requestedKey) ? requestedKey : 'track1';
+let selection = { kind: 'point', index: 0 };
+const current = () => drafts.get(currentKey);
+const track = () => current().track;
+const isDirty = draft => draft.saved !== JSON.stringify(draft.track);
+const status = $('#status');
+function message(text, error = false) { status.textContent = text; status.classList.toggle('error', error); }
+const view = createEditorView($('#editor-canvas'), {
+  onSelect(value) { selection = value; render(); view.select(selection); },
+  onMove(value, position) {
+    edit(next => {
+      if (value.kind === 'point') next.centerline[value.index].splice(0, 3, ...position);
+      else next.objects[value.index].position = position;
+    }, false);
+  },
+  onCommit() { current().history.push(track()); render(); view.setTrack(track(), selection); },
+});
 
-function markChanged() {
-  document.querySelector('#save-state').textContent = 'UNSAVED';
-  status.textContent = 'Unsaved changes for this track. Save to use them in the race.';
-  draw();
-  syncPointFields();
-  renderObjects();
+function edit(change, commit = true) {
+  try {
+    const next = structuredClone(track());
+    change(next);
+    current().track = normalizeTrack(next);
+    if (commit) current().history.push(track());
+    render();
+    view.setTrack(track(), selection);
+    message('Unsaved changes. Save to Game or Save & Test when ready.');
+  } catch (error) {
+    render();
+    message(error.message, true);
+  }
 }
 
-function resize() {
-  const rect = canvas.getBoundingClientRect();
-  const ratio = window.devicePixelRatio || 1;
-  canvas.width = Math.round(rect.width * ratio);
-  canvas.height = Math.round(rect.height * ratio);
-  context.setTransform(ratio, 0, 0, ratio, 0, 0);
-  draw();
+function setValue(selector, value) {
+  const input = $(selector);
+  if (document.activeElement !== input) input.value = value;
+}
+function clampSelection() {
+  const count = selection.kind === 'point' ? track().centerline.length : track().objects.length;
+  if (!count) selection = { kind: 'point', index: 0 };
+  else selection.index = Math.max(0, Math.min(selection.index, count - 1));
+}
+function render() {
+  clampSelection();
+  const value = track();
+  $('#track-title').textContent = value.name;
+  const select = $('#track-select');
+  select.replaceChildren(...Array.from(drafts, ([key, draft]) => {
+    const option = new Option(`${BUILTIN_TRACKS[key] ? '' : 'CUSTOM · '}${draft.track.name}${isDirty(draft) ? ' *' : ''}`, key);
+    return option;
+  }));
+  select.value = currentKey;
+  $('#save-state').textContent = isDirty(current()) ? 'UNSAVED' : 'SAVED';
+  $('#point-count').textContent = `${value.centerline.length} POINTS · ${value.objects.length} OBJECTS`;
+  setValue('#track-name', value.name);
+  setValue('#width-input', value.width);
+  setValue('#scale-input', value.horizontalScale);
+  $('#width-value').textContent = value.width.toFixed(2);
+  $('#scale-value').textContent = value.horizontalScale.toFixed(2);
+  $('#magnetic-input').checked = value.magnetic === true;
+  $('#undo-button').disabled = !current().history.canUndo;
+  $('#redo-button').disabled = !current().history.canRedo;
+  $('#reset-button').textContent = BUILTIN_TRACKS[currentKey] ? 'RESTORE BUILT-IN' : 'REMOVE CUSTOM';
+  const pointIndex = selection.kind === 'point' ? selection.index : 0;
+  const point = value.centerline[pointIndex];
+  setValue('#point-bank', point[3] ?? 0);
+  $('#point-bank').disabled = selection.kind !== 'point' || !value.magnetic;
+  $('#selected-point').textContent = selection.kind === 'point' ? String(pointIndex + 1).padStart(2, '0') : 'OBJECT SELECTED';
+  for (const [axis, name] of ['x', 'y', 'z'].entries()) {
+    setValue(`#point-${name}`, point[axis]);
+    $(`#point-${name}`).disabled = selection.kind !== 'point';
+  }
+  $('#add-point-btn').disabled = selection.kind !== 'point' || value.centerline.length >= 512;
+  $('#del-point-btn').disabled = selection.kind !== 'point' || value.centerline.length <= 4;
+  renderObjectInspector();
+  renderGaps();
 }
 
-function draw() {
-  const { width, height } = canvas.getBoundingClientRect();
-  context.clearRect(0, 0, width, height);
-  const points = track.centerline;
-  const minX = Math.min(...points.map((point) => point[0]));
-  const maxX = Math.max(...points.map((point) => point[0]));
-  const minZ = Math.min(...points.map((point) => point[2]));
-  const maxZ = Math.max(...points.map((point) => point[2]));
-  const padding = 58;
-
-  view.scale = Math.min(
-    (width - padding * 2) / Math.max(maxX - minX, 1),
-    (height - padding * 2) / Math.max(maxZ - minZ, 1)
-  );
-  view.cx = (width - (minX + maxX) * view.scale) / 2;
-  view.cy = (height - (minZ + maxZ) * view.scale) / 2;
-
-  const screen = ([x, , z]) => [view.cx + x * view.scale, view.cy + z * view.scale];
-
-  // Bakgrundsrutnät
-  context.strokeStyle = 'rgba(112, 157, 174, .11)';
-  context.lineWidth = 1;
-  for (let x = 0; x < width; x += 32) { context.beginPath(); context.moveTo(x, 0); context.lineTo(x, height); context.stroke(); }
-  for (let y = 0; y < height; y += 32) { context.beginPath(); context.moveTo(0, y); context.lineTo(width, y); context.stroke(); }
-
-  // Bana (Väg)
-  context.beginPath();
-  points.forEach((point, index) => {
-    const [x, y] = screen(point);
-    if (index === 0) context.moveTo(x, y); else context.lineTo(x, y);
-  });
-  context.closePath();
-  context.lineJoin = 'round';
-  context.lineCap = 'round';
-  context.strokeStyle = 'rgba(25, 39, 54, .9)';
-  context.lineWidth = Math.max(3, track.width * view.scale);
-  context.stroke();
-  context.strokeStyle = '#56e6dc';
-  context.lineWidth = 2;
-  context.stroke();
-
-  // Banans kontrollpunkter
-  points.forEach((point, index) => {
-    const [x, y] = screen(point);
-    context.beginPath();
-    context.arc(x, y, index === selected ? 7 : 4, 0, Math.PI * 2);
-    context.fillStyle = index === selected ? '#ff5f98' : '#d8fff9';
-    context.fill();
-    context.strokeStyle = '#09121c';
-    context.lineWidth = 2;
-    context.stroke();
-  });
-
-  // 3D-PRIMITIVER (Enkel, korrekt loop)
-  track.objects.forEach((object, index) => {
-    const [x, y] = screen([object.position[0], 0, object.position[2]]);
-
-    // Beräkna storlek i canvas-pixlar baserat på objektets scale
-    const widthPx = (object.scale?.[0] ?? 1) * view.scale;
-    const heightPx = (object.scale?.[2] ?? 1) * view.scale;
-    const rotY = object.rotation ? (object.rotation[1] * Math.PI) / 180 : 0;
-    const isSelected = selectedObject === index;
-
-    context.save();
-    context.translate(x, y);
-    context.rotate(rotY);
-
-    context.beginPath();
-    if (object.type === 'box') {
-      const w = Math.max(widthPx, 12); // Minst 12px så den går att klicka
-      const h = Math.max(heightPx, 12);
-      context.rect(-w / 2, -h / 2, w, h);
-    } else {
-      const rx = Math.max(widthPx / 2, 6); // Minst 6px radie
-      const ry = Math.max(heightPx / 2, 6);
-      context.ellipse(0, 0, rx, ry, 0, 0, Math.PI * 2);
+function renderGaps() {
+  const gaps = track().gaps ?? [];
+  $('#gap-count').textContent = String(gaps.length);
+  $('#add-gap-button').disabled = !track().magnetic || selection.kind !== 'point' || gaps.length >= 16;
+  const list = $('#gap-list');
+  if (list.contains(document.activeElement)) return;
+  list.replaceChildren(...gaps.map((gap, index) => {
+    const row = document.createElement('div'); row.className = 'gap-row';
+    for (const key of ['start', 'end']) {
+      const label = document.createElement('label'); label.textContent = `${key.toUpperCase()} %`;
+      const input = document.createElement('input');
+      Object.assign(input, { type: 'number', min: 3, max: key === 'start' ? 90 : 94, step: 0.1, value: (gap[key] * 100).toFixed(3) });
+      input.setAttribute('aria-label', `Gap ${index + 1} ${key} percent`);
+      input.addEventListener('change', () => { const value = input.valueAsNumber / 100; input.blur(); edit(next => { next.gaps[index][key] = value; }); });
+      label.append(input); row.append(label);
     }
-
-    context.fillStyle = object.type === 'cylinder' ? '#ffd166' : object.type === 'sphere' ? '#b58cff' : '#ff7aa8';
-    context.fill();
-    context.strokeStyle = isSelected ? '#ffffff' : '#09121c';
-    context.lineWidth = isSelected ? 3 : 2;
-    context.stroke();
-
-    context.restore();
-
-    // Rita nummerlapp i mitten
-    context.fillStyle = '#09121c';
-    context.font = '9px "DM Mono", monospace';
-    context.textAlign = 'center';
-    context.textBaseline = 'middle';
-    context.fillText(String(index + 1), x, y);
-  });
-
-  document.querySelector('#point-count').textContent = `${points.length} POINTS · ${track.objects.length} OBJECTS`;
-  document.querySelector('#width-value').textContent = Number(track.width).toFixed(2);
-  document.querySelector('#scale-value').textContent = Number(track.horizontalScale).toFixed(2);
-}
-function syncPointFields() {
-  const point = track.centerline[selected];
-  document.querySelector('#selected-point').textContent = String(selected + 1).padStart(2, '0');
-  [pointX, pointY, pointZ].forEach((input, axis) => { input.value = point[axis]; });
+    const remove = document.createElement('button'); remove.textContent = 'REMOVE';
+    remove.addEventListener('click', () => edit(next => { next.gaps.splice(index, 1); }));
+    row.append(remove); return row;
+  }));
 }
 
-function pointerToPoint(event) {
-  const rect = canvas.getBoundingClientRect();
-  const x = (event.clientX - rect.left - view.cx) / view.scale;
-  const z = (event.clientY - rect.top - view.cy) / view.scale;
-  let nearest = -1;
-  let distance = Infinity;
-  track.centerline.forEach((point, index) => {
-    const d = Math.hypot(point[0] - x, point[2] - z);
-    if (d < distance) { distance = d; nearest = index; }
-  });
-  let nearestObject = -1;
-  let objectDistance = Infinity;
-  track.objects.forEach((object, index) => {
-    const d = Math.hypot(object.position[0] - x, object.position[2] - z);
-    if (d < objectDistance) { objectDistance = d; nearestObject = index; }
-  });
-  return { nearest, x, z, distance: distance * view.scale, nearestObject, objectDistance: objectDistance * view.scale };
-}
-
-function renderObjects() {
-  const list = document.querySelector('#primitive-list');
-  list.innerHTML = '';
-  track.objects.forEach((object, index) => {
-    const row = document.createElement('div');
-    row.className = `primitive-row ${selectedObject === index ? 'active-row' : ''}`;
-    
-    object.rotation ||= [0, 0, 0];
-    object.animType ||= 'none';
-    object.opacity ||= 1;
-
-    row.innerHTML = `
-      <div style="display:flex; justify-content:space-between; align-items:center;">
-        <b>${index + 1}. ${object.type.toUpperCase()}</b>
-        ${object.texture ? `<img src="${object.texture}" style="width:20px; height:20px; object-fit:cover; border-radius:2px;">` : ''}
-      </div>
-      
-      <!-- POSITION -->
-      <label>POS <input data-field="x" type="number" value="${object.position[0]}" step="1">
-                 <input data-field="y" type="number" value="${object.position[1]}" step="1">
-                 <input data-field="z" type="number" value="${object.position[2]}" step="1"></label>
-      
-      <!-- ROTATION -->
-      <div class="object-dimensions">
-        <span>ROTATION (DEG)</span>
-        <label>X <input data-rot="0" type="number" step="15" value="${object.rotation[0]}"></label>
-        <label>Y <input data-rot="1" type="number" step="15" value="${object.rotation[1]}"></label>
-        <label>Z <input data-rot="2" type="number" step="15" value="${object.rotation[2]}"></label>
-      </div>
-
-      <!-- SCALE -->
-      <div class="object-dimensions">
-        <span>SCALE</span>
-        ${['x', 'y', 'z'].map((axis, dim) => `<label>${axis.toUpperCase()} <input data-dimension="${dim}" type="number" min="0.1" step="0.5" value="${object.scale?.[dim] ?? 1}"></label>`).join('')}
-      </div>
-
-      <!-- TEXTUR & FX -->
-      <label>TEXTURE <input data-field="texture" type="file" accept="image/*"></label>
-      <label>FX 
-        <select data-field="animType">
-          <option value="none" ${object.animType === 'none' ? 'selected' : ''}>STATIC</option>
-          <option value="scroll-x" ${object.animType === 'scroll-x' ? 'selected' : ''}>NEON SCROLL X</option>
-          <option value="scroll-y" ${object.animType === 'scroll-y' ? 'selected' : ''}>NEON SCROLL Y</option>
-          <option value="pulse" ${object.animType === 'pulse' ? 'selected' : ''}>GLOW PULSE</option>
-        </select>
-      </label>
-      <label>OPACITY
-        <input data-field="opacity" type="number" min="0.1" max="1" step="0.05" value="${object.opacity ?? 1}">
-      </label>
-      <button data-remove style="margin-top:8px;">REMOVE OBJECT</button>
-    `;
-
-    // Event listeners
-    row.querySelectorAll('[data-field]').forEach((input) => input.addEventListener('change', () => {
-      if (input.dataset.field === 'texture') {
-        const file = input.files[0];
-        if (file) {
-          const reader = new FileReader();
-          reader.onload = () => { object.texture = reader.result; markChanged(); };
-          reader.readAsDataURL(file);
-        }
-        return;
-      }
-      if (input.dataset.field === 'animType') {
-        object.animType = input.value;
-        markChanged();
-        return;
-      }
-      if (input.dataset.field === 'opacity') {
-        object.opacity = Number(input.value) || 1;
-        markChanged();
-        return;
-      }
-      object.position[['x', 'y', 'z'].indexOf(input.dataset.field)] = Number(input.value) || 0;
-      markChanged();
-    }));
-
-    row.querySelectorAll('[data-rot]').forEach((input) => input.addEventListener('change', () => {
-      const axis = Number(input.dataset.rot);
-      object.rotation[axis] = Number(input.value) || 0;
-      markChanged();
-    }));
-
-    row.querySelectorAll('[data-dimension]').forEach((input) => input.addEventListener('change', () => {
-      const dim = Number(input.dataset.dimension);
-      object.scale ||= [1, 1, 1];
-      object.scale[dim] = Number(input.value) || 1;
-      markChanged();
-    }));
-
-    row.querySelector('[data-remove]').addEventListener('click', () => { 
-      track.objects.splice(index, 1); 
-      selectedObject = -1;
-      markChanged(); 
+function renderObjectInspector() {
+  const select = $('#object-select');
+  select.replaceChildren(new Option('Select scenery…', ''), ...track().objects.map((object, i) => new Option(`${i + 1}. ${object.type.toUpperCase()}`, String(i))));
+  select.value = selection.kind === 'object' ? String(selection.index) : '';
+  const panel = $('#primitive-list');
+  // Keep a focused numeric control alive while a value is being entered.
+  if (panel.contains(document.activeElement)) return;
+  panel.replaceChildren();
+  if (selection.kind !== 'object') return;
+  const object = track().objects[selection.index];
+  const row = document.createElement('div');
+  row.className = 'primitive-row active-row';
+  const title = document.createElement('b');
+  title.textContent = `${selection.index + 1}. ${object.type.toUpperCase()}`;
+  row.append(title);
+  for (const [field, labelText, step] of [['position', 'POSITION', 1], ['rotation', 'ROTATION (DEG)', 5], ['scale', 'SCALE', 0.5]]) {
+    const section = document.createElement('div');
+    section.className = 'object-dimensions';
+    const heading = document.createElement('span'); heading.textContent = labelText; section.append(heading);
+    ['X', 'Y', 'Z'].forEach((axis, i) => {
+      const label = document.createElement('label'); label.textContent = axis;
+      const input = document.createElement('input');
+      input.type = 'number'; input.step = step; input.value = object[field][i];
+      input.setAttribute('aria-label', `${labelText} ${axis}`);
+      input.addEventListener('change', () => {
+        const value = input.valueAsNumber;
+        const index = selection.index;
+        input.blur();
+        edit(next => { next.objects[index][field][i] = value; });
+      });
+      label.append(input); section.append(label);
     });
-
-    list.append(row);
+    row.append(section);
+  }
+  const opacityLabel = document.createElement('label'); opacityLabel.textContent = 'OPACITY';
+  const opacity = document.createElement('input');
+  Object.assign(opacity, { type: 'number', min: 0, max: 1, step: 0.05, value: object.opacity });
+  opacity.setAttribute('aria-label', 'Object opacity');
+  opacity.addEventListener('change', () => { const value = opacity.valueAsNumber; opacity.blur(); edit(next => { next.objects[selection.index].opacity = value; }); });
+  opacityLabel.append(opacity); row.append(opacityLabel);
+  const fxLabel = document.createElement('label'); fxLabel.textContent = 'ANIMATION';
+  const fx = document.createElement('select'); fx.setAttribute('aria-label', 'Object animation');
+  for (const type of ['none', 'scroll-x', 'scroll-y', 'pulse']) fx.add(new Option(type.toUpperCase(), type));
+  fx.value = object.animType;
+  fx.addEventListener('change', () => { const value = fx.value; fx.blur(); edit(next => { next.objects[selection.index].animType = value; }); });
+  fxLabel.append(fx); row.append(fxLabel);
+  const textureLabel = document.createElement('label'); textureLabel.textContent = 'TEXTURE';
+  const file = document.createElement('input');
+  file.type = 'file'; file.accept = 'image/png,image/jpeg,image/webp,image/gif';
+  file.addEventListener('change', async () => {
+    const image = file.files[0]; if (!image) return;
+    if (image.size > 4 * 1024 * 1024) { message('Texture exceeds 4 MB. Choose a smaller image.', true); return; }
+    const key = currentKey, index = selection.index, before = track().objects[index];
+    const data = await new Promise((resolve, reject) => {
+      const reader = new FileReader(); reader.onload = () => resolve(reader.result); reader.onerror = reject; reader.readAsDataURL(image);
+    }).catch(() => null);
+    if (key !== currentKey || track().objects[index] !== before) { message('Selection changed; choose the texture again.'); return; }
+    if (!data) { message('Could not read the image.', true); return; }
+    file.blur(); edit(next => { next.objects[index].texture = data; });
   });
+  textureLabel.append(file); row.append(textureLabel);
+  if (object.texture) {
+    const image = document.createElement('img'); image.src = object.texture; image.alt = 'Object texture'; image.className = 'texture-preview'; row.append(image);
+    const clear = document.createElement('button'); clear.textContent = 'CLEAR TEXTURE';
+    clear.addEventListener('click', () => edit(next => { next.objects[selection.index].texture = null; })); row.append(clear);
+  }
+  const remove = document.createElement('button'); remove.textContent = 'REMOVE OBJECT';
+  remove.addEventListener('click', () => {
+    const index = selection.index;
+    selection = { kind: 'point', index: 0 };
+    edit(next => { next.objects.splice(index, 1); });
+  });
+  row.append(remove); panel.append(row);
 }
 
-// 1. Infoga ny punkt efter den valda
-document.querySelector('#add-point-btn')?.addEventListener('click', () => {
-  const current = track.centerline[selected];
-  const next = track.centerline[(selected + 1) % track.centerline.length];
-  // Skapa en ny punkt mitt emellan
-  const newPoint = [
-    Math.round((current[0] + next[0]) / 2),
-    Math.round((current[1] + next[1]) / 2),
-    Math.round((current[2] + next[2]) / 2),
-    current[3] || 0 // Lutning/Bank
-  ];
-  track.centerline.splice(selected + 1, 0, newPoint);
-  selected = selected + 1;
-  markChanged();
+function activate(key) {
+  currentKey = key;
+  selection = { kind: 'point', index: 0 };
+  render(); view.setTrack(track(), selection); view.fit();
+  message('Drafts are kept while switching tracks. Save or download before closing the editor.');
+}
+$('#track-select').addEventListener('change', event => activate(event.target.value));
+$('#object-select').addEventListener('change', event => {
+  if (event.target.value === '') return;
+  selection = { kind: 'object', index: Number(event.target.value) };
+  render(); view.select(selection); view.focus();
 });
-
-// 2. Ta bort vald punkt
-document.querySelector('#del-point-btn')?.addEventListener('click', () => {
-  if (track.centerline.length <= 4) {
-    alert("Banan måste ha minst 4 punkter!");
-    return;
-  }
-  track.centerline.splice(selected, 1);
-  selected = Math.max(0, selected - 1);
-  markChanged();
+$('#track-name').addEventListener('change', event => { const value = event.target.value; event.target.blur(); edit(next => { next.name = value; }); });
+$('#magnetic-input').addEventListener('change', event => edit(next => { next.magnetic = event.target.checked; }));
+$('#point-bank').addEventListener('change', event => {
+  const value = event.target.valueAsNumber; event.target.blur();
+  edit(next => { next.centerline[selection.index][3] = value; });
 });
-
-// 3. Automatisk höjdanpassning när du drar ett objekt på 2D-kartan
-canvas.addEventListener('pointermove', (event) => {
-  if (draggingObject && selectedObject >= 0) {
-    const { x, z } = pointerToPoint(event);
-    const obj = track.objects[selectedObject];
-    obj.position[0] = Math.round(x);
-    obj.position[2] = Math.round(z);
-
-    // Hitta den banpunkt i 2D som också är närmast objektets NUVARANDE höjd (Y)
-    let bestPoint = null;
-    let minScore = Infinity;
-
-    track.centerline.forEach((pt) => {
-      const d2d = Math.hypot(pt[0] - x, pt[2] - z);
-      if (d2d < 30) { // Inom rimligt räckvidd i 2D
-        const dY = Math.abs(pt[1] - obj.position[1]);
-        const score = d2d + dY * 2; // Prioritera punkter som ligger nära i höjdled
-        if (score < minScore) {
-          minScore = score;
-          bestPoint = pt;
-        }
-      }
-    });
-
-    if (bestPoint) {
-      obj.position[1] = bestPoint[1] + 2; // Sätt Y 2 enheter ovanför rätt spårnivå
-    }
-
-    markChanged();
-    return;
-  }
-
-  if (!dragging) return;
-  const { x, z } = pointerToPoint(event);
-  track.centerline[selected][0] = Math.round(x);
-  track.centerline[selected][2] = Math.round(z);
-  markChanged();
+$('#add-gap-button').addEventListener('click', () => {
+  const curve = createTrackCurve(track());
+  const start = Math.max(0.03, Math.min(0.87, progressAtControlPoint(curve, selection.index)));
+  edit(next => { next.gaps ??= []; next.gaps.push({ start, end: start + 0.025 }); });
 });
-
-document.querySelectorAll('[data-primitive]').forEach((button) => button.addEventListener('click', () => {
-  track.objects.push({ id: crypto.randomUUID(), type: button.dataset.primitive, position: [0, 2, 0], rotation: [0, 0, 0], scale: [1, 1, 1], texture: null });
-  markChanged();
-}));
-document.querySelector('#track-select').addEventListener('change', (event) => { currentTrackId = event.target.value; track = loadTrack(currentTrackId); widthInput.value = track.width; scaleInput.value = track.horizontalScale; selected = 0; syncPointFields(); draw(); renderObjects(); });
-
-canvas.addEventListener('pointerdown', (event) => {
-  const { nearest, distance, x, z, nearestObject, objectDistance } = pointerToPoint(event);
-  if (nearestObject >= 0 && objectDistance <= 18 && (objectDistance <= distance || distance > 18)) {
-    selectedObject = nearestObject;
-    draggingObject = true;
-    canvas.setPointerCapture(event.pointerId);
-    draw();
-    return;
-  }
-  selectedObject = -1;
-  if (distance > 18) return;
-  selected = nearest;
-  dragging = true;
-  canvas.setPointerCapture(event.pointerId);
-  syncPointFields();
-  draw();
-});
-canvas.addEventListener('pointermove', (event) => {
-  if (draggingObject && selectedObject >= 0) {
-    const { x, z } = pointerToPoint(event);
-    track.objects[selectedObject].position[0] = Math.round(x);
-    track.objects[selectedObject].position[2] = Math.round(z);
-    markChanged();
-    return;
-  }
-  if (!dragging) return;
-  const { x, z } = pointerToPoint(event);
-  track.centerline[selected][0] = Math.round(x);
-  track.centerline[selected][2] = Math.round(z);
-  markChanged();
-});
-canvas.addEventListener('pointerup', () => { dragging = false; draggingObject = false; });
-canvas.addEventListener('pointercancel', () => { dragging = false; draggingObject = false; });
-
-function bindNumber(input, axis) {
-  input.addEventListener('input', () => {
-    const value = Number(input.value);
-    if (!Number.isFinite(value)) return;
-    track.centerline[selected][axis] = value;
-    markChanged();
+for (const [axis, name] of ['x', 'y', 'z'].entries()) {
+  $(`#point-${name}`).addEventListener('change', event => {
+    const value = event.target.valueAsNumber; event.target.blur();
+    edit(next => { next.centerline[selection.index][axis] = value; });
   });
 }
-bindNumber(pointX, 0);
-bindNumber(pointY, 1);
-bindNumber(pointZ, 2);
-widthInput.addEventListener('input', () => { track.width = Number(widthInput.value); markChanged(); });
-scaleInput.addEventListener('input', () => { track.horizontalScale = Number(scaleInput.value); markChanged(); });
-
-document.querySelector('#save-button').addEventListener('click', () => {
-  savedTracks[currentTrackId] = track;
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(savedTracks));
-  document.querySelector('#save-state').textContent = 'SAVED';
-  status.textContent = 'Saved for this track and browser. Reload the race to see the updated route and objects.';
+for (const [selector, key] of [['#width-input', 'width'], ['#scale-input', 'horizontalScale']]) {
+  $(selector).addEventListener('input', event => edit(next => { next[key] = event.target.valueAsNumber; }, false));
+  $(selector).addEventListener('change', () => { current().history.push(track()); render(); });
+}
+$('#add-point-btn').addEventListener('click', () => {
+  const index = selection.index;
+  edit(next => {
+    const a = next.centerline[index], b = next.centerline[(index + 1) % next.centerline.length];
+    const point = a.slice(0, 3).map((n, axis) => (n + b[axis]) / 2);
+    if (a.length === 4) point.push(a[3]);
+    next.centerline.splice(index + 1, 0, point);
+  });
+  selection.index = index + 1; render(); view.select(selection);
 });
-document.querySelector('#reset-button').addEventListener('click', () => {
-  localStorage.removeItem(STORAGE_KEY);
-  location.reload();
+$('#del-point-btn').addEventListener('click', () => edit(next => { next.centerline.splice(selection.index, 1); }));
+for (const button of document.querySelectorAll('[data-primitive]')) {
+  button.addEventListener('click', () => {
+    const position = track().centerline[selection.kind === 'point' ? selection.index : 0].slice(0, 3);
+    position[1] += 2;
+    edit(next => next.objects.push({ id: crypto.randomUUID(), type: button.dataset.primitive, position, scale: [5, 5, 5] }));
+    selection = { kind: 'object', index: track().objects.length - 1 };
+    render(); view.select(selection);
+  });
+}
+function historyAction(action) {
+  current().track = current().history[action]();
+  render(); view.setTrack(track(), selection);
+  message(action === 'undo' ? 'Edit undone.' : 'Edit restored.');
+}
+$('#undo-button').addEventListener('click', () => historyAction('undo'));
+$('#redo-button').addEventListener('click', () => historyAction('redo'));
+window.addEventListener('keydown', event => {
+  if (event.target.matches('input, textarea, select') || !(event.ctrlKey || event.metaKey)) return;
+  if (event.code === 'KeyZ' || event.code === 'KeyY') {
+    event.preventDefault(); historyAction(event.shiftKey || event.code === 'KeyY' ? 'redo' : 'undo');
+  }
 });
-document.querySelector('#copy-button').addEventListener('click', async () => {
-  await navigator.clipboard.writeText(`export const NEON_CAUSEWAY = ${JSON.stringify(track, null, 2)};\n`);
-  status.textContent = 'Track definition copied as JavaScript.';
+$('#fit-button').addEventListener('click', () => view.fit());
+$('#top-button').addEventListener('click', () => view.fit(true));
+$('#side-button').addEventListener('click', () => view.fit('side'));
+$('#focus-button').addEventListener('click', () => view.focus());
+function save() {
+  try {
+    const normalized = saveTrack(localStorage, currentKey, track());
+    current().track = normalized; current().saved = JSON.stringify(normalized);
+    render(); message('Saved to this browser. The track is now available in the race selector.');
+    return true;
+  } catch (error) { message(error.message, true); return false; }
+}
+$('#save-button').addEventListener('click', save);
+$('#test-button').addEventListener('click', () => {
+  if (save()) window.open(`./?track=${encodeURIComponent(currentKey)}&editor=1`, '_blank', 'noopener');
 });
-document.querySelector('#download-button').addEventListener('click', () => {
-  const blob = new Blob([JSON.stringify(track, null, 2)], { type: 'application/json' });
-  const link = document.createElement('a');
-  link.href = URL.createObjectURL(blob);
-  link.download = `${track.id || 'track'}.json`;
-  link.click();
-  URL.revokeObjectURL(link.href);
-  status.textContent = 'Track JSON downloaded.';
+$('#reset-button').addEventListener('click', () => {
+  const builtIn = BUILTIN_TRACKS[currentKey];
+  if (!window.confirm(builtIn ? 'Restore this built-in track and discard its saved override and draft? Other tracks are kept.' : 'Remove this custom track and its draft? Download it first if you want to keep a copy.')) return;
+  try {
+    resetTrack(localStorage, currentKey);
+    if (builtIn) {
+      const restored = normalizeTrack(builtIn.data);
+      drafts.set(currentKey, { track: restored, saved: JSON.stringify(restored), history: createHistory(restored) });
+      activate(currentKey);
+    } else { drafts.delete(currentKey); activate('track1'); }
+    message('Selected track reset. Other tracks were kept.');
+  } catch (error) { message(error.message, true); }
 });
-
-widthInput.value = track.width;
-scaleInput.value = track.horizontalScale;
-syncPointFields();
-renderObjects();
-window.addEventListener('resize', resize);
-resize();
+$('#copy-button').addEventListener('click', async () => {
+  try { await navigator.clipboard.writeText(serializeTrack(track())); message('Track JSON copied.'); }
+  catch (error) { message(`Could not copy: ${error.message} Use Download instead.`, true); }
+});
+$('#download-button').addEventListener('click', () => {
+  try {
+    const url = URL.createObjectURL(new Blob([serializeTrack(track())], { type: 'application/json' }));
+    const link = document.createElement('a'); link.href = url;
+    link.download = `${track().id.replace(/[^a-z0-9_-]/gi, '-').slice(0, 80) || 'track'}.json`;
+    link.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+    message('Versioned track JSON downloaded. Embedded textures travel with the file.');
+  } catch (error) { message(error.message, true); }
+});
+$('#import-button').addEventListener('click', () => $('#import-file').click());
+$('#import-file').addEventListener('change', async event => {
+  const file = event.target.files[0]; event.target.value = ''; if (!file) return;
+  try {
+    if (file.size > MAX_TRACK_BYTES) throw new Error('File exceeds 16 MB.');
+    const value = parseTrack(await file.text());
+    const key = `custom-${crypto.randomUUID()}`;
+    drafts.set(key, { track: value, saved: null, history: createHistory(value) });
+    activate(key);
+    message('Imported as a new draft. Existing tracks are kept. Save to Game to make this track playable.');
+  } catch (error) { message(`Import failed — ${error.message}`, true); }
+});
+window.addEventListener('beforeunload', event => {
+  if ([...drafts.values()].some(isDirty)) { event.preventDefault(); event.returnValue = ''; }
+});
+render(); view.setTrack(track(), selection); view.fit();
+if (library.issues.length) message(library.issues.join(' '), true);

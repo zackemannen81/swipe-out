@@ -2,7 +2,7 @@
 :root { font-family: Inter, sans-serif; color: #eaf3f5; background: #080d14; font-synthesis: none; }
 * { box-sizing: border-box; }
 body { margin: 0; min-width: 320px; min-height: 100vh; background: radial-gradient(ellipse at 70% 15%, #122431, #080d14 65%); }
-button, input { font: inherit; }
+button, input, select { font: inherit; }
 .editor-shell { max-width: 1500px; min-height: 100vh; margin: auto; padding: 34px clamp(18px, 4vw, 64px) 24px; }
 .editor-header { display: flex; align-items: end; justify-content: space-between; padding-bottom: 27px; border-bottom: 1px solid #263944; }
 .eyebrow, .panel-heading, .canvas-help, .subheading, footer { font: 10px/1.5 'DM Mono', monospace; letter-spacing: .14em; }
@@ -15,7 +15,7 @@ h1 span { color: #5de8df; }
 .canvas-panel, .controls-panel { border: 1px solid #263944; background: rgba(7, 14, 22, .8); }
 .panel-heading { display: flex; justify-content: space-between; padding: 15px 17px; color: #aabac3; border-bottom: 1px solid #263944; }
 .panel-heading b { color: #5de8df; font-weight: 400; }
-#editor-canvas { display: block; width: 100%; height: min(68vh, 720px); min-height: 390px; touch-action: none; cursor: crosshair; }
+#editor-canvas { display: block; width: 100%; height: min(58vh, 580px); min-height: 390px; touch-action: none; cursor: crosshair; }
 .canvas-help { margin: 0; padding: 13px 17px; color: #81949e; border-top: 1px solid #263944; font-size: 9px; }
 .controls-panel { padding-bottom: 17px; }
 .controls-panel > label { display: block; padding: 19px 18px 0; color: #aabac3; font: 10px 'DM Mono', monospace; letter-spacing: .12em; }
@@ -43,5 +43,26 @@ button:hover { border-color: #5de8df; color: #5de8df; }
 button.primary { border-color: #5de8df; background: #5de8df; color: #071217; font-weight: 500; }
 button.primary:hover { background: #a1fff7; }
 .status { min-height: 42px; margin: 16px 18px 0; color: #81949e; font-size: 11px; line-height: 1.6; }
+.status.error { color: #ff8eaf; }
+.view-toolbar { display: flex; flex-wrap: wrap; gap: 6px; padding: 10px; }
+.view-toolbar button { font-size: 9px; min-width: 70px; }
+.test-button { display: block; width: calc(100% - 32px); margin: 16px; }
+.canvas-panel { align-self: start; position: sticky; top: 12px; }
+button:disabled { opacity: .35; cursor: default; }
+button:focus-visible, select:focus-visible { outline: 2px solid #5de8df; outline-offset: 3px; }
+.controls-panel select, #track-name { width: 100%; margin-top: 8px; padding: 8px; background: #10202a; color: #eaf3f5; border: 1px solid #304650; }
+.primitive-editor { margin: 23px 18px 0; padding-top: 17px; border-top: 1px solid #263944; }
+.primitive-editor .button-row { margin: 8px 0; flex-wrap: wrap; }
+.primitive-editor .button-row button { min-width: 55px; font-size: 9px; }
+.object-picker { display: block; font: 10px 'DM Mono', monospace; color: #aabac3; }
+.field-help { color: #81949e; font-size: 11px; line-height: 1.5; }
+.gap-editor { margin: 23px 18px 0; padding-top: 17px; border-top: 1px solid #263944; }
+.gap-editor > button { width: 100%; }
+.gap-row { display: grid; grid-template-columns: 1fr 1fr auto; gap: 6px; align-items: end; margin-top: 10px; }
+.gap-row label { font: 9px 'DM Mono', monospace; color: #aabac3; }
+.gap-row input { width: 100%; margin-top: 6px; padding: 7px; color: #eef; background: #10202a; border: 1px solid #304650; }
+.gap-row button { min-height: 32px; padding: 4px; }
+.texture-preview { display: block; width: 60px; height: 60px; object-fit: cover; margin-top: 8px; }
+@media (max-width: 800px) { .canvas-panel { position: static; } .editor-shell { padding: 18px 12px; } }
 footer { margin-top: 21px; color: #758891; font-size: 9px; } footer span { color: #5de8df; padding: 0 5px; }
 @media (max-width: 800px) { .editor-layout { grid-template-columns: 1fr; } #editor-canvas { height: 56vh; min-height: 320px; } .editor-header { align-items: center; } }

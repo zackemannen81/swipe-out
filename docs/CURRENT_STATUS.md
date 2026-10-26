@@ -1,5 +1,96 @@
 # Current Status
 
+## 2026-10-26 — TRACK-002: gaps, magnetic banks, barrel-rolls and loops
+
+Roadmap stages 3 and 4 are implemented for playtesting. The catalog now has twelve
+built-ins: the original ten plus TEST · Gap Run (track11) and TEST · Loop & Roll
+(track12). Original tracks keep their previous geometry, physics and tuning.
+The new circuits are deliberately simple mechanic prototypes using existing
+background/music assets. Branches and weapons remain unimplemented.
+
+Version 2 JSON adds optional magnetic road, per-control-point bank degrees and
+normalized gap intervals. Version 1 and plain legacy imports retain their old
+behavior; legacy fourth-coordinate metadata is inactive unless magnetic road is
+enabled. Editor controls include magnetic enable, bank/roll, gap start/end/remove,
+orange guide segments and side view, integrated with validation/history/save/test.
+Gaps stay at lap percentages when the spline changes; authors must recheck takeoff
+and landing after reshaping. Validation checks data, not whether a jump is possible.
+
+The shared transported frame remains continuous through vertical/inverted track,
+bank winding and the closed seam. Road, rails, markers, pads, craft and AI use it.
+Magnetic decks are opaque with subdued emission so they remain visible upside
+down; authored decorative objects keep world-space transforms. The magnetic camera
+follows local up and snaps on recovery; the legacy camera remains unchanged.
+
+Gaps remove real road triangles and fixtures. Orange/green lips mark departure
+and landing. Player/CPU launch at the exact edge with world momentum, downward
+gravity and limited sideways air control. Local surface projection supplies race
+progress and swept landing; it never constrains the flight position. Misses reset
+70 units before takeoff (adjusted if an earlier gap occupies that point), with a
+0.65-second recovery hold and no collision sweep across the teleport. Airborne
+craft cannot collect pads or hit invisible spline walls. Air-to-air impulses affect
+actual velocity. Checkpoints/finish wait for ground contact; race reset clears
+flight state. CPU drivers center and build speed before gaps.
+
+Verification: all 35 Node tests pass. New tests cover 100/129/140/210-speed landings,
+low-speed/sideways misses, real gravity, pause, airborne contacts, fixture removal,
+8,192 continuous frame samples, camera clearance, closed seams and 30/60/120 Hz.
+All four CPUs complete three laps on both circuits with real pads and collisions.
+Chromium WebGL passed the actual new editor controls and v2 export/import, player
+and four-CPU jump/landing, paused-flight freeze, controlled failed jump/recovery,
+reload reset, actual vertical-loop traversal and a controlled inverted barrel-roll
+view. The existing 3D editor acceptance script also passes mouse gizmo manipulation,
+history, legacy authoring, custom export/import/save-and-test, invalid-file
+preservation, reset/reload and landscape layout. Screenshots are inspected in
+temporary swipe-out-track001/002; no browser JS errors or failed requests.
+Production build, syntax and whitespace checks pass; existing Vite chunk warning.
+
+Limits: magnetic adhesion is intentional arcade behavior, not a force simulation.
+Landing checks the nearby intended road, not arbitrary intersecting surfaces or
+decorative scenery. Gap Run is a straight jump; unusual user-authored curved or
+inverted jumps need their own testing. The minimap remains a top-down centerline
+projection. Human readability/comfort, final difficulty and physical-device
+performance remain open; stage 4's human playtest checkbox is intentionally unset.
+
+## 2026-10-26 — TRACK-001: versioned track sharing and initial 3D editor
+
+The approved six-stage expansion is tracked in TRACK_ROADMAP.md. Stages 1 and 2
+are implemented; gaps, banking/twists/loops, branches and weapons remain planned.
+The older historical records below retain their original scope and limitations.
+
+Game/editor now share validated loading through track-format.js and track-library.js.
+Version 1 exports use a swipe-out-track envelope; old plain JSON files and both
+legacy storage keys load through the same migration. Every shipped track keeps its
+original centerline and scenery. Imported files become separate unsaved custom
+tracks, and saved customs appear in the game selector. Invalid files/future versions
+are rejected before draft/storage changes; corrupt saved entries fall back safely.
+Save/reset target one library entry; storage failure offers download recovery.
+
+The editor uses the actual game road and scenery meshes in an orbit/pan/zoom 3D
+view. Point selection and XYZ handles, numeric height/coordinates, width/scale,
+point insertion/deletion, scenery translation/properties, undo/redo and per-track
+drafts are connected. History is bounded by count and approximate string memory.
+Save & Test opens the selected saved track in a game tab; Start remains disabled
+while asynchronous craft assets initialize. Existing CPU, handling, catch-up and
+thruster behavior is preserved, including the user's concurrent speed calibration.
+
+Verification: 26 Node tests pass. Seven new regressions include exact geometry,
+curve length and boost placements for all ten built-ins after JSON round-trip,
+scenery/texture retention, legacy migration, invalid/future data, corrupt storage,
+quota failure, scoped reset and history. Actual Chromium WebGL interaction passed
+3D height drag, undo/redo, numeric/point editing, scenery preservation/opacity,
+draft switching, download/import, invalid imports leaving data intact, save-and-test
+on the exported track, race start/movement and reset/reload persistence. Inspected
+desktop editor/race and 844x390 layout screenshots; final run had no JS errors or
+failed requests. Build/syntax/whitespace checks pass; existing chunk-size warning.
+
+Limits: editor lights/guides differ from race presentation; scenery animations
+are static in the editor. Custom tracks currently inherit Neon Causeway music and
+backdrop. Embedded images are portable; referenced paths/URLs still need their
+assets. Imports are capped at 16 MB and browser save quota can be smaller. Full
+banking, free flight, branches and combat are not implemented. Physical-device
+performance, touch-authoring comfort and human track design/playtesting remain open.
+
 Last verified: 2026-10-26 (CPU/interaction and thruster scopes below; older sections retain their historical verification limits)
 
 ## 2026-10-26 — CPU driving and persistent race impacts

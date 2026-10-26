@@ -1,34 +1,51 @@
 # Current Task
 
-Task ID: RACE-003
+Task ID: TRACK-002
 Status: Complete
 Created: 2026-10-26
 
 ## Scope
 
-Add the approved mild catch-up to player and all four CPU ships equally.
-No target bonus within a two-second estimated leader gap; rise smoothly to
-8% at eight seconds. Smooth activation/removal. Preserve current CPU profiles,
-normal acceleration, physical collision consequences and accepted thruster tuning.
+Deliver approved roadmap stages 3 and 4: real road gaps with world-space flight,
+landing and safe recovery, plus magnetic banked/twisted/looped track with shared
+stable orientation. Extend the editor and versioned format, add separate playable
+test circuits, and preserve original tracks/handling. Player and CPU use the same
+surface/flight rules. Branches and weapons remain later stages.
 
 ## Definition of done
 
-- [x] One documented configuration for gap thresholds, maximum and smoothing.
-- [x] Shared leader snapshot and lap-aware accumulated distance; no leader slowdown.
-- [x] Bonus affects attainable top speed and CPU demand, including physical boosts.
-- [x] Pause, reset, countdown and finish handled; collisions/braking still matter.
-- [x] Numerical regressions and browser integration checks; production build passes.
-- [x] Continuity and tuning documentation updated with evidence and limits.
+- [x] Version 2 adds validated gap intervals and magnetic/bank authoring; legacy
+      and v1 imports retain their original geometry/behavior.
+- [x] Shared continuous frames drive geometry, physics, AI, pads and race camera.
+      No singularity or sudden flips at vertical/inverted track or closed seams.
+- [x] Gaps remove road, rails, markers and pads; craft launch with world momentum,
+      limited air control, swept landing and safe pre-gap recovery on a miss.
+- [x] Magnetic road holds player and CPU through bank, inversion, barrel roll and
+      a vertical loop; flight detaches only at missing road, not loop crests.
+- [x] Editor supports gap placement and bank/roll settings with undo/export/test.
+- [x] Separate clearly named test tracks available in game and editor.
+- [x] Tests cover low/high speed, lane misses, landing/respawn, interactions,
+      pause/reset and 30/60/120 Hz; CPU field can complete both test tracks.
+- [x] Build, browser rendering/control/race integration and continuity docs checked.
 
 ## Verification
 
-19 tests pass, including seven new catch-up tests for thresholds, symmetric help,
-30/60/120 Hz smoothing, leader changes, lap/finish bounds, real acceleration,
-braking/wall loss, pad stacking, CPU traffic limits and reset. Build/syntax/diff
-checks pass (existing Vite large-chunk warning). Chromium WebGL confirmed player
-and CPU bonuses, zero leader bonus, decay after lead change, frozen pause and
-five zero bonuses on restart, without console errors or failed requests.
+35 Node tests pass, including nine new feature regressions. All four CPUs finish
+three laps on both test tracks with actual pads/collisions. Flight/landing and
+magnetic traversal agree at 30/60/120 Hz; 8,192 frame samples check continuity.
 
-The gap is an estimate using nominal leader speed, not a recorded timing split.
-User-tuned CPU caps 129/130/135/136 and the shorter thruster tuning are preserved.
-Final difficulty feel and physical-device performance remain playtest items.
+Chromium WebGL: gap/bank/side-view editing, undo and v2 export/import; player and
+all CPUs complete the jump; pause freezes flight; a controlled low-speed miss
+recovers before the ramp; reload clears flight state. Actual loop traversal and
+an inverted roll pose render with local-up camera. Inspected screenshots, then
+made the magnetic deck opaque/emissive and repeated feature browser verification.
+Existing editor acceptance also passes 3D drag/history, custom save-and-test,
+invalid-file preservation, scoped reset, reload and landscape layout.
+Both scripts report no JS errors or failed requests. Build, syntax and diff checks
+pass; Vite's existing large-chunk advisory remains. Final local-axis impact shake
+integration is syntax/build checked; camera physics remains covered by Node tests.
+
+Playtest: /?track=track11 (Gap Run), /?track=track12 (Loop & Roll).
+Hold throttle after countdown for the gap. Orange marks takeoff, green landing.
+Editor and JSON preserve authored magnetic/gap/bank data. Human comfort, balancing
+and physical phone performance remain explicitly open in TRACK_ROADMAP.md.

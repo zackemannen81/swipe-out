@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#08101a" />
+    <link rel="icon" href="data:," />
     <title>Swipe-out — Track Editor</title>
   </head>
   <body>
@@ -11,15 +12,20 @@
       <header class="editor-header">
         <div>
           <p class="eyebrow">DEV TOOL / TRACK AUTHORING</p>
-          <h1>NEON <span>CAUSEWAY</span></h1>
+          <h1 id="track-title">TRACK <span>EDITOR</span></h1>
         </div>
         <a href="/" class="game-link">BACK TO RACE ↗</a>
       </header>
       <section class="editor-layout">
         <div class="canvas-panel">
-          <div class="panel-heading"><span>TOP-DOWN ROUTE PREVIEW</span><b id="point-count">33 POINTS</b></div>
-          <canvas id="editor-canvas" aria-label="Draggable top-down track route"></canvas>
-          <p class="canvas-help">DRAG POINTS TO SHAPE THE TRACK · CLICK/DRAG OBJECT MARKERS TO PLACE THEM · SELECTED OBJECTS ARE HIGHLIGHTED</p>
+          <div class="panel-heading"><span>3D TRACK EDITOR</span><b id="point-count">33 POINTS</b></div>
+          <div class="view-toolbar">
+            <button id="fit-button">FIT TRACK</button><button id="top-button">TOP VIEW</button><button id="side-button">SIDE VIEW</button><button id="focus-button">FOCUS SELECTION</button>
+            <button id="undo-button" title="Ctrl/Cmd+Z">UNDO</button><button id="redo-button" title="Ctrl/Cmd+Shift+Z">REDO</button>
+          </div>
+          <canvas id="editor-canvas" aria-label="3D track: select a point, then drag its colored axes to move it"></canvas>
+          <p class="canvas-help">DRAG TO ORBIT · RIGHT-DRAG TO PAN · SCROLL TO ZOOM · CLICK A POINT, THEN DRAG ITS AXES · GREEN AXIS = HEIGHT</p>
+          <button id="test-button" class="primary test-button">SAVE &amp; TEST ↗</button>
         </div>
         <aside class="controls-panel">
           <div class="panel-heading"><span>TRACK SETTINGS</span><b id="save-state">SAVED</b></div>
@@ -35,28 +41,40 @@
           <option value="track9">Obsidian Relay</option>
                     <option value="track10">Ion Cathedral</option>
           </select></label>
-          <label>ROAD WIDTH <output id="width-value">10.00</output><input id="width-input" type="range" min="4" max="24" step="0.25" /></label>
-          <label>HORIZONTAL SCALE <output id="scale-value">3.25</output><input id="scale-input" type="range" min="0.5" max="8" step="0.05" /></label>
+          <label>NAME <input id="track-name" type="text" maxlength="120" /></label>
+          <label>ROAD WIDTH <output id="width-value">10.00</output><input id="width-input" type="range" min="4" max="100" step="0.25" /></label>
+          <label>HORIZONTAL SCALE <output id="scale-value">3.25</output><input id="scale-input" type="range" min="0.1" max="10" step="0.05" /></label>
+          <label><input id="magnetic-input" type="checkbox" /> MAGNETIC ROAD · LOOPS &amp; GAPS</label>
 <div class="point-editor">
   <div class="subheading">SELECTED POINT <b id="selected-point">—</b></div>
   <label>X <input id="point-x" type="number" step="1" /></label>
   <label>HEIGHT (Y) <input id="point-y" type="number" step="1" /></label>
   <label>Z <input id="point-z" type="number" step="1" /></label>
-  <label>TILT / BANK (°) <input id="point-bank" type="number" step="5" value="0" /></label>
+  <label>BANK / ROLL (°) <input id="point-bank" type="number" min="-3600" max="3600" step="15" /></label>
+  <p class="field-help">With magnetic road enabled, 0 → 90 → 180 → 270 → 360 makes a full roll. Keep 360 on later points to stay upright.</p>
   
   <div class="button-row compact" style="margin: 10px 0 0 0;">
     <button id="add-point-btn">+ INSERT AFTER</button>
     <button id="del-point-btn" style="color: #ff5f98;">- DELETE</button>
   </div>
 </div>
+          <div class="gap-editor">
+            <div class="subheading">GAPS <b id="gap-count">0</b></div>
+            <p class="field-help">Orange = takeoff, green = landing. Positions are % of one lap. Leave room to accelerate and land.</p>
+            <button id="add-gap-button">+ GAP AT SELECTED POINT</button>
+            <div id="gap-list"></div>
+          </div>
           <div class="primitive-editor">
             <div class="subheading">3D PRIMITIVES</div>
-            <div class="button-row compact"><button data-primitive="box">+ BOX</button><button data-primitive="cylinder">+ CYLINDER</button><button data-primitive="sphere">+ SPHERE</button></div>
+            <div class="button-row compact"><button data-primitive="box">+ BOX</button><button data-primitive="cylinder">+ CYLINDER</button><button data-primitive="sphere">+ SPHERE</button><button data-primitive="cone">+ CONE</button></div>
+            <label class="object-picker">SCENERY <select id="object-select" aria-label="Select scenery"></select></label>
             <div id="primitive-list"></div>
           </div>
           <div class="button-row"><button id="save-button" class="primary">SAVE TO GAME</button><button id="reset-button">RESET</button></div>
           <div class="button-row"><button id="copy-button">COPY JSON</button><button id="download-button">DOWNLOAD</button></div>
-          <p class="status" id="status" role="status">Changes are local to this browser. Reload the race to preview them.</p>
+          <div class="button-row"><button id="import-button">IMPORT JSON AS NEW TRACK</button></div>
+          <input id="import-file" type="file" accept=".json,application/json" hidden />
+          <p class="status" id="status" role="status">Select a point and drag its axes. Save &amp; Test opens this track in the game.</p>
         </aside>
       </section>
       <footer>LOCAL DEV TOOL <span>·</span> EDITOR DATA IS STORED IN LOCAL STORAGE</footer>

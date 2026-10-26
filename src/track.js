@@ -1,5 +1,7 @@
 import * as THREE from 'three';
 import { NEON_CAUSEWAY } from './track-data.js';
+import { createTrackCurve, getTrackFrame, hasSurface } from './track-path.js';
+export { getTrackFrame } from './track-path.js';
 
 function addInstances(group, geometry, material, transforms) {
   const mesh = new THREE.InstancedMesh(geometry, material, transforms.length);
@@ -14,15 +16,16 @@ function addInstances(group, geometry, material, transforms) {
 }
 
 export function createTrack(definition = NEON_CAUSEWAY) {
-  const points = definition.centerline.map(([x, y, z]) =>
-    new THREE.Vector3(x * (definition.horizontalScale ?? 1), y, z * (definition.horizontalScale ?? 1)));
-  const curve = new THREE.CatmullRomCurve3(points, true, 'catmullrom', 0.42);
-  curve.arcLengthDivisions = 1800;
+  const curve = createTrackCurve(definition);
   const group = new THREE.Group();
   const roadMaterial = new THREE.MeshStandardMaterial({
-    color: 0x182234, metalness: 0.0, roughness: 0.48,
-    emissive: 0x06121c, emissiveIntensity: 0.1,
-    transparent: true, opacity: 0.75, depthWrite: false,
+    color: curve.track.magnetic ? 0x24374b : 0x182234, metalness: 0.0, roughness: 0.48,
+    emissive: curve.track.magnetic ? 0x0b2138 : 0x06121c,
+    emissiveIntensity: curve.track.magnetic ? 0.65 : 0.1,
+    // An opaque, gently emissive magnetic deck stays legible on the dark side
+    // of loops and prevents background/other road sections showing through it.
+    transparent: !curve.track.magnetic, opacity: curve.track.magnetic ? 1 : 0.75,
+    depthWrite: curve.track.magnetic, side: curve.track.magnetic ? THREE.DoubleSide : THREE.FrontSide,
   });
   const cyanMaterial = new THREE.MeshStandardMaterial({
     color: 0x58f4e8, emissive: 0x23dace, emissiveIntensity: 6.1,
@@ -41,9 +44,11 @@ export function createTrack(definition = NEON_CAUSEWAY) {
   function ribbon(offset, width, material, yOffset = 0.025, samples = 600) {
     const positions = [];
     const indices = [];
+    const stops = [...new Set([...Array.from({ length: samples + 1 }, (_, i) => i / samples),
+      ...curve.track.gaps.flatMap(gap => [gap.start, gap.end])])].sort((a, b) => a - b);
     const previousRight = new THREE.Vector3(1, 0, 0);
-    for (let i = 0; i <= samples; i += 1) {
-      const u = i / samples;
+    for (let i = 0; i < stops.length; i += 1) {
+      const u = stops[i];
       const frame = getTrackFrame(curve, u);
       const right = frame.right;
       if (right.lengthSq() > 0.5) previousRight.copy(right);
@@ -55,7 +60,7 @@ export function createTrack(definition = NEON_CAUSEWAY) {
         leftPoint.x, leftPoint.y, leftPoint.z,
         rightPoint.x, rightPoint.y, rightPoint.z,
       );
-      if (i < samples) {
+      if (i < stops.length - 1 && hasSurface(curve, (u + stops[i + 1]) * 0.5 * curve.getLength())) {
         const a = i * 2;
         indices.push(a, a + 2, a + 1, a + 1, a + 2, a + 3);
       }
@@ -90,6 +95,7 @@ export function createTrack(definition = NEON_CAUSEWAY) {
   const railGeometry = new THREE.CylinderGeometry(0.07, 0.07, 8.5, 8);
   const railTransforms = [];
   for (let distance = 4.25; distance < curve.getLength(); distance += 34) {
+    if (!hasSurface(curve, distance, 5)) continue;
     const frame = getTrackFrame(curve, distance / curve.getLength());
     for (const side of [-1, 1]) {
       const position = frame.center.clone()
@@ -107,6 +113,7 @@ export function createTrack(definition = NEON_CAUSEWAY) {
   const pinkRailTransforms = [];
   const cyanRailTransforms = [];
   for (let distance = 4.25; distance < curve.getLength(); distance += 8.5) {
+    if (!hasSurface(curve, distance, 5)) continue;
     const frame = getTrackFrame(curve, distance / curve.getLength());
     for (const side of [-1, 1]) {
       const position = frame.center.clone()
@@ -127,6 +134,7 @@ export function createTrack(definition = NEON_CAUSEWAY) {
   const pinkArrowTransforms = [];
   const cyanArrowTransforms = [];
   for (let distance = 10; distance < curve.getLength(); distance += 22) {
+    if (!hasSurface(curve, distance, 1)) continue;
     const frame = getTrackFrame(curve, distance / curve.getLength());
     const side = Math.floor(distance / 22) % 2 === 0 ? -1 : 1;
     const basePosition = frame.center.clone()
@@ -152,6 +160,7 @@ export function createTrack(definition = NEON_CAUSEWAY) {
   const boostPadPlacements = []; // Vi sparar positionerna för fysiken
 
   for (let distance = 50; distance < curve.getLength(); distance += 150) {
+    if (!hasSurface(curve, distance, 6)) continue;
     const frame = getTrackFrame(curve, distance / curve.getLength());
     
     // Växla position: 0 = mitten, 1 = vänster, 2 = höger
@@ -184,6 +193,7 @@ export function createTrack(definition = NEON_CAUSEWAY) {
   const dash = new THREE.BoxGeometry(3.565, 0.045, 5.05,2);
   const markerTransforms = [];
   for (let distance = 4.5; distance < curve.getLength(); distance += 9) {
+    if (!hasSurface(curve, distance, 3)) continue;
     const frame = getTrackFrame(curve, distance / curve.getLength());
     markerTransforms.push({
       position: frame.center.addScaledVector(frame.normal, 0.045),
@@ -198,12 +208,13 @@ export function createTrack(definition = NEON_CAUSEWAY) {
   const pinkBeaconTransforms = [];
   const cyanBeaconTransforms = [];
   for (let distance = 5.5; distance < curve.getLength(); distance += 11) {
+    if (!hasSurface(curve, distance, 1)) continue;
     const frame = getTrackFrame(curve, distance / curve.getLength());
     for (const side of [-1, 1]) {
       const base = frame.center.clone()
         .addScaledVector(frame.right, side * (trackWidth / 2 + 1.15));
       const postPosition = base.clone().addScaledVector(frame.normal, 0.525);
-      postTransforms.push({ position: postPosition, quaternion: new THREE.Quaternion() });
+      postTransforms.push({ position: postPosition, quaternion: curve.track.magnetic ? frame.rotation : new THREE.Quaternion() });
       const beaconPosition = base.clone().addScaledVector(frame.normal, 1.16);
       (side < 0 ? pinkBeaconTransforms : cyanBeaconTransforms).push({
         position: beaconPosition,
@@ -243,37 +254,54 @@ export function createTrack(definition = NEON_CAUSEWAY) {
   }
   group.add(gate);
 
+  for (const gap of curve.track.gaps) {
+    for (const [progress, color, direction] of [[gap.start, 0xffb344, -1], [gap.end, 0x42ffbc, 1]]) {
+      const frame = getTrackFrame(curve, progress + direction * 0.8 / curve.getLength());
+      const material = new THREE.MeshStandardMaterial({ color, emissive: color, emissiveIntensity: 3 });
+      const lip = new THREE.Mesh(new THREE.BoxGeometry(trackWidth, 0.12, 0.7), material);
+      lip.position.copy(frame.center).addScaledVector(frame.normal, 0.09);
+      lip.quaternion.copy(frame.rotation);
+      lip.userData.gapMarker = true;
+      group.add(lip);
+      for (const side of [-1, 1]) {
+        const beacon = new THREE.Mesh(new THREE.BoxGeometry(0.3, 4, 0.3), material);
+        beacon.position.copy(frame.center).addScaledVector(frame.right, side * trackWidth / 2).addScaledVector(frame.normal, 2);
+        beacon.quaternion.copy(frame.rotation);
+        group.add(beacon);
+      }
+    }
+  }
+
 
   
 return { group, curve, length: curve.getLength(), boostPads: boostPadPlacements };
 }
 
 
-export function getTrackFrame(curve, progress) {
-  const u = ((progress % 1) + 1) % 1;
-  const center = curve.getPointAt(u);
-  const tangent = curve.getTangentAt(u).normalize();
-  const right = new THREE.Vector3().crossVectors(new THREE.Vector3(0, 1, 0), tangent);
-  if (right.lengthSq() < 1e-8) right.set(1, 0, 0);
-  else right.normalize();
-  const normal = new THREE.Vector3().crossVectors(tangent, right).normalize();
-  const rotation = new THREE.Matrix4().makeBasis(right, normal, tangent);
-  return {
-    center,
-    tangent,
-    right,
-    normal,
-    rotation: new THREE.Quaternion().setFromRotationMatrix(rotation),
-    yaw: Math.atan2(tangent.x, tangent.z),
-  };
-}
+
 const textureLoader = new THREE.TextureLoader();
+export function disposeTrackGroup(group) {
+  const geometries = new Set(), materials = new Set(), textures = new Set();
+  group.traverse(object => {
+    if (object.geometry) geometries.add(object.geometry);
+    for (const material of (Array.isArray(object.material) ? object.material : [object.material])) {
+      if (!material) continue;
+      materials.add(material);
+      for (const value of Object.values(material)) if (value?.isTexture) textures.add(value);
+    }
+    // InstancedMesh also owns GPU instance buffers independent of its geometry.
+    if (object.isInstancedMesh) object.dispose();
+  });
+  textures.forEach(texture => texture.dispose());
+  materials.forEach(material => material.dispose());
+  geometries.forEach(geometry => geometry.dispose());
+}
 // Läs av opacity och säkra variabeln
 //const objectOpacity = typeof obj.opacity === 'number' ? obj.opacity : parseFloat(String(obj.opacity || 1).replace(',', '.')) || 1.0;
 //const isTransparent = objectOpacity < 0.99;
 /*export function spawnTrackObjects(scene, trackData) {
   const existingGroup = scene.getObjectByName('customTrackObjects');
-  if (existingGroup) scene.remove(existingGroup);
+  if (existingGroup) { scene.remove(existingGroup); disposeTrackGroup(existingGroup); }
 
   if (!trackData || !Array.isArray(trackData.objects)) return;
 
@@ -353,7 +381,7 @@ if (obj.type === 'cylinder') {
 }*/
 export function spawnTrackObjects(scene, trackData) {
   const existingGroup = scene.getObjectByName('customTrackObjects');
-  if (existingGroup) scene.remove(existingGroup);
+  if (existingGroup) { scene.remove(existingGroup); disposeTrackGroup(existingGroup); }
 
   if (!trackData || !Array.isArray(trackData.objects)) return;
 

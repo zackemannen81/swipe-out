@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { getTrackFrame } from './track.js';
+import { getTrackFrame } from './track-path.js';
 import { getRacerTopSpeed } from './catch-up.js';
 
 export const BOOST = { duration: 1, entryMultiplier: 1.3, maxMultiplier: 1.5, halfWidth: 1.2 };
@@ -15,6 +15,7 @@ export function registerImpact(ship, strength, side = 0) {
 }
 
 export function resolveWallImpact(ship, trackWidth = 10) {
+  if (ship.flight || ship.recoveryTimer > 0) return false;
   const edge = Math.max(0.5, trackWidth / 2 - 0.85);
   if (Math.abs(ship.lateralOffset) <= edge || ship.verticalOffset > 1.4) return false;
   const side = Math.sign(ship.lateralOffset);
@@ -36,6 +37,7 @@ export function resolveWallImpact(ship, trackWidth = 10) {
 // Pads are the three rendered arrows from d-4 to d, with a small end margin.
 // Sweep the traveled segment so fast craft cannot skip a pad between frames.
 export function collectBoostPad(ship, pads, trackLength, topSpeed) {
+  if (ship.flight || ship.recoveryTimer > 0) return false;
   const start = ship.previousDistance;
   const end = ship.distance;
   if (end <= start || !pads?.length) return false;
@@ -63,11 +65,13 @@ export function collectBoostPad(ship, pads, trackLength, topSpeed) {
 
 // Track-relative state is authoritative: impulses and separation survive the next pose update.
 function moveBy(ship, frame, correction) {
+  if (ship.flight) { ship.flight.position.add(correction); return; }
   ship.distance = Math.max(0, ship.distance + correction.dot(frame.tangent));
   ship.lateralOffset += correction.dot(frame.right);
 }
 
 function setVelocity(ship, frame, velocity) {
+  if (ship.flight) ship.flight.velocity.copy(velocity);
   ship.speed = Math.max(12, velocity.dot(frame.tangent));
   ship.lateralVelocity = clamp(velocity.dot(frame.right) / 2, -15, 15);
   ship.velocity.copy(velocity);
@@ -89,6 +93,7 @@ export function resolveRacerCollisions(racers, curve, delta, state) {
     if (a.finished || b.finished) continue;
     const sa = a.physics;
     const sb = b.physics;
+    if (sa.recoveryTimer > 0 || sb.recoveryTimer > 0) continue;
     const frameA = getTrackFrame(curve, sa.distance / length);
     const frameB = getTrackFrame(curve, sb.distance / length);
     const separation = a.group.position.clone().sub(b.group.position);

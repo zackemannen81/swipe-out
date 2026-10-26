@@ -56,6 +56,33 @@ architecture or behavior.
 
 ## Documentation truth boundary
 
+The approved expansion order is versioned track sharing, an initial 3D editor,
+gaps, banking/twists/loops, route branches, then optional combat. The detailed
+checklist and stage status are in TRACK_ROADMAP.md. Develop the editor alongside
+these mechanics; do not implement speculative branch or free-flight physics in
+the import/editor foundation. Existing handling and visual tuning remain the baseline.
+
+Track files use a versioned envelope, with legacy raw definitions accepted by
+the shared track-format/track-library modules. Game and editor use the same
+validated definitions. New imports receive separate library keys; browser saves
+and resets act on one track. Authoring uses game geometry, OrbitControls and
+TransformControls; UI/history and the 3D view have separate ownership.
+
+Version 2 optionally enables magnetic road, authored bank/roll angles and gap
+intervals. `track-path.js` owns the shared spline and continuous transported local
+frames for road geometry, physics, AI, fixtures and camera. Closed-path orientation
+is corrected at the seam. Legacy tracks retain their original world-up frames and
+crest handling unless magnetic road is explicitly enabled.
+
+Magnetic craft adhere to continuous road. Missing road launches player and CPU
+with world momentum into `gap-flight.js`, with world gravity, limited air steering,
+surface landing and recovery before the failed gap. Local projection tracks race
+progress without snapping flight onto the spline or another nearby floor. This
+does not yet provide arbitrary surface collisions or route branching. Magnetic
+motion substeps at at most 1/120 second; camera orientation follows local up through
+loops and rolls. Decorative scenery retains authored world transforms; road rails,
+markers and boost pads follow the shared frame and are omitted inside gaps.
+
 Player and CPU motion now share `ship-physics.js`. CPU profiles and route/traffic
 decisions belong to `opponents.js`; shared boost-pad, wall and craft contact rules
 belong to `race-interactions.js`. Collision impulses modify authoritative motion

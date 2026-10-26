@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { getTrackFrame } from './track.js';
+import { getTrackFrame, nextGap } from './track-path.js';
 import { createCraft } from './craft.js';
 import { createShipPhysics, stepShipPhysics } from './ship-physics.js';
 import { collectBoostPad } from './race-interactions.js';
@@ -111,6 +111,13 @@ function decide(opponent, opponents, player, curve, pads, trackWidth, elapsed) {
   }
   // Smooth driver error and finite reaction time can produce imperfect lines and wall scrapes.
   opponent.targetLane += Math.sin(elapsed * 1.7 + opponent.phase) * opponent.precision;
+  const gap = ship.flight?.gap ?? nextGap(curve, ship.distance);
+  if (gap && (ship.flight || gap.start - ship.distance < Math.max(110, ship.speed * 1.1))) {
+    opponent.targetLane = 0;
+    opponent.targetSpeed = opponent.topSpeed;
+    opponent.trafficSpeedLimit = Infinity;
+    opponent.strategy = ship.flight ? 'air-control' : 'gap-runup';
+  }
   opponent.decisionTimer += opponent.reaction;
 }
 
@@ -153,6 +160,7 @@ export function updateOpponents(opponents, curve, delta, elapsed, racing, {
     }
     const ship = opponent.physics;
     const initialPose = stepShipPhysics(ship, opponent.input, 0, curve, opponent.topSpeed, trackWidth);
+    const respawnSerial = ship.respawnSerial;
     if (!ship.previousTangent) {
       ship.previousSlope = initialPose.frame.tangent.y;
       ship.previousTangent = initialPose.frame.tangent.clone();
@@ -166,7 +174,7 @@ export function updateOpponents(opponents, curve, delta, elapsed, racing, {
       drive(opponent, curve, dt);
       stepShipPhysics(ship, opponent.input, dt, curve, opponent.topSpeed, trackWidth);
       collectBoostPad(ship, boostPads, length, opponent.topSpeed);
-      if (ship.distance >= totalDistance) {
+      if (!ship.flight && ship.distance >= totalDistance) {
         opponent.finishTime = now - (ship.distance - totalDistance) / Math.max(1, ship.speed);
         ship.distance = totalDistance;
         ship.boostTimer = 0;
@@ -174,7 +182,7 @@ export function updateOpponents(opponents, curve, delta, elapsed, racing, {
         break;
       }
     }
-    ship.previousPosition.copy(initialPose.position);
+    if (ship.respawnSerial === respawnSerial) ship.previousPosition.copy(initialPose.position);
     syncOpponentPose(opponent, curve, trackWidth);
   }
 }

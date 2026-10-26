@@ -260,3 +260,54 @@
   pause and reset, with no console/request errors. Existing size warning remains.
 - Updated README tuning guidance, GDD accepted direction and system/status/file map.
   Archived RACE-002. Gap is an estimate, and final balance needs human playtesting.
+
+## 2026-10-26 — TRACK-001: approved roadmap and first authoring delivery
+
+- Recorded all six approved stages in TRACK_ROADMAP.md, with acceptance checklists.
+  Archived RACE-003 and delivered the import/export and first 3D editor stages.
+- Added a versioned JSON format with legacy migration and field-specific validation;
+  unified game/editor catalog and storage. Imports create separate custom drafts.
+  Save/reset touch only the selected entry; errors preserve existing work.
+- Replaced the top-down canvas with shared game geometry, orbit/pan/zoom and XYZ
+  handles. Added independent draft/history state, scenery inspector, save-and-test,
+  portable embedded textures and preservation of built-in scenery previously lost
+  by the editor's fallback. Dispose track resources when replacing geometry.
+- Browser testing exposed Start accepting clicks before async model initialization;
+  it now shows loading until the race and input handlers are ready.
+- Preserved racing/CPU/catch-up/thruster tuning and the user's concurrent calibration.
+- Verified 26 Node tests, including all ten tracks' exact geometry/length/pads after
+  round-trip. Chromium WebGL passed 3D manipulation/history, import/export, invalid
+  file preservation, real custom-track race start/movement, scoped reset, reload and
+  landscape layout. Inspected screenshots; no JS errors or failed requests in final
+  run. Build/syntax/diff checks pass with existing Vite size warning.
+- Next stage: a small gap test track with shared player/CPU free flight, landing
+  and recovery. Physical-device performance and subjective editor feel are open.
+
+## 2026-10-26 — TRACK-002: gaps and magnetic loops/rolls
+
+- Delivered the next two authorized roadmap stages and archived TRACK-001.
+  Added separate Gap Run and Loop & Roll circuits, catalog slots track11/track12.
+- Added shared transported/banked track frames, closed seam correction and v2
+  magnetic/gap fields while preserving v1/legacy behavior and original ten tracks.
+- Gaps remove actual road/fixtures and launch both player and CPU into world-space
+  flight, with gravity, limited steering, landing contact and pre-gap recovery.
+  Airborne collisions persist in velocity; pads/walls/checkpoints respect flight.
+- Magnetic adhesion, local-up chase/cockpit/orbit cameras and 120 Hz substeps make
+  banks, inversion, a full barrel-roll and vertical loop playable. Added opaque,
+  gently emissive magnetic road after visually checking the inverted deck.
+- Extended the editor with gap intervals/removal, bank/roll degrees, magnetic
+  enable and side view. Undo, versioned sharing and save/test retain the settings.
+- All 35 Node tests pass, including real gravity, low/high speed, side misses,
+  airborne contacts, pause/reset, exact gap geometry, frame/camera continuity,
+  30/60/120 Hz and all four CPUs completing three laps on each feature track.
+- Browser acceptance passes both the existing editor suite and new feature suite:
+  actual player/CPU jump and landing, pause, controlled miss/recovery, reload,
+  loop traversal and controlled inverted roll view; no JS/request errors.
+  The first jump trial exposed an overly demanding landing after traffic impacts;
+  shortened the opening and lowered its landing, then verified normal/missed jumps.
+- Inspected screenshots and passed production build/syntax/diff checks. Existing
+  bundle-size warning remains. Local-axis camera impact shake is preserved and
+  reset on race start; that final integration is syntax/build checked.
+- Updated roadmap/status/system/design/file-map/README. Human balance, comfort
+  and physical-device performance remain open. Alternative routes are next in
+  the roadmap, after feedback on these prototypes; weapons remain a later stage.

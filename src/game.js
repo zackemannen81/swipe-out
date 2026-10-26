@@ -6,14 +6,15 @@ import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js'
 import { RaceAudio } from './audio.js';
 import './style.css';
 
-import { spawnTrackObjects, createTrack, getTrackFrame } from './track.js';
-import { NEON_CAUSEWAY, SYNTHETIC_DREAMS, DIGITAL_HORIZON, MOMMY_IM_SCARED ,DARK_SKIES, GEMINI,THE_JOKER,THE_VOID, AGENT_008_STAGE,ION_CATHEDRAL} from './track-data.js';
+import { spawnTrackObjects, createTrack, getTrackFrame, disposeTrackGroup } from './track.js';
+import { readTrackLibrary } from './track-library.js';
 import { createShipPhysics, stepShipPhysics } from './ship-physics.js';
 import { createOpponents, getPlayerPosition, resetOpponents, updateOpponents, syncOpponentPose } from './opponents.js';
 import { createCraft } from './craft.js';
 import { collectBoostPad, createCollisionState, resolveRacerCollisions, resolveWallImpact } from './race-interactions.js';
 import { updateCatchUp } from './catch-up.js';
 import { ThrusterSystem } from './thrusters.js';
+import { createTrackCamera } from './track-camera.js';
 
 
 const canvas = document.querySelector('#game-canvas');
@@ -30,7 +31,7 @@ const speedDisplay = document.querySelector('#race-speed');
 const minimapRoute = document.querySelector('#minimap-route');
 const minimapStart = document.querySelector('#minimap-start');
 const minimapPlayer = document.querySelector('#minimap-player');
-const STORAGE_KEY = 'swipe-out-track-definitions';
+
 // Högst upp bland DOM-elementen:
 const countdownOverlay = document.querySelector('#countdown-overlay');
 
@@ -90,15 +91,10 @@ document.addEventListener('webkitfullscreenchange', syncFullscreenButton);
 
 
 function getActiveTrackData(trackId) {
-  try {
-    const savedTracks = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
-    if (savedTracks[trackId]) {
-      return savedTracks[trackId];
-    }
-  } catch (err) {
-    console.warn('Kunde inte läsa från localStorage:', err);
-  }
-  return TRACK_CONFIG[trackId]?.data;
+  const latest = readTrackLibrary(localStorage);
+  const entry = latest.entries[trackId] ?? latest.entries.track1;
+  TRACK_CONFIG[trackId] = entry;
+  return entry.data;
 }
 
 function triggerCountdownAnim(text, isGo = false) {
@@ -124,28 +120,23 @@ if (menuButton) {
   });
 }
 
-export const SPEEDCALIBRATION = 73; // Justera detta värde för att kalibrera spelets hastighe
+export const SPEEDCALIBRATION = 75; // Justera detta värde för att kalibrera spelets hastighe
 const scene = new THREE.Scene();
 //scene.background = new THREE.Color(0x080c0a);
 scene.background = new THREE.Color(0x000000);
 scene.fog = new THREE.FogExp2(0x080d18, 0.0035);
 //scene.fog = new THREE.Fog(0x080c0a,350,420);
 
-const TRACK_CONFIG = {
-  'track1': { name: 'Neon Causeway', data: NEON_CAUSEWAY, defaultAudio: '/audio/tracks/track_001.mp3', backdrop: '/images/backdrop_track-001.jpg' },
-  'track2': { name: 'Synthetic Dreams', data: SYNTHETIC_DREAMS, defaultAudio: '/audio/tracks/track_002.mp3', backdrop: '/images/backdrop_track-002.jpg' },
-  'track3': { name: 'Digital Horizon', data: DIGITAL_HORIZON, defaultAudio: '/audio/tracks/track_006.mp3', backdrop: '/images/backdrop_track-003.jpg' },
-  'track4': { name: 'Mommy I\'m Scared', data: MOMMY_IM_SCARED, defaultAudio: '/audio/tracks/track_005.mp3', backdrop: '/images/backdrop_track-004.jpg' },
-  'track5': { name: 'Dark skies', data: DARK_SKIES, defaultAudio: '/audio/tracks/track_004.mp3', backdrop: '/images/backdrop_track-005.jpg' },
-  'track6': { name: 'Gemini', data: GEMINI, defaultAudio: '/audio/tracks/track_007.mp3', backdrop: '/images/backdrop_track-006.jpg' },
-  'track7': { name: 'The Joker', data: THE_JOKER, defaultAudio: '/audio/tracks/track_009.mp3', backdrop: '/images/backdrop_track-007.jpg' } ,
-  'track8': { name: 'The Void', data: THE_VOID, defaultAudio: '/audio/tracks/track_010.mp3', backdrop: '/images/backdrop_track-009.jpg' } ,
-  'track9': { name: 'Agent 008 Stage: Obsidian Relay', data: AGENT_008_STAGE, defaultAudio: '/audio/tracks/track_011.mp3', backdrop: '/images/backdrop_track-010.jpg' },
-  'track10': { name: 'Ion Cathedral', data: ION_CATHEDRAL, defaultAudio: '/audio/tracks/track_012.mp3', backdrop: '/images/backdrop_track-013.png' },  
-
-};
-
-let currentTrackId = 'track1'; 
+const loadedTracks = readTrackLibrary(localStorage);
+const TRACK_CONFIG = loadedTracks.entries;
+if (loadedTracks.issues.length) console.warn('Track loading:', loadedTracks.issues.join(' '));
+const requestedTrack = new URLSearchParams(location.search).get('track');
+let currentTrackId = Object.hasOwn(TRACK_CONFIG, requestedTrack) ? requestedTrack : 'track1';
+const initialTrackSelect = document.querySelector('#track-select');
+initialTrackSelect.replaceChildren(...Object.entries(TRACK_CONFIG).map(([key, entry]) => new Option(`${entry.custom ? 'CUSTOM · ' : ''}${entry.name}`, key)));
+initialTrackSelect.value = currentTrackId;
+const editorLink = document.querySelector('.editor-link');
+if (editorLink) editorLink.href = `./editor.html?track=${encodeURIComponent(currentTrackId)}`;
 // Ändra din raceAudio till att vara en let istället för const så vi kan byta ut den
 let raceAudio = new RaceAudio(TRACK_CONFIG[currentTrackId].defaultAudio);
 
@@ -194,15 +185,7 @@ const pinkLight = new THREE.PointLight(0xff397b, 80, 42);
 pinkLight.position.set(-24, 10, -16);
 scene.add(pinkLight);
 
-const savedTrack = (() => {
-  try {
-    const value = JSON.parse(localStorage.getItem('swipe-out-track-definition'));
-    return value?.centerline?.length >= 4 ? value : NEON_CAUSEWAY;
-  } catch (error) {
-    console.warn('Unable to load saved track definition.', error);
-    return NEON_CAUSEWAY;
-  }
-})();
+const savedTrack = getActiveTrackData(currentTrackId);
 let { group: track, curve } = createTrack(savedTrack);
 let trackWidth = savedTrack.width ?? 10;
 scene.add(track);
@@ -304,6 +287,7 @@ function spawnGhost() {
   ghost.material.opacity = 0.25;
 }
 const clock = new THREE.Clock();
+const magneticCamera = createTrackCamera();
 //const raceAudio = new RaceAudio(RACE_TRACK_AUDIO);
 // --- KAMERASYSTEM INTEGRATION (Vänd 180 grader för att titta framåt) ---
 const cameraSystem = {
@@ -325,6 +309,18 @@ const cameraSystem = {
   },
 
   update(craftPosition, craftQuaternion, craftVelocity, delta, trackFrame) {
+    if (curve.track?.magnetic) {
+      const frame = race.poseFrame ?? trackFrame;
+      magneticCamera.update(camera, craftPosition, frame, delta, this.mode, shipPhysics.respawnSerial);
+      if (this.shakeTimer > 0) {
+        this.shakeTimer = Math.max(0, this.shakeTimer - delta);
+        const strength = this.shakeIntensity * this.shakeTimer;
+        camera.position.addScaledVector(frame.right, (Math.random() - 0.5) * strength)
+          .addScaledVector(frame.normal, (Math.random() - 0.5) * strength);
+      }
+      return;
+    }
+    camera.up.set(0, 1, 0);
     this.lastPosition.copy(this.position);
 
     switch (this.mode) {
@@ -554,6 +550,7 @@ const pose = (race.state === 'racing' || race.state === 'finished') && delta > 0
     : stepShipPhysics(shipPhysics, input, 0, curve, baseSpeed+SPEEDCALIBRATION, trackWidth);
 
   race.distance = shipPhysics.distance;
+  race.poseFrame = pose.frame;
   race.currentSpeed = shipPhysics.speed;
   race.lateralVelocity = shipPhysics.lateralVelocity;
   race.airborne = shipPhysics.airborne;
@@ -587,28 +584,31 @@ for (const [key, offset] of Object.entries(offsets)) {
 }
 
 function beginRace() {
+  magneticCamera.reset();
+  cameraSystem.shakeTimer = 0;
   // Läs av vilken bana som valts
   const trackSelect = document.querySelector('#track-select');
   currentTrackId = trackSelect.value;
   const trackData = getActiveTrackData(currentTrackId);
   //const trackData = TRACK_CONFIG[currentTrackId].data;
 // Hämta banans namn och gör det till stora bokstäver
-  const trackName = TRACK_CONFIG[currentTrackId].name.toUpperCase();
+  const trackName = trackData.name.toUpperCase();
 
   // Uppdatera texten i toppmenyn
   const buildTag = document.querySelector('.build-tag');
   if (buildTag) {
-    buildTag.innerHTML = `<i></i> 0.1 · ${trackName}`;
+    buildTag.replaceChildren(document.createElement('i'), document.createTextNode(' 0.1 · ' + trackName));
   }
 
   // Uppdatera texten på resultatskärmen
   const resultsEyebrow = document.querySelector('#results-screen .eyebrow');
   if (resultsEyebrow) {
-    resultsEyebrow.innerHTML = `<span>FINISH</span> &nbsp; ${trackName}`;
+    const label = document.createElement('span'); label.textContent = 'FINISH';
+    resultsEyebrow.replaceChildren(label, document.createTextNode(' ' + trackName));
   }
   // Ta bort den gamla banan om den finns
   if (track) {
-    scene.remove(track);
+    scene.remove(track); disposeTrackGroup(track);
   }
 
   // Skapa och lägg till den nya banan
@@ -987,15 +987,19 @@ musicSelect.addEventListener('change', async (event) => {
   }
 });
 const trackSelect = document.querySelector('#track-select');
-trackSelect.addEventListener('change', (event) => {
+function updateTrackSelection(event) {
   const newTrackName = TRACK_CONFIG[event.target.value].name.toUpperCase();
   const startEyebrow = document.querySelector('#start-screen .eyebrow');
   if (startEyebrow) {
     // 01, 02 eller 03 beroende på vald bana
     const trackNumber = event.target.value.replace('track', '0'); 
-    startEyebrow.innerHTML = `<span>${trackNumber}</span> &nbsp; ${newTrackName}`;
+    const label = document.createElement('span'); label.textContent = TRACK_CONFIG[event.target.value].custom ? 'CUSTOM' : trackNumber;
+    startEyebrow.replaceChildren(label, document.createTextNode(' ' + newTrackName));
   }
-});
+  if (editorLink) editorLink.href = './editor.html?track=' + encodeURIComponent(event.target.value);
+}
+trackSelect.addEventListener('change', updateTrackSelection);
+updateTrackSelection({ target: trackSelect });
 
 function resize() {
   viewportWidth = window.innerWidth;
@@ -1125,7 +1129,7 @@ if (countVal !== prevCount) {
     lapDisplay.textContent = `${String(currentLap).padStart(2, '0')} / ${String(totalLaps).padStart(2, '0')}${currentLap === totalLaps && lapProgress >= 0.72 ? ' · FINAL' : ''}`;
     //crossedFinish = race.distance >= curve.getLength() * totalLaps;
     raceAudio.updateEngine(race.currentSpeed, shipPhysics.boostTimer > 0, true);
-    crossedFinish = race.distance >= curve.getLength() * totalLaps;
+    crossedFinish = !shipPhysics.flight && race.distance >= curve.getLength() * totalLaps;
 
   } else if (race.state === 'finished') {
     race.finishElapsed += delta;
@@ -1199,13 +1203,13 @@ for (const ghost of ghostPool) {
     resolveRacerCollisions(racers, curve, delta, collisionState);
     for (const racer of racers) if (!racer.finished) resolveWallImpact(racer.physics, trackWidth);
     updateCraftPose(0);
-    crossedFinish ||= race.distance >= curve.getLength() * totalLaps;
+    crossedFinish ||= !shipPhysics.flight && race.distance >= curve.getLength() * totalLaps;
     for (const opponent of opponents) syncOpponentPose(opponent, curve, trackWidth);
 
     // --- CHECKPOINT LOGIK (Motståndare) ---
     // Motståndarnas checkpoint-tider uppdateras
     opponents.forEach(opp => {
-      if (opp.nextCheckpointIndex < race.checkpoints.length) {
+      if (!opp.physics.flight && opp.physics.recoveryTimer <= 0 && opp.nextCheckpointIndex < race.checkpoints.length) {
         if (opp.distance >= race.checkpoints[opp.nextCheckpointIndex]) {
           opp.checkpointTimes[opp.nextCheckpointIndex] = race.elapsed;
           opp.nextCheckpointIndex++;
@@ -1214,7 +1218,7 @@ for (const ghost of ghostPool) {
     });
 
     // --- CHECKPOINT LOGIK (Spelaren) ---
-    if (race.nextCheckpointIndex < race.checkpoints.length) {
+    if (!shipPhysics.flight && shipPhysics.recoveryTimer <= 0 && race.nextCheckpointIndex < race.checkpoints.length) {
       const nextCpDist = race.checkpoints[race.nextCheckpointIndex];
       if (race.distance >= nextCpDist) {
         race.checkpointTimes[race.nextCheckpointIndex] = race.elapsed;
@@ -1348,13 +1352,17 @@ if (thrustFill) {
   thrusters.update(delta, camera, renderer.domElement.height);
 
   speedDisplay.textContent = race.state === 'racing'
-    ? `${race.airborne ? 'AIR' : race.throttleTarget > 0.1 ? 'THRUST' : race.throttleTarget < -0.1 ? 'BRAKE' : 'AUTO'} · ${Math.round(race.currentSpeed * 36)} KM/H`
+    ? `${shipPhysics.recoveryTimer > 0 ? 'RECOVERING' : race.airborne ? 'AIR' : race.throttleTarget > 0.1 ? 'THRUST' : race.throttleTarget < -0.1 ? 'BRAKE' : 'AUTO'} · ${Math.round(race.currentSpeed * 36)} KM/H`
     : 'AUTO · READY';
     composer.render();
   requestAnimationFrame(render);
 }
 updateCraftPose();
 render();
+// The model loaders above await several assets. Keep Start unavailable until
+// the race and its handlers exist, including when opened directly by the editor.
+startButton.innerHTML = 'START RACE <span aria-hidden="true">↗</span>';
+startButton.disabled = false;
 
 window.addEventListener('pagehide', () => {
   thrusters.dispose();

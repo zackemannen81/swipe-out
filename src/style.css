@@ -6,6 +6,8 @@
   font-display: swap;
 }
 
+.action-button:disabled { opacity: .55; cursor: progress; }
+
 :root {
   color-scheme: dark;
   font-family: 'Inter', sans-serif;

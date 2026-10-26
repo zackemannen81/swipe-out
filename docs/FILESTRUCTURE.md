@@ -1,5 +1,36 @@
 # File Structure
 
+## 2026-10-26 — TRACK-002 gaps and magnetic track
+
+- `docs/CURRENT_TASK.md` — active TRACK-002 acceptance and verification
+- `docs/archive/TRACK-001.md` — completed import/export and initial editor task
+- `src/track-path.js` — shared spline, transported/banked frames, surface gaps and local projection
+- `src/gap-flight.js` — world-space launch, gravity, air steering, landing and recovery
+- `src/track-camera.js` — local-up magnetic camera with continuous quaternion rotation
+- `src/track-labs.js` — Gap Run and Loop & Roll test circuits (catalog track11/track12)
+- `tests/track-features.test.js` — gap, loop, camera, format, frame-rate and complete CPU-race regressions
+- `tools/verify-track-features.mjs` — browser editor, flight/pause/recovery and inverted camera checks
+
+Existing track-format/library, geometry, physics, interactions, opponents and
+editor modules integrate these features. Older entries below remain historical.
+
+## 2026-10-26 — TRACK-001 authoring foundation
+
+- `docs/TRACK_ROADMAP.md` — approved Swedish six-stage plan and completion checklist
+- `docs/archive/RACE-003.md` — completed catch-up task record
+- `docs/CURRENT_TASK.md` — TRACK-001 scope, acceptance and verification
+- `src/track-format.js` — versioned track envelope, validation, legacy decode, JSON IO
+- `src/track-library.js` — shared built-in catalog, saved/custom loading and scoped writes
+- `src/editor-history.js` — bounded independent undo/redo snapshots
+- `src/editor-view.js` — Three.js authoring view, shared road/scenery, camera and XYZ handles
+- `src/editor.js` — editor drafts, forms, selection, history, import/export and save/test UI
+- `editor.html` / `src/editor.css` — responsive 3D editor interface
+- `src/track.js` — shared geometry/scenery and GPU resource disposal on rebuild
+- `tests/track-format.test.js` — migration, round-trip geometry/scenery, rejection/storage/history regressions
+- `tools/verify-track-editor.mjs` — optional real-browser authoring-to-race acceptance checks
+
+Historical entries below describe earlier implementations, not the current editor.
+
 Verified 2026-10-11 after IMPLEMENT-008. The project implements the competitive version 0.1 circuit race, with a data-defined 3D Neon Causeway centerline and width, procedural Three.js geometry, touch/keyboard controls, two deterministic CPU rivals, live/final placement, finish/results, retry, audio-reactive presentation, and a user-provided panorama backdrop; interactive race/device verification remains pending.
 
 - `AGENTS.md` — repository instructions and docs-first entry point
