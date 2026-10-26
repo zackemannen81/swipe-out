@@ -11,7 +11,7 @@ import { NEON_CAUSEWAY, SYNTHETIC_DREAMS, DIGITAL_HORIZON, MOMMY_IM_SCARED ,DARK
 import { createShipPhysics, stepShipPhysics } from './ship-physics.js';
 import { createOpponents, getPlayerPosition, resetOpponents, updateOpponents,resolveCraftCollisions } from './opponents.js';
 import { createCraft } from './craft.js';
-import { ParticleSystem } from './ParticleSystem.js'; // Vårt nya partikelsystem
+import { ThrusterSystem } from './thrusters.js';
 
 
 const canvas = document.querySelector('#game-canvas');
@@ -230,18 +230,19 @@ function updateMinimap(position) {
 
 setupMinimap();
 
-export const particleSystem = new ParticleSystem(5000, scene);
-particleSystem.initParticleSystem();
+const thrusters = new ThrusterSystem(scene);
 
 // 1. Invänta spelarens skepp
 const playerCraft = await createCraft({ accentColor: 0x43f6ea, modelUrl: '/models/racer_optimized.glb' });
 const craft = playerCraft.group; 
 scene.add(craft);
+const playerThrusters = thrusters.addCraft(craft);
 
 // 2. Invänta motståndarnas skepp
 const opponents = await createOpponents();
 for (const opponent of opponents) {
   scene.add(opponent.group);
+  opponent.thrusters = thrusters.addCraft(opponent.group);
 }
 
 // 3. Nu är 'craft' Garanterat inladdad och full av mesh-data!
@@ -670,6 +671,7 @@ Object.assign(shipPhysics, createShipPhysics(baseSpeed+SPEEDCALIBRATION));
   race.keyboardThrottle = 0;
   race.playerFinishTime = null;
   resetOpponents(opponents);
+  thrusters.reset();
   race.airborne = false;
   race.airWorldY = 0;
   race.airVelocity = 0;
@@ -1329,31 +1331,19 @@ if (thrustFill) {
   const bass = race.state === 'racing' ? raceAudio.channels.bass : { value: 0 };
   bloomPass.strength = 0.62 + kick.hitValue * 0.55 + bass.value * 0.12;
 
-// --- UPPDATERA PARTIKLAR & THRUSTERS ---
-  const isRacing = (race.state === 'racing' || race.state === 'finished');
-  const throttle = Math.max(0, race.throttleTarget);
-  const boostActive = shipPhysics.boostTimer > 0;
+  // Update world-space exhaust only after player/CPU poses and the camera are final.
+  const enginesRunning = ['countdown', 'racing', 'finished'].includes(race.state);
+  thrusters.updateCraft(playerThrusters, delta, Math.max(0, race.throttleTarget),
+    race.state === 'racing' && shipPhysics.boostTimer > 0, enginesRunning);
+  for (const opponent of opponents) {
+    const moving = (race.state === 'racing' || race.state === 'countdown') && opponent.finishTime === null;
+    // CPU strategy already controls speed: map that demand onto the same engine effect.
+    const demand = race.state === 'countdown' ? 0
+      : THREE.MathUtils.clamp((opponent.currentSpeed / opponent.baseSpeed - 0.75) / 0.5, 0, 1);
+    thrusters.updateCraft(opponent.thrusters, delta, demand, false, moving);
+  }
+  thrusters.update(delta, camera, renderer.domElement.height);
 
-  // Uppdatera spelarens thruster-emittrar med aktuell position, rotation, hastighet och gaspådrag
-  playerCraft.updateThrusters(craft.position, craft.quaternion, shipPhysics.velocity, throttle, isRacing && boostActive);
-  
-  // Kör det centrala uppdateringssteget för partikelsystemet
-  particleSystem.updateSystem(delta);
-
-/*
-// --- UPPDATERA PARTIKLAR & MOTORER ---
-  const isRacing = (race.state === 'racing' || race.state === 'finished');
-  
-  // 1. Spelarens motorer (boost = extra tryck)
-  playerCraft.emitThrusters(globalThrusterSystem, isRacing, shipPhysics.boostTimer > 0);
-  
-  // 2. AI-motståndarnas motorer
-  opponents.forEach(opp => opp.craft.emitThrusters(globalThrusterSystem, isRacing, false));
-  
-  // 3. Få partikelsystemet att röra sig framåt i tiden
-  globalThrusterSystem.update(delta);
-
-*/
   speedDisplay.textContent = race.state === 'racing'
     ? `${race.airborne ? 'AIR' : race.throttleTarget > 0.1 ? 'THRUST' : race.throttleTarget < -0.1 ? 'BRAKE' : 'AUTO'} · ${Math.round(race.currentSpeed * 36)} KM/H`
     : 'AUTO · READY';
@@ -1364,6 +1354,7 @@ updateCraftPose();
 render();
 
 window.addEventListener('pagehide', () => {
+  thrusters.dispose();
   window.removeEventListener('resize', resize);
   renderer.dispose();
   scene.traverse((object) => {

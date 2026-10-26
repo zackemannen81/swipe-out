@@ -56,6 +56,13 @@ architecture or behavior.
 
 ## Documentation truth boundary
 
+Thruster presentation is owned by `src/thrusters.js` and orchestrated by the game
+after player and CPU transforms are finalized. All five craft share procedural
+plasma and particle materials. Fixed-rate world-space history supplies continuous
+wakes; pooled particles supply detail, and recorded birth times provide a smooth
+lifetime fade independently of render rate. Throttle/boost affect presentation
+without changing physics. See CURRENT_STATUS for verification and device limits.
+
 This document records the intended product direction, not existing software
 behavior. See `GDD.md` for the detailed game design and `CURRENT_STATUS.md` for
 verified repository reality. Record confirmed durable architecture and behavior

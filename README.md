@@ -25,6 +25,18 @@ Press **Start Race** to begin. The race starts the bundled custom techno track `
 
 This extended/elevated layout has not yet been exercised through an interactive browser race. The earlier touch-emulation checks apply to the baseline 0.1 build only; steering, course readability, finish/results/retry, and representative physical-device feel on the new layout still need playtesting. The chase camera now follows closely (3.6 units behind, 1.72 above) and aims 9 units ahead, with a slightly wider view on mobile. Its visual framing still needs interactive browser/device playtesting. See `docs/CURRENT_STATUS.md` for the current verification boundary and `docs/CURRENT_TASK.md` for the remaining check.
 
+## Thruster effects
+
+All five craft use paired white/cyan plasma exhaust with fine particles and a
+world-space wake that fades behind them. Idle remains visible; throttle and boost
+smoothly increase the output. CPU exhaust follows its existing speed demand.
+Tuning and shaders live in `src/thrusters.js`. The earlier particle/shader
+experiments are retained but are no longer imported by the game.
+
+Run `node --test tests/thrusters.test.js` for emission/lifecycle regression checks.
+Desktop WebGL and a landscape mobile viewport were checked; physical-device
+performance still needs playtesting. See the dated current-status entry for evidence.
+
 ## Project map
 
 - `src/game.js` — Three.js setup, camera follow, input, race lifecycle, and render loop

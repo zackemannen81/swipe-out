@@ -1,6 +1,35 @@
 # Current Status
 
-Last verified: 2026-10-13
+Last verified: 2026-10-26 (thruster scope below; older sections retain their historical verification limits)
+
+## 2026-10-26 — continuous exhaust for all five craft
+
+The active exhaust implementation is now `src/thrusters.js`. The player and four
+CPU craft each have two white/cyan plasma wakes plus fine blue/white particles.
+A reusable 240 Hz world-space history interpolates emission position, orientation
+and birth age between render frames. This prevents frame-sized clumps; existing
+exhaust retains its own age and intensity and fades smoothly after the ship moves
+on. Throttle is damped, idle remains visible, and boost increases strength, width,
+lifetime and particle rate. CPU output follows its existing speed demand.
+
+Effects update after all craft poses, remain frozen during pause, fade on engine
+shutdown, clear on race restart/track change, and discard ribbon history on a
+teleport. Fixed resources: 128 samples per nozzle, 2,048 pooled particles,
+ten ribbon meshes and one particle batch. Craft loading no longer imports game.js
+to create emitters. The old ParticleSystem.js and shaders.js experiments remain
+in the repository but are not used by the active exhaust. Existing local shader
+edits were preserved. Driving and AI behavior were not changed.
+
+Validation: four Node regression tests cover 30/60/120 Hz birth spacing and ages,
+idle/throttle/boost smoothing, all five ships, shutdown/reset, turns/teleports and
+bounded reusable resources. Chromium WebGL checks exercised real start/countdown,
+keyboard throttle/release, boost, all ten nozzle draw ranges, pause and restart.
+Pause preserved particle time/count; restart cleared all ten wakes and particles.
+Desktop (1440x900), close camera and landscape viewport (844x390) captures were
+visually inspected. The final browser run had no console errors or failed requests.
+Production build, JS syntax and diff whitespace checks passed; Vite retains its
+existing large-chunk warning. Physical phone performance and final art approval
+remain unverified; this is not a full race/gameplay release validation.
 
 ## Recent change — telemetry HUD redesign
 

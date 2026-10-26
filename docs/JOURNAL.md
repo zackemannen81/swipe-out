@@ -203,3 +203,23 @@
 - Added live lap time, lap number, player position, speed/max speed, course minimap/progress, steering/gyro state and meter, thrust/boost meter, and brake indicators, connected to existing race and input state.
 - Preserved race controls and physics. Updated current status and file map.
 - Validation: `npm run build`, `node --check src/game.js`, and `git diff --check` passed. Browser and physical-device visual/input verification were not performed. `npm ci` installed dependencies; npm reported 3 moderate audit vulnerabilities.
+
+## 2026-10-26 — VFX-001: continuous player and CPU thrusters
+
+- Replaced the active 0.04-second, frame-aged particle experiment with two white/cyan
+  plasma wakes per craft and pooled glint particles. Interpolate birth position,
+  rotation and subframe age at 240 Hz; fade retained world-space history smoothly.
+- Added damped idle/throttle/boost output and connected all four CPU racers to the
+  same effect using existing speed demand. Handle pause, stop, restart,
+  track reset and teleport without stale connecting trails.
+- Removed craft-to-game emitter coupling and the per-frame unused cone/material
+  creation from the local experiment. Preserved the user's shader texture edits
+  and left the older experimental modules available but inactive.
+- Archived the previous unfinished PORT-001 record and completed VFX-001.
+- Validation: four Node tests passed, including 30/60/120 Hz equivalence; production
+  build, JS syntax and diff whitespace checks passed. Chromium WebGL exercised
+  start/countdown, throttle/release, boost, all five engines, pause and restart;
+  all ten nozzle ranges populated, pause froze time/count, restart cleared all.
+  Inspected desktop, close camera and 844x390 renders. Final browser run: no JS,
+  shader or request errors. Vite's existing large-chunk warning remains.
+- Physical-device performance and subjective art approval are still unverified.

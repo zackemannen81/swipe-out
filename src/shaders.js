@@ -105,7 +105,7 @@ fragmentShader: `
   // Generera en mjuk glöd-textur direkt i minnet
 export function createGlowTexture() {
     const canvas = document.createElement('canvas');
-    canvas.width = 128; canvas.height = 128;
+    canvas.width = 96; canvas.height = 96;
     const ctx = canvas.getContext('2d');
     
     // Mjukare övergångar skapar illusionen av gas/plasma
@@ -116,7 +116,7 @@ export function createGlowTexture() {
     grad.addColorStop(1, 'rgb(240, 195, 230)');
     
     ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, 128, 128);
+    ctx.fillRect(0, 0, 96, 96);
     
     const texture = new THREE.CanvasTexture(canvas);
     texture.needsUpdate = true;

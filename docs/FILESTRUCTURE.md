@@ -32,3 +32,15 @@ Verified 2026-10-11 after IMPLEMENT-008. The project implements the competitive 
 
 Update this map when files or directories are added, removed, or reorganized.
 Do not list planned paths as if they already exist.
+
+## 2026-10-26 — thruster implementation additions
+
+- `src/thrusters.js` — world-space plasma wakes, pooled glint particles, throttle
+  smoothing, reset and disposal for the player plus four CPU craft
+- `src/craft.js` — asynchronous GLTF loading; exhaust is managed by game.js
+- `src/ParticleSystem.js` / `src/shaders.js` — retained older experiments, no longer
+  imported by the active thruster implementation
+- `tests/thrusters.test.js` — Node regression checks for temporal continuity,
+  throttle, lifecycle and fixed resource budgets
+- `docs/archive/PORT-001-paused.md` — previous unfinished task record preserved
+- `docs/CURRENT_TASK.md` — VFX-001 scope and verification record
