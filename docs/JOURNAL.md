@@ -411,3 +411,19 @@
   pass with the existing large-chunk warning. Added TIME_ATTACK.md and updated
   continuity docs. Human line/ghost comfort and physical-phone performance
   remain playtest items; CPU difficulty is the next planned stage.
+
+## 2026-10-27 — DRIVE-002 Wipeout wall pinball
+
+- Reproduced four rail hits from one collision without steering on a straight
+  10-wide road. Reflected side speed, angular reflection/kick and a reversed nose
+  reinforced each other. Explained nose steering versus delayed momentum.
+- Centralized classic wall attitude settling in the shared resolver; removed
+  heading reversal and yaw impulse, limited rebound, retained player escape
+  motion, speed loss and visual impact. Cooldown contacts stop outward motion.
+  Open-track steering and Swipeout/CPU collision behavior are unchanged.
+- The same fixture now settles after one hit. Added mirrored side/width/30-60-120
+  Hz tests and digital away/countersteer recovery; all 71 tests pass, including
+  complete Foundry/Time Attack physics. Build passes with existing chunk warning.
+- Versioned Wipeout PB identity only, leaving old data stored and Swipeout PB keys
+  unchanged. Updated control guide and continuity docs. Human feel still needs
+  replay; no browser or physical-device playtest was performed for this change.

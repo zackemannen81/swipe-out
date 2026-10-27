@@ -1,6 +1,7 @@
 import { Quaternion, Vector3 } from 'three';
 
 export const TIME_ATTACK = Object.freeze({ version: 1, physics: 'drive-001-v1', sampleHz: 20,
+  classicPhysics: 'drive-002-wall-v2',
   maxLapSeconds: 600, maxSamples: 12004, timedLaps: 3, prefix: 'swipe-out:lap:v1:' });
 
 function stable(value) {
@@ -16,7 +17,8 @@ function hash(text) {
 export function recordKey({ track, ship = 'racer', speedClass = 'standard', topSpeed = 143, handling, assist }) {
   // Include full track revision: edited circuits cannot inherit old geometry's ghost.
   return TIME_ATTACK.prefix + hash(JSON.stringify(stable({ track, ship, speedClass, topSpeed,
-    handling, assist: handling === 'wipeout' ? 'manual' : assist, physics: TIME_ATTACK.physics })));
+    handling, assist: handling === 'wipeout' ? 'manual' : assist,
+    physics: handling === 'wipeout' ? TIME_ATTACK.classicPhysics : TIME_ATTACK.physics })));
 }
 export function validRecord(record, key) {
   if (!record || record.version !== TIME_ATTACK.version || record.key !== key ||

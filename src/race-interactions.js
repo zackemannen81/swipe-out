@@ -4,6 +4,14 @@ import { getRacerTopSpeed } from './catch-up.js';
 
 export const BOOST = { duration: 1, entryMultiplier: 1.3, maxMultiplier: 1.5, halfWidth: 1.2 };
 const clamp = THREE.MathUtils.clamp;
+export const CLASSIC_WALL = Object.freeze({ restitution: 0.12, maxRebound: 1.25 });
+
+function settleClassicWallAttitude(ship, side) {
+  // Stop motion into the rail; never manufacture a new sustained inward heading.
+  // Already-applied player countersteer away from the rail remains authoritative.
+  if (ship.yaw * side > 0) ship.yaw = 0;
+  if (ship.yawVelocity * side > 0) ship.yawVelocity = 0;
+}
 
 export function registerImpact(ship, strength, side = 0) {
   ship.impactStrength = Math.max(ship.impactStrength, clamp(strength, 0, 1));
@@ -19,18 +27,29 @@ export function resolveWallImpact(ship, trackWidth = 10) {
   const edge = Math.max(0.5, trackWidth / 2 - 0.85);
   if (Math.abs(ship.lateralOffset) <= edge || ship.verticalOffset > 1.4) return false;
   const side = Math.sign(ship.lateralOffset);
+  const classic = ship.handlingMode === 'wipeout';
   ship.lateralOffset = side * edge;
   if (ship.crashCooldown > 0) {
     if (ship.lateralVelocity * side > 0) ship.lateralVelocity = 0;
+    if (classic) settleClassicWallAttitude(ship, side);
     return false;
   }
   const severity = clamp((Math.abs(ship.lateralVelocity) * 2 + Math.abs(ship.yaw) * ship.speed * 0.3) / 22, 0.15, 1);
   ship.speed *= 1 - (0.1 + severity * 0.35);
-  ship.lateralVelocity = -side * Math.max(1.5, Math.abs(ship.lateralVelocity) * 0.55);
-  ship.yawVelocity *= -0.35;
+  if (classic) {
+    const incoming = Math.max(0, ship.lateralVelocity * side);
+    // lateralVelocity is half physical side speed. Preserve existing escape
+    // momentum if another craft has pushed us outside while we steer away.
+    if (incoming > 0) ship.lateralVelocity = -side * Math.min(CLASSIC_WALL.maxRebound, incoming * CLASSIC_WALL.restitution);
+    settleClassicWallAttitude(ship, side);
+  } else {
+    ship.lateralVelocity = -side * Math.max(1.5, Math.abs(ship.lateralVelocity) * 0.55);
+    ship.yawVelocity *= -0.35;
+  }
   ship.crashCooldown = 0.3;
   ship.wallHits++;
-  registerImpact(ship, severity, -side);
+  registerImpact(ship, severity, classic ? 0 : -side);
+  if (classic) ship.roll -= side * severity * 0.16; // Keep visible impact without a steering kick.
   return true;
 }
 

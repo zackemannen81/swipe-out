@@ -74,6 +74,10 @@ the assisted/mobile baseline and remains the default. The optional Wipeout-inspi
 profile uses local heading/momentum separation, angular inertia, countersteer and
 independent airbrakes. It retains spline progress, magnetic road and shared
 collision/flight rules rather than replacing them with free-body physics.
+Classic rail contact dissipates outward heading/angular motion and bounds rebound
+without adding an inward steering impulse; existing player escape steering is
+preserved. Open-track momentum remains manual. Mode-specific physics versions
+isolate Time Attack records when one handling profile changes.
 The source-informed camera follows ship heading with bounded local correction;
 road bank/inversion and craft roll have separate treatment. CPU profiles retain
 their existing handling. Player preferences are separate from track storage.

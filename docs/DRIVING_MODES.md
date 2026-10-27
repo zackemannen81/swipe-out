@@ -38,6 +38,27 @@ genom loopen. Cockpit får en liten andel av skeppets egen roll.
 
 ## Kontroller
 
+### När skeppet driver mot räcket
+
+Styrningen vrider nosen; den flyttar inte skeppet direkt till en vald fil.
+Släppt styrning stoppar rotationen gradvis men rätar inte automatiskt upp nosen.
+Om du är vid vänsterräcket: gör en kort högersväng för att komma loss, styr sedan
+försiktigt tillbaka så att nosen pekar längs banan. Håller du höger fortsätter
+skeppet att vrida sig; släpper du med nosen fortfarande åt höger fortsätter det
+att glida åt höger. Analog spak med små utslag gör detta lättare att dosera.
+
+DRIVE-002 rättar en separat överdriven väggreaktion: tidigare kombinerades
+sidostuds, rotationsknuff och spegling av nosen, vilket kunde ge flera väggträffar
+även utan input. Wipeout-kontakt har nu en liten begränsad sidostuds, stoppar
+rotation/riktning in i räcket och skapar ingen ny rotation bort från räcket.
+Redan påbörjad styrning bort från räcket bevaras. Fartförlust och synlig impakt
+finns kvar. Upprepade kontakter under kollisionsspärren stoppar fortsatt rörelse
+in i väggen utan ny skade-/fartförlust. Detta är inte automatisk filcentrering.
+
+Time Attack använder en ny fysikversion för Wipeout efter denna rättning.
+Tidigare Wipeout-rekord finns kvar i lagringen men blandas inte med nya varv;
+Swipeout-rekord påverkas inte.
+
 | Inmatning | Wipeout-läge |
 | --- | --- |
 | A/D eller vänster/höger pil | Vrid nosen / motstyr |
@@ -72,6 +93,8 @@ har inte flyttats över. FOV och befintliga åskådarvyer är oförändrade.
   maxrotation, motorstyrka, sladdens eftersläpning, bromsvridning och roll.
 - `src/classic-camera.js`: `CLASSIC_CAMERA` styr avstånd, höjd, korrigering och
   cockpit-roll.
+- `src/race-interactions.js`: `CLASSIC_WALL` styr Wipeout-räckets begränsade
+  återstuds; samma lösning används efter både vanlig rörelse och skeppskollision.
 - `src/driving-settings.js`: validerade inställningar och Wipeout-handkontroll.
 - `tests/driving-modes.test.js`: styrning, motstyrning, analog broms, 30/60/120 Hz,
   paus/återställning, båda hopp, lopp med riktiga inputs, kameror, lagring och sikte.

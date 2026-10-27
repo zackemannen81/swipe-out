@@ -73,6 +73,9 @@ test('pause repeats no samples, saved PB survives retry; slower lap never overwr
 test('record keys isolate geometry, handling, effective assist, ship and speed; camera is irrelevant',()=>{
   const config={track:{width:10,centerline:[[1,2,3],[4,5,6]]},ship:'racer',speedClass:'standard',topSpeed:143,handling:'swipeout',assist:1};
   const base=recordKey(config);
+  // Stored pre-DRIVE-002 identity remains valid for unchanged Swipeout physics.
+  assert.equal(base,'swipe-out:lap:v1:1c0fcd20-afef0848');
+  assert.notEqual(recordKey({...config,handling:'wipeout'}),'swipe-out:lap:v1:bfedcd1a-316b6070');
   for(const change of [{track:{...config.track,width:11}},{ship:'other'},{speedClass:'elite'},{topSpeed:144},{handling:'wipeout'},{assist:0}])assert.notEqual(recordKey({...config,...change}),base);
   assert.equal(recordKey({...config,camera:'wipeout'}),base);
   assert.equal(recordKey({...config,handling:'wipeout',assist:1}),recordKey({...config,handling:'wipeout',assist:0}));

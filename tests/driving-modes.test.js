@@ -10,6 +10,7 @@ import { CLASSIC_HANDLING, stepClassicAttitude } from '../src/classic-handling.j
 import { createClassicCamera } from '../src/classic-camera.js';
 import { createCombat } from '../src/combat.js';
 import { loadDrivingSettings, saveDrivingSettings, cameraProfile, readClassicGamepad } from '../src/driving-settings.js';
+import { resolveWallImpact } from '../src/race-interactions.js';
 
 const straight = createTrackCurve({ width: 100, horizontalScale: 1, magnetic: true,
   centerline: [[0,0,-2000],[0,0,-1000],[0,0,0],[0,0,1000],[0,0,2000],[2000,0,2500],[2000,0,-2500]] });
@@ -35,6 +36,49 @@ test('Swipeout remains default; classic keeps an offset and heading instead of c
   assert.equal(classic.yawVelocity, 0);
   assert.ok(classic.yaw >= heading && classic.lateralOffset > lane);
   assert.ok(Math.abs(Math.atan2(classic.lateralVelocity * 2, classic.speed) - classic.yaw) < 0.06);
+});
+
+test('classic rail impact cannot start an uncommanded wall-to-wall oscillation, on either side or at 30/60/120 Hz', () => {
+  for (const width of [7,10,22]) for (const side of [-1,1]) {
+    const results=[];
+    for (const hz of [30,60,120]) {
+      const s=ship();
+      Object.assign(s,{speed:143,lateralOffset:side*(width/2-.9),lateralVelocity:side*12,yaw:side*.4,yawVelocity:side*.8});
+      stepShipPhysics(s,{},1/120,straight,143,width);
+      assert.equal(s.wallHits,1);assert.ok(s.speed<100);assert.equal(s.yaw,0);assert.equal(s.yawVelocity,0);
+      for(let i=0;i<6*hz;i++)stepShipPhysics(s,{thrust:1},1/hz,straight,143,width);
+      assert.equal(s.wallHits,1);assert.ok(s.lateralOffset*side>width/2-1.8);
+      results.push(s);
+    }
+    for(const s of results)assert.ok(Math.abs(s.lateralOffset-results[0].lateralOffset)<1e-7);
+  }
+});
+
+test('classic contact preserves deliberate escape steering and cooldown contact stops only outward motion', () => {
+  for(const side of [-1,1]) {
+    const s=ship();Object.assign(s,{lateralOffset:side*5,lateralVelocity:-side*2,yaw:-side*.1,yawVelocity:-side*.3});
+    resolveWallImpact(s,10);
+    assert.equal(s.lateralVelocity,-side*2);assert.equal(s.yaw,-side*.1);assert.equal(s.yawVelocity,-side*.3);
+    assert.equal(s.impactSerial,1);assert.ok(s.speed<140);
+    const speed=s.speed;
+    Object.assign(s,{lateralOffset:side*5,lateralVelocity:side*4,yaw:side*.2,yawVelocity:side*.3});
+    resolveWallImpact(s,10);
+    assert.equal(s.lateralVelocity,0);assert.equal(s.yaw,0);assert.equal(s.yawVelocity,0);
+    assert.equal(s.speed,speed);assert.equal(s.impactSerial,1);
+  }
+});
+
+test('after a classic wall hit a short steer-away followed by straightening is controllable without another hit', () => {
+  for(const side of [-1,1]){
+    const s=ship();Object.assign(s,{speed:143,lateralOffset:side*4.1,lateralVelocity:side*12,yaw:side*.4,yawVelocity:side*.8});
+    stepShipPhysics(s,{},1/120,straight,143,10);
+    for(let i=0;i<720;i++) {
+      // Input-only correction: steer away briefly, then countersteer to parallel.
+      const steer=i<12?side:i<28?-side:0;
+      stepShipPhysics(s,{steer,thrust:1},1/120,straight,143,10);
+    }
+    assert.equal(s.wallHits,1);assert.ok(Math.abs(s.yaw)<.002);assert.ok(s.lateralOffset*side>0);
+  }
 });
 
 test('countersteer decelerates rotation faster; analog steering and airbrakes are independent', () => {

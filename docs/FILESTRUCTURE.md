@@ -1,5 +1,12 @@
 # File Structure
 
+## 2026-10-27 — DRIVE-002 classic wall response
+
+- `docs/archive/TT-001.md` — completed Time Attack task record
+- `src/race-interactions.js` — central classic rail response and CLASSIC_WALL tuning
+- `tests/driving-modes.test.js` — no-input pinball, mirrored/fps/cooldown/escape regressions
+- `src/time-attack.js` / `tests/time-attack.test.js` — mode-specific physics identities
+
 ## 2026-10-27 — TT-001 Time Attack and racing guidance
 
 - `docs/archive/DRIVE-001.md` — completed optional driving-mode task record

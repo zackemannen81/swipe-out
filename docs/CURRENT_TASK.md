@@ -1,45 +1,32 @@
 # Current Task
 
-Task ID: TT-001
+Task ID: DRIVE-002
 Status: Complete
 Created: 2026-10-27
 
 ## Scope
 
-Deliver the approved next stage: solo Time Attack, durable personal lap bests,
-sector timing/deltas, actual recorded ghost playback, recommended racing line
-and sharp-corner warnings. Preserve accepted handling. Record subsequent approved
-CPU/cup/audio/presentation stages separately in PRODUCT_ROADMAP.md.
+Explain classic steering and fix the reported Wipeout wall-to-wall pinball.
+Preserve open-track steering, drift/countersteer, impact speed loss and the
+existing Swipeout/CPU wall response. Isolate changed Wipeout Time Attack records.
 
 ## Definition of done
 
-- [x] Solo mode excludes CPU simulation/contacts, combat and catch-up.
-- [x] One out lap and three flying laps, interpolated sectors/finish timing,
-      recovery-invalidated laps, safe pause/retry/menu lifecycle.
-- [x] Versioned records separated by track revision, ship, speed class, handling
-      and effective assist; corrupt/unavailable/quota storage handled visibly.
-- [x] Fixed-rate world-pose ghost replays PB timing/branches/gaps/orientation,
-      is non-collidable and bounded; comparison shows signed deltas and sectors.
-- [x] Optional surface-following recommended line, pad/route guidance and local
-      sharp-turn warnings; no ribbon over missing road, safe in loops/branches.
-- [x] Desktop/touch HUD/menu/results, saved guidance preferences and clear limits.
-- [x] Meaningful tests, browser acceptance/visual checks, regressions/build pass.
-- [x] User guide, approved product roadmap and continuity docs updated.
+- [x] Reproduce unsolicited opposite-wall contact and identify stacked impulses.
+- [x] Classic wall contact dissipates lateral/yaw motion without creating a new
+      sustained inward heading; player countersteer remains effective.
+- [x] Same resolver covers physics and post-collision wall correction, including
+      cooldown contact. Mirror/fps/width/steering tests and regressions pass.
+- [x] Preserve Swipeout/CPU response and their records; version only classic PBs.
+- [x] Build and continuity/user-control documentation updated with limits.
 
 ## Verification
 
-- All 68 Node tests pass (ten new TT tests). Includes off-frame 30/60/120 Hz
-  timing, lap validity, storage failure/isolation, replay, guidance and a real
-  input-driven four-lap Foundry physics run with eight landings/no recovery.
-- Chromium WebGL acceptance passes real solo render-loop isolation, keyboard/
-  pause, accelerated complete laps, PB/ghost/storage reload, category separation,
-  helper toggle persistence/visibility, early end and return to Race. No JS or
-  failed HTTP responses. Final focused early-end/retry/pause-button check passes.
-- Inspected menu/results and bank/gap/shortcut/inverted/landscape screenshots:
-  temporary swipe-out-tt001. Tests inject helpers only in network responses.
-- Final build and diff check pass; existing large-chunk warning remains.
+Before fix, a straight 10-wide track at speed 143 with lane 4.1, lateralVelocity
+12, yaw 0.4 and yawVelocity 0.8 hits the opposite wall after 0.52 s with no steering,
+then two more walls within 3.3 s. A 0.1 s away-steer pulse makes five wall hits
+within six seconds. Input is not required to sustain the initial oscillation.
 
-Physical-phone tests and final recommended-line/human-feel tuning require
-playtesting. The line is heuristic, not a proven fastest trajectory. Current ship
-and speed-class selections are Racer/Standard; record identity supports future
-choices. Existing driving changes in the working tree belong to DRIVE-001.
+After fix: one contact for the same no-input fixture; digital escape and
+countersteer also avoid repeat contact. All 71 tests and production build pass.
+Existing chunk-size warning remains. Human/browser/device feel not re-tested.

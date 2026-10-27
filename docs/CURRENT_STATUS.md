@@ -1,5 +1,32 @@
 # Current Status
 
+## 2026-10-27 — DRIVE-002: classic wall pinball correction
+
+Reproduced the user's report on a straight 10-wide test track: a speed-143
+classic ship hitting one rail reached the opposite rail after 0.52 s without
+steering, with four contacts within 3.3 s. The old response stacked reflected
+lateral velocity, reflected yaw velocity, an impact yaw kick and heading reversal.
+
+Classic wall response now limits restitution to 12% and rebound to 1.25 internal
+lateral units (2.5 world units/s), clears only heading/rotation into the wall and
+adds no inward yaw kick. Existing away-steering/velocity remains player-owned.
+The same resolver handles physics and post-collision wall correction; cooldown
+contact also removes outward motion without repeated speed loss. Existing impact
+speed loss and visual roll remain. Open-track classic steering, Swipeout and CPU
+wall response are unchanged. Sustained steering or an angled nose can still
+carry the craft across the track; this does not add lane centering.
+
+The original no-input fixture now has one contact and settles near the same rail.
+Digital away-then-countersteer pulses recover without another hit. All 71 Node
+tests pass, covering mirrored sides, 7/10/22-wide tracks, 30/60/120 Hz, cooldown,
+escape input, ordinary-race regressions and complete Foundry/Time Attack laps.
+Production build and diff check pass with the existing large-chunk warning.
+Human feel remains for the user's replay; no new browser/device playtest is claimed.
+
+Only Wipeout's Time Attack physics identity advances to drive-002-wall-v2.
+Previous Wipeout records remain stored but do not mix with changed physics;
+unchanged Swipeout key fixtures continue matching their previous records.
+
 ## 2026-10-27 — TT-001: Time Attack, PB ghost and guidance
 
 The user accepted Wipeout/low-assist handling as sufficiently skill-based. That

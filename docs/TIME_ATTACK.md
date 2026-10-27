@@ -80,8 +80,10 @@ De tre visningsvalen sparas och gäller Time Attack; de ändrar inte körningen.
 ## Kod och verifiering
 
 - `src/time-attack.js`: timing, flygande varv, validering, lagring, rekordnycklar,
-  ghostinterpolation och delta. Höj `TIME_ATTACK.physics` vid rekordbrytande
-  fysik-/boost-/hastighetsändringar.
+  ghostinterpolation och delta. Höj berörd `TIME_ATTACK.physics` (Swipeout) och/
+  eller `TIME_ATTACK.classicPhysics` (Wipeout) vid rekordbrytande ändringar.
+  DRIVE-002:s väggreaktion ändrar endast Wipeouts rekordkategori; gamla poster
+  lämnas kvar men används inte för den nya fysiken.
 - `src/lap-ghost.js`: icke-kolliderande ghostvisning med delad skeppsgeometri.
 - `src/racing-guide.js`: bananalys, linje, vägval, bromsansats och varningar.
   `GUIDE` innehåller analysens avstånd och accelerationsantaganden. Ett fast

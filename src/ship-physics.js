@@ -256,8 +256,7 @@ ship.lateralOffset += (ship.lateralVelocity + effectiveCentering) * dt * 2;
 
   // The original uses face collisions and track repulsion. SwipeOut's track is
   // a smooth ribbon, so the edge is handled as a damped impact instead.
-  const wall = resolveWallImpact(ship, trackWidth);
-  if (classic && wall && ship.yaw * ship.lateralOffset > 0) ship.yaw *= -0.25;
+  resolveWallImpact(ship, trackWidth);
   const outerLimit = trackWidth / 2 + 0.4;
   ship.lateralOffset = THREE.MathUtils.clamp(ship.lateralOffset, -outerLimit, outerLimit);
 
