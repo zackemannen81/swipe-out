@@ -1,45 +1,45 @@
 # Current Task
 
-Task ID: TRACK-004
+Task ID: TT-001
 Status: Complete
-Created: 2026-10-26
+Created: 2026-10-27
 
 ## Scope
 
-Author a complete new circuit using the user's primitive textures, with a cohesive
-industrial environment, gaps, banked corners, a vertical loop, a technical section
-and a shortcut. Preserve existing tracks, tuning and original source images.
+Deliver the approved next stage: solo Time Attack, durable personal lap bests,
+sector timing/deltas, actual recorded ghost playback, recommended racing line
+and sharp-corner warnings. Preserve accepted handling. Record subsequent approved
+CPU/cup/audio/presentation stages separately in PRODUCT_ROADMAP.md.
 
 ## Definition of done
 
-- [x] New circuit available in the race and 3D editor as track15.
-- [x] Authored scenery gives each sector identity and leaves racing space clear.
-- [x] Optimized texture derivatives, reproducible conversion and bounded shared
-      scenery GPU resources; original files retained.
-- [x] Two playable gaps, banked corners, technical S bends, loop and shorter,
-      narrower alternative route with readable approaches.
-- [x] Player/CPU physics complete the course; both routes and jumps verified.
-- [x] Browser visual inspection, texture requests, editor export/reload checks,
-      appropriate regression tests and production build pass.
-- [x] Track guide and continuity documents record features and verification limits.
+- [x] Solo mode excludes CPU simulation/contacts, combat and catch-up.
+- [x] One out lap and three flying laps, interpolated sectors/finish timing,
+      recovery-invalidated laps, safe pause/retry/menu lifecycle.
+- [x] Versioned records separated by track revision, ship, speed class, handling
+      and effective assist; corrupt/unavailable/quota storage handled visibly.
+- [x] Fixed-rate world-pose ghost replays PB timing/branches/gaps/orientation,
+      is non-collidable and bounded; comparison shows signed deltas and sectors.
+- [x] Optional surface-following recommended line, pad/route guidance and local
+      sharp-turn warnings; no ribbon over missing road, safe in loops/branches.
+- [x] Desktop/touch HUD/menu/results, saved guidance preferences and clear limits.
+- [x] Meaningful tests, browser acceptance/visual checks, regressions/build pass.
+- [x] User guide, approved product roadmap and continuity docs updated.
 
 ## Verification
 
-50 Node regressions pass. The six affected Foundry tests pass again after the
-final scenery adjustment. Player simulation completes three laps on either route;
-all four CPUs finish three laps with both routes, six landings and no recoveries.
-Both jumps pass at normal/boosted speeds and 30/120 Hz; slow misses recover safely.
-Tests also cover conservative scenery clearance, v3 round-trip, asset sizes,
-shared resources, independent scrolling and disposal on rebuild.
+- All 68 Node tests pass (ten new TT tests). Includes off-frame 30/60/120 Hz
+  timing, lap validity, storage failure/isolation, replay, guidance and a real
+  input-driven four-lap Foundry physics run with eight landings/no recovery.
+- Chromium WebGL acceptance passes real solo render-loop isolation, keyboard/
+  pause, accelerated complete laps, PB/ghost/storage reload, category separation,
+  helper toggle persistence/visibility, early end and return to Race. No JS or
+  failed HTTP responses. Final focused early-end/retry/pause-button check passes.
+- Inspected menu/results and bank/gap/shortcut/inverted/landscape screenshots:
+  temporary swipe-out-tt001. Tests inject helpers only in network responses.
+- Final build and diff check pass; existing large-chunk warning remains.
 
-Chromium WebGL passes optimized texture loading, controlled sector/cockpit/loop
-captures, actual render-loop jumps on both gaps, lane-selected shortcut travel
-through merge, landscape layout and editor export/save/reload. Inspected captures
-are in temporary swipe-out-track004. The existing editor browser suite also
-passes its real gizmo, history, texture, import, reset and Save & Test flows.
-Both suites report no JS errors or failed requests.
-
-Final production build, syntax and diff checks pass. The existing Vite large
-chunk warning remains. Original source textures and existing gameplay tuning are
-preserved. Real-device performance, human difficulty/fun and loop comfort remain
-playtest items, documented in ION_FOUNDRY.md and CURRENT_STATUS.
+Physical-phone tests and final recommended-line/human-feel tuning require
+playtesting. The line is heuristic, not a proven fastest trajectory. Current ship
+and speed-class selections are Racer/Standard; record identity supports future
+choices. Existing driving changes in the working tree belong to DRIVE-001.

@@ -47,6 +47,18 @@ another game's protected content.
 
 ## 4. Core player loop
 
+### Approved product expansion — 2026-10-27
+
+The user accepts the current Wipeout/low-assist handling as the skill baseline.
+Add solo Time Attack with PB sectors, a real replay ghost, optional recommended
+line and corner warnings; then Rookie/Pilot/Elite CPU difficulty, a three-track
+cup/medals/liveries, richer audio feedback and presentation/device settings.
+PRODUCT_ROADMAP.md owns this approved sequence. Time Attack uses an out lap and
+three flying laps, excludes combat/catch-up/CPU contacts, and separates records
+by track revision and effective vehicle/speed/handling/assist configuration.
+Guidance supports learning but never modifies steering or guarantees optimality.
+Later progression and physical-phone performance remain future stages.
+
 1. Choose an available ship and one of the three tracks.
 2. Start a race and learn the course through its visual landmarks and turns.
 3. Swipe to steer, hold a clean racing line, and compete with CPU opponents.

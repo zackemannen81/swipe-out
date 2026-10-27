@@ -1,5 +1,33 @@
 # File Structure
 
+## 2026-10-27 — TT-001 Time Attack and racing guidance
+
+- `docs/archive/DRIVE-001.md` — completed optional driving-mode task record
+- `docs/PRODUCT_ROADMAP.md` — approved skill/progression/polish stages
+- `docs/TIME_ATTACK.md` — controls, records, ghost, guidance and technical limits
+- `src/time-attack.js` — lap/sector timing, validity, versioned storage and replay
+- `src/time-attack-ui.js` — saved practice options, menu/HUD/results and session
+- `src/lap-ghost.js` — transparent PB craft, sharing geometry without physics
+- `src/racing-guide.js` — line/route estimates, warnings and bounded guide mesh
+- `tests/time-attack.test.js` — timing/storage/ghost/guidance and full physics runs
+- `tools/verify-time-attack.mjs` — WebGL flows, persistence, guides and screenshots
+
+`game.js` isolates solo simulation and connects session lifecycle; `index.html`
+and `style.css` add the event selector, timing panel, warning and results table.
+
+## 2026-10-27 — DRIVE-001 optional handling and camera profiles
+
+- `docs/archive/TRACK-004.md` — completed Ion Foundry task
+- `docs/DRIVING_MODES.md` — user controls, source comparison, tuning and limits
+- `src/classic-handling.js` — Wipeout-inspired angular/sideways momentum profile
+- `src/classic-camera.js` — local correction and heading-follow chase/cockpit
+- `src/driving-settings.js` — preferences, validation and isolated gamepad mapping
+- `tests/driving-modes.test.js` — profile/input/camera/flight/progress/aim regressions
+- `tools/verify-driving-modes.mjs` — browser preferences, controls and lifecycle
+
+`ship-physics.js`, `gap-flight.js`, `combat.js` and `game.js` integrate the optional
+profile; `index.html`/`style.css` provide independent mode and camera selectors.
+
 ## 2026-10-26 — TRACK-004 Ion Foundry
 
 - `docs/archive/TRACK-003.md` — completed routes/combat/cloning task

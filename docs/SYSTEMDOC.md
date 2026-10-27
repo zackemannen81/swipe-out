@@ -56,6 +56,28 @@ architecture or behavior.
 
 ## Documentation truth boundary
 
+The user has accepted the skill-based handling baseline. The next approved
+product sequence is Time Attack/ghost/guidance, CPU difficulty, a three-track cup
+with progression, audio feedback, then presentation/device performance. Stage
+details and completion state belong to PRODUCT_ROADMAP.md and CURRENT_STATUS.
+
+Time Attack uses one out lap and three flying laps, without CPU simulation,
+combat or catch-up. The time-attack module owns interpolated timing, lap validity,
+versioned local records and fixed-rate world-pose replay. Records are isolated by
+track revision and effective driving configuration, and never replay as physical
+racers. The racing-guide module analyses track geometry/pads/branches and renders
+a bounded optional recommendation; it does not steer or claim a globally optimal
+trajectory. Race mode retains its existing shared interactions and handling.
+
+Player handling and camera follow are independently selectable. Swipeout retains
+the assisted/mobile baseline and remains the default. The optional Wipeout-inspired
+profile uses local heading/momentum separation, angular inertia, countersteer and
+independent airbrakes. It retains spline progress, magnetic road and shared
+collision/flight rules rather than replacing them with free-body physics.
+The source-informed camera follows ship heading with bounded local correction;
+road bank/inversion and craft roll have separate treatment. CPU profiles retain
+their existing handling. Player preferences are separate from track storage.
+
 Complete authored circuits combine verified mechanics as ordinary versioned
 track data. Ion Foundry is the first such combined environment: its source helper
 builds editable primitives and control points; saved drafts remain independent.

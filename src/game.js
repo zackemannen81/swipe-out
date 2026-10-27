@@ -15,8 +15,11 @@ import { collectBoostPad, createCollisionState, resolveRacerCollisions, resolveW
 import { updateCatchUp } from './catch-up.js';
 import { ThrusterSystem } from './thrusters.js';
 import { createTrackCamera } from './track-camera.js';
+import { createClassicCamera } from './classic-camera.js';
+import { loadDrivingSettings, saveDrivingSettings, cameraProfile, readClassicGamepad } from './driving-settings.js';
 import { getRacerWidth, nextBranch, canFinishRace } from './track-path.js';
 import { createCombat, createCombatView, WEAPONS, COMBAT } from './combat.js';
+import { createPracticeUI, lapTime } from './time-attack-ui.js';
 
 
 const canvas = document.querySelector('#game-canvas');
@@ -119,6 +122,7 @@ if (menuButton) {
     raceAudio.stop();
     setScreen(resultsScreen, false);
     setScreen(startScreen, true);
+    practice.menu();
   });
 }
 
@@ -130,6 +134,27 @@ scene.fog = new THREE.FogExp2(0x080d18, 0.0035);
 //scene.fog = new THREE.Fog(0x080c0a,350,420);
 
 const loadedTracks = readTrackLibrary(localStorage);
+let drivingSettings = loadDrivingSettings(localStorage);
+let activeDrivingSettings = { ...drivingSettings };
+const handlingSelect = document.querySelector('#handling-select');
+const cameraFollowSelect = document.querySelector('#camera-follow-select');
+const laneAssistSelect = document.querySelector('#assist-select');
+handlingSelect.value = drivingSettings.handling;
+cameraFollowSelect.value = drivingSettings.camera;
+laneAssistSelect.value = drivingSettings.assist.toFixed(1);
+function updateDrivingDescription() {
+  const classic = handlingSelect.value === 'wipeout';
+  laneAssistSelect.disabled = classic;
+  document.querySelector('#driving-description').textContent = classic
+    ? 'Nose-led steering, momentum and countersteer. No lane centering. Q/E or L1/R1/L2/R2: airbrakes. Gamepad A / Cross: thrust.'
+    : 'Mobile-friendly steering with selectable lane assist. Camera follow can be chosen independently.';
+}
+for (const select of [handlingSelect, cameraFollowSelect, laneAssistSelect]) select.addEventListener('change', () => {
+  drivingSettings = { handling: handlingSelect.value, camera: cameraFollowSelect.value, assist: Number(laneAssistSelect.value) };
+  updateDrivingDescription();
+  if (!saveDrivingSettings(localStorage, drivingSettings)) document.querySelector('#driving-description').textContent += ' Settings apply this session; browser storage is unavailable.';
+});
+updateDrivingDescription();
 const TRACK_CONFIG = loadedTracks.entries;
 if (loadedTracks.issues.length) console.warn('Track loading:', loadedTracks.issues.join(' '));
 const requestedTrack = new URLSearchParams(location.search).get('track');
@@ -294,6 +319,7 @@ function spawnGhost() {
 }
 const clock = new THREE.Clock();
 const magneticCamera = createTrackCamera();
+const classicCamera = createClassicCamera();
 //const raceAudio = new RaceAudio(RACE_TRACK_AUDIO);
 // --- KAMERASYSTEM INTEGRATION (Vänd 180 grader för att titta framåt) ---
 const cameraSystem = {
@@ -315,6 +341,17 @@ const cameraSystem = {
   },
 
   update(craftPosition, craftQuaternion, craftVelocity, delta, trackFrame) {
+    if (cameraProfile(activeDrivingSettings) === 'wipeout' && !['circle', 'static'].includes(this.mode)) {
+      const frame = race.poseFrame ?? trackFrame;
+      classicCamera.update(camera, craftPosition, frame, shipPhysics, delta, this.mode, shipPhysics.respawnSerial);
+      if (this.shakeTimer > 0) {
+        this.shakeTimer = Math.max(0, this.shakeTimer - delta);
+        const strength = this.shakeIntensity * this.shakeTimer;
+        camera.position.addScaledVector(frame.right, (Math.random() - 0.5) * strength)
+          .addScaledVector(frame.normal, (Math.random() - 0.5) * strength);
+      }
+      return;
+    }
     if (curve.track?.magnetic) {
       const frame = race.poseFrame ?? trackFrame;
       magneticCamera.update(camera, craftPosition, frame, delta, this.mode, shipPhysics.respawnSerial);
@@ -486,6 +523,7 @@ if (this.mode === 'cockpit' || this.mode === 'internal') {
 const baseSpeed = 65; 
 const drag = { active: false, lastX: 0, pointerId: null, throttle: 0 };
 const heldKeys = new Set();
+let classicGamepadInput = readClassicGamepad(null);
 const mobileSteering = { pointerId: null, startX: 0 };
 const mobileInput = { throttle: 0, gyroEnabled: false, gyroSteering: 0, orientationHandler: null };
 const mobileControls = document.querySelector('#mobile-controls');
@@ -505,7 +543,7 @@ const combatRay = new THREE.Raycaster(), combatSightCache = new Map();
 const combatHud = document.querySelector('#combat-hud');
 const targetReticle = document.querySelector('#target-reticle');
 function combatRacers() {
-  return [{...playerRacer,player:true,finished:race.state==='finished'},...opponents.map(o=>({id:o.name,physics:o.physics,group:o.group,finished:o.finishTime!==null}))];
+  return [{...playerRacer,player:true,finished:race.state==='finished'},...(practice.active?[]:opponents).map(o=>({id:o.name,physics:o.physics,group:o.group,finished:o.finishTime!==null}))];
 }
 function combatBlocked(from,to) {
   const key=from.toArray().concat(to.toArray()).map(n=>n.toFixed(2)).join(',');
@@ -556,7 +594,11 @@ const race = {
   countdownTimer: 3.0, // NY: För nedräkningen
 };
 // NY: Basfart för spelet, justeras med SPEEDCALIBRATION
-const totalLaps = 3;
+let totalLaps = 3;
+const practice = createPracticeUI(scene,craft,localStorage,()=>({
+  track:getActiveTrackData(initialTrackSelect.value),handling:drivingSettings.handling,
+  assist:drivingSettings.assist,topSpeed:baseSpeed+SPEEDCALIBRATION,
+}));
 let viewportWidth = window.innerWidth;
 let viewportHeight = window.innerHeight;
 
@@ -594,9 +636,9 @@ function updateCraftPose(delta = 0) {
   const input = {
     steer: race.steering,
     thrust: Math.max(0, race.throttleTarget),
-    brakeLeft: heldKeys.has('q') || race.throttleTarget < -0.1,
-    brakeRight: heldKeys.has('e') || race.throttleTarget < -0.1,
-    pitch: (heldKeys.has('r') ? 1 : 0) - (heldKeys.has('f') ? 1 : 0),
+    brakeLeft: Math.max(heldKeys.has('q') || race.throttleTarget < -0.1 ? 1 : 0, classicGamepadInput.brakeLeft),
+    brakeRight: Math.max(heldKeys.has('e') || race.throttleTarget < -0.1 ? 1 : 0, classicGamepadInput.brakeRight),
+    pitch: ((heldKeys.has('r') ? 1 : 0) - (heldKeys.has('f') ? 1 : 0)) || classicGamepadInput.pitch,
   };
 const pose = (race.state === 'racing' || race.state === 'finished') && delta > 0
     ? stepShipPhysics(shipPhysics, input, delta, curve, baseSpeed+SPEEDCALIBRATION, trackWidth)
@@ -637,7 +679,12 @@ for (const [key, offset] of Object.entries(offsets)) {
 }
 
 function beginRace() {
+  isPaused=false;setScreen(pauseScreen,false);
   magneticCamera.reset();
+  classicCamera.reset();
+  activeDrivingSettings = { ...drivingSettings };
+  classicGamepadInput = readClassicGamepad(null);
+  race.gamepadThrottle = 0;
   cameraSystem.shakeTimer = 0;
   // Läs av vilken bana som valts
   const trackSelect = document.querySelector('#track-select');
@@ -670,6 +717,10 @@ const trackAssets = createTrack(trackData);
   curve = trackAssets.curve;
   trackWidth = trackData.width ?? 10;
   race.boostPads = trackAssets.boostPads; // Hämta de slumpade positionerna från banan!
+  practice.begin(trackData,curve,race.boostPads,{handling:activeDrivingSettings.handling,
+    assist:activeDrivingSettings.assist,topSpeed:baseSpeed+SPEEDCALIBRATION});
+  totalLaps=practice.active?4:3;
+  for(const opponent of opponents)opponent.group.visible=!practice.active;
   track.traverse((child) => {
     if (child.isMesh) {
       child.layers.enable(1); // Aktivera lager 1 för alla banans mesh-objekt      
@@ -709,6 +760,7 @@ const trackAssets = createTrack(trackData);
   raceAudio.play().catch((error) => console.warn('Unable to start race music.', error));
   race.state = 'racing';
 Object.assign(shipPhysics, createShipPhysics(baseSpeed+SPEEDCALIBRATION));
+  shipPhysics.handlingMode = activeDrivingSettings.handling;
   
   // Läs av hur mycket styrhjälp spelaren vill ha
   const assistSelect = document.querySelector('#assist-select');
@@ -729,10 +781,11 @@ Object.assign(shipPhysics, createShipPhysics(baseSpeed+SPEEDCALIBRATION));
   race.currentSpeed = baseSpeed;
   race.throttleTarget = 0;
   race.keyboardThrottle = 0;
+  document.querySelector('#race-lap-time').textContent='00:00.00';
   race.playerFinishTime = null;
   resetOpponents(opponents);
   firing=touchFiring=false;
-  combat.reset(document.querySelector('#combat-enabled').checked,combatRacers());
+  combat.reset(!practice.active&&document.querySelector('#combat-enabled').checked,combatRacers());
   combatView.update(combat);updateCombatHud();
   collisionState.cooldowns.clear();
   race.lastImpactSerial = 0;
@@ -783,17 +836,25 @@ function finishRace() {
   
   race.state = 'finished';
   race.playerFinishTime = race.elapsed - Math.max(0, race.distance - curve.getLength() * totalLaps) / Math.max(1, race.currentSpeed);
-  positionDisplay.textContent = `${getPlayerPosition(opponents, race.distance, race.playerFinishTime)} / ${opponents.length + 1}`;
+  positionDisplay.textContent = practice.active?'SOLO':`${getPlayerPosition(opponents, race.distance, race.playerFinishTime)} / ${opponents.length + 1}`;
   resultPositionDisplay.textContent = positionDisplay.textContent;
   drag.active = false;
   
   // Aktivera Autopilot-inställningar för ärovarvet
   shipPhysics.assistLevel = 1.0; // Sätt lane assist till max
+  shipPhysics.handlingMode = 'swipeout'; // The post-finish victory lap remains automatic.
   shipPhysics.boostTimer = 0;    // Nollställ eventuell boost
   shipPhysics.speed = 65;        // Sätt farten till basfarten
   cameraSystem.mode = 'circle';  // Byt till snurrande kameran
 
   resultDisplay.textContent = formatTime(race.playerFinishTime);
+  const bestLap=practice.finish();
+  document.querySelector('#results-heading').replaceChildren(
+    document.createTextNode(practice.active?'TIME':'RUN'),document.createElement('br'),
+    document.createTextNode(practice.active?'ATTACK.':'COMPLETE.'));
+  document.querySelector('#result-time-label').textContent=practice.active?'SESSION BEST LAP':'YOUR TIME';
+  document.querySelector('#result-position-label').textContent=practice.active?'TIME ATTACK':'YOUR POSITION';
+  if(practice.active)resultDisplay.textContent=lapTime(bestLap);
   setScreen(resultsScreen, true);
   retryButton.focus({ preventScroll: true });
 }
@@ -834,6 +895,19 @@ canvas.addEventListener('pointermove', (event) => {
 function handleGamepadInput() {
   const gamepads = navigator.getGamepads();
   const gp = gamepads[0]; 
+
+  if (activeDrivingSettings.handling === 'wipeout') {
+    const previousSteer = classicGamepadInput.steer;
+    classicGamepadInput = readClassicGamepad(race.state === 'racing' && !isPaused && inputFocused ? gp : null);
+    race.gamepadThrottle = classicGamepadInput.thrust;
+    if (classicGamepadInput.steer !== 0) race.targetSteering = classicGamepadInput.steer;
+    else if (previousSteer !== 0) {
+      const left = heldKeys.has('arrowleft') || heldKeys.has('a');
+      const right = heldKeys.has('arrowright') || heldKeys.has('d');
+      race.targetSteering = left === right ? 0 : left ? -1 : 1;
+    }
+    return;
+  }
 
   if (!gp || race.state !== 'racing') return; 
 
@@ -994,7 +1068,26 @@ window.addEventListener('keyup', (event) => {
     race.targetSteering = left === right ? 0 : left ? -1 : 1;
   }
 });
+let inputFocused = true;
+window.addEventListener('focus', () => { inputFocused = true; });
+function clearClassicInput() {
+  classicGamepadInput = readClassicGamepad(null);
+  race.gamepadThrottle = 0;
+  heldKeys.clear();
+  race.targetSteering = race.keyboardThrottle = 0;
+  mobileInput.throttle = 0;
+  drag.active = false; drag.throttle = 0;
+  for (const [element, pointerId] of [[canvas, drag.pointerId], [steeringZone, mobileSteering.pointerId]]) {
+    if (pointerId !== null && element?.hasPointerCapture(pointerId)) element.releasePointerCapture(pointerId);
+  }
+  drag.pointerId = mobileSteering.pointerId = null;
+  if (steeringIndicator) steeringIndicator.style.transform = 'translateX(-50%)';
+  thrustButton?.classList.remove('active');
+  brakeButton?.classList.remove('active');
+}
 window.addEventListener('blur', () => {
+  inputFocused = false;
+  if (activeDrivingSettings.handling === 'wipeout') clearClassicInput();
   heldKeys.clear();
   drag.active = false;
   drag.throttle = 0;
@@ -1015,6 +1108,11 @@ window.addEventListener('keydown', (event) => {
 });
 
 resumeButton.addEventListener('click', togglePause);
+document.querySelector('#end-session-button').addEventListener('click',()=>{
+  if(!practice.active)return;
+  if(isPaused)togglePause();
+  setScreen(pauseScreen,false);clearClassicInput();finishRace();
+});
 pauseToggleButton?.addEventListener('click', togglePause);
 cameraCycleButton?.addEventListener('click', () => cameraSystem.cycleMode());
 
@@ -1025,6 +1123,7 @@ function togglePause() {
   if (pauseToggleButton) pauseToggleButton.textContent = isPaused ? 'RESUME ▶' : 'PAUSE ⏸';
   
   if (isPaused) {
+    if (activeDrivingSettings.handling === 'wipeout') clearClassicInput();
     raceAudio.audio.pause();
   } else {
     raceAudio.audio.play();
@@ -1081,6 +1180,7 @@ function render() {
     return; 
   }
   const delta = Math.min(clock.getDelta(), 0.05);
+  const racingOpponents=practice.active?[]:opponents;
   let crossedFinish = false;
   // --- ANIMERA BANE-OBJEKT ---
   const customObjects = scene.getObjectByName('customTrackObjects');
@@ -1111,7 +1211,8 @@ function render() {
     });
   }
 
-  updateCatchUp([
+  if(practice.active){shipPhysics.catchUpBonus=shipPhysics.catchUpGap=0;}
+  else updateCatchUp([
     { physics: shipPhysics, topSpeed: baseSpeed + SPEEDCALIBRATION, finished: race.playerFinishTime !== null },
     ...opponents.map(opponent => ({
       physics: opponent.physics, topSpeed: opponent.topSpeed, finished: opponent.finishTime !== null,
@@ -1156,6 +1257,7 @@ if (countVal !== prevCount) {
     if (race.countdownTimer <= 0) {
       race.state = 'racing';
       race.elapsed = 0;
+      practice.advance(practice.point(0,shipPhysics));
     }
 
   } else if (race.state === 'racing') {
@@ -1172,7 +1274,7 @@ if (countVal !== prevCount) {
     race.steering = THREE.MathUtils.damp(
       race.steering,
       race.targetSteering,
-      race.airborne ? 3.8 : 9.5,
+      race.airborne ? 3.8 : shipPhysics.handlingMode === 'wipeout' ? 22 : 9.5,
       delta,
     );
     updateCraftPose(delta);
@@ -1249,11 +1351,11 @@ for (const ghost of ghostPool) {
       cameraSystem.shakeIntensity = 0.35;
     }
     updateCraftPose(0); // Publish a newly collected boost to the collision velocity.
-    updateOpponents(opponents, curve, delta, race.elapsed, true, {
+    updateOpponents(racingOpponents, curve, delta, race.elapsed, true, {
       player: playerRacer, boostPads: race.boostPads, trackWidth,
     });
     playerRacer.finished = crossedFinish;
-    const racers = [playerRacer, ...opponents.map(opponent => ({
+    const racers = [playerRacer, ...racingOpponents.map(opponent => ({
       id: opponent.name, physics: opponent.physics, group: opponent.group,
       finished: opponent.finishTime !== null,
     }))];
@@ -1261,11 +1363,11 @@ for (const ghost of ghostPool) {
     for (const racer of racers) if (!racer.finished) resolveWallImpact(racer.physics, getRacerWidth(curve,racer.physics,trackWidth));
     updateCraftPose(0);
     crossedFinish ||= canFinishRace(curve, shipPhysics, totalLaps);
-    for (const opponent of opponents) syncOpponentPose(opponent, curve, trackWidth);
+    for (const opponent of racingOpponents) syncOpponentPose(opponent, curve, trackWidth);
 
     // --- CHECKPOINT LOGIK (Motståndare) ---
     // Motståndarnas checkpoint-tider uppdateras
-    opponents.forEach(opp => {
+    racingOpponents.forEach(opp => {
       if (!opp.physics.flight && opp.physics.recoveryTimer <= 0 && opp.nextCheckpointIndex < race.checkpoints.length) {
         if (opp.distance >= race.checkpoints[opp.nextCheckpointIndex]) {
           opp.checkpointTimes[opp.nextCheckpointIndex] = race.elapsed;
@@ -1275,7 +1377,7 @@ for (const ghost of ghostPool) {
     });
 
     // --- CHECKPOINT LOGIK (Spelaren) ---
-    if (!shipPhysics.flight && shipPhysics.recoveryTimer <= 0 && race.nextCheckpointIndex < race.checkpoints.length) {
+    if (!practice.active && !shipPhysics.flight && shipPhysics.recoveryTimer <= 0 && race.nextCheckpointIndex < race.checkpoints.length) {
       const nextCpDist = race.checkpoints[race.nextCheckpointIndex];
       if (race.distance >= nextCpDist) {
         race.checkpointTimes[race.nextCheckpointIndex] = race.elapsed;
@@ -1324,9 +1426,13 @@ for (const ghost of ghostPool) {
     }
 
   } else {
-    updateOpponents(opponents, curve, delta, race.elapsed + race.finishElapsed, race.state === 'finished', {
+    updateOpponents(racingOpponents, curve, delta, race.elapsed + race.finishElapsed, race.state === 'finished', {
       boostPads: race.boostPads, trackWidth,
     });
+  }
+  if(race.state==='racing'&&practice.active){
+    practice.advance(practice.point(race.elapsed,shipPhysics));
+    crossedFinish=practice.session.done;
   }
   if (crossedFinish) finishRace();
   combatSightCache.clear();
@@ -1339,7 +1445,11 @@ for (const ghost of ghostPool) {
     updateCraftPose(0);for(const opponent of opponents)syncOpponentPose(opponent,curve,trackWidth);
   }
   combatView.update(combat);
-  positionDisplay.textContent = `${getPlayerPosition(opponents, race.distance, race.playerFinishTime)} / ${opponents.length + 1}`;
+  positionDisplay.textContent = practice.active?'SOLO':`${getPlayerPosition(opponents, race.distance, race.playerFinishTime)} / ${opponents.length + 1}`;
+  if(practice.active&&race.state==='racing'){
+    lapDisplay.textContent=practice.session.lapStart===null?'OUT LAP':`${Math.min(3,practice.session.completed.length+1)} / 3`;
+    document.querySelector('#race-lap-time').textContent=lapTime(practice.session.lapStart===null?null:practice.session.elapsed);
+  }
 
   if (shipPhysics.impactSerial !== race.lastImpactSerial) {
     race.lastImpactSerial = shipPhysics.impactSerial;
@@ -1405,6 +1515,7 @@ if (thrustFill) {
   // Kör det nya integrerade kamerapasset
   cameraSystem.update(craft.position, craft.quaternion, shipPhysics.velocity, delta, trackFrame);
   updateCombatHud();
+  practice.update(race.state,race.elapsed,shipPhysics,delta);
   
   panoramaBackdrop.position.copy(camera.position);
 
@@ -1417,7 +1528,7 @@ if (thrustFill) {
   thrusters.updateCraft(playerThrusters, delta, Math.max(0, race.throttleTarget),
     race.state === 'racing' && shipPhysics.boostTimer > 0, enginesRunning);
   for (const opponent of opponents) {
-    const moving = enginesRunning && opponent.finishTime === null;
+    const moving = !practice.active && enginesRunning && opponent.finishTime === null;
     const demand = race.state === 'countdown' ? 0 : opponent.physics.thrust;
     thrusters.updateCraft(opponent.thrusters, delta, demand, opponent.physics.boostTimer > 0, moving);
   }
@@ -1437,6 +1548,7 @@ startButton.innerHTML = 'START RACE <span aria-hidden="true">↗</span>';
 startButton.disabled = false;
 
 window.addEventListener('pagehide', () => {
+  practice.dispose();
   thrusters.dispose();
   window.removeEventListener('resize', resize);
   renderer.dispose();

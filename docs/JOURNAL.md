@@ -362,3 +362,52 @@
 - Final build/syntax/diff checks pass with the existing large-chunk warning.
   Added ION_FOUNDRY.md and updated roadmap/README/continuity docs. Physical-phone
   performance, human fun/balance and loop comfort remain playtest items.
+
+## 2026-10-27 — DRIVE-001 selectable handling and camera
+
+- Compared the supplied tmp/src/wipeout steering and camera source. Added an
+  optional Wipeout-inspired profile with independent nose/momentum, angular
+  acceleration, countersteer and analog airbrakes. Existing Swipeout assist,
+  default controls and CPU tuning remain available and unchanged.
+- Added independent saved handling/camera selectors. Classic chase follows the
+  nose without hull roll, using track-local damped correction through loops;
+  cockpit retains a small roll contribution. Shared gaps/routes/collisions remain.
+- Classic controller A/Cross accelerates; L1/R1/L2/R2 are independent airbrakes.
+  Added input cleanup for pause/blur and captured touch steering. Classic weapon
+  aim follows the nose. Landing/recovery and retry reset transient state.
+- All 58 Node tests pass, including frame rates, both gaps, three-lap input-driven
+  progression, camera inversion, settings, brakes and aim. Browser WebGL checks
+  pass keyboard, synthetic gamepad, pointer steering/pedal, pause, real landing,
+  loop/cockpit, retry and independent mode persistence. No JS/request errors.
+- Production build and diff check pass; existing large-chunk warning remains.
+  Added DRIVING_MODES.md and updated continuity docs. This is a first track-relative
+  adaptation, not the original free-body physics. Human steering/camera feel and
+  physical-phone/controller evaluation remain for playtesting.
+
+## 2026-10-27 — TT-001 Time Attack, PB ghost and guidance
+
+- Recorded the approved product sequence in PRODUCT_ROADMAP.md. The user accepts
+  Wipeout/low-assist skill handling; retain it while adding the surrounding game.
+- Added solo Time Attack: one out lap, three flying attempts, interpolated sectors
+  and finish, signed PB delta and per-lap results. CPU simulation/contacts,
+  catch-up and combat are excluded; normal Race remains available. Recovery
+  invalidates a lap. Early end saves completed valid attempts only.
+- Versioned local records isolate track revision, ship/speed/handling/assist and
+  physics version. Invalid storage is ignored visibly; quota failures retain a
+  session PB with a warning. Added bounded 20 Hz world-pose recording, quaternion
+  replay, transparent non-physical PB ghost and overlap fading.
+- Added optional geometry-based line with lane smoothing, pad attraction,
+  branch estimates and a braking envelope. It follows bank/loops/routes and
+  skips missing road. Local turn/gap warnings and helper preferences are saved.
+  This is a recommendation, not a mathematically optimal racing trajectory.
+- All 68 Node tests pass. A real input-driven physics run completes four Foundry
+  laps with eight landings, branches/gates and zero recovery. Chromium WebGL
+  passes solo isolation, keyboard/pause, accelerated lap recording, PB reload and
+  category isolation, guide toggles, results, early end and return to Race.
+  Inspected desktop/landscape/loop/shortcut/gap captures; no JS/request errors.
+- Tightened the line slope near jumps after visual review, fitted Time Attack
+  overlays, and corrected early-end pause-button state. Focused retry/early-end
+  browser check passes after the final lifecycle fix. Final build/diff checks
+  pass with the existing large-chunk warning. Added TIME_ATTACK.md and updated
+  continuity docs. Human line/ghost comfort and physical-phone performance
+  remain playtest items; CPU difficulty is the next planned stage.

@@ -17,6 +17,18 @@ npm run dev
 
 Open the local URL printed by Vite. Run `npm run build` for the production bundle or `npm run preview` to serve that bundle locally. The developer track editor is available at `/editor.html`.
 
+## Time Attack
+
+Select **EVENT → Time Attack · solo** for an out lap and three flying laps,
+without CPU racers, combat or catch-up. Personal bests, sectors and a recorded
+transparent ghost persist per track revision/ship/speed/handling/assist category.
+Optional racing-line and corner-warning guides help learn the circuit. The line
+is a geometric recommendation, not a guaranteed optimal lap. Pause → **End Time
+Attack** keeps completed valid records and discards the unfinished attempt.
+See [the Time Attack guide](docs/TIME_ATTACK.md) and the approved
+[product roadmap](docs/PRODUCT_ROADMAP.md). Run `node --test tests/*.test.js` for
+regressions and `node tools/verify-time-attack.mjs` for browser acceptance.
+
 ## Ion Foundry — complete circuit
 
 Choose **Ion Foundry** (`/?track=track15`): a 5.8 km industrial circuit with two
@@ -99,6 +111,17 @@ Flight tuning is in `src/gap-flight.js` (`FLIGHT`), magnetic camera offsets in
 same browser prerequisites as above; captures go to temporary `swipe-out-track002`.
 
 ## Play
+
+### Control mode and camera follow
+
+The start screen offers **Swipeout** (existing assist/mobile handling, default)
+and **Wipeout** (nose-led steering, momentum, countersteer and independent airbrakes).
+**Camera Follow** can match the control mode or independently select the previous
+Swipeout follow / new Wipeout-inspired heading camera. Choices persist locally.
+V/C and CAMERA still choose the view. Wipeout gamepad controls use A/Cross for
+thrust and L1/R1 or analog L2/R2 for airbrakes; Q/E are keyboard airbrakes.
+See [DRIVING_MODES.md](docs/DRIVING_MODES.md) for source comparison, adaptation
+limits and tuning. This is a first playable handling profile for human comparison.
 
 ### Alternative routes
 

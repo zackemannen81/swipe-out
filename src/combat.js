@@ -47,7 +47,8 @@ export function createCombat() {
       }
       for(const r of racers) {
         const s=this.states.get(r.id);if(!eligible(r)){s.lockTarget=null;s.lockTime=0;continue;}
-        const origin=point(r), forward=r.frame.tangent;
+        const origin=point(r), forward=r.physics.handlingMode==='wipeout'
+          ? new THREE.Vector3(0,0,1).applyQuaternion(r.group.quaternion).normalize() : r.frame.tangent;
         let candidate=null,nearest=COMBAT.range;
         for(const other of racers) {
           if(other===r || !eligible(other))continue;

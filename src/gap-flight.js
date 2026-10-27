@@ -49,6 +49,7 @@ export function recoverBeforeGap(ship, curve, baseSpeed) {
   ship.airborne = false;
   ship.lateralOffset = ship.lateralVelocity = ship.verticalOffset = ship.verticalVelocity = 0;
   ship.yaw = ship.yawVelocity = ship.roll = ship.pitch = 0;
+  ship.classicRollVelocity = 0;
   ship.boostTimer = 0;
   ship.lastBoostKey = null;
   ship.speed = baseSpeed * 0.9;
@@ -99,6 +100,10 @@ export function stepGapFlight(ship, input, dt, curve, baseSpeed, width) {
     ship.verticalOffset = ship.verticalVelocity = 0;
     ship.speed *= 1 - severity * 0.08;
     ship.landings++;
+    if (ship.handlingMode === 'wipeout') {
+      ship.yaw = THREE.MathUtils.clamp(Math.atan2(ship.lateralVelocity * 2, ship.speed), -0.65, 0.65);
+      ship.yawVelocity = 0;
+    }
     ship.previousTangent = frame.tangent.clone();
     ship.previousSlope = frame.tangent.y;
     registerImpact(ship, severity * 0.35);

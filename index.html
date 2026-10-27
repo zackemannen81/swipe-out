@@ -223,6 +223,34 @@
           </select>
         </div>
 
+        <div class="driving-settings">
+          <label for="race-mode-select">EVENT
+            <select id="race-mode-select"><option value="race">Race · CPU rivals</option><option value="time-attack">Time Attack · solo</option></select>
+          </label>
+        </div>
+        <div id="practice-options" class="practice-options" hidden>
+          <label><input id="practice-ghost" type="checkbox" checked /> PB GHOST</label>
+          <label><input id="practice-line" type="checkbox" checked /> RACING LINE</label>
+          <label><input id="practice-warnings" type="checkbox" checked /> CORNER WARNINGS</label>
+          <small>Recommended line: cyan = flow · amber = lift · pink = brake.</small>
+        </div>
+        <p id="practice-preview" class="driving-description" hidden></p>
+        <div class="driving-settings">
+          <label for="handling-select">CONTROL MODE
+            <select id="handling-select" aria-describedby="driving-description">
+              <option value="swipeout">Swipeout · assisted</option>
+              <option value="wipeout">Wipeout · inertia</option>
+            </select>
+          </label>
+          <label for="camera-follow-select">CAMERA FOLLOW
+            <select id="camera-follow-select">
+              <option value="auto">Match control mode</option>
+              <option value="swipeout">Swipeout</option>
+              <option value="wipeout">Wipeout</option>
+            </select>
+          </label>
+        </div>
+        <p id="driving-description" class="driving-description" aria-live="polite"></p>
         <label class="combat-mode"><input id="combat-enabled" type="checkbox" /> COMBAT MODE · rockets / homing / minigun</label>
         <button class="action-button" id="start-button" type="button" disabled>LOADING CRAFT…</button>
         <p class="control-hint">DRAG TO STEER · UP = THRUST · DOWN = BRAKE · ARROWS / W A S D</p>
@@ -232,10 +260,14 @@
       <section class="screen-card results-card" id="results-screen" aria-labelledby="results-heading" aria-live="assertive" hidden>
         <p class="eyebrow"><span>FINISH</span> &nbsp; TRACK</p>
         <h2 id="results-heading">RUN<br />COMPLETE.</h2>
-        <p class="result-label">YOUR POSITION</p>
+        <p class="result-label" id="result-position-label">YOUR POSITION</p>
         <strong class="result-time" id="result-position">1 / 5</strong>
-        <p class="result-label">YOUR TIME</p>
+        <p class="result-label" id="result-time-label">YOUR TIME</p>
         <strong class="result-time" id="result-time">00:00.00</strong>
+        <section id="practice-results" hidden>
+          <p id="practice-result-summary"></p><p id="practice-result-best"></p>
+          <table><thead><tr><th>Lap</th><th>Time</th><th>S1</th><th>S2</th><th>S3</th><th>Status</th></tr></thead><tbody id="practice-result-laps"></tbody></table>
+        </section>
         <button class="action-button" id="retry-button" type="button">RACE AGAIN <span aria-hidden="true">↻</span></button>
         <button class="action-button" id="menu-button" type="button">MENU <span aria-hidden="true">≡</span></button>
       </section>
@@ -257,8 +289,16 @@
           <option value="/audio/tracks/track_011.mp3">Ion Cathedral</option>
         </select>
         <button class="action-button" id="resume-button" type="button">RESUME RACE <span aria-hidden="true">▶</span></button>
+        <button class="action-button" id="end-session-button" type="button" hidden>END TIME ATTACK</button>
       </section>
 
+      <aside id="time-attack-hud" hidden aria-label="Time Attack timing">
+        <div class="practice-heading"><span id="practice-lap">OUT LAP</span><span id="practice-best">PB —</span></div>
+        <div class="practice-timing"><strong id="practice-clock">—</strong><strong id="practice-delta">SET YOUR PACE</strong></div>
+        <p id="practice-sectors">S1 — S2 — S3 —</p>
+        <p id="practice-notice" role="status"></p><p id="practice-status" role="status"></p>
+      </aside>
+      <div id="corner-warning" hidden></div>
       <footer class="footer-bar">
         <span>SWIPE-OUT <b>·</b> Version 1.1</span>
         <span class="footer-center"><i aria-hidden="true"></i> ONE TRACK · ONE PILOT</span>

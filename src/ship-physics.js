@@ -3,6 +3,7 @@ import { BOOST, resolveWallImpact } from './race-interactions.js';
 import { getRacerTopSpeed } from './catch-up.js';
 import { getRacerFrame, getRacerWidth, advanceRouteDistance, recordRaceProgress, gapAt, nextGap } from './track-path.js';
 import { launchAcrossGap, stepGapFlight, flightPose } from './gap-flight.js';
+import { CLASSIC_HANDLING, stepClassicAttitude, stepClassicMomentum, stepClassicRoll } from './classic-handling.js';
 
 // Konstanter för svävaren (kan flyttas överst i filen)
 const GRAVITY = -26.0;         // Snabb arkad-gravitation i Y-led
@@ -16,6 +17,7 @@ const HOVER_DAMPING = 9.0;     // Dämpning så att skeppet inte studsar oändli
 // brakes, track adhesion, airborne gravity, angular inertia and edge impacts.
 export function createShipPhysics(baseSpeed, tuning = {}) {
   return {
+    handlingMode: tuning.handlingMode === 'wipeout' ? 'wipeout' : 'swipeout', classicRollVelocity: 0,
     route: null, routeDecision: '', routeEntries: 0, routeMerges: 0, gatesPassed: 0, completedLaps: 0, pendingFlightFrom: null,
     flight: null, recoveryTimer: 0, recoveries: 0, respawnSerial: 0, launches: 0, landings: 0,
     boostTimer: 0,        
@@ -76,7 +78,7 @@ export function stepShipPhysics(ship, input, dt, curve, baseSpeed, trackWidth = 
 }
 
 function stepRoutePhysics(ship, input, dt, curve, baseSpeed, trackWidth) {
-  if (!curve.track?.magnetic || dt <= 1 / 120) return stepShipSubstep(ship, input, dt, curve, baseSpeed, trackWidth);
+  if ((!curve.track?.magnetic && ship.handlingMode !== 'wipeout') || dt <= 1 / 120) return stepShipSubstep(ship, input, dt, curve, baseSpeed, trackWidth);
   const previous = { distance: ship.distance, lane: ship.lateralOffset, height: ship.verticalOffset,
     position: stepShipSubstep(ship, input, 0, curve, baseSpeed, trackWidth).position, serial: ship.respawnSerial };
   const steps = Math.ceil(dt / (1 / 120));
@@ -128,11 +130,12 @@ ship.boostTimer = Math.max(0, ship.boostTimer - dt);
     0,
     1,
   );
+  const classic = ship.handlingMode === 'wipeout';
+  if (classic) stepClassicAttitude(ship, input, dt);
+  else {
   ship.brakeLeft = damp(ship.brakeLeft, input.brakeLeft ? 1 : 0, input.brakeLeft ? 5.8 : 7.5, dt);
   ship.brakeRight = damp(ship.brakeRight, input.brakeRight ? 1 : 0, input.brakeRight ? 5.8 : 7.5, dt);
   const brake = ship.brakeLeft + ship.brakeRight;
-  const differentialBrake = ship.brakeLeft - ship.brakeRight;
-
   // Angular acceleration / inertia, inspired by ship_player_update_race().
   const steer = THREE.MathUtils.clamp(-(input.steer ?? 0), -1, 1);
   const turnAcceleration = 3.7 + brake * 1.8;
@@ -140,10 +143,13 @@ ship.boostTimer = Math.max(0, ship.boostTimer - dt);
   ship.yawVelocity = THREE.MathUtils.clamp(ship.yawVelocity, -2.2, 2.2);
   ship.yaw = damp(ship.yaw, THREE.MathUtils.clamp(ship.yawVelocity * 0.15, -0.24, 0.24), 5.2, dt);
   ship.pitch = damp(ship.pitch, THREE.MathUtils.clamp(input.pitch ?? 0, -1, 1) * 0.09, 3.2, dt);
+  }
+  const brake = ship.brakeLeft + ship.brakeRight;
+  const differentialBrake = ship.brakeLeft - ship.brakeRight;
 
   // Longitudinal force balance: thrust, drag and braking. Speed is in the
   // existing SwipeOut world scale, rather than the original PS1 fixed-point scale.
-  const throttleForce = ship.thrust * (ship.tuning.engineForce ?? 8);
+  const throttleForce = ship.thrust * (ship.tuning.engineForce ?? (classic ? CLASSIC_HANDLING.engineForce : 8));
   const baselineDrag = ship.speed * 0.045;
   const brakingForce = brake * (ship.tuning.brakeForce ?? 18);
   ship.speed += (throttleForce - baselineDrag - brakingForce) * dt;
@@ -204,6 +210,8 @@ ship.boostTimer = Math.max(0, ship.boostTimer - dt);
       ship.airborne = true;
     }
   }
+  if (classic) stepClassicMomentum(ship, frame, dt);
+  else {
 // --- NY KOD: CENTRIFUGALKRAFT OCH DRIFT ---
   if (!ship.previousTangent) {
     ship.previousTangent = frame.tangent.clone();
@@ -244,21 +252,25 @@ const centeringForce = -ship.lateralOffset * (ship.assistLevel * (ship.tuning.ce
 const effectiveCentering = THREE.MathUtils.lerp(centeringForce, 0, Math.abs(steeringInput));
 
 ship.lateralOffset += (ship.lateralVelocity + effectiveCentering) * dt * 2;
-
+  }
 
   // The original uses face collisions and track repulsion. SwipeOut's track is
   // a smooth ribbon, so the edge is handled as a damped impact instead.
-  resolveWallImpact(ship, trackWidth);
+  const wall = resolveWallImpact(ship, trackWidth);
+  if (classic && wall && ship.yaw * ship.lateralOffset > 0) ship.yaw *= -0.25;
   const outerLimit = trackWidth / 2 + 0.4;
   ship.lateralOffset = THREE.MathUtils.clamp(ship.lateralOffset, -outerLimit, outerLimit);
 
   // Track-relative bank and attitude damping.
+  if (classic) stepClassicRoll(ship, dt);
+  else {
   const desiredRoll = THREE.MathUtils.clamp(
     -(ship.lateralVelocity * 0.035 + ship.yawVelocity * 0.1),
     -0.38,
     0.38,
   );
   ship.roll = damp(ship.roll, desiredRoll, ship.airborne ? 5.5 : 10.6, dt);
+  }
 
   // Progress advances with forward speed, not with steering input.
   const boundary = nextGap(curve, ship.distance);

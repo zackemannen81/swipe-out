@@ -1,5 +1,96 @@
 # Current Status
 
+## 2026-10-27 — TT-001: Time Attack, PB ghost and guidance
+
+The user accepted Wipeout/low-assist handling as sufficiently skill-based. That
+baseline is retained. PRODUCT_ROADMAP.md records the approved next stages; this
+delivery implements Time Attack, while CPU difficulty/cup/audio/presentation
+remain planned work.
+
+EVENT now selects Race or solo Time Attack. Solo has one out lap followed by
+three flying timed laps, with no CPU simulation/rendered rivals/contacts, combat
+or catch-up. Shared steering, boosts, wall response and flight remain. Timing
+interpolates 33%/66%/finish crossings in canonical route progress. Recovery
+invalidates the affected lap; incomplete, failed-gate and over-ten-minute laps
+cannot save. Pause freezes the simulation clock; early end retains completed
+valid records. Retry starts a new out lap.
+
+Versioned browser records include track revision, ship, speed class, top speed,
+handling/effective assist and physics version. Current selection remains one
+player craft (Racer) and one speed class (Standard). Camera/visual helpers do not
+split records. Malformed records are ignored visibly; quota/unavailable storage
+keeps a session PB with a warning rather than deleting existing records. A bounded
+eight-category cache supports retry without losing an unsaved PB. No cloud sync.
+
+The transparent PB ghost replays world position and quaternion recorded at 20 Hz
+plus timing boundaries, with interpolation and no physics/collisions/pad triggers.
+It follows recorded branches, loops and gaps, restarts on flying-lap boundaries,
+and fades on overlap. HUD shows lap/sector times and signed progress-matched
+delta. Results include valid/invalid status, per-lap sectors and session-best
+improvement over the starting PB. Ghost and visual guides are separately saved
+options. Existing boost afterimages are independent.
+
+The optional local-surface racing line estimates lower-curvature lanes, attracts
+to reachable pads, limits sideways slope and compares branch travel estimates.
+It follows the actual selected route, omits gap segments and colours the braking
+approach. Local left/right turn warnings depend on curvature/speed; gaps have
+priority. A fixed 64-segment mesh updates at approximately 10 simulation Hz.
+This is geometric coaching, not proven fastest-lap optimization or steering
+assistance. It needs human tuning, especially on custom circuits.
+
+Verification: all 68 Node tests pass, including ten new timing/storage/replay/
+guidance checks. Off-frame crossings agree at 30/60/120 Hz. An input-driven
+classic-physics run completes the out lap plus three timed Foundry laps with
+four branch entries, eight landings and zero recovery, saving a reloadable PB.
+The browser separately passes actual solo render-loop isolation and keyboard/
+pause, accelerated input-driven complete laps, real storage/reload/category
+isolation, persisted helper toggles, early end, results and return to Race.
+Inspected desktop/landscape screenshots cover bank, gap, shortcut and inversion
+in temporary swipe-out-tt001. No JS errors or failed HTTP responses were recorded.
+Test hooks are response-only and never shipped. Production build passes with
+the existing large-chunk warning; diff check passes.
+
+Physical-phone performance, human ghost comfort and recommended-line balance
+remain unverified. See TIME_ATTACK.md for operation, storage limits and tuning.
+
+## 2026-10-27 — DRIVE-001: selectable handling and camera
+
+Start-screen CONTROL MODE now selects the existing default Swipeout/assist or
+an optional Wipeout-inspired profile. CAMERA FOLLOW independently selects either
+camera, or follows the control mode. Both choices and the Swipeout assist value
+persist in browser storage and apply at the next race start.
+
+The new profile separates nose heading from lateral momentum, accelerates yaw,
+supports faster countersteer and analog independent airbrakes, and removes lane
+centering. Its engine force is 20 versus the existing player's 8 for recovery after
+braking; top-speed/boost/catch-up rules and CPU profiles are unchanged. Keyboard,
+touch and gyro retain their inputs. Classic gamepad A/Cross accelerates, while
+L1/R1 or L2/R2 brake independently, eliminating R2's thrust/brake overlap in this
+profile. Optional weapon aim follows the classic ship's nose.
+
+The classic camera follows nose heading without hull roll in chase view, with
+damped track-relative correction and a small hull-roll contribution in cockpit.
+Local correction avoids world-position lag through loops; gap landing/recovery,
+view changes and retry reset transient state. See DRIVING_MODES.md for reference
+comparison, controls and tuning constants. This adapts the supplied C source's
+principles to the existing spline physics; it does not port free-body triangle
+collision/repulsion, and heading remains bounded to roughly +/-37 degrees.
+
+All 58 Node tests and the production build pass. Coverage includes 30/60/120 Hz,
+countersteer/brakes, reset, both Foundry gaps at three speeds, an input-driven
+three-lap run with gates/branches/six landings, camera inversion, preferences and
+weapon direction. The automated driver contacts walls; it is not evidence of
+optimal racing or enjoyable human handling. Physical-device performance,
+controller feel and final human handling/camera tuning remain playtest items.
+The existing Vite large-chunk warning remains.
+
+Chromium WebGL acceptance passes saved independent settings, keyboard steering/
+countersteer, synthetic analog gamepad brakes/thrust/disconnect, mobile pointer
+steering/pedal and pointer-capture reset on pause, frozen pause, real gap landing,
+inverted chase/cockpit rendering, finish/retry and restored Swipeout assist.
+Inspected desktop/landscape screenshots are in temporary swipe-out-drive001.
+No browser JavaScript errors or failed HTTP responses were recorded.
+
 ## 2026-10-26 — TRACK-004: Ion Foundry complete circuit
 
 Fifteen built-ins now include Ion Foundry (track15), a roughly 5,798-unit orbital
