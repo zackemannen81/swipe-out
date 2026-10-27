@@ -1,5 +1,10 @@
 # File Structure
 
+## 2026-10-27 — README-001 documentation refresh
+
+- `README.md` — current SwipeOut2026 setup, play/editor guide and roadmap overview
+- `docs/archive/DRIVE-002.md` — completed Wipeout wall-response task record
+
 ## 2026-10-27 — DRIVE-002 classic wall response
 
 - `docs/archive/TT-001.md` — completed Time Attack task record

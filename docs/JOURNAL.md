@@ -427,3 +427,13 @@
 - Versioned Wipeout PB identity only, leaving old data stored and Swipeout PB keys
   unchanged. Updated control guide and continuity docs. Human feel still needs
   replay; no browser or physical-device playtest was performed for this change.
+
+## 2026-10-27 — README-001 SwipeOut2026 overview
+
+- Refreshed README for the current playable build: setup, Race/Time Attack,
+  PB ghost/sectors/guidance, handling/cameras, tracks/editor/sharing, CPU/combat,
+  browser-local persistence and the approved next stages.
+- Corrected stale top speed, procedural-craft and track-distance claims; kept
+  release versions and gameplay unchanged. Archived completed DRIVE-002.
+- Checked 28 local links, npm commands, browser-script paths and Markdown fences;
+  diff check passes. No gameplay tests/build rerun for documentation-only edits.

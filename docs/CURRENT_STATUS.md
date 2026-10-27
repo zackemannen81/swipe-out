@@ -1,5 +1,14 @@
 # Current Status
 
+## 2026-10-27 — README-001: SwipeOut2026 overview
+
+README now describes the current playable build, setup, both events and handling
+profiles, cameras, tracks/editor/sharing, combat, local data and planned work.
+Corrected stale craft, top-speed and track-distance descriptions. No gameplay or
+release-version changes. Checked all 28 local links, npm commands, browser-script
+paths and Markdown fences; diff check passes. Gameplay tests/build were not rerun
+for this documentation-only task; the README dates the existing DRIVE-002 evidence.
+
 ## 2026-10-27 — DRIVE-002: classic wall pinball correction
 
 Reproduced the user's report on a straight 10-wide test track: a speed-143
