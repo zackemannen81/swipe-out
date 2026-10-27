@@ -122,7 +122,7 @@ if (menuButton) {
   });
 }
 
-export const SPEEDCALIBRATION = 75; // Justera detta värde för att kalibrera spelets hastighe
+export const SPEEDCALIBRATION = 78; // Justera detta värde för att kalibrera spelets hastighe
 const scene = new THREE.Scene();
 //scene.background = new THREE.Color(0x080c0a);
 scene.background = new THREE.Color(0x000000);

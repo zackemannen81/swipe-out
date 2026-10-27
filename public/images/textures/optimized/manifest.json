@@ -1,0 +1,170 @@
+[
+  {
+    "source": "tex001.png",
+    "originalSize": [
+      1254,
+      1254
+    ],
+    "sourceBytes": 4368955,
+    "file": "tex001.webp",
+    "size": [
+      512,
+      512
+    ],
+    "bytes": 100826
+  },
+  {
+    "source": "tex002.png",
+    "originalSize": [
+      1254,
+      1254
+    ],
+    "sourceBytes": 2355792,
+    "file": "tex002.webp",
+    "size": [
+      512,
+      512
+    ],
+    "bytes": 14704
+  },
+  {
+    "source": "tex003.png",
+    "originalSize": [
+      1254,
+      1254
+    ],
+    "sourceBytes": 3750424,
+    "file": "tex003.webp",
+    "size": [
+      512,
+      512
+    ],
+    "bytes": 101118
+  },
+  {
+    "source": "tex004.png",
+    "originalSize": [
+      1254,
+      1254
+    ],
+    "sourceBytes": 2854025,
+    "file": "tex004.webp",
+    "size": [
+      512,
+      512
+    ],
+    "bytes": 54466
+  },
+  {
+    "source": "tex005.png",
+    "originalSize": [
+      1254,
+      1254
+    ],
+    "sourceBytes": 3884320,
+    "file": "tex005.webp",
+    "size": [
+      512,
+      512
+    ],
+    "bytes": 80136
+  },
+  {
+    "source": "tex006.png",
+    "originalSize": [
+      1254,
+      1254
+    ],
+    "sourceBytes": 4203726,
+    "file": "tex006.webp",
+    "size": [
+      512,
+      512
+    ],
+    "bytes": 105148
+  },
+  {
+    "source": "tex007.png",
+    "originalSize": [
+      1254,
+      1254
+    ],
+    "sourceBytes": 3571369,
+    "file": "tex007.webp",
+    "size": [
+      512,
+      512
+    ],
+    "bytes": 71992
+  },
+  {
+    "source": "tex008.png",
+    "originalSize": [
+      1254,
+      1254
+    ],
+    "sourceBytes": 3829039,
+    "file": "tex008.webp",
+    "size": [
+      512,
+      512
+    ],
+    "bytes": 117444
+  },
+  {
+    "source": "tex009.png",
+    "originalSize": [
+      1254,
+      1254
+    ],
+    "sourceBytes": 3416088,
+    "file": "tex009.webp",
+    "size": [
+      512,
+      512
+    ],
+    "bytes": 47010
+  },
+  {
+    "source": "tex010.png",
+    "originalSize": [
+      1254,
+      1254
+    ],
+    "sourceBytes": 3811808,
+    "file": "tex010.webp",
+    "size": [
+      512,
+      512
+    ],
+    "bytes": 59958
+  },
+  {
+    "source": "tex011.png",
+    "originalSize": [
+      1254,
+      1254
+    ],
+    "sourceBytes": 2849527,
+    "file": "tex011.webp",
+    "size": [
+      512,
+      512
+    ],
+    "bytes": 63058
+  },
+  {
+    "source": "tex012.jpg",
+    "originalSize": [
+      1024,
+      1024
+    ],
+    "sourceBytes": 538500,
+    "file": "tex012.webp",
+    "size": [
+      512,
+      512
+    ],
+    "bytes": 75906
+  }
+]

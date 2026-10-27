@@ -1,5 +1,20 @@
 # File Structure
 
+## 2026-10-26 — TRACK-004 Ion Foundry
+
+- `docs/archive/TRACK-003.md` — completed routes/combat/cloning task
+- `docs/CURRENT_TASK.md` — TRACK-004 complete-circuit scope and verification
+- `docs/ION_FOUNDRY.md` — circuit sectors, driving guide, assets and authoring notes
+- `src/track-foundry.js` — authored track15, bank compensation and editable scenery
+- `public/images/textures/tex*` — user-provided original source textures
+- `public/images/textures/optimized/` — 12 WebP derivatives, five signs and manifest
+- `tools/prepare-foundry-textures.py` — reproducible Pillow conversion/sign generation
+- `tests/foundry.test.js` — track/asset/clearance/flight/race/resource regressions
+- `tools/verify-foundry.mjs` — WebGL sector captures, flight/route and editor checks
+
+`track-library.js` registers the circuit; `track.js` shares resources within each
+scenery group while preserving independent scrolling texture animations.
+
 ## 2026-10-26 — TRACK-003 routes, combat and cloning
 
 - `docs/archive/TRACK-002.md` — completed gaps/magnetic-track task

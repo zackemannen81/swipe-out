@@ -1,12 +1,13 @@
 import { NEON_CAUSEWAY, SYNTHETIC_DREAMS, DIGITAL_HORIZON, MOMMY_IM_SCARED, DARK_SKIES, GEMINI, THE_JOKER, THE_VOID, AGENT_008_STAGE, ION_CATHEDRAL } from './track-data.js';
 import { decodeTrack, normalizeTrack, trackDocument } from './track-format.js';
 import { GAP_LAB, LOOP_LAB, ROUTE_LAB, COMBAT_LAB } from './track-labs.js';
+import { ION_FOUNDRY } from './track-foundry.js';
 
 export const STORAGE_KEY = 'swipe-out-track-definitions';
 export const LEGACY_STORAGE_KEY = 'swipe-out-track-definition';
-const definitions = [NEON_CAUSEWAY, SYNTHETIC_DREAMS, DIGITAL_HORIZON, MOMMY_IM_SCARED, DARK_SKIES, GEMINI, THE_JOKER, THE_VOID, AGENT_008_STAGE, ION_CATHEDRAL, GAP_LAB, LOOP_LAB, ROUTE_LAB, COMBAT_LAB];
-const audio = ['001', '002', '006', '005', '004', '007', '009', '010', '011', '012'];
-const backgrounds = ['001.jpg', '002.jpg', '003.jpg', '004.jpg', '005.jpg', '006.jpg', '007.jpg', '009.jpg', '010.jpg', '013.png'];
+const definitions = [NEON_CAUSEWAY, SYNTHETIC_DREAMS, DIGITAL_HORIZON, MOMMY_IM_SCARED, DARK_SKIES, GEMINI, THE_JOKER, THE_VOID, AGENT_008_STAGE, ION_CATHEDRAL, GAP_LAB, LOOP_LAB, ROUTE_LAB, COMBAT_LAB, ION_FOUNDRY];
+const audio = ['001', '002', '006', '005', '004', '007', '009', '010', '011', '012', '001', '001', '001', '001', '013'];
+const backgrounds = ['001.jpg', '002.jpg', '003.jpg', '004.jpg', '005.jpg', '006.jpg', '007.jpg', '009.jpg', '010.jpg', '013.png', '001.jpg', '001.jpg', '001.jpg', '001.jpg', '012.jpg'];
 export const BUILTIN_TRACKS = Object.fromEntries(definitions.map((data, i) => [`track${i + 1}`, {
   name: data.name, data, defaultAudio: `/audio/tracks/track_${audio[i] ?? '001'}.mp3`, backdrop: `/images/backdrop_track-${backgrounds[i] ?? '001.jpg'}`,
 }]));

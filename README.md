@@ -1,7 +1,7 @@
 # Swipe-out
 
 Swipe-out is a Three.js anti-gravity racing prototype with three-lap races against
-four CPU opponents, fourteen built-in circuits, custom track import/export and a
+four CPU opponents, fifteen built-in circuits, custom track import/export and a
 3D editor. Test circuits cover gaps, loops, alternative routes and optional combat.
 
 ## Requirements and run
@@ -16,6 +16,17 @@ npm run dev
 ```
 
 Open the local URL printed by Vite. Run `npm run build` for the production bundle or `npm run preview` to serve that bundle locally. The developer track editor is available at `/editor.html`.
+
+## Ion Foundry — complete circuit
+
+Choose **Ion Foundry** (`/?track=track15`): a 5.8 km industrial circuit with two
+gaps, banked corners, technical S bends, a vertical reactor loop and the narrow
+Needle Skyway shortcut. Take the **left** approach lane at its amber fork. Keep
+throttle through the jumps. All four CPU racers use the same road and flight rules.
+The environment contains 656 editable primitives and optimized versions of the
+user's textures. Open `/editor.html?track=track15` to customize it.
+See [the track guide](docs/ION_FOUNDRY.md) for sectors, assets and tuning.
+`node tools/verify-foundry.mjs` runs its browser acceptance checks.
 
 ## Track editor and minimap
 

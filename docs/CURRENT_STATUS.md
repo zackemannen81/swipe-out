@@ -1,5 +1,53 @@
 # Current Status
 
+## 2026-10-26 — TRACK-004: Ion Foundry complete circuit
+
+Fifteen built-ins now include Ion Foundry (track15), a roughly 5,798-unit orbital
+industrial circuit. It combines two 101-unit gaps, banked corners, a descending
+S-bend section, a vertical loop of radius 70 with a separated exit, and the raised
+Needle Skyway. Left approach selects the 8-wide, 541-unit shortcut; the 22-wide
+main detour is 749 units. Six sign gantries identify hazards and sectors. Music
+uses track_007 and the existing backdrop_track-009.jpg. Previous tracks/tuning
+and default-off combat remain unchanged.
+
+The environment contains 656 individually editable primitives: district buildings,
+reactor islands, coolant shafts, machine halls, outriggers, skyway supports,
+loop rings/core and neon guides. Launch/landing lanes stay clear. Bank metadata
+compensates parallel-transport roll at authored anchors, keeping jump ramps level
+in world space. Saved editor drafts are ordinary v3 data, independent of the
+initial source helpers. Scenery remains decorative; existing weapon occlusion
+still uses it. See ION_FOUNDRY.md for the driving/authoring guide.
+
+All 12 user source textures are preserved and have reproducible 512-square WebP
+derivatives (891,766 bytes vs 39,433,573 original bytes). Five generated wayfinding
+textures are 1024x256. The circuit loads eight surface maps plus five signs,
+683,454 bytes total. Scenery shares four geometries and 13 static texture instances
+within its disposable group; identical materials also share. Scrolling maps remain
+independent. Tests verify disposal once per resource and no offset cross-talk.
+
+Verification: 50 Node regressions pass; after the final loop scenery adjustment,
+the six affected Foundry tests pass again. Player physics completes three laps
+on both paths with six landings; all four CPUs finish with six landings, zero
+recoveries, boosts/contacts and both paths used. CPU times without catch-up/combat
+are approximately 133–141 seconds. Both gaps land at 100/140/210 speed at 30/120 Hz;
+40-speed misses recover safely. Conservative sampled scenery bounds leave the
+road/craft/camera-height envelope clear. Format/asset budgets also pass.
+
+Chromium WebGL loads all 13 scenery maps, renders inspected district, bank,
+fork, skyway, switchback, cockpit, loop and inverted views, and passes actual
+render-loop player jumps on both gaps plus lane-selected fork-to-merge travel.
+The editor opens, exports all scenery/routes/gaps and saves/reloads. Desktop and
+landscape captures are in temporary swipe-out-track004. No browser JS errors or
+failed HTTP responses. The browser uses controlled approach/inspection poses;
+complete multi-lap verification is the Node simulation, not a human playthrough.
+The previous editor browser suite also passes gizmo/history/textures/import,
+scoped reset and Save & Test. Final production build, syntax and diff checks pass.
+
+Physical-phone frame rate, human challenge/fun, shortcut balance and inversion
+comfort remain unverified. The unchanged main bundle still triggers Vite's
+large-chunk warning. Local texture references in exported JSON require the same
+assets when moved to another installation; they are not embedded automatically.
+
 ## 2026-10-26 — TRACK-003: scenery cloning, alternative routes and optional combat
 
 The user gave positive feedback on gaps/loops and authorized the final two roadmap

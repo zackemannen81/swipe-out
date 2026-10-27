@@ -56,6 +56,13 @@ architecture or behavior.
 
 ## Documentation truth boundary
 
+Complete authored circuits combine verified mechanics as ordinary versioned
+track data. Ion Foundry is the first such combined environment: its source helper
+builds editable primitives and control points; saved drafts remain independent.
+Scenery assets share geometry/materials/static textures within one disposable
+group. Animated scrolling textures remain independent. Original source images
+are retained separately from reproducible delivery-sized WebP derivatives.
+
 The approved expansion order is versioned track sharing, an initial 3D editor,
 gaps, banking/twists/loops, route branches, then optional combat. The detailed
 checklist and stage status are in TRACK_ROADMAP.md. Develop the editor alongside

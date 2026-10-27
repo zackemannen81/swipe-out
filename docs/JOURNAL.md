@@ -339,3 +339,26 @@
 - Updated roadmap, README and continuity docs. No nested routes/gaps on branches,
   weapon pickups, health or elimination. Minigun is a playable prototype; balance,
   sound mix, touch comfort and physical-device performance need human evaluation.
+
+## 2026-10-26 — TRACK-004 Ion Foundry
+
+- Authored track15, a complete 5,798-unit industrial circuit with two real gaps,
+  banked turns, a technical S section, narrow raised shortcut and vertical loop.
+  Added 656 editable scenery primitives, sector signs, coolant shafts, reactors,
+  machine halls and loop structure. Preserved previous tracks and gameplay tuning.
+- Preserved all user texture originals. Added reproducible 512-square WebP
+  derivatives (39.4 MB to 0.892 MB for all 12) and five sign maps. The circuit
+  loads 13 maps totaling 0.683 MB. Shared group-owned geometries/materials/textures
+  reduce duplicate GPU allocations; scrolling maps retain independent offsets.
+- 50 Node tests pass; six affected tests rerun after final scenery change pass.
+  All four CPUs finish three laps using both routes, with six landings and zero
+  recoveries. Player physics finishes on either route. Jumps, sampled clearance,
+  asset budgets, round-trip and GPU lifecycle pass. Extended the second landing
+  straight after a boosted-speed test exposed a premature turn.
+- WebGL browser checks pass all texture requests, inspected sectors/cockpit/loop,
+  both real render-loop jumps, lane-selected shortcut traversal and merge,
+  landscape capture and full editor export/save/reload. Existing editor browser
+  regression also passes. No JS errors or failed requests in either suite.
+- Final build/syntax/diff checks pass with the existing large-chunk warning.
+  Added ION_FOUNDRY.md and updated roadmap/README/continuity docs. Physical-phone
+  performance, human fun/balance and loop comfort remain playtest items.

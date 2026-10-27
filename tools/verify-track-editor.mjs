@@ -25,7 +25,7 @@ try {
   await page.waitForFunction(() => document.querySelector('#track-title').textContent === 'Neon Causeway');
   await page.waitForTimeout(700);
   await page.screenshot({ path: join(output, 'editor-overview.png') });
-  assert.equal(await page.locator('#track-select option').count(), 14);
+  assert.equal(await page.locator('#track-select option').count(), 15);
 
   // Actual mouse manipulation of the selected point's green height gizmo.
   await page.locator('#focus-button').click();
@@ -77,7 +77,7 @@ try {
   await page.waitForFunction(() => document.querySelector('#status').textContent.startsWith('Imported as a new draft'));
   const customKey = await page.locator('#track-select').inputValue();
   assert.match(customKey, /^custom-/);
-  assert.equal(await page.locator('#track-select option').count(), 15);
+  assert.equal(await page.locator('#track-select option').count(), 16);
   assert.equal(await page.locator('#track-title').innerText(), 'Editor Test Circuit');
   console.log('PASS: built-in scenery, zero opacity, retained drafts, download and import as new track.');
 

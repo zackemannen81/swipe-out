@@ -396,26 +396,38 @@ export function spawnTrackObjects(scene, trackData) {
 
   const hScale = trackData.horizontalScale ?? 1;
 
+  // Ownership stays inside this group so editor rebuilds / track changes can
+  // dispose everything once. Static duplicates share GPU resources. Scrolling
+  // maps stay independent because each object's animation mutates its offset.
+  const geometries = new Map(), textures = new Map(), materials = new Map();
+
   trackData.objects.forEach((obj) => {
-    let geometry;
-    if (obj.type === 'cylinder') {
+    let geometry = geometries.get(obj.type);
+    if (!geometry && obj.type === 'cylinder') {
       geometry = new THREE.CylinderGeometry(0.5, 0.5, 1, 32);
-    } else if (obj.type === 'sphere') {
+    } else if (!geometry && obj.type === 'sphere') {
       geometry = new THREE.SphereGeometry(0.5, 32, 32);
-    } else if (obj.type === 'cone') {
+    } else if (!geometry && obj.type === 'cone') {
       // En cylinder med radie 0 i toppen blir en kon i Three.js
       geometry = new THREE.CylinderGeometry(0, 0.5, 1, 32); 
-    } else {
+    } else if (!geometry) {
       geometry = new THREE.BoxGeometry(1, 1, 1);
     }
+    geometries.set(obj.type, geometry);
 
     const rawOpacity = typeof obj.opacity === 'string' ? obj.opacity.replace(',', '.') : obj.opacity;
     const parsedOpacity = parseFloat(rawOpacity);
     const opacity = !isNaN(parsedOpacity) ? parsedOpacity : 1.0;
 
-    let material;
-    if (obj.texture) {
-      const tex = textureLoader.load(obj.texture);
+    const scrolling = obj.animType === 'scroll-x' || obj.animType === 'scroll-y';
+    const materialKey = JSON.stringify([obj.texture || null, obj.type, obj.color, obj.emissive, opacity]);
+    let material = scrolling ? null : materials.get(materialKey);
+    if (!material && obj.texture) {
+      let tex = scrolling ? null : textures.get(obj.texture);
+      if (!tex) {
+        tex = textureLoader.load(obj.texture);
+        if (!scrolling) textures.set(obj.texture, tex);
+      }
       tex.colorSpace = THREE.SRGBColorSpace;
       
       // TILLÄGG 1: Säger åt Three.js att texturen får repeteras, vilket krävs för scroll-animationer
@@ -433,7 +445,7 @@ export function spawnTrackObjects(scene, trackData) {
         roughness: 0.3,
         metalness: 0.7
       });
-    } else {
+    } else if (!material) {
       // TILLÄGG 2: Tillåter egna färger och neonglöd från JSON-filen (bra för Abyssal Circuit)
       const colorHex = obj.color !== undefined ? obj.color : 
         (obj.type === 'cylinder' ? 0xffd166 : obj.type === 'sphere' ? 0xb58cff : 0xff7aa8);
@@ -450,6 +462,8 @@ export function spawnTrackObjects(scene, trackData) {
         metalness: isNeon ? 0.1 : 0.8
       });
     }
+
+    if (!scrolling) materials.set(materialKey, material);
 
     const mesh = new THREE.Mesh(geometry, material);
 

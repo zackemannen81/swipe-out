@@ -78,7 +78,7 @@ test('mixed legacy/versioned library isolates corrupt records and safely loads b
   assert.equal(issues.length, 1);
   assert.match(issues[0], /track2.*unsupported version 99/);
   const corrupted = memoryStorage({ [STORAGE_KEY]: '{broken' });
-  assert.equal(Object.keys(readTrackLibrary(corrupted).entries).length, 14);
+  assert.equal(Object.keys(readTrackLibrary(corrupted).entries).length, 15);
   assert.throws(() => saveTrack(corrupted, 'track1', definitions.NEON_CAUSEWAY));
   assert.equal(corrupted.getItem(STORAGE_KEY), '{broken');
 });
@@ -97,7 +97,7 @@ test('save/reset affect only the chosen track; invalid writes and quota failure 
   assert.equal(storage.getItem(LEGACY_STORAGE_KEY), null);
   assert.equal(readTrackLibrary(storage).entries['custom-one'].data.objects.length, 5);
   resetTrack(storage, 'custom-one');
-  assert.equal(Object.keys(readTrackLibrary(storage).entries).length, 14);
+  assert.equal(Object.keys(readTrackLibrary(storage).entries).length, 15);
 });
 
 test('undo/redo retain scenery and edits independently of saved snapshots, and discard redo after new edits', () => {

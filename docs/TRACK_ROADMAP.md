@@ -12,6 +12,7 @@ dess kontroller är verifierade. Körkänsla, CPU-profiler och thrusters bevaras
 | 4 | Dosering, twists och loopar | Implementerad — TRACK-002, komforttest återstår |
 | 5 | Alternativa vägar och shortcuts | Implementerad — TRACK-003, redo för provkörning |
 | 6 | Valbart vapensystem | Spelbar prototyp — TRACK-003, balansutvärdering återstår |
+| 7 | Komplett miljösatt bana: Ion Foundry | TRACK-004 — innehåll och verifiering, mänsklig provkörning återstår |
 
 ## 1. Banformat och import/export
 
@@ -94,6 +95,11 @@ inga livspoäng eller eliminering. Balansering av skada, omladdning och CPU-eld
 återstår efter den mänskliga provkörningen.
 
 ## Leveransregler
+
+Efter användarens önskemål kombineras mekanikerna i **Ion Foundry** (`track15`):
+två gaps, doserade kurvor, tekniskt S-parti, upphöjd genväg och vertikal loop i en
+texturerad reaktormiljö. [Banguiden](ION_FOUNDRY.md) beskriver sektorerna,
+optimerade texturer och fortsatt provkörning. Det är innehållsetappen TRACK-004.
 
 - En liten spelbar testbana per ny mekanik före bred innehållsproduktion.
 - Dokumentera faktisk verifiering i CURRENT_STATUS; skilj kodtester från

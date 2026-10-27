@@ -1,53 +1,45 @@
 # Current Task
 
-Task ID: TRACK-003
+Task ID: TRACK-004
 Status: Complete
 Created: 2026-10-26
 
 ## Scope
 
-Deliver approved stages 5 and 6 (alternative routes and optional combat) plus
-scenery-object cloning requested by the user after their positive gap/loop test.
+Author a complete new circuit using the user's primitive textures, with a cohesive
+industrial environment, gaps, banked corners, a vertical loop, a technical section
+and a shortcut. Preserve existing tracks, tuning and original source images.
 
 ## Definition of done
 
-- [x] Clone scenery with independent data, new ID, visible offset, all properties,
-      undo/redo, save and export.
-- [x] Version 3 validates branches and migrates v1/v2/legacy files.
-- [x] Continuous route splits/merges; actual route length controls travel time,
-      shared progress/checkpoints control rank, laps, finish and catch-up.
-- [x] Player approach-lane choice and CPU use of both routes; geometry, pads,
-      walls, collisions, minimap, camera and reset respect route selection.
-- [x] Editor creates/removes branches and edits connections, width and 3D points.
-- [x] Optional combat defaults off; shared player/CPU ammunition, cooldowns,
-      swept projectile hits, knockback, speed loss and brief hit protection.
-- [x] Rockets, lock-on missiles with sight/lock/warning, and a bounded minigun
-      trial; keyboard/touch controls; pause/retry/finish lifecycle.
-- [x] Separate playable route/combat test circuits, readable HUD and effects.
-- [x] Node/browser verification, production build and continuity docs complete.
+- [x] New circuit available in the race and 3D editor as track15.
+- [x] Authored scenery gives each sector identity and leaves racing space clear.
+- [x] Optimized texture derivatives, reproducible conversion and bounded shared
+      scenery GPU resources; original files retained.
+- [x] Two playable gaps, banked corners, technical S bends, loop and shorter,
+      narrower alternative route with readable approaches.
+- [x] Player/CPU physics complete the course; both routes and jumps verified.
+- [x] Browser visual inspection, texture requests, editor export/reload checks,
+      appropriate regression tests and production build pass.
+- [x] Track guide and continuity documents record features and verification limits.
 
 ## Verification
 
-44 Node tests pass, including nine new route/combat regressions. All four CPUs
-finish three validated laps using both paths with contacts and boost pads. Tests
-check real route-time savings at 30/60/120 Hz, equal-progress catch-up, ordered
-gates, route pads, safe recovery after merges, swept weapon hits, dodges/occlusion,
-homing lock/warnings, ammo/reload/cooldowns, protection and lifecycle/air impulses.
+50 Node regressions pass. The six affected Foundry tests pass again after the
+final scenery adjustment. Player simulation completes three laps on either route;
+all four CPUs finish three laps with both routes, six landings and no recoveries.
+Both jumps pass at normal/boosted speeds and 30/120 Hz; slow misses recover safely.
+Tests also cover conservative scenery clearance, v3 round-trip, asset sizes,
+shared resources, independent scrolling and disposal on rebuild.
 
-Chromium WebGL passes cloning identity/properties/textures/independence,
-undo/redo/save/reload/export, branch editing/creation/removal and v3 import/export.
-A controlled player approach takes and traverses the shortcut, merges, and updates
-the minimap/HUD. Actual keyboard and pointer controls fire rockets, homing missiles
-and minigun; player and CPU hits, lock reticle, paused shots, finish/retry and
-landscape layout pass. The existing editor browser suite also passes. No JS errors
-or failed requests. Inspected screenshots in temporary swipe-out-track003.
+Chromium WebGL passes optimized texture loading, controlled sector/cockpit/loop
+captures, actual render-loop jumps on both gaps, lane-selected shortcut travel
+through merge, landscape layout and editor export/save/reload. Inspected captures
+are in temporary swipe-out-track004. The existing editor browser suite also
+passes its real gizmo, history, texture, import, reset and Save & Test flows.
+Both suites report no JS errors or failed requests.
 
-Production build, syntax and diff checks pass; existing Vite chunk warning.
-Final bounded/instanced branch-fixture and validation changes pass the affected
-16 route/combat/format tests and a fresh build. Accepted speed, CPU and thruster
-tuning is retained. Human balance/fun, sound mix, touch comfort and physical-device
-performance remain explicit playtest items in the roadmap.
-
-Try track13 (Split Decision, approach LEFT for Needle Shortcut) and track14
-(Crossfire Circuit, enable COMBAT MODE before start). Space/FIRE shoots; 1/2/3
-select weapons. Editor CLONE OBJECT / Ctrl/Cmd+D duplicates selected scenery.
+Final production build, syntax and diff checks pass. The existing Vite large
+chunk warning remains. Original source textures and existing gameplay tuning are
+preserved. Real-device performance, human difficulty/fun and loop comfort remain
+playtest items, documented in ION_FOUNDRY.md and CURRENT_STATUS.
