@@ -56,10 +56,14 @@ architecture or behavior.
 
 ## Documentation truth boundary
 
-The user has accepted the skill-based handling baseline. The next approved
-product sequence is Time Attack/ghost/guidance, CPU difficulty, a three-track cup
-with progression, audio feedback, then presentation/device performance. Stage
-details and completion state belong to PRODUCT_ROADMAP.md and CURRENT_STATUS.
+The user has accepted the skill-based handling baseline and explicitly requires
+the existing countdown to remain unchanged. The expanded 2026-10-28 wishlist
+covers race intro/results, CPU difficulty, track tools/readability, combat and
+countermeasures, cup/ship progression, audio, menus/environments and device
+performance. PRODUCT_ROADMAP.md owns the recommended sequence and acceptance
+targets; CURRENT_STATUS records implementation evidence. A new camera intro must
+finish before the existing countdown begins. Proposed tuning is not approved
+implementation or proof of delivered behavior.
 
 Time Attack uses one out lap and three flying laps, without CPU simulation,
 combat or catch-up. The time-attack module owns interpolated timing, lap validity,

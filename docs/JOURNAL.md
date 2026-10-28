@@ -437,3 +437,13 @@
   release versions and gameplay unchanged. Archived completed DRIVE-002.
 - Checked 28 local links, npm commands, browser-script paths and Markdown fences;
   diff check passes. No gameplay tests/build rerun for documentation-only edits.
+
+## 2026-10-28 — PLAN-002 expanded wishlist
+
+- Recorded all requested improvements with staged acceptance targets, source
+  observations and recommended order. Preserve countdown unchanged; intro must
+  end before it. Separate delivered features from proposals and reported defects.
+- Flagged existing F/pitch mapping, missing per-point width, track-format/record
+  compatibility, physical-phone checks and ship progression tradeoffs.
+- Updated roadmap references and archived README-001. Documentation only; no
+  gameplay changes, browser reproduction or gameplay tests claimed.

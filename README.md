@@ -272,8 +272,11 @@ documents are not evidence that a feature is already implemented.
 
 ## Next steps and current limits
 
-The approved [product roadmap](docs/PRODUCT_ROADMAP.md) follows the completed
-handling and Time Attack stages with:
+The expanded [product roadmap](docs/PRODUCT_ROADMAP.md), updated 28 October 2026,
+adds race intro/results, track tools, combat countermeasures and weapon pickups,
+ship unlocks and animated menus. It recommends starting with results layout and
+a camera intro while preserving the existing countdown. The longer-term goals
+following the completed handling and Time Attack stages include:
 
 1. **Rookie / Pilot / Elite CPU difficulty:** precision, braking, overtaking,
    shortcut decisions and risk profiles.

@@ -1,5 +1,17 @@
 # Current Status
 
+## 2026-10-28 — PLAN-002: expanded improvement roadmap
+
+Captured the user's expanded wishlist and recommended delivery stages A–G in
+PRODUCT_ROADMAP.md. Countdown preservation is explicit. Source inspection found
+global/branch widths but no per-point main-road width in format v3; F already
+controls classic pitch. Results inherit scroll/height rules, but the reported
+clipping has not yet been visually reproduced or fixed. Existing combat alerts,
+boosts and guide warnings are extension points, not newly delivered features.
+No gameplay changes or new gameplay test claims. Next recommended implementation
+is results layout and a separate pre-countdown camera intro; sequence/tuning are
+proposals. Documentation links and diff checked.
+
 ## 2026-10-27 — README-001: SwipeOut2026 overview
 
 README now describes the current playable build, setup, both events and handling

@@ -4,6 +4,15 @@
 **Document status:** Initial design baseline; proposed details require playtesting
 **Audience:** Product, design, art, audio, and engineering
 
+## Expanded product plan — 2026-10-28
+
+[PRODUCT_ROADMAP.md](PRODUCT_ROADMAP.md) owns the latest expanded wishlist and
+proposed delivery order, including race presentation, CPU levels, variable track
+width, hazards, weapon pickups/flares and ship progression. Its concrete design
+proposals remain subject to playtesting. Preserve the accepted driving baseline
+and countdown. Older milestone ordering below is historical design context;
+CURRENT_STATUS remains the evidence for implemented behavior.
+
 ## 1. High concept
 
 Swipe-out is a fast-paced mobile 3D anti-gravity racing game. Players pilot

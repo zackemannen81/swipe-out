@@ -1,25 +1,24 @@
 # Current Task
 
-Task ID: README-001
+Task ID: PLAN-002
 Status: Complete
-Created: 2026-10-27
+Created: 2026-10-28
 
 ## Scope
 
-Refresh README.md for the current playable SwipeOut2026 build. Describe verified
-features, setup, controls, editor/sharing, local persistence and remaining work.
-Documentation only; do not change gameplay or package/release version numbers.
+Capture the expanded user wishlist in the product roadmap, compare relevant
+existing implementation, and recommend incremental delivery order. Preserve the
+accepted countdown and driving baseline. Planning only, not feature delivery.
 
 ## Definition of done
 
-- [x] README reflects current source and status, including Time Attack and the
-      latest Wipeout handling; planned features are explicitly distinguished.
-- [x] Setup/test commands and local Markdown links are checked.
-- [x] Continuity records updated and documentation diff checked.
+- [x] Every requested improvement has a stage and observable acceptance target.
+- [x] Existing features, reported defects and new proposals are distinguished.
+- [x] Dependencies, input conflicts, record compatibility and mobile checks noted.
+- [x] Continuity and roadmap references updated; documentation diff verified.
 
 ## Verification
 
-Cross-checked source, package scripts, Vite Node requirements and current-status
-evidence. All 28 local README links, npm commands, browser-script paths and code
-fences pass checks; git diff --check passes. No gameplay changes. Tests/build
-were not rerun; README explicitly dates the previous DRIVE-002 verification.
+Source-reviewed relevant track format, input, combat and results CSS. Checked
+roadmap links and git diff whitespace. Planning only; no runtime tests or browser
+reproduction performed. Recommended order and tuning remain proposals.

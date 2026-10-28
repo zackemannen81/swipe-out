@@ -1,5 +1,10 @@
 # File Structure
 
+## 2026-10-28 — PLAN-002 expanded roadmap
+
+- `docs/PRODUCT_ROADMAP.md` — expanded wishlist, proposed stages A–G and acceptance targets
+- `docs/archive/README-001.md` — completed README refresh task
+
 ## 2026-10-27 — README-001 documentation refresh
 
 - `README.md` — current SwipeOut2026 setup, play/editor guide and roadmap overview
