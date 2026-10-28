@@ -1,5 +1,44 @@
 # File Structure
 
+## 2026-10-29 — AUDIO-002
+
+- `src/announcer.js` — voice policy, queue, loading and shared gain
+- `tests/announcer.test.js` — priority/lifecycle/volume/assets tests
+- `tools/verify-announcer.mjs` — browser volume/countdown/combat/solo acceptance
+- `public/audio/announcer/` — 49 voice clips (21 referenced by current runtime)
+- `docs/archive/AUDIO-001.md` — completed generator task
+
+## 2026-10-28 — AUDIO-001
+
+- `tools/generate-announcer.py` — batch TTS/SoX generator with isolated output
+- `tools/announcer-lines.json` — 49 categorized SwipeOut phrases
+- `tools/test-announcer.py` — offline selection/output/failure tests
+- `docs/ANNOUNCER.md` — usage, dependencies, recipe and verification limits
+- `public/audio/announcer/weapon_acquired.wav` — generated sample, not yet played by runtime
+- `docs/archive/COMBAT-004.md` — completed icon integration task
+
+## 2026-10-28 — COMBAT-004
+
+- `src/weapon-icons.js` — shared artwork URLs for pickups and HUD
+- `public/images/icons/*-256.png` — user-supplied transparent weapon icons
+- `docs/archive/COMBAT-003.md` — completed weapon pickup task
+
+## 2026-10-28 — COMBAT-003
+
+- `src/weapon-pickups.js` — pure swept route-aware pickup crossing rules
+- `src/weapon-pads.js` — automatic placement and instanced pad presentation
+- `tests/weapon-pickups.test.js` — ammo, crossing, lifecycle, format and CPU coverage
+- `tools/verify-weapon-pickups.mjs` — editor/pickup/HUD/lifecycle browser checks
+- `docs/WEAPON_PICKUPS.md` — D2 authoring, controls, rules and validation limits
+- `docs/archive/COMBAT-002.md` — accepted D1 task
+
+## 2026-10-28 — COMBAT-002
+
+- `docs/COMBAT_DEFENCE.md` — D1 controls, mechanics and verification limits
+- `tests/combat-flares.test.js` — defence, cooldown, lifecycle and effect bounds
+- `tools/verify-combat-flares.mjs` — browser input/HUD/pause/retry/solo checks
+- `docs/archive/EDITOR-006.md` — completed object color editor task
+
 ## 2026-10-28 — EDITOR-006
 
 - `tools/verify-object-colors.mjs` — color editor/material/persistence browser checks

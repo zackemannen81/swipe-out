@@ -160,10 +160,12 @@ always disables catch-up.
 ### Optional combat
 
 Enable **Combat Mode** before a Race; it defaults off and is disabled in Time
-Attack. Rockets, lock-on homing missiles and a minigun use clips and automatic
-empty-clip reloads. Hold Space or **FIRE**, and select weapons with 1/2/3 or HUD
-buttons. Homing needs sustained forward aim and clear sight; the HUD shows target
-lock and incoming threats.
+Attack. Everyone starts empty. Purple weapon pads fill one slot with 3 rockets,
+1 homing missile or 30 minigun rounds, replacing the previous ammunition. There
+is no automatic reload; pads recharge after 8 seconds for all racers. Hold Space,
+**FIRE**, or gamepad X/Square to shoot. Homing needs sustained forward aim and clear
+sight; the HUD shows target lock and incoming threats. See the
+[weapon pickup guide](docs/WEAPON_PICKUPS.md).
 
 Road and scenery block shots. Hits reduce speed and apply sideways impulse;
 there is no health bar or elimination. CPU craft use the same ammunition, lock
@@ -198,7 +200,7 @@ height changes and loops.
 - **Save to Game** persists the selected track locally. **Save & Test** saves and
   opens the game with that track selected. **Restore Built-in** resets only the
   selected built-in track; **Remove Custom** removes the selected custom track.
-- **Download** and **Copy JSON** export version 4 `swipe-out-track` documents.
+- **Download** and **Copy JSON** export version 5 `swipe-out-track` documents.
   **Import JSON as New Track** also accepts v1/v2 and older plain JSON exports,
   validates them, and creates a separate unsaved track without replacing others.
 
@@ -303,3 +305,13 @@ viewport does not establish physical-phone performance.
 Track authoring now includes **POINT WIDTH**, authored boost/brake pads with Focus,
 conservative boost suggestions and opt-in Raceway markings. Existing tracks retain
 their layout. See [Track Workshop guide](docs/TRACK_WORKSHOP.md).
+
+Combat now has separate incoming-threat alerts, fading impact sparks and flares:
+**X / touch Flares / gamepad B (Circle)**, with a 25-second cooldown. Homing
+missiles divert; rockets and bullets remain dangerous. CPU shares the rules.
+See [Combat defence guide](docs/COMBAT_DEFENCE.md). Weapon pickups are implemented; see [pickup rules](docs/WEAPON_PICKUPS.md).
+
+Announcer voices cover combat threats/pickups, final lap, Time Attack records
+and race results. **ANNOUNCER** in start/pause controls all voices including the
+original countdown; default 35%, saved locally. Music/SFX levels are separate
+from this control. See [Announcer guide](docs/ANNOUNCER.md).

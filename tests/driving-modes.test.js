@@ -193,7 +193,7 @@ test('classic weapons follow the nose while Swipeout keeps its existing track-fo
     const pose = stepShipPhysics(physics, {}, 0, straight, 140, 100);
     const group = new THREE.Group(); group.position.copy(pose.position); group.quaternion.copy(pose.orientation);
     const racer = { id: 'player', player: true, physics, group }, combat = createCombat();
-    combat.reset(true, [racer]); combat.step(1 / 120, [racer], straight, { fire: true });
+    combat.reset(true, [racer]); combat.equip('player','rocket'); combat.step(1 / 120, [racer], straight, { fire: true });
     assert.equal(combat.projectiles.length, 1);
     const expected = mode === 'wipeout' ? new THREE.Vector3(0, 0, 1).applyQuaternion(pose.orientation) : pose.frame.tangent;
     assert.ok(combat.projectiles[0].velocity.clone().normalize().dot(expected) > 0.999999);

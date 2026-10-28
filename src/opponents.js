@@ -90,17 +90,18 @@ function decide(opponent, opponents, player, curve, pads, trackWidth, elapsed) {
   let nextPad = null;
   let nearestPad = Infinity;
   for (const pad of pads) {
-    if (pad.type === 'brake') continue;
+    if (pad.type === 'brake' || (pad.type==='weapon' && !opponent.weaponPadIds?.has(pad.id))) continue;
     if ((pad.routeId ?? null) !== (ship.route?.id ?? null)) continue;
     const aheadDistance = (pad.d - ship.distance % length + length) % length;
-    if (aheadDistance < nearestPad && aheadDistance < Math.max(45, ship.speed * 1.15)) {
-      nearestPad = aheadDistance;
+    const score=aheadDistance*(pad.type==='weapon'?0.6:1)+(pad.type==='weapon'?Math.abs(pad.offset-ship.lateralOffset)*8:0);
+    if (score < nearestPad && aheadDistance < Math.max(45, ship.speed * 1.15)) {
+      nearestPad = score;
       nextPad = pad;
     }
   }
   if (nextPad && Math.abs(turn) < 0.65 + opponent.risk * 0.3) {
     opponent.targetLane = clamp(nextPad.offset, -edge, edge);
-    opponent.strategy = 'boost-pad';
+    opponent.strategy = nextPad.type==='weapon'?'weapon-pad':'boost-pad';
   }
 
   for (const pad of pads) {

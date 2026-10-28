@@ -1,3 +1,4 @@
+import { updateWeaponPads } from './weapon-pads.js';
 import { updateTrackPresentation, padPlacement } from './track-pads.js';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -153,6 +154,7 @@ export function createEditorView(canvas, { onSelect, onMove, onCommit }) {
       marker.scale.setScalar(camera.position.distanceTo(marker.position) * 0.006);
     }
     updateTrackPresentation(road, performance.now()/1000);
+    updateWeaponPads(road, performance.now()/1000, null, true);
     renderer.render(scene, camera);
   });
   return {

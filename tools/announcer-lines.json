@@ -1,0 +1,249 @@
+{
+  "clips": [
+    {
+      "id": "race_complete",
+      "text": "Race complete.",
+      "group": "race"
+    },
+    {
+      "id": "final_lap",
+      "text": "Final lap.",
+      "group": "race"
+    },
+    {
+      "id": "two_laps_remaining",
+      "text": "Two laps remaining.",
+      "group": "race"
+    },
+    {
+      "id": "checkpoint",
+      "text": "Checkpoint.",
+      "group": "race"
+    },
+    {
+      "id": "first_place",
+      "text": "First place.",
+      "group": "race"
+    },
+    {
+      "id": "second_place",
+      "text": "Second place.",
+      "group": "race"
+    },
+    {
+      "id": "third_place",
+      "text": "Third place.",
+      "group": "race"
+    },
+    {
+      "id": "fourth_place",
+      "text": "Fourth place.",
+      "group": "race"
+    },
+    {
+      "id": "fifth_place",
+      "text": "Fifth place.",
+      "group": "race"
+    },
+    {
+      "id": "you_win",
+      "text": "You win.",
+      "group": "race"
+    },
+    {
+      "id": "lead_taken",
+      "text": "You have taken the lead.",
+      "group": "race"
+    },
+    {
+      "id": "lead_lost",
+      "text": "You have lost the lead.",
+      "group": "race"
+    },
+    {
+      "id": "weapon_acquired",
+      "text": "Weapon acquired.",
+      "group": "combat"
+    },
+    {
+      "id": "rockets_acquired",
+      "text": "Rockets acquired.",
+      "group": "combat"
+    },
+    {
+      "id": "heatseeker_acquired",
+      "text": "Heat seeker acquired.",
+      "group": "combat"
+    },
+    {
+      "id": "minigun_acquired",
+      "text": "Minigun acquired.",
+      "group": "combat"
+    },
+    {
+      "id": "ammo_depleted",
+      "text": "Ammunition depleted.",
+      "group": "combat"
+    },
+    {
+      "id": "target_locked",
+      "text": "Target locked.",
+      "group": "combat"
+    },
+    {
+      "id": "lock_lost",
+      "text": "Target lost.",
+      "group": "combat"
+    },
+    {
+      "id": "enemy_lock",
+      "text": "Enemy lock detected.",
+      "group": "combat"
+    },
+    {
+      "id": "incoming_missile",
+      "text": "Incoming missile.",
+      "group": "combat"
+    },
+    {
+      "id": "flares_ready",
+      "text": "Flares ready.",
+      "group": "combat"
+    },
+    {
+      "id": "flares_deployed",
+      "text": "Flares deployed.",
+      "group": "combat"
+    },
+    {
+      "id": "missile_deflected",
+      "text": "Missile deflected.",
+      "group": "combat"
+    },
+    {
+      "id": "direct_hit",
+      "text": "Direct hit.",
+      "group": "combat"
+    },
+    {
+      "id": "time_attack",
+      "text": "Time attack.",
+      "group": "time_attack"
+    },
+    {
+      "id": "personal_best",
+      "text": "Personal best.",
+      "group": "time_attack"
+    },
+    {
+      "id": "new_lap_record",
+      "text": "New lap record.",
+      "group": "time_attack"
+    },
+    {
+      "id": "new_track_record",
+      "text": "New track record.",
+      "group": "time_attack"
+    },
+    {
+      "id": "sector_improved",
+      "text": "Sector improved.",
+      "group": "time_attack"
+    },
+    {
+      "id": "lap_invalid",
+      "text": "Lap invalidated.",
+      "group": "time_attack"
+    },
+    {
+      "id": "ghost_enabled",
+      "text": "Ghost enabled.",
+      "group": "time_attack"
+    },
+    {
+      "id": "session_complete",
+      "text": "Session complete.",
+      "group": "time_attack"
+    },
+    {
+      "id": "warning",
+      "text": "Warning.",
+      "group": "warnings"
+    },
+    {
+      "id": "sharp_left",
+      "text": "Sharp left ahead.",
+      "group": "warnings"
+    },
+    {
+      "id": "sharp_right",
+      "text": "Sharp right ahead.",
+      "group": "warnings"
+    },
+    {
+      "id": "jump_ahead",
+      "text": "Jump ahead.",
+      "group": "warnings"
+    },
+    {
+      "id": "brake_zone",
+      "text": "Brake zone ahead.",
+      "group": "warnings"
+    },
+    {
+      "id": "wrong_way",
+      "text": "Wrong way.",
+      "group": "warnings"
+    },
+    {
+      "id": "returning_to_track",
+      "text": "Returning to track.",
+      "group": "warnings"
+    },
+    {
+      "id": "next_race",
+      "text": "Next race.",
+      "group": "cup"
+    },
+    {
+      "id": "final_race",
+      "text": "Final race.",
+      "group": "cup"
+    },
+    {
+      "id": "cup_complete",
+      "text": "Cup complete.",
+      "group": "cup"
+    },
+    {
+      "id": "cup_champion",
+      "text": "Cup champion.",
+      "group": "cup"
+    },
+    {
+      "id": "gold_medal",
+      "text": "Gold medal awarded.",
+      "group": "cup"
+    },
+    {
+      "id": "silver_medal",
+      "text": "Silver medal awarded.",
+      "group": "cup"
+    },
+    {
+      "id": "bronze_medal",
+      "text": "Bronze medal awarded.",
+      "group": "cup"
+    },
+    {
+      "id": "new_ship_unlocked",
+      "text": "New ship unlocked.",
+      "group": "cup"
+    },
+    {
+      "id": "new_livery_unlocked",
+      "text": "New livery unlocked.",
+      "group": "cup"
+    }
+  ]
+}

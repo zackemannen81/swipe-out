@@ -513,3 +513,65 @@
 - 86 tests/build pass (existing chunk warning). Browser verifies presets, custom
   color, undo/clone, textured material values, off/reset, save/reload and export.
   Inspected editor screenshot; no page errors. Next roadmap stage remains D1.
+
+## 2026-10-28 - COMBAT-002: D1 defence and feedback
+
+- User approved object colors after testing; archived EDITOR-006 and advanced D1.
+- Added player/CPU flares with shared 25s cooldown, 1.2s window and 140-unit range.
+  CPU triggers within 85 units. Homing missiles visibly divert to decoys; rockets
+  and bullets retain damage. Added X/touch/standard-gamepad B without changing F.
+- Separated outgoing lock, incoming threats and diversion success, with short
+  transition sounds. Added bounded instanced fading impact/flare sparks.
+- 90 tests/build pass (existing bundle warning). Browser verifies input paths,
+  pause/retry/solo and landscape HUD separation with no page errors. Inspected
+  threat/diversion/impact screenshots; fixed overlap found on 568x320 viewport.
+- Updated roadmap, status, design/system/structure docs, README and defence guide.
+  Physical device/controller, audio perception and human balance remain. Next D2.
+
+## 2026-10-28 — COMBAT-003: D2 weapon pickups
+
+- User accepted D1; archived COMBAT-002. Empty start, one slot, 3 rocket / 1 homing /
+  30 minigun ammo; replacement on pickup, no auto reload, shared 8s pad recharge.
+- Added swept route-aware CPU/player pickups, ready-pad seeking, instanced visuals,
+  HUD/audio and gamepad fire. Paired fallback pads improve access across the field.
+- Editor supports weapon types with history/save/import/export; v5 reads v1–4.
+  Time Attack/non-combat disable pads; handling and countdown remain unchanged.
+- 97 tests and build pass (existing chunk warning). Browser editor/race/lifecycle
+  checks pass with no page errors; desktop/editor/small landscape images reviewed.
+- Updated continuity, roadmap, README and pickup guide. Physical device/controller,
+  audio perception and human pickup balance remain. Next stage E: cup/progression.
+
+## 2026-10-28 — COMBAT-004: supplied weapon icons
+
+- Integrated user PNGs as floating, gently oscillating pickup icons and HUD art.
+  Filename mapping: rockets to rocket, heatseeker to homing, minigun to minigun.
+- Kept purple footprints, shared cooldown, combat rules and editor persistence.
+  Three instanced batches own maps disposed through existing track cleanup.
+- 97 tests/build pass (existing chunk warning). Browser editor/race/lifecycle
+  checks pass; all icon URLs available, HUD decodes at 256px and hides when empty.
+  Editor/race screenshots reviewed, no page errors. Physical device unmeasured.
+
+## 2026-10-28 — AUDIO-001: announcer batch generation
+
+- Added 49 race/combat/practice/warnings/cup lines and configurable batch script.
+  Uses existing voice_creator.py and exact user two-stage SoX recipe; old scripts
+  and countdown untouched. Selection/list/dry-run/skip/force with isolated temps.
+- Six offline tests pass, including failed-force preservation and output checks.
+  Real network TTS/FFmpeg/SoX produced weapon_acquired.wav, 2.60s PCM; 48 pending.
+- SoX reported clipping from original gain settings; retained and documented for
+  listening. No runtime integration. Added ANNOUNCER.md and continuity updates.
+
+## 2026-10-29 — AUDIO-002: runtime announcer
+
+- Connected 21 voice events for combat, final lap, Time Attack and finish/place.
+  Bounded priority/expiry queue; incoming missiles preempt routine announcements.
+  Pause drops stale speech; menu/retry/finish clear voice state.
+- Added saved 0–100% voice control to start/pause, default 35%, shared with old
+  countdown files. Countdown timer/trigger lines unchanged from HEAD; browser
+  confirms Three/Two/One/Go once. Smaller pause heading prevents clipping.
+- Found 37 user-created WAVs; generated 12 missing using accepted exact recipe.
+  Existing assets untouched. All 49 present; no cup voice triggers yet.
+- 102 tests/build pass (existing bundle warning). Browser verifies decode, saved
+  volume, threats/preemption, pause/mute/retry/solo; no page errors. Desktop and
+  small-landscape screenshots inspected. Human listening and physical phone remain.
+- Updated guide/README/roadmap and continuity. Next: E cup/progression.

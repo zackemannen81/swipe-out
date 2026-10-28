@@ -1,7 +1,7 @@
 import { validatePads } from './track-pads.js';
-// Version 4 adds point widths, authored pads and road styles; versions 1–3 remain readable.
+// Version 5 adds weapon pads; versions 1–4 remain readable.
 export const TRACK_FORMAT = 'swipe-out-track';
-export const TRACK_VERSION = 4;
+export const TRACK_VERSION = 5;
 export const MAX_TRACK_BYTES = 16 * 1024 * 1024;
 
 function fail(path, reason) { throw new Error(`${path}: ${reason}`); }
@@ -151,11 +151,13 @@ export function normalizeTrack(input) {
     if (!Array.isArray(input.pads) || input.pads.length > 256) fail('track.pads','expected at most 256 pads.');
     const ids = new Set();
     result.pads = input.pads.map((p,i) => {
-      const path = 'track.pads['+i+']'; record(p,path); knownFields(p,['id','type','progress','offset','routeId'],path);
+      const path = 'track.pads['+i+']'; record(p,path); knownFields(p,['id','type','progress','offset','routeId','weapon'],path);
       const id = text(p.id,path+'.id'); if(ids.has(id)) fail(path,'duplicate pad id.'); ids.add(id);
-      if(!['boost','brake'].includes(p.type)) fail(path,'expected boost or brake.');
+      if(!['boost','brake','weapon'].includes(p.type)) fail(path,'expected boost, brake or weapon.');
       const progress = number(p.progress,path+'.progress',0.001,0.999);
       const pad = {id,type:p.type,progress,offset:number(p.offset,path+'.offset',-48,48)};
+      if(p.type==='weapon'){if(!['rocket','homing','minigun'].includes(p.weapon))fail(path,'choose rocket, homing or minigun.');pad.weapon=p.weapon;}
+      else if(p.weapon!==undefined)fail(path,'weapon is only valid on weapon pads.');
       if(p.routeId !== undefined) {
         const branch = result.branches?.find(b=>b.id===p.routeId);
         if(!branch || progress <= branch.start || progress >= branch.end) fail(path,'pad must lie inside its route.');
@@ -172,11 +174,12 @@ export function decodeTrack(value) {
   record(value, 'file');
   if ('format' in value || 'version' in value || 'track' in value) {
     if (value.format !== TRACK_FORMAT) fail('file.format', `expected ${TRACK_FORMAT}.`);
-    if (![1, 2, 3, TRACK_VERSION].includes(value.version)) fail('file.version', `unsupported version ${String(value.version)}; this editor supports versions 1–${TRACK_VERSION}.`);
+    if (![1, 2, 3, 4, TRACK_VERSION].includes(value.version)) fail('file.version', `unsupported version ${String(value.version)}; this editor supports versions 1–${TRACK_VERSION}.`);
     knownFields(value, ['format', 'version', 'track'], 'file');
     if (value.version === 1 && (value.track?.magnetic !== undefined || value.track?.gaps !== undefined)) fail('file.version', 'magnetic road and gaps require version 2.');
     if (value.version < 3 && value.track?.branches !== undefined) fail('file.version', 'branches require version 3.');
     if (value.version < 4 && ['pointWidths','pads','roadStyle'].some(k=>value.track?.[k] !== undefined)) fail('file.version','widths, pads and road styles require version 4.');
+    if(value.version<5 && value.track?.pads?.some(p=>p.type==='weapon'))fail('file.version','weapon pads require version 5.');
     return normalizeTrack(value.track);
   }
   return normalizeTrack(value);

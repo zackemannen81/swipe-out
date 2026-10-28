@@ -8,7 +8,7 @@ export const GUIDE = Object.freeze({ spacing: 7, points: 65, lateralAcceleration
 // A geometric recommendation, not an optimal-control solver. Reduce curvature
 // within safe road margins, attract to reachable pads and compare route estimates.
 function buildProfile(length, frameAt, widthAt, pads, isGap, closed, topSpeed) {
-  pads = pads.filter(p=>p.type !== 'brake');
+  pads = pads.filter(p=>p.type !== 'brake' && p.type !== 'weapon');
   const count = clamp(Math.ceil(length / 6), 40, 2400), step = length/count;
   const nodes = Array.from({length:count+1},(_,i) => {
     const u=i/count, frame=frameAt(u), edge=Math.max(0,widthAt(u)/2-2.1);

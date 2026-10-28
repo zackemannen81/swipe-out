@@ -202,6 +202,7 @@ export function collectBoostPad(ship, pads, trackLength, topSpeed) {
   for (let lap = Math.floor(start / trackLength); lap <= Math.floor(end / trackLength); lap++) {
     for (let i=0;i<pads.length;i++) {
       const pad=pads[i];
+      if(pad.type==='weapon')continue;
       if ((pad.routeId ?? null) !== (ship.route?.id ?? null)) continue;
       const entry = lap * trackLength + pad.d - 5 * (pad.metric ?? 1);
       const exit = lap * trackLength + pad.d + (pad.metric ?? 1);

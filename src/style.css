@@ -631,3 +631,30 @@ select option { color: #eaf3f5; background: #080d14; }
   #results-screen { left: 12px; width: calc(100vw - 24px); padding: 16px; }
   #race-intro { gap: 8px; padding: 8px; font-size: 8px; }
 }
+
+#combat-threat { position:absolute; z-index:29; top:28%; left:50%; transform:translateX(-50%); max-width:calc(100% - 24px); width:360px; text-align:center; pointer-events:none; padding:9px 12px; border:1px solid #ff526d; background:#200e19df; color:#ff7489; font-family:monospace; box-sizing:border-box; }
+#combat-threat[hidden], #lock-status[hidden] { display:none; }
+#combat-threat strong { color:inherit; display:block; font-size:clamp(14px,2vw,22px); letter-spacing:1px; }
+#combat-threat span { display:block; margin-top:5px; font-size:10px; color:#fff2dd; }
+#combat-threat[data-threat="targeted"] { border-color:#ffbd58; color:#ffbd58; }
+#combat-threat[data-threat="deflected"] { border-color:#66ffd4; color:#66ffd4; background:#08271edf; }
+#flare-button { width:100%; min-height:34px; margin-bottom:5px; border-color:#ffc56e!important; color:#ffc56e!important; }
+#flare-button:disabled { opacity:0.55; }
+@media(max-height:500px) { #combat-threat {top:26%;width:300px;padding:5px 8px;} #combat-threat strong{font-size:14px;} #combat-threat span{font-size:9px;margin-top:2px;} #flare-button{min-height:28px;margin-bottom:3px;} }
+
+#lock-status { position:absolute; z-index:29; top:22%; left:50%; transform:translateX(-50%); pointer-events:none; text-align:center; font:12px monospace; color:#ffb46d; }
+
+@media(max-height:500px) { #lock-status{top:108px;min-height:18px;font-size:10px;} #combat-threat{top:130px;} }
+
+#weapon-pickup-message { min-height:16px; margin:5px 0; color:#cf9dff; font-size:10px; }
+#fire-button:disabled { opacity:0.45; }
+
+.weapon-slot { display:flex; align-items:center; gap:8px; min-height:40px; }
+#weapon-icon { flex:0 0 40px; width:40px; height:40px; object-fit:contain; }
+#weapon-icon[hidden] { display:none; }
+@media(max-height:500px) { .weapon-slot { min-height:28px; gap:5px; } #weapon-icon { width:28px; height:28px; flex-basis:28px; } }
+
+.announcer-setting { display:flex; align-items:center; gap:10px; font:11px monospace; margin:12px 0; color:var(--cyan); }
+.announcer-setting input { flex:1; min-width:60px; accent-color:var(--cyan); }
+#pause-screen #pause-heading { font-size:clamp(26px,4vw,42px); line-height:1.08; }
+@media(max-height:500px) { #pause-screen { padding:14px 18px; } #pause-screen #pause-heading { font-size:26px; } #pause-screen .announcer-setting { margin:8px 0; } }

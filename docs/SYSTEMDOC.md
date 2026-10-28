@@ -136,7 +136,7 @@ walls, camera and minimap follow the selected route. The first format supports
 four non-overlapping branches, without gaps inside them.
 
 Optional combat is owned by `combat.js`: a shared player/CPU simulation with
-bounded projectiles/effects, clip/reload/cooldown state, forward lock acquisition,
+bounded projectiles/effects, single-slot ammo/cooldown state, forward lock acquisition,
 limited-turn homing, swept relative hull intersections and persistent impacts.
 The game supplies road/scenery visibility queries and input. Presentation uses
 instanced effects, target reticle, threat warnings and short synthesized sounds.
@@ -187,3 +187,29 @@ is the opt-in proving ground. Details and limits: TRACK_WORKSHOP.md.
 Scenery surface color and emissive color are shared authoring properties for
 textured and untextured primitives. Editor neon presets reuse those fields;
 self-illumination is visible in the editor, with race bloom applied by the game.
+
+## Combat defence — 2026-10-28
+
+Flares share deterministic rules across player and CPU. They divert targeted
+homing projectiles without altering rocket/bullet damage or player handling.
+Combat HUD separates own lock from incoming threats. Presentation effects are
+bounded and simulation-driven; Time Attack disables the entire combat system.
+See COMBAT_DEFENCE.md for current values and validation limits.
+
+## Weapon pickups — 2026-10-28
+
+Combat starts empty and uses one weapon slot with finite ammo, no automatic reload.
+Shared swept pickup detection accounts for route segments, frame timing and recovery;
+all racers compete for an 8-second pad recharge. CPU seeks reachable ready pads.
+Format v5 stores weapon type on authored pads; v1–4 remain readable. Tracks without
+authored weapon pads receive runtime fallback placements, hidden outside Combat.
+Instanced presentation follows simulation time. Details: WEAPON_PICKUPS.md.
+
+Weapon artwork shares one URL mapping between HUD and track presentation. Floating
+icons use three instanced textured batches, track-owned resources, and a small
+oscillation around the approach-facing pose. Existing track disposal frees maps.
+
+Announcer production tooling uses an editable 49-line catalog and accepted
+voice/SoX recipe. Runtime playback now uses a bounded priority/expiry queue and
+shared saved voice gain, including original countdown sounds. Countdown triggers
+remain outside the queue and preserve their timing. See ANNOUNCER.md.

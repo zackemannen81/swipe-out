@@ -42,12 +42,14 @@
 
       <!-- Required by the countdown animation in game.js. -->
       <div id="countdown-overlay" aria-hidden="true"></div>
-      <div id="lock-status"></div>
+      <div id="lock-status" hidden></div>
+      <div id="combat-threat" hidden role="status"><strong></strong><span></span></div>
       <div id="route-hint" aria-live="off"></div>
       <section id="combat-hud" hidden aria-label="Combat controls">
-        <div id="weapon-status">ROCKET · 6</div>
-        <div class="weapon-buttons"><button data-weapon="rocket">1 · ROCKET</button><button data-weapon="homing">2 · HOMING</button><button data-weapon="minigun">3 · MINIGUN</button></div>
-        <button id="fire-button" type="button">FIRE · SPACE</button>
+        <div class="weapon-slot"><img id="weapon-icon" alt="" width="40" height="40" hidden><div id="weapon-status">EMPTY · FIND A PURPLE WEAPON PAD</div></div>
+        <div id="weapon-pickup-message" aria-live="polite"></div>
+        <button id="flare-button" type="button">FLARES READY · X / B</button>
+        <button id="fire-button" type="button">FIRE · SPACE / X–SQUARE</button>
       </section>
       <div id="target-reticle" hidden aria-hidden="true"></div>
 
@@ -258,6 +260,10 @@
           </label>
         </div>
         <p id="driving-description" class="driving-description" aria-live="polite"></p>
+        <label class="announcer-setting">ANNOUNCER <output data-voice-value>35%</output>
+          <input type="range" data-voice-volume aria-label="Announcer volume" min="0" max="100" value="35">
+        </label>
+        <p class="driving-description" data-voice-storage hidden></p>
         <label class="combat-mode"><input id="combat-enabled" type="checkbox" /> COMBAT MODE · rockets / homing / minigun</label>
         <button class="action-button" id="start-button" type="button" disabled>LOADING CRAFT…</button>
         <p class="control-hint">DRAG TO STEER · UP = THRUST · DOWN = BRAKE · ARROWS / W A S D</p>
@@ -300,6 +306,10 @@
           <option value="/audio/tracks/track_010.mp3">Obsidian Relay</option>
           <option value="/audio/tracks/track_011.mp3">Ion Cathedral</option>
         </select>
+        <label class="announcer-setting">ANNOUNCER <output data-voice-value>35%</output>
+          <input type="range" data-voice-volume aria-label="Announcer volume" min="0" max="100" value="35">
+        </label>
+        <p class="driving-description" data-voice-storage hidden></p>
         <button class="action-button" id="resume-button" type="button">RESUME RACE <span aria-hidden="true">▶</span></button>
         <button class="action-button" id="end-session-button" type="button" hidden>END TIME ATTACK</button>
       </section>

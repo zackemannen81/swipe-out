@@ -1,3 +1,4 @@
+import { Announcer, readVoiceVolume, VOICES } from './announcer.js';
 const CHANNELS = {
   kick: { low: 40, high: 160, sensitivity: 2.4, hit: true },
   bass: { low: 45, high: 250, sensitivity: 1.8 },
@@ -13,6 +14,8 @@ export class RaceAudio {
     this.audio.preload = 'auto';
     this.audio.volume = 0.90;
     this.context = null;
+    this.voiceVolume = readVoiceVolume();
+    this.announcer = null;
     this.analyser = null;
     this.data = null;
     this.channels = Object.fromEntries(Object.entries(CHANNELS).map(([id, definition]) => [id, {
@@ -30,6 +33,8 @@ export class RaceAudio {
   async play() {
     if (!this.context) {
       this.context = new AudioContext();
+      this.announcer = new Announcer(this.context, this.voiceVolume);
+      for(const id of Object.keys(VOICES))void this.announcer.load(id);
       const source = this.context.createMediaElementSource(this.audio);
       this.analyser = this.context.createAnalyser();
       this.analyser.fftSize = 2048;
@@ -196,9 +201,11 @@ updateEngine(speed, isBoosting, isRacing) {
       
       // Justera volymen för effekterna lite om det behövs
       gain.gain.value = type === 'crash' ? 0.8 : 0.6;
+      const countdown=type.startsWith('countdown');
+      if(countdown){gain.gain.value=1;this.announcer.countdown(source.buffer.duration);}
       
       source.connect(gain);
-      gain.connect(this.context.destination);
+      gain.connect(countdown?this.announcer.gain:this.context.destination);
       source.start();
     } 
     // Behåll det syntetiska ljudet för checkpoints tills du laddar ner en fil för det
@@ -218,6 +225,17 @@ updateEngine(speed, isBoosting, isRacing) {
     }
   }
 
+  playCombatAlert(type) {
+    if(!this.context || this.context.state!=='running')return;
+    const t=this.context.currentTime, osc=this.context.createOscillator(),gain=this.context.createGain();
+    const frequency={incoming:1000,targeted:520,deflected:760,flare:260,pickup:880}[type]??520;
+    osc.type='sine';osc.frequency.setValueAtTime(frequency,t);
+    osc.frequency.exponentialRampToValueAtTime(['deflected','pickup'].includes(type)?1200:type==='flare'?90:frequency*0.65,t+0.18);
+    gain.gain.setValueAtTime(0.0001,t);gain.gain.exponentialRampToValueAtTime(0.10,t+0.015);gain.gain.exponentialRampToValueAtTime(0.001,t+0.22);
+    osc.connect(gain);gain.connect(this.context.destination);
+    osc.onended=()=>{osc.disconnect();gain.disconnect();};osc.start(t);osc.stop(t+0.23);
+  }
+
   playWeapon(type, volume = 1) {
     if (!this.context || this.context.state !== 'running') return;
     const t=this.context.currentTime, duration=type==='minigun'?0.055:0.18;
@@ -231,7 +249,11 @@ updateEngine(speed, isBoosting, isRacing) {
     oscillator.start(t);oscillator.stop(t+duration);
   }
 
+  announce(id) { return this.announcer?.say(id); }
+  setVoiceVolume(value) { this.voiceVolume=value;this.announcer?.setVolume(value); }
+
   stop() {
+    this.announcer?.clear();
     this.audio.pause();
     this.audio.currentTime = 0;
     for (const channel of Object.values(this.channels)) {

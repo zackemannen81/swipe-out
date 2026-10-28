@@ -1,5 +1,70 @@
 # Current Status
 
+## 2026-10-29 — AUDIO-002: runtime announcer
+
+Shared saved voice volume in start/pause defaults to 35%, including countdown.
+Countdown timer/trigger lines match HEAD and browser logs Three/Two/One/Go once.
+Priority/expiry/cooldowns bound voices to one active announcer and four queued.
+Incoming missiles preempt; pause drops stale speech, retry/menu/finish clear it.
+Race/combat/Time Attack events are integrated; cup and other catalog entries wait.
+37 generated assets were present; the accepted recipe supplied 12 missing clips.
+102 tests/build pass (existing chunk warning). Browser verifies persisted volume,
+decoding, countdown, preemption, pause/mute, retry and solo finish without errors.
+Pause heading reduced to avoid clipping. Human listening/mix and physical phone
+remain; see ANNOUNCER.md. Next stage: E cup/progression.
+
+## 2026-10-28 — AUDIO-001: announcer generation tools
+
+Added a 49-line race/combat/practice/warnings/cup catalog and configurable Python
+batch generator wrapping the existing voice creator and exact user SoX recipe.
+Supports selection/list/dry-run/skip/force, isolated temp files, validated PCM
+output and failure reporting. Six offline tests pass. One real weapon_acquired
+clip generated (2.60s); remaining 48 not rendered. SoX reports clipping with the
+supplied gain/overdrive; recipe preserved for user listening. No runtime audio
+integration or countdown changes. Usage: ANNOUNCER.md.
+
+## 2026-10-28 — COMBAT-004: supplied weapon icons
+
+User artwork now replaces pickup diamonds with gently bobbing/oscillating flat
+icons in editor and race. Blue rockets, amber heatseeker and turquoise minigun
+follow the supplied filenames. The HUD shows the same icon beside ammunition,
+hidden when empty. Purple bases, cooldown and gameplay rules remain unchanged.
+Three instanced batches use track-owned textures disposed on track replacement.
+97 tests/build pass (existing chunk warning). Browser editor/race/lifecycle checks
+pass with decoded 256px HUD icon, all three assets available and no page errors.
+Editor/race screenshots reviewed. Physical device performance remains unmeasured.
+
+## 2026-10-28 — COMBAT-003: D2 weapon pickups
+
+User accepted D1. Combat now starts empty, with one slot and fixed-type purple
+pickups: 3 rockets / 1 homing / 30 minigun rounds. New pickups replace ammo; no
+automatic reload. Shared 8s recharge, swept route-aware CPU/player collection,
+ready-pad CPU seeking, pause/reset and instanced feedback are integrated. Editor
+supports weapon selection/history/persistence; format v5 reads v1–4. Old tracks
+get runtime fallback pads, paired on wide main-road sections. Time Attack and
+non-combat races hide/disable pickups. Handling/countdown are unchanged.
+
+97 Node tests and production build pass (existing large-chunk warning). Browser
+verifies editor undo/redo/save/reload/export/import, empty start, pickup, ammo
+depletion, pause/retry and solo isolation, with no page errors. Desktop/editor
+and 568x320 screenshots inspected. Four CPUs finish Crossfire and each collects
+weapons in deterministic simulation. Human balance, physical controller/phone
+and audio perception remain for playtesting. Guide: WEAPON_PICKUPS.md. Next: E cup.
+
+## 2026-10-28 — COMBAT-002: D1 defence and combat feedback
+
+User approved the object-color/editor additions after testing. D1 now adds shared
+player/CPU flares (25s cooldown, 1.2s active, 140-unit homing capture; CPU triggers
+within 85), X/touch/B input, visible decoy diversion, distinct outgoing lock/threat/
+success HUD and transition audio. Rocket/bullet damage is unchanged; Time Attack
+keeps combat disabled. Impact/flare bursts add bounded instanced fading sparks.
+Pause freezes simulation, retry resets cooldown. Countdown/handling are unchanged.
+
+90 tests pass; build passes with existing chunk warning. Browser verifies all
+three input paths, pause/retry/solo and small landscape HUD separation; screenshots
+reviewed. Physical controller/phone, audio perception and human balance remain.
+See COMBAT_DEFENCE.md. Next roadmap step is D2 weapon pickups.
+
 ## 2026-10-28 — EDITOR-006: object colors and neon
 
 Selected scenery now exposes surface/glow color pickers, Cyan/Pink/Lime/Amber/Violet

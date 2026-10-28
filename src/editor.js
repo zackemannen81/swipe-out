@@ -417,11 +417,11 @@ $('#point-width').addEventListener('change',event=>{
   edit(next=>{next.pointWidths??=next.centerline.map(()=>null);next.pointWidths[selection.index]=value;});
 });
 $('#road-style').addEventListener('change',event=>{const value=event.target.value;edit(next=>{next.roadStyle=value;});});
-for(const type of ['boost','brake']) $('#add-'+type).addEventListener('click',()=>{
+for(const type of ['boost','brake','weapon']) $('#add-'+type).addEventListener('click',()=>{
   const curve=createTrackCurve(track());
   const branch=selection.kind==='branch'?curve.track.branches[selection.branch]:null;
   const progress=branch?(branch.start+branch.end)/2:Math.max(0.01,Math.min(0.99,progressAtControlPoint(curve,selection.kind==='point'?selection.index:0)));
-  edit(next=>{authoredPads(next);next.pads.push({id:crypto.randomUUID(),type,progress,offset:0,...(branch?{routeId:branch.id}:{})});});
+  edit(next=>{authoredPads(next);next.pads.push({id:crypto.randomUUID(),type,progress,offset:0,...(type==='weapon'?{weapon:'rocket'}:{}),...(branch?{routeId:branch.id}:{})});});
 });
 $('#auto-pads').addEventListener('click',()=>edit(next=>{delete next.pads;}));
 $('#suggest-pads').addEventListener('click',()=>edit(next=>{
@@ -431,13 +431,18 @@ $('#suggest-pads').addEventListener('click',()=>edit(next=>{
 function renderPads() {
   const list=$('#pad-list'); if(list.contains(document.activeElement)) return;
   list.replaceChildren();
-  if(!track().pads) {list.textContent='Automatic legacy boost placement';return;}
+  if(!track().pads) {list.textContent='Automatic boost and Combat weapon placement';return;}
   if(!track().pads.length) {list.textContent='No pads. Add one or suggest boosts.';return;}
   track().pads.forEach((pad,index)=>{
     const row=document.createElement('div'); row.className='gap-row';
     const type=document.createElement('select'); type.setAttribute('aria-label','Pad '+(index+1)+' type');
-    for(const value of ['boost','brake']) type.add(new Option(value.toUpperCase(),value)); type.value=pad.type;
-    type.onchange=()=>{const value=type.value;type.blur();edit(next=>{next.pads[index].type=value;});}; row.append(type);
+    for(const value of ['boost','brake','weapon']) type.add(new Option(value.toUpperCase(),value)); type.value=pad.type;
+    type.onchange=()=>{const value=type.value;type.blur();edit(next=>{next.pads[index].type=value;if(value==='weapon')next.pads[index].weapon='rocket';else delete next.pads[index].weapon;});}; row.append(type);
+    if(pad.type==='weapon') {
+      const weapon=document.createElement('select');weapon.setAttribute('aria-label','Pad '+(index+1)+' weapon');
+      for(const value of ['rocket','homing','minigun'])weapon.add(new Option(value.toUpperCase(),value));weapon.value=pad.weapon;
+      weapon.onchange=()=>{const value=weapon.value;weapon.blur();edit(next=>{next.pads[index].weapon=value;});};row.append(weapon);
+    }
     for(const key of ['progress','offset']) {
       const label=document.createElement('label');label.textContent=key==='progress'?'LAP %':'OFFSET';
       const input=document.createElement('input'); Object.assign(input,{type:'number',step:0.1,value:key==='progress'?(pad.progress*100).toFixed(3):pad.offset});

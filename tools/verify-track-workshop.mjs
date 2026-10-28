@@ -29,7 +29,7 @@ try {
  await page.locator('#point-width').scrollIntoViewIfNeeded();await page.screenshot({path:join(output,'editor-width.png')});
  const downloadWait=page.waitForEvent('download');await page.locator('#download-button').click();
  const download=await downloadWait;const source=await readFile(await download.path(),'utf8');
- const exported=JSON.parse(source);assert.equal(exported.version,4);assert.equal(exported.track.pointWidths[0],24);
+ const exported=JSON.parse(source);assert.equal(exported.version,5);assert.equal(exported.track.pointWidths[0],24);
  await page.locator('#import-file').setInputFiles({name:'workshop.json',mimeType:'application/json',buffer:Buffer.from(source)});
  await page.waitForFunction(()=>document.querySelector('#track-select').value.startsWith('custom-'));
  assert.deepEqual(await page.evaluate(()=>window.__editor.snapshot()),exported.track);

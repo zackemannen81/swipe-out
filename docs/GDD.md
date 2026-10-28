@@ -331,7 +331,7 @@ TRACK-003 adds a first split/merge circuit and optional combat, plus scenery
 cloning in the editor. Shorter routes trade time savings for narrower road;
 canonical section progress and ordered shared gates preserve race accounting.
 Combat is off by default: rockets, a visible-lock homing missile and a minigun
-trial share clip/reload limits and brief impact protection across player and CPU.
+trial share ammunition limits and brief impact protection across player and CPU.
 There is no elimination/health system. Gameplay balance, the minigun's long-term
 inclusion and physical-device comfort/performance remain evaluation decisions.
 
@@ -364,3 +364,26 @@ markings, authored boost and brake pads. Brakes remove 28% of speed once per
 plate/lap and cancel boost; acceleration can immediately recover. CPU uses the
 same effects and attempts avoidance. These values and sign readability await
 human balance testing. Authoring, constraints and evidence: TRACK_WORKSHOP.md.
+
+## D1 combat defence prototype — 2026-10-28
+
+Initial implemented flare balance is 25s cooldown / 1.2s active. X, touch and
+standard gamepad B/Circle deploy; F remains pitch. CPU shares rules but reacts
+at 85 units. Incoming homing within 140 units diverts, with visible/audio feedback;
+rockets and bullets remain dangerous. D1 was accepted after user playtesting; D2 pickup balance remains to be tested.
+
+## D2 weapon pickup prototype — 2026-10-28
+
+All racers start empty. One slot holds 3 rockets, 1 homing missile or 30 minigun
+rounds; a new pickup replaces the old ammunition. No automatic reload. Fixed-type
+purple pads recharge for everyone after 8 seconds; the first crossing wins. One
+successful collection per pad/lap. CPU follows the same rules and seeks available
+pads when empty. Editor exposes pad type; automatic fallback serves older tracks.
+Time Attack and non-combat races hide and disable these pads. See WEAPON_PICKUPS.md.
+
+## Announcer integration — 2026-10-29
+
+Race/combat/practice voices share saved volume with countdown, default 35%.
+Imminent missile warnings take precedence over routine messages. Short-lived
+queues and per-event cooldowns prevent chatter; pause discards stale speech.
+Cup voices remain prepared assets. Human mix validation remains. See ANNOUNCER.md.

@@ -1,3 +1,4 @@
+import { automaticWeaponPads, addWeaponPads } from './weapon-pads.js';
 import * as THREE from 'three';
 import { addAuthoredPads, addCornerSigns } from './track-pads.js';
 import { NEON_CAUSEWAY } from './track-data.js';
@@ -288,10 +289,12 @@ export function createTrack(definition = NEON_CAUSEWAY) {
 
   
   addBranchGeometry(group, curve, boostPadPlacements, definition.pads === undefined);
-  if (definition.pads) addAuthoredPads(group, curve, definition.pads, boostPadPlacements);
+  if (definition.pads) addAuthoredPads(group, curve, definition.pads.filter(p=>p.type!=='weapon'), boostPadPlacements);
   if (definition.roadStyle === 'raceway') addCornerSigns(group, curve);
   if (definition.pads) boostPadPlacements.sort((a,b)=>a.d-b.d);
-return { group, curve, length: curve.getLength(), boostPads: boostPadPlacements };
+  const authoredWeapons=definition.pads?.filter(p=>p.type==='weapon')??[];
+  const weaponPads=addWeaponPads(group,curve,authoredWeapons.length?authoredWeapons:automaticWeaponPads(curve,boostPadPlacements));
+return { group, curve, length: curve.getLength(), boostPads: boostPadPlacements, weaponPads };
 }
 
 

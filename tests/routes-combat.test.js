@@ -13,7 +13,7 @@ import { updateCatchUp } from '../src/catch-up.js';
 import { recoverBeforeGap } from '../src/gap-flight.js';
 
 test('v3 branch round-trip, v1/v2 compatibility and invalid topology rejection',()=>{
-  assert.equal(JSON.parse(serializeTrack(ROUTE_LAB)).version,4);
+  assert.equal(JSON.parse(serializeTrack(ROUTE_LAB)).version,5);
   assert.deepEqual(parseTrack(serializeTrack(ROUTE_LAB)),normalizeTrack(ROUTE_LAB));
   assert.deepEqual(parseTrack(JSON.stringify({format:'swipe-out-track',version:2,track:GAP_LAB})),normalizeTrack(GAP_LAB));
   assert.throws(()=>parseTrack(JSON.stringify({format:'swipe-out-track',version:2,track:ROUTE_LAB})),/version 3/);
@@ -88,7 +88,7 @@ function arena(distance=50,lane=0) {
     group.position.copy(frame.center).addScaledVector(frame.normal,0.62).addScaledVector(frame.right,physics.lateralOffset);physics.previousPosition.copy(group.position);
     return {id:i?'cpu':'player',player:i===0,physics,group};
   });
-  const combat=createCombat();combat.reset(true,racers);combat.states.get('cpu').aiTimer=999;
+  const combat=createCombat();combat.reset(true,racers);combat.equip('player','rocket');combat.states.get('cpu').aiTimer=999;
   return {curve,racers,combat};
 }
 function run(a,seconds,options={},hz=120){for(let i=0;i<seconds*hz;i++)a.combat.step(1/hz,a.racers,a.curve,options);}
@@ -105,7 +105,8 @@ test('rockets hit swept hulls at 30/60/120 Hz; damage persists and moving aside 
 });
 
 test('homing requires continuous visible lock, warns its target and can lose sight',()=>{
-  const a=arena(90);a.combat.select('player','homing');run(a,0.5,{fire:true});
+  const a=arena(90);a.combat.states.get('cpu').flareCooldown=25; // Test an undefended lock/hit; flare defence has dedicated coverage.
+  a.combat.equip('player','homing');run(a,0.5,{fire:true});
   assert.equal(a.combat.states.get('player').shots,0);assert.equal(a.combat.states.get('cpu').targeted,true);
   run(a,0.1,{fire:true,blocked:()=>true});assert.equal(a.combat.states.get('player').lockTime,0);
   run(a,0.8,{fire:true});assert.equal(a.combat.states.get('player').shots,0);
@@ -113,12 +114,12 @@ test('homing requires continuous visible lock, warns its target and can lose sig
   run(a,0.5);assert.equal(a.combat.states.get('player').hits,1);
 });
 
-test('clip/reload, rate limits, shared hit protection and bounded projectile/effect resources',()=>{
-  const a=arena(200,50);a.combat.select('player','minigun');run(a,0.5,{fire:true});
+test('finite ammo, rate limits, shared hit protection and bounded projectile/effect resources',()=>{
+  const a=arena(200,50);a.combat.equip('player','minigun');run(a,0.5,{fire:true});
   assert.ok(a.combat.states.get('player').shots<=5);
   const s=a.combat.states.get('player');s.ammo.minigun=1;s.cooldown=0;
-  run(a,0.02,{fire:true});assert.equal(s.ammo.minigun,0);assert.ok(s.reload.minigun>0);
-  run(a,3,{fire:true});assert.equal(s.ammo.minigun,0);run(a,1.1);assert.equal(s.ammo.minigun,WEAPONS.minigun.clip);
+  run(a,0.02,{fire:true});assert.equal(s.ammo.minigun,0);assert.equal(s.weapon,null);
+  run(a,3,{fire:true});assert.equal(s.ammo.minigun,0);run(a,1.1);assert.equal(s.ammo.minigun,0);
   const hit={owner:'player',type:'rocket',velocity:new THREE.Vector3(20,0,200)};
   a.combat.hit(hit,a.racers[1],a.curve);const speed=a.racers[1].physics.speed;
   a.combat.hit(hit,a.racers[1],a.curve);assert.equal(a.racers[1].physics.speed,speed);
@@ -127,11 +128,11 @@ test('clip/reload, rate limits, shared hit protection and bounded projectile/eff
 
 test('combat off, pause, finish/retry and airborne knockback preserve lifecycle rules',()=>{
   const a=arena();a.combat.reset(false,a.racers);run(a,1,{fire:true});assert.equal(a.combat.projectiles.length,0);
-  a.combat.reset(true,a.racers);a.combat.states.get('cpu').aiTimer=999;
+  a.combat.reset(true,a.racers);a.combat.equip('player','rocket');a.combat.states.get('cpu').aiTimer=999;
   a.combat.step(1/120,a.racers,a.curve,{fire:true});const snapshot=JSON.stringify([...a.combat.states]);const p=a.combat.projectiles[0].position.clone();
   a.combat.step(0,a.racers,a.curve,{fire:true});assert.equal(JSON.stringify([...a.combat.states]),snapshot);assert.deepEqual(a.combat.projectiles[0].position,p);
   const target=a.racers[1].physics;target.flight={velocity:new THREE.Vector3(0,0,100)};
   a.combat.hit({owner:'player',type:'rocket',velocity:new THREE.Vector3(20,0,200)},a.racers[1],a.curve);assert.ok(target.flight.velocity.z<100);assert.ok(target.lateralVelocity!==0);
   a.combat.step(0.1,a.racers,a.curve,{active:false});assert.equal(a.combat.projectiles.length,0);
-  a.combat.reset(true,a.racers);assert.equal(a.combat.states.get('player').shots,0);assert.equal(a.combat.states.get('player').ammo.rocket,WEAPONS.rocket.clip);
+  a.combat.reset(true,a.racers);assert.equal(a.combat.states.get('player').shots,0);assert.equal(a.combat.states.get('player').ammo.rocket,0);
 });

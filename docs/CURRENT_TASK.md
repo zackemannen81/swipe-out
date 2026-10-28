@@ -1,25 +1,25 @@
 # Current Task
 
-Task ID: EDITOR-006
+Task ID: AUDIO-002
 Status: Complete
 Created: 2026-10-28
 
 ## Scope
-
-Add object surface and emissive color controls and cyan/pink/lime/amber neon
-presets. Reuse existing color/emissive fields; honor them for textured objects.
-Preserve defaults, textures, clone/history and saved tracks.
+Integrate race/combat/Time Attack announcer events with bounded priority queue,
+expiry/repeat limits and saved shared volume including existing countdown audio.
+Preserve countdown triggers/assets/timing. Complete missing catalog clips using
+accepted generator. Cup integration stays in later cup task.
 
 ## Definition of done
-
-- [x] Selected objects support custom surface/glow color, glow off and neon presets.
-- [x] Editor and game materials honor colors, including textured objects.
-- [x] Browser verifies edits, undo/clone/save/reload/export and material values.
-- [x] Build and relevant regression checks pass; continuity docs updated.
+- [x] Events, priority/expiry and lifecycle work without overlapping queued voices.
+- [x] Shared voice volume persists and controls countdown without timing changes.
+- [x] Missing clips generated, meaningful tests/browser/build and docs complete.
 
 ## Verification
 
-86 Node tests pass; build passes with existing chunk-size warning. Browser checks
-all five presets, custom surface color, undo, clone, textured material RGB/emission,
-glow off, save/reload, JSON export and default reset. No page errors. Editor
-screenshot inspected; race and editor share the tested scenery renderer.
+102 Node tests pass; production build passes with existing large-chunk warning.
+Browser confirms persistence/reload, 21 decoded voices, countdown calls once,
+missile preemption, pause/mute, retry and Time Attack finish; no page errors.
+Desktop and 568x320 pause UI inspected. Countdown timer/trigger lines unchanged
+from HEAD. 12 missing WAVs generated; 49 catalog files now present. Physical
+phone and human mix/listening remain. Next task: E cup/progression.

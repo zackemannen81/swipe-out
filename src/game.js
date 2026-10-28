@@ -1,3 +1,6 @@
+import { VOICE_VOLUME_KEY } from './announcer.js';
+import { WEAPON_ICONS } from './weapon-icons.js';
+import { updateWeaponPads } from './weapon-pads.js';
 import { updateTrackPresentation } from './track-pads.js';
 import * as THREE from 'three';
 import { load, parse } from 'opentype.js'
@@ -194,6 +197,18 @@ const editorLink = document.querySelector('.editor-link');
 if (editorLink) editorLink.href = `./editor.html?track=${encodeURIComponent(currentTrackId)}`;
 // Ändra din raceAudio till att vara en let istället för const så vi kan byta ut den
 let raceAudio = new RaceAudio(TRACK_CONFIG[currentTrackId].defaultAudio);
+let selectedVoiceVolume=raceAudio.voiceVolume;
+function syncVoiceControls(){
+  document.querySelectorAll('[data-voice-volume]').forEach(el=>el.value=Math.round(selectedVoiceVolume*100));
+  document.querySelectorAll('[data-voice-value]').forEach(el=>el.textContent=Math.round(selectedVoiceVolume*100)+'%');
+}
+syncVoiceControls();
+document.querySelectorAll('[data-voice-volume]').forEach(el=>el.addEventListener('input',()=>{
+  selectedVoiceVolume=Number(el.value)/100;raceAudio.setVoiceVolume(selectedVoiceVolume);syncVoiceControls();
+  let failed=false;try{localStorage.setItem(VOICE_VOLUME_KEY,String(selectedVoiceVolume));}catch{failed=true;}
+  document.querySelectorAll('[data-voice-storage]').forEach(note=>{note.hidden=!failed;note.textContent='Volume kept for this session only.';});
+}));
+let spokenLap=1, voiceCombatPrevious={};
 
 const panoramaTexture = new THREE.TextureLoader().load(
   TRACK_CONFIG[currentTrackId].backdrop,
@@ -587,7 +602,7 @@ const shipPhysics = createShipPhysics((baseSpeed+SPEEDCALIBRATION)*1.5);
 const collisionState = createCollisionState();
 const playerRacer = { id: 'player', physics: shipPhysics, group: craft };
 const combat = createCombat(), combatView = createCombatView(scene);
-let firing = false, touchFiring = false;
+let firing = false, touchFiring = false, padFiring = false, flareRequested = false, flarePadHeld = false, previousThreat = '';
 const combatRay = new THREE.Raycaster(), combatSightCache = new Map();
 const combatHud = document.querySelector('#combat-hud');
 const targetReticle = document.querySelector('#target-reticle');
@@ -648,10 +663,34 @@ function combatBlocked(from, to) {
 function updateCombatHud() {
   combatHud.hidden=!combat.enabled || !['racing','countdown'].includes(race.state);
   targetReticle.hidden=true;
-  const state=combat.states.get('player');if(!state)return;
+  const state=combat.states.get('player');
+  const lock=document.querySelector('#lock-status'), threat=document.querySelector('#combat-threat'), flareButton=document.querySelector('#flare-button');
+  lock.hidden=combatHud.hidden;threat.hidden=true;
+  if(!state)return;
+  flareButton.disabled=combatHud.hidden || race.state!=='racing' || state.flareCooldown>0;
+  flareButton.textContent=state.flareCooldown>0?'FLARES · '+state.flareCooldown.toFixed(1)+'s':'FLARES READY · X / B';
+  const danger=state.incoming?'incoming':state.deflectedTime>0?'deflected':state.targeted?'targeted':'';
+  threat.dataset.threat=danger;threat.hidden=combatHud.hidden || !danger;
+  threat.querySelector('strong').textContent=danger==='incoming'?'INCOMING MISSILE':danger==='targeted'?'ENEMY TARGET LOCK':danger==='deflected'?'MISSILE DIVERTED':'';
+  threat.querySelector('span').textContent=danger==='incoming'?(state.flareCooldown<=0?'DEPLOY FLARES · X / B / TOUCH':'FLARES RECHARGING · EVADE'):danger==='targeted'?'BREAK THEIR AIM':danger==='deflected'?'COUNTERMEASURES SUCCESSFUL':'';
+  if(!combatHud.hidden && race.state==='racing' && danger!==previousThreat && ['incoming','targeted','deflected'].includes(danger)) raceAudio.playCombatAlert(danger);
+  if(!combatHud.hidden && race.state==='racing'){
+    if(danger!==previousThreat)raceAudio.announce({incoming:'incoming_missile',targeted:'enemy_lock',deflected:'missile_deflected'}[danger]);
+    const locked=state.weapon==='homing'&&state.lockTime>=COMBAT.lockSeconds&&!!state.lockTarget;
+    if(locked&&!voiceCombatPrevious.locked)raceAudio.announce('target_locked');
+    if(!state.weapon&&voiceCombatPrevious.weapon)raceAudio.announce('ammo_depleted');
+    if(state.flareCooldown<=0&&voiceCombatPrevious.flareCooldown>0)raceAudio.announce('flares_ready');
+    voiceCombatPrevious={locked,weapon:state.weapon,flareCooldown:state.flareCooldown};
+  }
+  previousThreat=danger;
   const weapon=WEAPONS[state.weapon];
-  document.querySelector('#weapon-status').textContent=`${weapon.name} · ${state.reload[state.weapon]>0?`RELOAD ${state.reload[state.weapon].toFixed(1)}s`:`${state.ammo[state.weapon]} / ${weapon.clip}`}`;
-  document.querySelector('#lock-status').textContent=state.incoming?'INCOMING MISSILE!':state.targeted?'ENEMY LOCK!':state.weapon==='homing'?(state.lockTarget?`${state.lockTime>=COMBAT.lockSeconds?'LOCKED':'LOCKING'} · ${Math.round(state.lockTime/COMBAT.lockSeconds*100)}%`:'KEEP TARGET IN FRONT'):'SPACE / FIRE';
+  const icon=document.querySelector('#weapon-icon');
+  icon.hidden=!weapon;
+  if(weapon && icon.getAttribute('src')!==WEAPON_ICONS[state.weapon])icon.src=WEAPON_ICONS[state.weapon];
+  document.querySelector('#weapon-status').textContent=weapon?weapon.name+' · '+state.ammo[state.weapon]+' / '+weapon.clip:'EMPTY · FIND A PURPLE WEAPON PAD';
+  document.querySelector('#weapon-pickup-message').textContent=state.pickupTime>0?WEAPONS[state.lastPickup].name+' ACQUIRED':'';
+  document.querySelector('#fire-button').disabled=!weapon || race.state!=='racing';
+  document.querySelector('#lock-status').textContent=state.weapon==='homing'?(state.lockTarget?`${state.lockTime>=COMBAT.lockSeconds?'TARGET LOCKED':'TARGET LOCKING'} · ${Math.round(state.lockTime/COMBAT.lockSeconds*100)}%`:'KEEP TARGET IN FRONT'):'SPACE / FIRE';
   combatHud.classList.toggle('incoming',state.incoming||state.targeted);
   const target=opponents.find(o=>o.name===state.lockTarget);
   if(!combatHud.hidden && target){
@@ -661,20 +700,19 @@ function updateCombatHud() {
       targetReticle.classList.toggle('locked',state.lockTime>=COMBAT.lockSeconds);
     }
   }
-  document.querySelectorAll('[data-weapon]').forEach(button=>button.classList.toggle('active',button.dataset.weapon===state.weapon));
 }
-document.querySelectorAll('[data-weapon]').forEach(button=>button.addEventListener('click',()=>combat.select('player',button.dataset.weapon)));
 const fireButton=document.querySelector('#fire-button');
 fireButton.addEventListener('pointerdown',event=>{event.preventDefault();event.stopPropagation();fireButton.setPointerCapture(event.pointerId);touchFiring=true;});
 for(const type of ['pointerup','pointercancel','lostpointercapture'])fireButton.addEventListener(type,()=>{touchFiring=false;});
 combatHud.addEventListener('pointerdown',event=>event.stopPropagation());
+document.querySelector('#flare-button').addEventListener('click',()=>{if(race.state==='racing' && !isPaused)flareRequested=true;});
 window.addEventListener('keydown',event=>{
-  if(event.target.matches('input,select,textarea')||race.state!=='racing'||!combat.enabled)return;
+  if(event.target.matches('input,select,textarea')||race.state!=='racing'||isPaused||!combat.enabled)return;
+  if(event.code==='KeyX' && !event.repeat){event.preventDefault();flareRequested=true;}
   if(event.code==='Space'){event.preventDefault();firing=true;}
-  if(['Digit1','Digit2','Digit3'].includes(event.code))combat.select('player',['rocket','homing','minigun'][Number(event.code.at(-1))-1]);
 });
 window.addEventListener('keyup',event=>{if(event.code==='Space')firing=false;});
-window.addEventListener('blur',()=>{firing=touchFiring=false;});
+window.addEventListener('blur',()=>{firing=touchFiring=padFiring=flareRequested=false;previousThreat='';});
 const race = {
   lastImpactSerial: 0, finishElapsed: 0,
   topSpeed: 0,
@@ -812,6 +850,7 @@ const trackAssets = createTrack(trackData);
   track = trackAssets.group;
   curve = trackAssets.curve;
   trackWidth = trackData.width ?? 10;
+  race.weaponPads = trackAssets.weaponPads;
   race.boostPads = trackAssets.boostPads; // Hämta de slumpade positionerna från banan!
   practice.begin(trackData,curve,race.boostPads,{handling:activeDrivingSettings.handling,
     assist:activeDrivingSettings.assist,topSpeed:baseSpeed+SPEEDCALIBRATION});
@@ -831,6 +870,7 @@ const trackAssets = createTrack(trackData);
   // Byt musik
   raceAudio.stop();
   raceAudio = new RaceAudio(TRACK_CONFIG[currentTrackId].defaultAudio);
+  raceAudio.setVoiceVolume(selectedVoiceVolume);spokenLap=1;voiceCombatPrevious={};
   // Läs av sökvägen till den nya bakgrundsbilden
   const backdropUrl = TRACK_CONFIG[currentTrackId].backdrop;
 
@@ -884,7 +924,7 @@ Object.assign(shipPhysics, createShipPhysics(baseSpeed+SPEEDCALIBRATION));
   activeCpuDifficulty = selectedCpuDifficulty;
   resetOpponents(opponents, activeCpuDifficulty);
   firing=touchFiring=false;
-  combat.reset(!practice.active&&document.querySelector('#combat-enabled').checked,combatRacers());
+  combat.reset(!practice.active&&document.querySelector('#combat-enabled').checked,combatRacers(),race.weaponPads);
   combatView.update(combat);updateCombatHud();
   collisionState.cooldowns.clear();
   race.lastImpactSerial = 0;
@@ -938,9 +978,12 @@ function finishRace() {
   // VIKTIGT: Ta bort raceAudio.stop() så musiken spelar under ärovarvet!
   
   race.state = 'finished';
+  raceAudio.announcer?.clear();
+  raceAudio.announce(practice.active?'session_complete':'race_complete');
   race.playerFinishTime = race.elapsed - Math.max(0, race.distance - curve.getLength() * totalLaps) / Math.max(1, race.currentSpeed);
   positionDisplay.textContent = practice.active?'SOLO':`${getPlayerPosition(opponents, race.distance, race.playerFinishTime)} / ${opponents.length + 1}`;
   resultPositionDisplay.textContent = positionDisplay.textContent;
+  if(!practice.active)raceAudio.announce(['first_place','second_place','third_place','fourth_place','fifth_place'][getPlayerPosition(opponents,race.distance,race.playerFinishTime)-1]);
   drag.active = false;
   
   // Aktivera Autopilot-inställningar för ärovarvet
@@ -952,6 +995,7 @@ function finishRace() {
 
   resultDisplay.textContent = formatTime(race.playerFinishTime);
   const bestLap=practice.finish();
+  if(practice.active&&practice.session.completed.at(-1)?.improved)raceAudio.announce('personal_best');
   document.querySelector('#results-heading').replaceChildren(
     document.createTextNode(practice.active?'TIME':'RUN'),document.createElement('br'),
     document.createTextNode(practice.active?'ATTACK.':'COMPLETE.'));
@@ -998,6 +1042,10 @@ canvas.addEventListener('pointermove', (event) => {
 function handleGamepadInput() {
   const gamepads = navigator.getGamepads();
   const gp = gamepads[0];
+  padFiring=!!gp?.buttons[2]?.pressed && race.state==='racing' && !isPaused && inputFocused && combat.enabled;
+  const flarePressed=!!gp?.buttons[1]?.pressed;
+  if(flarePressed && !flarePadHeld && race.state==='racing' && !isPaused && inputFocused && combat.enabled)flareRequested=true;
+  flarePadHeld=flarePressed;
   if (race.state === 'intro' && !isPaused && inputFocused && gp?.buttons[0]?.pressed) raceIntro.skip();
 
   if (activeDrivingSettings.handling === 'wipeout') {
@@ -1227,16 +1275,19 @@ function togglePause() {
   if (!['intro', 'countdown', 'racing'].includes(race.state)) return;
   document.querySelector('#end-session-button').hidden = !practice.active || race.state !== 'racing';
   isPaused = !isPaused;
+  raceAudio.announcer?.pause(isPaused);
   setScreen(pauseScreen, isPaused);
   introOverlay.hidden = isPaused || race.state !== 'intro';
   pauseToggleButton?.setAttribute('aria-pressed', String(isPaused));
   if (pauseToggleButton) pauseToggleButton.textContent = isPaused ? 'RESUME ▶' : 'PAUSE ⏸';
   
   if (isPaused) {
+    firing=touchFiring=flareRequested=false;
     if (activeDrivingSettings.handling === 'wipeout') clearClassicInput();
     raceAudio.audio.pause();
   } else {
-    raceAudio.audio.play();
+    if(raceAudio.context)raceAudio.audio.play().catch(()=>{});
+    else raceAudio.play().catch(error=>console.warn('Unable to resume audio.',error));
     // Nollställ klockan så inte fysiken hoppar framåt när vi avpausar
     clock.getDelta(); 
   }
@@ -1247,6 +1298,7 @@ musicSelect.addEventListener('change', async (event) => {
   const newAudioUrl = event.target.value;
   raceAudio.stop();
   raceAudio = new RaceAudio(newAudioUrl);
+  raceAudio.setVoiceVolume(selectedVoiceVolume);
   
   if (!isPaused) {
     await raceAudio.play();
@@ -1290,6 +1342,13 @@ function render() {
     return; 
   }
   const delta = Math.min(clock.getDelta(), 0.05);
+  raceAudio.announcer?.tick(delta);
+  combat.capture(combatRacers());
+  const readyWeaponIds=new Set(combat.enabled?(race.weaponPads??[]).filter(p=>combat.padReady(p.id)).map(p=>p.id):[]);
+  for(const opponent of opponents){
+    opponent.weaponPadIds=combat.states.get(opponent.name)?.weapon?null:readyWeaponIds;
+  }
+  const drivingPads=combat.enabled?[...race.boostPads,...race.weaponPads]:race.boostPads;
   const racingOpponents=practice.active?[]:opponents;
   let crossedFinish = false;
   // --- ANIMERA BANE-OBJEKT ---
@@ -1462,7 +1521,7 @@ for (const ghost of ghostPool) {
     }
     updateCraftPose(0); // Publish a newly collected boost to the collision velocity.
     updateOpponents(racingOpponents, curve, delta, race.elapsed, true, {
-      player: playerRacer, boostPads: race.boostPads, trackWidth,
+      player: playerRacer, boostPads: drivingPads, trackWidth,
     });
     playerRacer.finished = crossedFinish;
     const racers = [playerRacer, ...racingOpponents.map(opponent => ({
@@ -1542,7 +1601,15 @@ for (const ghost of ghostPool) {
   }
   if(race.state==='racing'&&practice.active){
     practice.advance(practice.point(race.elapsed,shipPhysics));
+    for(const event of practice.session.events){
+      if(event.type==='lap')raceAudio.announce(!event.valid?'lap_invalid':event.improved?'personal_best':null);
+      else if(event.type==='sector'&&event.delta<0)raceAudio.announce('sector_improved');
+    }
     crossedFinish=practice.session.done;
+  }
+  if(race.state==='racing'){
+    const lap=practice.active?practice.session.completed.length+1:Math.floor(race.distance/curve.getLength())+1;
+    if(lap>spokenLap){spokenLap=lap;if(lap===3)raceAudio.announce('final_lap');}
   }
   if (crossedFinish) finishRace();
   
@@ -1556,10 +1623,14 @@ if (raycastFrameCounter % 15=== 0) {
 }
 
   combat.step(delta,combatRacers(),curve,{
-    active:race.state==='racing',fire:firing || touchFiring, blocked:combatBlockedFlag
+    active:race.state==='racing',fire:firing || touchFiring || padFiring, flares:flareRequested, blocked:typeof combatBlockedFlag==='function'?combatBlockedFlag:combatBlocked
   });
 
+  flareRequested=false;
   for(const event of combat.events){
+    if(event.kind==='pickup'){if(event.owner==='player'){raceAudio.playCombatAlert('pickup');raceAudio.announce({rocket:'rockets_acquired',homing:'heatseeker_acquired',minigun:'minigun_acquired'}[event.weapon]);}continue;}
+    if(event.kind==='flare'){if(event.owner==='player'){raceAudio.playCombatAlert('flare');raceAudio.announce('flares_deployed');}continue;}
+    if(event.kind!=='shot')continue;
     const owner=event.owner==='player'?craft:opponents.find(o=>o.name===event.owner)?.group;
     if(owner && owner.position.distanceTo(craft.position)<180)raceAudio.playWeapon(event.weapon,event.owner==='player'?1:0.22);
   }
@@ -1667,6 +1738,7 @@ if (thrustFill) {
     : 'AUTO · READY';
 
   updateTrackPresentation(track, performance.now()/1000);
+  updateWeaponPads(track, combat.time, combat);
   particleSystem.updateSystem(delta);
     composer.render();
   requestAnimationFrame(render);

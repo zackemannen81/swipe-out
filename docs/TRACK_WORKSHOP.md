@@ -28,7 +28,8 @@ Alternativrutter räknar om längden till fysisk distans. Ljuspulsen ändrar int
 
 ## Format och begränsningar
 
-Export är nu version 4; version 1–3 och äldre råa banor läses fortfarande.
+Export är nu version 5; version 1–4 och äldre råa banor läses fortfarande.
+V5 lägger till vapenplattor med val av rocket/homing/minigun, se WEAPON_PICKUPS.md.
 De nya fälten är frivilliga: pointWidths är en array med bredd/null per punkt,
 pads är en array med id/type/progress/offset och valfri routeId, roadStyle är
 classic eller raceway. Saknat pads-fält använder gamla autoplattor; [] betyder

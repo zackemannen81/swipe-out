@@ -86,25 +86,26 @@ implementerad och godkänd efter provkörning av alla nivåer. Etapp C är imple
 
 ## D — Combat som ett taktiskt lopp
 
-Dela gärna upp i D1 (träffar/hot/flares) och D2 (vapenplattor).
+D1 är godkänd av användaren efter provkörning. D2 är implementerad 2026-10-28:
+se WEAPON_PICKUPS.md. Den nya pickupbalansen återstår att provspela.
 
-- [ ] Mer läsbara on-hit-partiklar: kort träffblixt, gnistor och avklingande effekt
+- [x] Mer läsbara on-hit-partiklar: kort träffblixt, gnistor och avklingande effekt
   vid träffpunkten. Skilj skott, träff och miss utan att dölja körbanan.
-- [ ] Skilj egen TARGET LOCKED från ENEMY LOCK och INCOMING MISSILE. Visa en
+- [x] Skilj egen TARGET LOCKED från ENEMY LOCK och INCOMING MISSILE. Visa en
   tydlig, något större hottext under låsrutan med ljud och begriplig prioritet.
-- [ ] Flares kan avleda inkommande homingmissil vid rätt timing, med synlig
+- [x] Flares kan avleda inkommande homingmissil vid rätt timing, med synlig
   READY/cooldown. **Förslag att provbalansera:** 20–30 sekunders cooldown och
   kort skyddsfönster; ingen permanent immunitet eller effekt på vanliga kulor.
-- [ ] Lös input utan att stjäla pitch på F: föreslå X som första tangent, plus
+- [x] Lös input utan att stjäla pitch på F: föreslå X som första tangent, plus
   touchknapp och handkontrollbindning. F är möjligt endast med uttrycklig ombindning.
-- [ ] CPU följer samma flarevillkor och cooldown; paus fryser cooldown, retry
+- [x] CPU följer samma flarevillkor och cooldown; paus fryser cooldown, retry
   återställer sessionen. Visa avledd missil så att effekten går att förstå.
-- [ ] Vapen hämtas på vapenplattor i stället för ständig tillgång till alla vapen.
-  Rekommenderad första version: en vapenslot och begränsad ammunition; bestäm
-  ersättning vid ny pickup och plattans återladdning före implementation.
-- [ ] Vapenplattor stöds av editor, sparformat och CPU-vägval. Kontrollera att
+- [x] Vapen hämtas på vapenplattor i stället för ständig tillgång till alla vapen.
+  En slot, tom start, ny pickup ersätter ammunitionen; ingen automatisk omladdning.
+  Plattan återkommer efter 8 sekunder, gemensamt för alla förare.
+- [x] Vapenplattor stöds av editor, sparformat och CPU-vägval. Kontrollera att
   pickups och räckvidd fungerar även vid hög fart, på branches och i loopar.
-- [ ] Combat, vapenpickups och flares påverkar inte Time Attack.
+- [x] Combat, vapenpickups och flares påverkar inte Time Attack.
 
 ## E — Cup, medaljer och upplåsningar
 
@@ -124,9 +125,12 @@ Dela gärna upp i D1 (träffar/hot/flares) och D2 (vapenplattor).
 
 ## F — Ljud och återkoppling
 
+Announcer integrerad 2026-10-29: sparad röstvolym inklusive nedräkning, prioriterad
+kö och anti-spam. Musik/SFX-reglage samt hörlurs-/högtalarmix återstår. Se ANNOUNCER.md.
+
 - [ ] Motor reagerar på belastning; luftbromsar susar, boost har tydligt påslag,
   räcken ger metallskrap och landning har ett distinkt ljud.
-- [ ] Korta signaler för sista varvet, personbästa och inkommande missil, samordnade
+- [x] Korta signaler för sista varvet, personbästa och inkommande missil, samordnade
   med befintliga ljud så att samma händelse inte annonseras flera gånger.
 - [ ] Prioritera farovarningar över upprepade lågprioriterade effekter. Begränsa
   samtidiga röster och kontrollera mix med musik på både högtalare och hörlurar.
@@ -150,7 +154,7 @@ Dela gärna upp i D1 (träffar/hot/flares) och D2 (vapenplattor).
 
 ## Genomförande och verifiering
 
-Nästa implementation är **D1: combat, träffeffekter, hot och flares**. Sätt
+Nästa implementation är **E: cup, medaljer och progression**, i avgränsade delar. Sätt
 exakt omfattning och acceptans i [CURRENT_TASK](CURRENT_TASK.md) före kodändring.
 Efter varje leverans: relevanta automatiska kontroller, visuell kontroll av ändrade
 flöden och ärlig dokumentation av vad som återstår för mänsklig provkörning.
