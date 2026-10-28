@@ -257,13 +257,14 @@ const thrusters = new ThrusterSystem(scene);
 const playerCraft = await createCraft({ accentColor: 0x43f6ea, modelUrl: '/models/racer_optimized.glb' });
 const craft = playerCraft.group; 
 scene.add(craft);
-const playerThrusters = thrusters.addCraft(craft);
+const playerThrusters = thrusters.addCraft(craft, playerCraft.color);
 
 // 2. Invänta motståndarnas skepp
+
 const opponents = await createOpponents();
 for (const opponent of opponents) {
   scene.add(opponent.group);
-  opponent.thrusters = thrusters.addCraft(opponent.group);
+  opponent.thrusters = thrusters.addCraft(opponent.group, opponent.craft.color);
 }
 
 // 3. Nu är 'craft' Garanterat inladdad och full av mesh-data!
