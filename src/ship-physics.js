@@ -126,7 +126,7 @@ ship.boostTimer = Math.max(0, ship.boostTimer - dt);
   ship.thrust = ship.tuning.engineForce !== undefined
     ? damp(ship.thrust, thrustInput, 6, dt)
     : THREE.MathUtils.clamp(
-    ship.thrust + (thrustInput > 0 ? 1.75 * thrustInput : -1.1) * dt,
+    ship.thrust + (thrustInput > 0 ? 1.8 * thrustInput : -1.1) * dt,
     0,
     1,
   );
@@ -149,7 +149,7 @@ ship.boostTimer = Math.max(0, ship.boostTimer - dt);
 
   // Longitudinal force balance: thrust, drag and braking. Speed is in the
   // existing SwipeOut world scale, rather than the original PS1 fixed-point scale.
-  const throttleForce = ship.thrust * (ship.tuning.engineForce ?? (classic ? CLASSIC_HANDLING.engineForce : 8));
+  const throttleForce = ship.thrust * (ship.tuning.engineForce ?? (classic ? CLASSIC_HANDLING.engineForce : 10));
   const baselineDrag = ship.speed * 0.045;
   const brakingForce = brake * (ship.tuning.brakeForce ?? 18);
   ship.speed += (throttleForce - baselineDrag - brakingForce) * dt;
