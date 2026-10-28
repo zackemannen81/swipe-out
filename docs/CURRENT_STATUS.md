@@ -1,5 +1,41 @@
 # Current Status
 
+## 2026-10-28 — PRESENT-002: preferred start camera
+
+Corrected beginRace's view reset from external to wipeoutStyle, matching the
+user's preferred existing view. This covers Race, Time Attack and retry through
+the shared start path. Intro still blends into the active follow profile; no
+camera tuning, handling, countdown or result layout was changed. The separate
+camera-follow preference is still respected.
+
+## 2026-10-28 — PRESENT-001: results and grid fly-by
+
+Stage A implemented. Results now have a width-aware heading, fixed action row and
+scrollable detail area. Reproduced clipped COMPLETE using the committed CSS;
+inspected corrected desktop and 844x390, 667x375 and 568x320 landscape views.
+Long Time Attack detail fixtures scroll without moving the heading or buttons.
+Portrait continues to show the existing rotate-device overlay.
+
+A separate 3.2-second intro frames the craft and blends into the selected camera
+profile's chase pose before countdown. Enter/Space, gamepad A/Cross and a button
+skip it; reduced motion skips automatically. Retry resets the victory camera.
+Intro pauses without changing timer, distance or CPU progress. Legacy grids get
+a framed start pose, then ease into existing driving-camera tuning after GO.
+Countdown implementation and CSS/animation remain identical to committed code;
+browser-observed Three/Two/One/Go audio fires once each at the original boundaries.
+
+Removed the new physics-to-game import cycle by injecting the existing particle
+system/material from game setup. Spark parameters and user physics/weapon tuning
+are unchanged. Updated the stale rocket-reset assertion to use the configured
+clip (currently three), rather than reverting that user change.
+
+Verification: 73 Node tests pass; production build passes with existing bundle
+size warning. Browser acceptance passes intro pause/resume, frozen CPU/player,
+normal completion, skip, retry, solo early end, long results, reduced motion and
+legacy grid framing. Screenshots in temporary swipe-out-present001 inspected.
+Browser uses Windows Chrome/D3D11; no physical phone/controller playtest or new
+performance claim. Countdown source/style identity and diff checks pass.
+
 ## 2026-10-28 — PLAN-002: expanded improvement roadmap
 
 Captured the user's expanded wishlist and recommended delivery stages A–G in

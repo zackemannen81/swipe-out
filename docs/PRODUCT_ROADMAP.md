@@ -39,18 +39,18 @@ visuellt innan den fastställs. Läs [aktuell status](CURRENT_STATUS.md) och
 | G | Menyer, miljöer och prestandapass | Sammanhängande presentation med mätbar mobilbudget |
 
 Varje etapp kan delas i mindre leveranser. Mät prestanda under arbetet; slutpasset
-ersätter inte löpande kontroll. Alla kryssrutor nedan är ännu öppna.
+ersätter inte löpande kontroll. Etapp A är implementerad 2026-10-28 (PRESENT-001); övriga etapper är öppna.
 
 ## A — Resultatskärm och startintro
 
-- [ ] Reproducera och rätta klippning av RACE COMPLETE. Rubrik och primärknappar
+- [x] Reproducera och rätta klippning av RACE COMPLETE. Rubrik och primärknappar
   ska vara helt synliga på desktop och liten landskapsskärm. Långa resultatlistor
   får en avsiktlig egen scrollregion vid behov; dölj inte bara överflödet.
-- [ ] Kort fly-by som tydligt visar spelarens skepp, inspirerad av den uppskattade
+- [x] Kort fly-by som tydligt visar spelarens skepp, inspirerad av den uppskattade
   inzoomningen vid laddning. Kameran landar mjukt i chase cam innan nedräkningen.
-- [ ] Separat introfas; ingen tävlingstid eller CPU-start innan befintlig start.
+- [x] Separat introfas; ingen tävlingstid eller CPU-start innan befintlig start.
   Ge möjlighet att hoppa över fly-by till samma stabila chase-position.
-- [ ] Retry, paus, Race och Time Attack startar korrekt utan dubbla ljud/timers.
+- [x] Retry, paus, Race och Time Attack startar korrekt utan dubbla ljud/timers.
   Jämför nedräkningen före/efter: dess timing, ljud och animation ska vara identiska.
 
 ## B — CPU-svårighet och förarpersonlighet
@@ -147,7 +147,7 @@ Dela gärna upp i D1 (träffar/hot/flares) och D2 (vapenplattor).
 
 ## Genomförande och verifiering
 
-Nästa rekommenderade implementation är **A: resultatskärm + startintro**. Sätt
+Nästa implementation är **B: CPU-svårighet och förarpersonlighet**. Sätt
 exakt omfattning och acceptans i [CURRENT_TASK](CURRENT_TASK.md) före kodändring.
 Efter varje leverans: relevanta automatiska kontroller, visuell kontroll av ändrade
 flöden och ärlig dokumentation av vad som återstår för mänsklig provkörning.

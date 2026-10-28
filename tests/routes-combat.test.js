@@ -133,5 +133,5 @@ test('combat off, pause, finish/retry and airborne knockback preserve lifecycle 
   const target=a.racers[1].physics;target.flight={velocity:new THREE.Vector3(0,0,100)};
   a.combat.hit({owner:'player',type:'rocket',velocity:new THREE.Vector3(20,0,200)},a.racers[1],a.curve);assert.ok(target.flight.velocity.z<100);assert.ok(target.lateralVelocity!==0);
   a.combat.step(0.1,a.racers,a.curve,{active:false});assert.equal(a.combat.projectiles.length,0);
-  a.combat.reset(true,a.racers);assert.equal(a.combat.states.get('player').shots,0);assert.equal(a.combat.states.get('player').ammo.rocket,6);
+  a.combat.reset(true,a.racers);assert.equal(a.combat.states.get('player').shots,0);assert.equal(a.combat.states.get('player').ammo.rocket,WEAPONS.rocket.clip);
 });

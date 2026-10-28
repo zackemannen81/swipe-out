@@ -258,9 +258,11 @@
         </section>
 
         
+      <div id="race-intro" hidden><span>GRID APPROACH</span><button id="skip-intro" type="button">SKIP INTRO · ENTER / A</button></div>
       <section class="screen-card results-card" id="results-screen" aria-labelledby="results-heading" aria-live="assertive" hidden>
         <p class="eyebrow"><span>FINISH</span> &nbsp; TRACK</p>
         <h2 id="results-heading">RUN<br />COMPLETE.</h2>
+        <div class="results-details" tabindex="0" aria-label="Race results">
         <p class="result-label" id="result-position-label">YOUR POSITION</p>
         <strong class="result-time" id="result-position">1 / 5</strong>
         <p class="result-label" id="result-time-label">YOUR TIME</p>
@@ -269,8 +271,11 @@
           <p id="practice-result-summary"></p><p id="practice-result-best"></p>
           <table><thead><tr><th>Lap</th><th>Time</th><th>S1</th><th>S2</th><th>S3</th><th>Status</th></tr></thead><tbody id="practice-result-laps"></tbody></table>
         </section>
+        </div>
+        <div class="results-actions">
         <button class="action-button" id="retry-button" type="button">RACE AGAIN <span aria-hidden="true">↻</span></button>
         <button class="action-button" id="menu-button" type="button">MENU <span aria-hidden="true">≡</span></button>
+        </div>
       </section>
 
       <section class="screen-card results-card" id="pause-screen" aria-labelledby="pause-heading" aria-live="assertive" hidden>

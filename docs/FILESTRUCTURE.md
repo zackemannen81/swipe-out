@@ -1,5 +1,16 @@
 # File Structure
 
+## 2026-10-28 — PRESENT-002 start-view correction
+
+- `docs/archive/PRESENT-001.md` — completed intro/results implementation record
+
+## 2026-10-28 — PRESENT-001 race presentation
+
+- `src/race-intro.js` — skippable presentation-only fly-by and chase blending
+- `tests/race-intro.test.js` — frame-rate, endpoint, skip and restart checks
+- `tools/verify-race-presentation.mjs` — browser lifecycle/layout/countdown acceptance
+- `docs/archive/PLAN-002.md` — completed expanded-roadmap task
+
 ## 2026-10-28 — PLAN-002 expanded roadmap
 
 - `docs/PRODUCT_ROADMAP.md` — expanded wishlist, proposed stages A–G and acceptance targets

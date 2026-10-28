@@ -11,9 +11,11 @@ import { readTrackLibrary } from './track-library.js';
 import { createShipPhysics, stepShipPhysics } from './ship-physics.js';
 import { createOpponents, getPlayerPosition, resetOpponents, updateOpponents, syncOpponentPose } from './opponents.js';
 import { createCraft } from './craft.js';
-import { collectBoostPad, createCollisionState, resolveRacerCollisions, resolveWallImpact } from './race-interactions.js';
+import { configureImpactParticles, collectBoostPad, createCollisionState, resolveRacerCollisions, resolveWallImpact } from './race-interactions.js';
 import { updateCatchUp } from './catch-up.js';
 import { ThrusterSystem } from './thrusters.js';
+import { sparks_material } from './shaders.js';
+import { createRaceIntro } from './race-intro.js';
 import { createTrackCamera } from './track-camera.js';
 import { createClassicCamera } from './classic-camera.js';
 import { loadDrivingSettings, saveDrivingSettings, cameraProfile, readClassicGamepad } from './driving-settings.js';
@@ -135,7 +137,8 @@ scene.background = new THREE.Color(0x000000);
 scene.fog = new THREE.FogExp2(0x080d18, 0.0035);
 //scene.fog = new THREE.Fog(0x080c0a,350,420);
 export const particleSystem = new ParticleSystem(2048, scene);
-particleSystem.initParticleSystem(); // MÅSTE LÄGGAS TILL
+particleSystem.initParticleSystem();
+configureImpactParticles(particleSystem, sparks_material);
 
 const loadedTracks = readTrackLibrary(localStorage);
 let drivingSettings = loadDrivingSettings(localStorage);
@@ -323,6 +326,12 @@ function spawnGhost() {
   ghost.material.opacity = 0.25;
 }
 const clock = new THREE.Clock();
+const raceIntro = createRaceIntro();
+const introOverlay = document.querySelector('#race-intro');
+const skipIntroButton = document.querySelector('#skip-intro');
+skipIntroButton.addEventListener('click', () => {
+  if (race.state === 'intro' && !isPaused) raceIntro.skip();
+});
 const magneticCamera = createTrackCamera();
 const classicCamera = createClassicCamera();
 //const raceAudio = new RaceAudio(RACE_TRACK_AUDIO);
@@ -369,6 +378,17 @@ const cameraSystem = {
       return;
     }
     camera.up.set(0, 1, 0);
+    if (race.state === 'intro' || race.state === 'countdown') {
+      // Frame the entire craft on legacy grids too. The existing race follow
+      // eases away from this seeded pose after GO; its tuning is unchanged.
+      this.position.copy(craftPosition).addScaledVector(trackFrame.tangent, -7)
+        .addScaledVector(trackFrame.normal, 3.3);
+      this.currentLook.copy(craftPosition).addScaledVector(trackFrame.tangent, 8)
+        .addScaledVector(trackFrame.normal, 0.3);
+      camera.up.copy(trackFrame.normal);
+      camera.position.copy(this.position); camera.lookAt(this.currentLook);
+      return;
+    }
     this.lastPosition.copy(this.position);
 
     switch (this.mode) {
@@ -513,9 +533,11 @@ if (this.mode === 'cockpit' || this.mode === 'internal') {
   },
 
   toggleMode() {
+    if (race.state === 'intro') return;
     this.mode = this.mode === 'external' ? 'internal' : 'external';
   },
   cycleMode() {
+    if (race.state === 'intro') return;
   const modes = ['external', 'internal', 'circle', 'static', 'wipeoutStyle','cockpit'];
   const index = modes.indexOf(this.mode);
   this.mode = modes[(index + 1) % modes.length];
@@ -728,6 +750,10 @@ for (const [key, offset] of Object.entries(offsets)) {
 
 function beginRace() {
   isPaused=false;setScreen(pauseScreen,false);
+  pauseToggleButton?.setAttribute('aria-pressed', 'false');
+  if (pauseToggleButton) pauseToggleButton.textContent = 'PAUSE ⏸';
+  raceIntro.restore(camera);
+  cameraSystem.mode = 'wipeoutStyle';
   magneticCamera.reset();
   classicCamera.reset();
   activeDrivingSettings = { ...drivingSettings };
@@ -816,7 +842,9 @@ Object.assign(shipPhysics, createShipPhysics(baseSpeed+SPEEDCALIBRATION));
     shipPhysics.assistLevel = parseFloat(assistSelect.value);
   }
   
-  race.state = 'countdown';
+  race.state = 'intro';
+  raceIntro.start(window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  introOverlay.hidden = false;
   race.countdownTimer = 4.0; // 3 sekunders nedräkning
   shipPhysics.previousSlope = getTrackFrame(curve, 0).tangent.y;
   race.distance = 0;
@@ -875,6 +903,10 @@ Object.assign(shipPhysics, createShipPhysics(baseSpeed+SPEEDCALIBRATION));
   // Lägg ut Boost-pads jämnt över hela banan (exempelvis var 150:e meter)
   setScreen(startScreen, false);
   setScreen(resultsScreen, false);
+  updateCraftPose(0);
+  const startFrame = race.poseFrame ?? getTrackFrame(curve, 0);
+  cameraSystem.position.copy(craft.position).addScaledVector(startFrame.tangent, -7).addScaledVector(startFrame.normal, 3);
+  cameraSystem.currentLook.copy(craft.position).addScaledVector(startFrame.tangent, 9);
   canvas.focus({ preventScroll: true });
 }
 
@@ -942,7 +974,8 @@ canvas.addEventListener('pointermove', (event) => {
 });
 function handleGamepadInput() {
   const gamepads = navigator.getGamepads();
-  const gp = gamepads[0]; 
+  const gp = gamepads[0];
+  if (race.state === 'intro' && !isPaused && inputFocused && gp?.buttons[0]?.pressed) raceIntro.skip();
 
   if (activeDrivingSettings.handling === 'wipeout') {
     const previousSteer = classicGamepadInput.steer;
@@ -1087,6 +1120,9 @@ gyroToggle?.addEventListener('click', toggleGyro);
 window.addEventListener('keydown', (event) => {
   const key = event.key.toLowerCase();
   
+  if (race.state === 'intro' && !isPaused && (key === ' ' || key === 'enter')) {
+    event.preventDefault(); raceIntro.skip(); return;
+  }
   // Växla kameraläge med 'v'
   if (key === 'v') {
     cameraSystem.toggleMode();
@@ -1150,14 +1186,14 @@ const musicSelect = document.querySelector('#music-select');
 
 // Lyssna efter Escape för att pausa/avpausa
 window.addEventListener('keydown', (event) => {
-  if (event.key === 'Escape' && race.state === 'racing') {
+  if (event.key === 'Escape' && ['intro', 'countdown', 'racing'].includes(race.state)) {
     togglePause();
   }
 });
 
 resumeButton.addEventListener('click', togglePause);
 document.querySelector('#end-session-button').addEventListener('click',()=>{
-  if(!practice.active)return;
+  if(!practice.active || race.state !== 'racing')return;
   if(isPaused)togglePause();
   setScreen(pauseScreen,false);clearClassicInput();finishRace();
 });
@@ -1165,8 +1201,11 @@ pauseToggleButton?.addEventListener('click', togglePause);
 cameraCycleButton?.addEventListener('click', () => cameraSystem.cycleMode());
 
 function togglePause() {
+  if (!['intro', 'countdown', 'racing'].includes(race.state)) return;
+  document.querySelector('#end-session-button').hidden = !practice.active || race.state !== 'racing';
   isPaused = !isPaused;
   setScreen(pauseScreen, isPaused);
+  introOverlay.hidden = isPaused || race.state !== 'intro';
   pauseToggleButton?.setAttribute('aria-pressed', String(isPaused));
   if (pauseToggleButton) pauseToggleButton.textContent = isPaused ? 'RESUME ▶' : 'PAUSE ⏸';
   
@@ -1573,7 +1612,13 @@ if (thrustFill) {
 }
 
   // Kör det nya integrerade kamerapasset
+  raceIntro.restore(camera);
   cameraSystem.update(craft.position, craft.quaternion, shipPhysics.velocity, delta, trackFrame);
+  if (race.state === 'intro' && raceIntro.update(camera, craft.position, race.poseFrame ?? trackFrame, delta)) {
+    race.state = 'countdown';
+    introOverlay.hidden = true;
+    canvas.focus({ preventScroll: true });
+  }
   updateCombatHud();
   practice.update(race.state,race.elapsed,shipPhysics,delta);
   

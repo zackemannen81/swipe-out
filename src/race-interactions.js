@@ -1,8 +1,12 @@
 import * as THREE from 'three';
 import { getRacerFrame, routeMetric, activeBranch, recordRaceProgress } from './track-path.js';
 import { getRacerTopSpeed } from './catch-up.js';
-import { particleSystem, scene } from './game.js';
-import { sparks_material } from './shaders.js';
+// Presentation is injected by the game; physics also runs without a browser.
+let particleSystem = null, scrapeMaterial = null;
+export function configureImpactParticles(system, material) {
+  particleSystem = system; scrapeMaterial = material;
+}
+
 
 
 // Skapa materialet för gnistorna en gång i minnet
@@ -26,6 +30,7 @@ function settleClassicWallAttitude(ship, side) {
 }
 
 function spawnScrapeSparks(position, inward, tangent, up, speed, strength, delta) {
+  if (!particleSystem) return;
   // Antal gnistor per sekund, inte per kollision.
   const expected = (120 + strength * 450) * delta;
   const count = Math.floor(expected) +
@@ -51,7 +56,7 @@ function spawnScrapeSparks(position, inward, tangent, up, speed, strength, delta
     particleSystem.createParticle(
       spawnPos,
       vel,
-      sparks_material,
+      scrapeMaterial,
       0.5 + Math.random() * 0.5,
       1,
       0.25 + Math.random() * 0.35,
@@ -62,6 +67,7 @@ function spawnScrapeSparks(position, inward, tangent, up, speed, strength, delta
 }
 
 function spawnImpactSparks(position, normal, velocity, strength) {
+  if (!particleSystem) return;
   const count = Math.floor(strength * 100) + 100;
   
   // Lista ut vilket håll skeppet åker åt

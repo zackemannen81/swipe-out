@@ -584,3 +584,50 @@ select option { color: #eaf3f5; background: #080d14; }
 .time-attack-selected #start-screen .control-hint {margin-bottom:0;}
 @media(max-height:500px),(max-width:820px){#time-attack-hud{top:85px;left:8px;width:225px;padding:6px 8px;font-size:9px;}.practice-heading{font-size:8px;letter-spacing:0;}.practice-timing{margin:3px 0;}.practice-timing strong:first-child{font-size:18px;}.practice-timing strong:last-child{font-size:11px;}#practice-sectors{font-size:8px;}#corner-warning{top:27%;font-size:10px;padding:6px 9px;}#practice-results table{font-size:9px;}}
 @media(pointer:coarse),(max-height:500px){#combat-hud{left:50%;transform:translateX(-50%);}}
+
+/* Results keep the heading/actions fixed; only detailed results may scroll. */
+#results-screen {
+  display: flex; flex-direction: column; gap: 12px; container-type: inline-size;
+  width: min(540px, calc(100vw - clamp(16px, 7vw, 100px) - 16px)); max-height: calc(100% - 32px);
+  top: 50%; left: clamp(16px, 7vw, 100px); transform: translateY(-50%);
+  overflow: visible; padding: 24px;
+}
+#results-screen .eyebrow { margin: 0; flex: none; overflow-wrap: anywhere; }
+#results-screen #results-heading {
+  flex: none; font-size: clamp(18px, 8cqi, 38px); line-height: 1.12;
+  letter-spacing: 0; overflow-wrap: normal;
+}
+#results-screen .results-details {
+  min-height: 0; overflow-y: auto; overflow-x: hidden;
+  scrollbar-width: thin; scrollbar-color: #347579 transparent;
+}
+#results-screen .result-label { margin-top: 10px; }
+#results-screen .result-time { font-size: clamp(23px, 3vw, 32px); }
+#results-screen .results-actions { display: flex; flex: none; flex-wrap: wrap; gap: 10px; }
+#results-screen .results-actions button { flex: 1; min-width: 115px; margin: 0; }
+#results-screen #practice-results { margin-bottom: 0; }
+#results-screen #practice-results table { table-layout: fixed; width: 100%; }
+#results-screen #practice-results th, #results-screen #practice-results td { overflow-wrap: anywhere; }
+#results-screen #practice-results th:first-child { width: 8%; }
+#results-screen #practice-results th:last-child { width: 22%; }
+#race-intro {
+  position: absolute; z-index: 35; bottom: max(30px, env(safe-area-inset-bottom));
+  left: 50%; transform: translateX(-50%); display: flex; align-items: center;
+  gap: 16px; padding: 12px 16px; background: rgba(5, 12, 22, .88);
+  border: 1px solid var(--cyan-dim); color: var(--cyan);
+  font: 10px/1.4 'DM Mono', monospace; white-space: nowrap;
+}
+#race-intro[hidden] { display: none; }
+#skip-intro { background: transparent; border: 1px solid var(--cyan); color: white; padding: 12px; cursor: pointer; }
+#skip-intro:focus-visible { outline: 2px solid white; outline-offset: 3px; }
+@media (max-height: 500px) {
+  #results-screen { padding: 14px 18px; gap: 6px; max-height: calc(100% - 20px); }
+  #results-screen #results-heading { font-size: min(28px, 8cqi); line-height: 1.05; }
+  #results-screen .result-label { margin-top: 7px; }
+  #results-screen .result-time { font-size: 23px; }
+  #results-screen .results-actions button { min-height: 38px; }
+}
+@media (max-width: 430px) {
+  #results-screen { left: 12px; width: calc(100vw - 24px); padding: 16px; }
+  #race-intro { gap: 8px; padding: 8px; font-size: 8px; }
+}

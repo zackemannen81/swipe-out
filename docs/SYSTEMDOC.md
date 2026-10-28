@@ -56,6 +56,12 @@ architecture or behavior.
 
 ## Documentation truth boundary
 
+Race presentation has a separate pre-countdown intro phase. It freezes race
+progress, blends into the selected chase camera and may be skipped or paused.
+The accepted countdown remains the next unchanged phase. Result headings/actions
+stay outside the scrollable detail region. Collision spark presentation is
+injected at game setup so shared physics does not import browser game lifecycle.
+
 The user has accepted the skill-based handling baseline and explicitly requires
 the existing countdown to remain unchanged. The expanded 2026-10-28 wishlist
 covers race intro/results, CPU difficulty, track tools/readability, combat and

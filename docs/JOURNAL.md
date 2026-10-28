@@ -447,3 +447,27 @@
   compatibility, physical-phone checks and ship progression tradeoffs.
 - Updated roadmap references and archived README-001. Documentation only; no
   gameplay changes, browser reproduction or gameplay tests claimed.
+
+## 2026-10-28 — PRESENT-001 results and race intro
+
+- Implemented stage A: short skippable fly-by, chase reset on retry, reduced-motion
+  support and intro pause. Preserved countdown implementation, sounds and CSS.
+- Reproduced clipped results heading using committed styles; sized typography to
+  the card and isolated detail scrolling from heading/actions. Inspected desktop
+  and small landscape screenshots including long Time Attack results.
+- Test runner exposed a physics-to-game particle import cycle from recent work.
+  Injected the same particle system/material at startup, preserving spark tuning.
+  Updated a stale rocket clip assertion to respect the user's current value.
+- All 73 Node tests and production build pass (existing chunk warning). Browser
+  checks pass frozen intro state, pause, normal/skip/retry/solo/reduced-motion
+  flows, legacy framing and original countdown audio boundaries. Physical phone
+  and controller feel remain for playtesting. Roadmap next stage is CPU levels.
+
+## 2026-10-28 — PRESENT-002 preferred start view
+
+- User identified the start camera as the wrong chase variant. Confirmed the
+  PRESENT-001 reset selected external and changed it to existing wipeoutStyle.
+  Shared start/retry path covers Race and Time Attack. No camera tuning changed.
+- Updated browser expectations; full presentation acceptance passes, including
+  intro/retry mode and unchanged countdown sounds/source. Syntax/diff pass.
+  This checks view selection, not high-speed curve visibility on every circuit.
