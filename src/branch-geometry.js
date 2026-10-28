@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 
-export function addBranchGeometry(group, curve, boostPads) {
+export function addBranchGeometry(group, curve, boostPads, includePads = true) {
   for (const branch of curve.track.branches ?? []) {
     const positions = [], indices = [], edgePositions = [[], []];
     const samples = Math.min(2400, Math.max(80, Math.ceil(branch.length / 3)));
@@ -33,7 +33,7 @@ export function addBranchGeometry(group, curve, boostPads) {
     const rails = new THREE.InstancedMesh(railGeometry,railMaterial,railMatrices.length);
     railMatrices.forEach((m,i)=>rails.setMatrixAt(i,m)); group.add(rails);
     const padMatrices=[];
-    for (let d = 70; d < branch.length - 60; d += Math.max(180,branch.length/128)) {
+    for (let d = 70; includePads && d < branch.length - 60; d += Math.max(180,branch.length/128)) {
       const u = d / branch.length, frame = branch.frame(u);
       const position=frame.center.clone().addScaledVector(frame.normal,0.08);
       padMatrices.push(new THREE.Matrix4().compose(position,frame.rotation,new THREE.Vector3(1,1,1)));
@@ -46,7 +46,7 @@ export function addBranchGeometry(group, curve, boostPads) {
       const frame=branch.frame(u);
       for (const side of [-1,1]) {
         const beacon=new THREE.Mesh(new THREE.BoxGeometry(0.35,4,0.35),railMaterial);
-        beacon.position.copy(frame.center).addScaledVector(frame.right,side*(curve.track.width/2+0.5)).addScaledVector(frame.normal,2);
+        beacon.position.copy(frame.center).addScaledVector(frame.right,side*(branch.widthAt(u)/2+0.5)).addScaledVector(frame.normal,2);
         beacon.quaternion.copy(frame.rotation); group.add(beacon);
       }
     }

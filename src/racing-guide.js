@@ -1,3 +1,4 @@
+import { getTrackWidth } from './track-path.js';
 import * as THREE from 'three';
 import { getTrackFrame, getRacerFrame, getRacerWidth, advanceRouteDistance, gapAt } from './track-path.js';
 
@@ -7,6 +8,7 @@ export const GUIDE = Object.freeze({ spacing: 7, points: 65, lateralAcceleration
 // A geometric recommendation, not an optimal-control solver. Reduce curvature
 // within safe road margins, attract to reachable pads and compare route estimates.
 function buildProfile(length, frameAt, widthAt, pads, isGap, closed, topSpeed) {
+  pads = pads.filter(p=>p.type !== 'brake');
   const count = clamp(Math.ceil(length / 6), 40, 2400), step = length/count;
   const nodes = Array.from({length:count+1},(_,i) => {
     const u=i/count, frame=frameAt(u), edge=Math.max(0,widthAt(u)/2-2.1);
@@ -55,7 +57,7 @@ function buildProfile(length, frameAt, widthAt, pads, isGap, closed, topSpeed) {
 }
 export function createRacingGuide(curve,pads=[],topSpeed=143) {
   const length=curve.getLength(), wrap=u=>((u%1)+1)%1;
-  const main=buildProfile(length,u=>getTrackFrame(curve,u),()=>curve.track.width??10,
+  const main=buildProfile(length,u=>getTrackFrame(curve,u),u=>getTrackWidth(curve,u),
     pads.filter(p=>!p.routeId).map(p=>({...p,u:p.d/length})),u=>!!gapAt(curve,wrap(u)*length),true,topSpeed);
   const branches=new Map();
   for(const b of curve.track.branches??[]) {
@@ -71,7 +73,7 @@ export function createRacingGuide(curve,pads=[],topSpeed=143) {
     if(branch) {
       const t=clamp((u-branch.branch.start)/(branch.branch.end-branch.branch.start),0,1), sample=branch.at(t);
       // Join the approach lane continuously, then move onto the branch line.
-      const entry=branch.branch.side*(curve.track.width??10)*0.26;
+      const entry=branch.branch.side*getTrackWidth(curve,branch.branch.start)*0.26;
       sample.lane=THREE.MathUtils.lerp(entry,sample.lane,Math.min(1,t*branch.length/60));
       sample.lane*=Math.min(1,(1-t)*branch.length/50);
       return sample;
@@ -80,7 +82,7 @@ export function createRacingGuide(curve,pads=[],topSpeed=143) {
     for(const profile of branches.values()) {
       const b=profile.branch, ahead=(b.start-u)*length;
       if(ahead>=0 && ahead<200) {
-        const target=b.side*(curve.track.width??10)*(profile.recommended?0.26:-0.18);
+        const target=b.side*getTrackWidth(curve,b.start)*(profile.recommended?0.26:-0.18);
         sample.lane=THREE.MathUtils.lerp(sample.lane,target,1-THREE.MathUtils.smoothstep(ahead,0,200));
       }
       const after=(u-b.end)*length;

@@ -13,6 +13,7 @@ export function createTrackCurve(definition) {
     banks: definition.centerline.map(point => point[3] ?? 0),
     gaps: (definition.gaps ?? []).map(gap => ({ ...gap })),
     width: definition.width,
+    pointWidths: definition.pointWidths,
   };
   if (curve.track.magnetic) buildFrames(curve);
   curve.track.branches = (definition.branches ?? []).map(branch => buildBranch(curve, branch, scale));
@@ -53,7 +54,7 @@ function buildBranch(base, definition, scale) {
     return { center: path.getPointAt(u), tangent, right, normal,
       rotation: new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().makeBasis(right,normal,tangent)) };
   };
-  branch.widthAt = u => THREE.MathUtils.lerp(base.track.width, branch.width, Math.min(1, Math.max(0, Math.min(u, 1-u) / 0.1)));
+  branch.widthAt = u => THREE.MathUtils.lerp(getTrackWidth(base, u < 0.5 ? branch.start : branch.end), branch.width, Math.min(1, Math.max(0, Math.min(u, 1-u) / 0.1)));
   return branch;
 }
 
@@ -71,7 +72,7 @@ export function getRacerFrame(curve, ship, progress = ship.distance / curve.getL
 
 export function getRacerWidth(curve, ship, fallback = curve.track?.width ?? 10) {
   const branch = activeBranch(curve, ship);
-  return branch ? branch.widthAt((ship.distance / curve.getLength() - ship.route.lap - branch.start) / (branch.end - branch.start)) : fallback;
+  return branch ? branch.widthAt((ship.distance / curve.getLength() - ship.route.lap - branch.start) / (branch.end - branch.start)) : getTrackWidth(curve, ship.distance / curve.getLength(), fallback);
 }
 
 export function routeMetric(curve, ship) {
@@ -108,7 +109,7 @@ export function advanceRouteDistance(curve, ship, travel) {
     const { branch: b, lap } = junction;
     if (ship.routeDecision !== `${lap}:${b.id}`) {
       ship.routeDecision = `${lap}:${b.id}`;
-      if (!ship.flight && ship.lateralOffset * b.side > curve.track.width * 0.12) {
+      if (!ship.flight && ship.lateralOffset * b.side > getTrackWidth(curve, b.start) * 0.12) {
         ship.route = { id: b.id, lap }; ship.routeEntries++;
         continue;
       }
@@ -254,4 +255,13 @@ export function progressAtControlPoint(curve, index) {
   const lengths = curve.getLengths(), t = index / curve.points.length * (lengths.length - 1);
   const i = Math.floor(t), f = t - i;
   return THREE.MathUtils.lerp(lengths[i], lengths[Math.min(i + 1, lengths.length - 1)], f) / lengths.at(-1);
+}
+
+export function getTrackWidth(curve, progress, fallback = curve.track?.width ?? 10) {
+  const widths = curve.track?.pointWidths;
+  if (!widths) return fallback;
+  fallback = curve.track?.width ?? fallback;
+  const t = curve.getUtoTmapping(wrap(progress)) * widths.length;
+  const i = Math.floor(t) % widths.length, f = t - Math.floor(t);
+  return THREE.MathUtils.lerp(widths[i] ?? fallback, widths[(i + 1) % widths.length] ?? fallback, f * f * (3 - 2 * f));
 }

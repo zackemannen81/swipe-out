@@ -1,3 +1,4 @@
+import { updateTrackPresentation } from './track-pads.js';
 import * as THREE from 'three';
 import { load, parse } from 'opentype.js'
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
@@ -1665,6 +1666,7 @@ if (thrustFill) {
     ? `${shipPhysics.recoveryTimer > 0 ? 'RECOVERING' : race.airborne ? 'AIR' : race.throttleTarget > 0.1 ? 'THRUST' : race.throttleTarget < -0.1 ? 'BRAKE' : 'AUTO'} · ${Math.round(race.currentSpeed * 36)} KM/H`
     : 'AUTO · READY';
 
+  updateTrackPresentation(track, performance.now()/1000);
   particleSystem.updateSystem(delta);
     composer.render();
   requestAnimationFrame(render);

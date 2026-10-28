@@ -5,7 +5,7 @@ pilots, chase your own ghost in Time Attack, or build circuits in the integrated
 3D editor. Choose assisted touch-friendly handling or a Wipeout-inspired profile
 with nose steering, momentum and independent airbrakes.
 
-**Current playable development build · 27 October 2026.** Fifteen built-in tracks,
+**Current playable development build · 28 October 2026.** Sixteen built-in tracks,
 one selectable player craft (**Racer**) and one speed class (**Standard**).
 Rookie, Pilot and Elite CPU difficulties are selectable; cup progression is planned.
 
@@ -118,6 +118,7 @@ The library includes the original ten circuits, four mechanic test circuits and
 | `track13` | TEST · Split Decision | Narrow shortcut versus wider main route |
 | `track14` | TEST · Crossfire Circuit | Combat practice and open sightlines |
 | `track15` | Ion Foundry | Two gaps, banked corners, technical S bends, reactor loop and Needle Skyway shortcut |
+| `track16` | TEST · Raceway Workshop | Variable width, editable boost/brake pads, turn arrows and shortcut |
 
 For Ion Foundry, take the **left** approach lane at the amber fork to enter the
 narrow elevated shortcut. Keep throttle through the jumps. Open
@@ -197,7 +198,7 @@ height changes and loops.
 - **Save to Game** persists the selected track locally. **Save & Test** saves and
   opens the game with that track selected. **Restore Built-in** resets only the
   selected built-in track; **Remove Custom** removes the selected custom track.
-- **Download** and **Copy JSON** export version 3 `swipe-out-track` documents.
+- **Download** and **Copy JSON** export version 4 `swipe-out-track` documents.
   **Import JSON as New Track** also accepts v1/v2 and older plain JSON exports,
   validates them, and creates a separate unsaved track without replacing others.
 
@@ -298,3 +299,7 @@ following the completed handling and Time Attack stages include:
 Cup progression and the later polish stages remain planned. Combat balance, custom-track
 guidance and camera/ghost comfort still need human playtesting. A simulated mobile
 viewport does not establish physical-phone performance.
+
+Track authoring now includes **POINT WIDTH**, authored boost/brake pads with Focus,
+conservative boost suggestions and opt-in Raceway markings. Existing tracks retain
+their layout. See [Track Workshop guide](docs/TRACK_WORKSHOP.md).

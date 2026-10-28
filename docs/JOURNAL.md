@@ -487,3 +487,29 @@
   save/reload/retry/runtime profiles/solo isolation/storage failure. Inspected
   desktop/landscape menu. Human race/combat balance and physical-phone testing
   remain; track tools/readability is next. Countdown and player controls unchanged.
+
+## 2026-10-28 - TRACK-005: track tools and readability
+
+- User approved every CPU level, committed and pushed; archived CPU-001.
+- Implemented optional v4 pointWidths/pads/roadStyle with legacy v1-v3 reading.
+  Shared width drives road/rails, physics, AI, guide, branch joins and landing.
+- Editor supports inherited per-point width, pad position/type/route/focus,
+  conservative boost suggestions and undo/save/import/export. Pads validate road
+  footprint, gaps and overlaps. Authored boosts/brakes use instanced markings
+  and two animated materials; brake reduces speed 28% once per pad/lap.
+- Added separate track16 Raceway Workshop with changing widths and a shortcut.
+  Earlier circuit data and accepted countdown/camera/handling remain unchanged.
+- 86 tests and build pass (existing bundle warning); 12 CPU runs complete three
+  Workshop laps. Browser authoring/reload/JSON roundtrip/start/retry passes with
+  no page errors; inspected editor and desktop/landscape race screenshots.
+- Updated status, roadmap, system/design docs, README and TRACK_WORKSHOP guide.
+  Human balance/sign readability and physical-phone performance remain. Next: D1.
+
+## 2026-10-28 - EDITOR-006: object colors and neon
+
+- Added surface/glow pickers, five neon presets, glow off and default reset.
+- Reused color/emissive fields; textured scenery now honors explicit colors too.
+  Legacy defaults, textures, clone/history and serialized shape are preserved.
+- 86 tests/build pass (existing chunk warning). Browser verifies presets, custom
+  color, undo/clone, textured material values, off/reset, save/reload and export.
+  Inspected editor screenshot; no page errors. Next roadmap stage remains D1.

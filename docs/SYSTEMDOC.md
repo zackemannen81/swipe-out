@@ -176,3 +176,14 @@ This document records the intended product direction, not existing software
 behavior. See `GDD.md` for the detailed game design and `CURRENT_STATUS.md` for
 verified repository reality. Record confirmed durable architecture and behavior
 here as implementation matures; keep unresolved design choices explicitly open.
+
+## Track authoring update — 2026-10-28
+
+Stage C uses one interpolated main-road width across render, physics, AI and guide.
+Format v4 optionally stores point widths, authored boost/brake pads and road style.
+Earlier formats retain their data and automatic pad behavior. Workshop (track16)
+is the opt-in proving ground. Details and limits: TRACK_WORKSHOP.md.
+
+Scenery surface color and emissive color are shared authoring properties for
+textured and untextured primitives. Editor neon presets reuse those fields;
+self-illumination is visible in the editor, with race bloom applied by the game.

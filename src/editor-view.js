@@ -1,8 +1,9 @@
+import { updateTrackPresentation, padPlacement } from './track-pads.js';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { TransformControls } from 'three/addons/controls/TransformControls.js';
 import { createTrack, spawnTrackObjects, disposeTrackGroup } from './track.js';
-import { hasSurface } from './track-path.js';
+import { hasSurface, createTrackCurve } from './track-path.js';
 
 export function createEditorView(canvas, { onSelect, onMove, onCommit }) {
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
@@ -151,10 +152,18 @@ export function createEditorView(canvas, { onSelect, onMove, onCommit }) {
     for (const marker of markers.children) {
       marker.scale.setScalar(camera.position.distanceTo(marker.position) * 0.006);
     }
+    updateTrackPresentation(road, performance.now()/1000);
     renderer.render(scene, camera);
   });
   return {
     setTrack, fit,
+    focusPad(pad) {
+      const assets = createTrackCurve(track), p = padPlacement(assets,pad), f = p.frameAt(p.d);
+      orbit.target.copy(f.center).addScaledVector(f.right,p.offset);
+      camera.up.copy(f.normal);
+      camera.position.copy(orbit.target).addScaledVector(f.normal,14).addScaledVector(f.tangent,-18);
+      orbit.update();
+    },
     select(value) { selection = value; syncSelection(); },
     focus() {
       const offset = camera.position.clone().sub(orbit.target).normalize().multiplyScalar(Math.max(track.width * 7, 60));

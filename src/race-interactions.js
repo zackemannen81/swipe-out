@@ -197,27 +197,37 @@ export function collectBoostPad(ship, pads, trackLength, topSpeed) {
   const start = ship.previousDistance;
   const end = ship.distance;
   if (end <= start || !pads?.length) return false;
+  let boosted = false;
+  ship.padPassages ??= {};
   for (let lap = Math.floor(start / trackLength); lap <= Math.floor(end / trackLength); lap++) {
-    for (let i = 0; i < pads.length; i++) {
-      const pad = pads[i];
+    for (let i=0;i<pads.length;i++) {
+      const pad=pads[i];
       if ((pad.routeId ?? null) !== (ship.route?.id ?? null)) continue;
-      const entry = lap * trackLength + pad.d - 5;
-      const exit = lap * trackLength + pad.d + 1;
+      const entry = lap * trackLength + pad.d - 5 * (pad.metric ?? 1);
+      const exit = lap * trackLength + pad.d + (pad.metric ?? 1);
       if (end < entry || start > exit) continue;
       const key = `${lap}:${i}`;
-      if (ship.lastBoostKey === key) continue;
+      if (ship.padPassages[i] === lap) continue;
       const fraction = clamp((Math.max(start, entry) - start) / (end - start), 0, 1);
       const lane = THREE.MathUtils.lerp(ship.previousLateralOffset, ship.lateralOffset, fraction);
       const height = THREE.MathUtils.lerp(ship.previousVerticalOffset, ship.verticalOffset, fraction);
       if (Math.abs(lane - pad.offset) > BOOST.halfWidth || height > 1.2) continue;
+      ship.padPassages[i] = lap;
+      if (pad.type === 'brake') {
+        ship.lastBrakeKey = key;
+        ship.speed *= 0.72;
+        ship.boostTimer = 0;
+        ship.brakePadCount = (ship.brakePadCount ?? 0) + 1;
+        continue;
+      }
       ship.lastBoostKey = key;
       ship.boostTimer = BOOST.duration;
       ship.speed = Math.max(ship.speed, getRacerTopSpeed(ship, topSpeed) * BOOST.entryMultiplier);
       ship.boostCount++;
-      return true;
+      boosted = true;
     }
   }
-  return false;
+  return boosted;
 }
 
 // Track-relative state is authoritative: impulses and separation survive the next pose update.

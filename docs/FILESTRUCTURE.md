@@ -1,5 +1,19 @@
 # File Structure
 
+## 2026-10-28 — EDITOR-006
+
+- `tools/verify-object-colors.mjs` — color editor/material/persistence browser checks
+- `docs/archive/TRACK-005.md` — completed track workshop task
+
+## 2026-10-28 — TRACK-005
+
+- `src/track-pads.js` — pad placement/validation/suggestions and instanced markings
+- `src/track-workshop.js` — track16 variable-width demonstration
+- `tests/track-workshop.test.js` — width, pads, migration and CPU race coverage
+- `tools/verify-track-workshop.mjs` — editor and race browser acceptance
+- `docs/TRACK_WORKSHOP.md` — editor guide, format and verification limits
+- `docs/archive/CPU-001.md` — accepted CPU difficulty implementation
+
 ## 2026-10-28 — CPU-001 difficulty and personalities
 
 - `src/cpu-difficulty.js` — profiles, safe preference persistence and route choices

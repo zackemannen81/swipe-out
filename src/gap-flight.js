@@ -1,3 +1,4 @@
+import { getTrackWidth } from './track-path.js';
 import * as THREE from 'three';
 import { getTrackFrame, hasSurface, projectOnTrack, gapAt } from './track-path.js';
 import { registerImpact } from './race-interactions.js';
@@ -93,7 +94,7 @@ export function stepGapFlight(ship, input, dt, curve, baseSpeed, width) {
   ship.speed = Math.max(12, flight.velocity.dot(frame.tangent));
   ship.velocity.copy(flight.velocity);
 
-  if (hasSurface(curve, distance) && oldHeight >= -0.02 && height <= 0.02 && ship.verticalVelocity < 0 && Math.abs(lane) <= width / 2 - 0.65) {
+  if (hasSurface(curve, distance) && oldHeight >= -0.02 && height <= 0.02 && ship.verticalVelocity < 0 && Math.abs(lane) <= getTrackWidth(curve, distance / curve.getLength(), width) / 2 - 0.65) {
     const severity = THREE.MathUtils.clamp(-ship.verticalVelocity / 35, 0.08, 1);
     ship.flight = null;
     ship.airborne = false;

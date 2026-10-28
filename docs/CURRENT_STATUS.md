@@ -1,5 +1,32 @@
 # Current Status
 
+## 2026-10-28 — EDITOR-006: object colors and neon
+
+Selected scenery now exposes surface/glow color pickers, Cyan/Pink/Lime/Amber/Violet
+neon presets, Glow Off and Default Colors. Existing color/emissive fields are reused;
+no format migration. Textured scenery now honors those fields while keeping legacy
+defaults when omitted. Texture tint/emission uses the same renderer in editor/game.
+Clone, history and saved/exported data preserve colors. 86 tests and build pass
+(existing chunk warning). Browser covers presets, custom color, undo/clone, textured
+material values, off/reset, save/reload/export; screenshot inspected, no page errors.
+
+## 2026-10-28 — TRACK-005: track tools and readability
+
+User playtested all CPU levels, accepted stage B and committed/pushed the baseline.
+Stage C adds format v4 optional pointWidths/pads/roadStyle, shared width interpolation
+for geometry, physics, AI, guide, branch endpoints and gap landings. Editor supports
+widths, pad types/positions/routes/focus, suggestions, undo and versioned persistence.
+Orange brakes remove 28% speed once per pad/lap and cancel boost; shared swept
+CPU/player detection handles route metrics. CPU avoids brakes where space permits.
+Authored pads pulse; Raceway uses slim centre marks and approach turn arrows.
+Track16 Workshop demonstrates this separately; earlier track data is unchanged.
+
+86 tests and production build pass (existing bundle warning). All 12 CPU runs
+finish three laps on Workshop. Browser authoring, save/reload, export/import, race
+and retry pass; editor/race screenshots inspected. Human tuning and physical phone
+performance remain. Guide: TRACK_WORKSHOP.md. Next planned stage: D1 combat feedback,
+threat alerts and flares. Countdown, camera and handling tuning remain unchanged.
+
 ## 2026-10-28 — CPU-001: difficulty and driver personalities
 
 User confirmed stage A, including the corrected wipeoutStyle start, works in-game.

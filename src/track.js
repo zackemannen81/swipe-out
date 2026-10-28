@@ -1,6 +1,7 @@
 import * as THREE from 'three';
+import { addAuthoredPads, addCornerSigns } from './track-pads.js';
 import { NEON_CAUSEWAY } from './track-data.js';
-import { createTrackCurve, getTrackFrame, hasSurface } from './track-path.js';
+import { createTrackCurve, getTrackFrame, getTrackWidth, hasSurface } from './track-path.js';
 import { addBranchGeometry } from './branch-geometry.js';
 export { getTrackFrame } from './track-path.js';
 
@@ -55,9 +56,10 @@ export function createTrack(definition = NEON_CAUSEWAY) {
       const right = frame.right;
       if (right.lengthSq() > 0.5) previousRight.copy(right);
       else right.copy(previousRight);
-      const center = frame.center.addScaledVector(right, offset).addScaledVector(frame.normal, yOffset);
-      const leftPoint = center.clone().addScaledVector(right, -width / 2);
-      const rightPoint = center.clone().addScaledVector(right, width / 2);
+      const center = frame.center.addScaledVector(right, typeof offset === 'function' ? offset(u) : offset).addScaledVector(frame.normal, yOffset);
+      const localWidth = typeof width === 'function' ? width(u) : width;
+      const leftPoint = center.clone().addScaledVector(right, -localWidth / 2);
+      const rightPoint = center.clone().addScaledVector(right, localWidth / 2);
       positions.push(
         leftPoint.x, leftPoint.y, leftPoint.z,
         rightPoint.x, rightPoint.y, rightPoint.z,
@@ -74,11 +76,11 @@ export function createTrack(definition = NEON_CAUSEWAY) {
     group.add(new THREE.Mesh(geometry, material));
   }
 
-  const trackWidth = definition.width;
-  const edgeOffset = trackWidth / 2 - 0.18;
-  ribbon(0, trackWidth, roadMaterial, 0, 900);
-  ribbon(-edgeOffset, 0.19, pinkMaterial, 0.075);
-  ribbon(edgeOffset, 0.19, cyanMaterial, 0.075);
+  const trackWidth = getTrackWidth(curve, 0);
+  const widthAt = u => getTrackWidth(curve,u);
+  ribbon(0, widthAt, roadMaterial, 0, 900);
+  ribbon(u => -(widthAt(u)/2-0.18), 0.19, pinkMaterial, 0.075);
+  ribbon(u => widthAt(u)/2-0.18, 0.19, cyanMaterial, 0.075);
   //ribbon(-trackWidth / 2 - 0.15, 0.1, transparentDarkMaterial, 0.14);
   //ribbon(trackWidth / 2 + 0.15, 0.1, transparentDarkMaterial, 0.14);
 
@@ -100,6 +102,7 @@ export function createTrack(definition = NEON_CAUSEWAY) {
     if (!junctionClear(distance)) continue;
     if (!hasSurface(curve, distance, 5)) continue;
     const frame = getTrackFrame(curve, distance / curve.getLength());
+    const trackWidth = widthAt(distance / curve.getLength());
     for (const side of [-1, 1]) {
       const position = frame.center.clone()
         .addScaledVector(frame.right, side * (trackWidth / 2 + 1.15))
@@ -119,6 +122,7 @@ export function createTrack(definition = NEON_CAUSEWAY) {
     if (!junctionClear(distance)) continue;
     if (!hasSurface(curve, distance, 5)) continue;
     const frame = getTrackFrame(curve, distance / curve.getLength());
+    const trackWidth = widthAt(distance / curve.getLength());
     for (const side of [-1, 1]) {
       const position = frame.center.clone()
         .addScaledVector(frame.right, side * (trackWidth / 2 + 1.15))
@@ -140,6 +144,7 @@ export function createTrack(definition = NEON_CAUSEWAY) {
   for (let distance = 10; distance < curve.getLength(); distance += 22) {
     if (!hasSurface(curve, distance, 1)) continue;
     const frame = getTrackFrame(curve, distance / curve.getLength());
+    const trackWidth = widthAt(distance / curve.getLength());
     const side = Math.floor(distance / 22) % 2 === 0 ? -1 : 1;
     const basePosition = frame.center.clone()
       .addScaledVector(frame.right, side * (trackWidth / 2 - 0.85))
@@ -163,9 +168,10 @@ export function createTrack(definition = NEON_CAUSEWAY) {
   const greenArrowTransforms = [];
   const boostPadPlacements = []; // Vi sparar positionerna för fysiken
 
-  for (let distance = 50; distance < curve.getLength(); distance += 150) {
+  for (let distance = 50; definition.pads === undefined && distance < curve.getLength(); distance += 150) {
     if (!hasSurface(curve, distance, 6)) continue;
     const frame = getTrackFrame(curve, distance / curve.getLength());
+    const trackWidth = widthAt(distance / curve.getLength());
     
     // Växla position: 0 = mitten, 1 = vänster, 2 = höger
     const posType = Math.floor(distance / 150) % 3;
@@ -194,7 +200,7 @@ export function createTrack(definition = NEON_CAUSEWAY) {
 
 
   const laneMaterial = new THREE.MeshBasicMaterial({ color: 0x182234 , transparent: true, opacity: 0.5, depthWrite: false });
-  const dash = new THREE.BoxGeometry(3.565, 0.045, 5.05,2);
+  const dash = new THREE.BoxGeometry(definition.roadStyle === 'raceway' ? 0.18 : 3.565, 0.045, 5.05,2);
   const markerTransforms = [];
   for (let distance = 4.5; distance < curve.getLength(); distance += 9) {
     if (!hasSurface(curve, distance, 3)) continue;
@@ -215,6 +221,7 @@ export function createTrack(definition = NEON_CAUSEWAY) {
     if (!junctionClear(distance)) continue;
     if (!hasSurface(curve, distance, 1)) continue;
     const frame = getTrackFrame(curve, distance / curve.getLength());
+    const trackWidth = widthAt(distance / curve.getLength());
     for (const side of [-1, 1]) {
       const base = frame.center.clone()
         .addScaledVector(frame.right, side * (trackWidth / 2 + 1.15));
@@ -261,6 +268,7 @@ export function createTrack(definition = NEON_CAUSEWAY) {
 
   for (const gap of curve.track.gaps) {
     for (const [progress, color, direction] of [[gap.start, 0xffb344, -1], [gap.end, 0x42ffbc, 1]]) {
+      const trackWidth = widthAt(progress);
       const frame = getTrackFrame(curve, progress + direction * 0.8 / curve.getLength());
       const material = new THREE.MeshStandardMaterial({ color, emissive: color, emissiveIntensity: 3 });
       const lip = new THREE.Mesh(new THREE.BoxGeometry(trackWidth, 0.12, 0.7), material);
@@ -279,7 +287,10 @@ export function createTrack(definition = NEON_CAUSEWAY) {
 
 
   
-  addBranchGeometry(group, curve, boostPadPlacements);
+  addBranchGeometry(group, curve, boostPadPlacements, definition.pads === undefined);
+  if (definition.pads) addAuthoredPads(group, curve, definition.pads, boostPadPlacements);
+  if (definition.roadStyle === 'raceway') addCornerSigns(group, curve);
+  if (definition.pads) boostPadPlacements.sort((a,b)=>a.d-b.d);
 return { group, curve, length: curve.getLength(), boostPads: boostPadPlacements };
 }
 
@@ -435,10 +446,11 @@ export function spawnTrackObjects(scene, trackData) {
       tex.wrapT = THREE.RepeatWrapping;
 
       material = new THREE.MeshStandardMaterial({
+        color: obj.color ?? 0xffffff,
         map: tex,
         emissiveMap: tex,
-        emissive: new THREE.Color(0xffffff),
-        emissiveIntensity: 0.2,
+        emissive: obj.emissive ?? 0xffffff,
+        emissiveIntensity: obj.emissive !== undefined ? 4.0 : 0.2,
         transparent: opacity < 1,
         opacity: opacity,
         depthWrite: opacity >= 1,
@@ -449,7 +461,7 @@ export function spawnTrackObjects(scene, trackData) {
       // TILLÄGG 2: Tillåter egna färger och neonglöd från JSON-filen (bra för Abyssal Circuit)
       const colorHex = obj.color !== undefined ? obj.color : 
         (obj.type === 'cylinder' ? 0xffd166 : obj.type === 'sphere' ? 0xb58cff : 0xff7aa8);
-      const isNeon = obj.emissive !== undefined;
+      const isNeon = obj.emissive !== undefined && new THREE.Color(obj.emissive).getHex() !== 0;
 
       material = new THREE.MeshStandardMaterial({
         color: colorHex,

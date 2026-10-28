@@ -1,6 +1,7 @@
-// Version 3 adds connected alternative routes; versions 1/2 remain readable.
+import { validatePads } from './track-pads.js';
+// Version 4 adds point widths, authored pads and road styles; versions 1–3 remain readable.
 export const TRACK_FORMAT = 'swipe-out-track';
-export const TRACK_VERSION = 3;
+export const TRACK_VERSION = 4;
 export const MAX_TRACK_BYTES = 16 * 1024 * 1024;
 
 function fail(path, reason) { throw new Error(`${path}: ${reason}`); }
@@ -41,7 +42,7 @@ function texture(value, path) {
 
 export function normalizeTrack(input) {
   record(input, 'track');
-  knownFields(input, ['id', 'name', 'width', 'horizontalScale', 'centerline', 'objects', 'magnetic', 'gaps', 'branches'], 'track');
+  knownFields(input, ['id', 'name', 'width', 'horizontalScale', 'centerline', 'objects', 'magnetic', 'gaps', 'branches', 'pointWidths', 'pads', 'roadStyle'], 'track');
   const id = text(input.id, 'track.id');
   const name = text(input.name, 'track.name');
   const width = number(input.width, 'track.width', 4, 100);
@@ -138,6 +139,32 @@ export function normalizeTrack(input) {
       if ((result.gaps ?? []).some(g => g.start < b.end + 0.02 && g.end > b.start - 0.02)) fail('track.branches', 'leave 2% between gaps and branch junctions; branches must have continuous road.');
     }
   }
+  if (input.pointWidths !== undefined) {
+    if (!Array.isArray(input.pointWidths) || input.pointWidths.length !== centerline.length) fail('track.pointWidths', 'provide one width (or null for inherited width) per point.');
+    result.pointWidths = input.pointWidths.map((w,i) => w === null ? null : number(w, 'track.pointWidths['+i+']', 4, 100));
+  }
+  if (input.roadStyle !== undefined) {
+    if (!['classic','raceway'].includes(input.roadStyle)) fail('track.roadStyle','expected classic or raceway.');
+    result.roadStyle = input.roadStyle;
+  }
+  if (input.pads !== undefined) {
+    if (!Array.isArray(input.pads) || input.pads.length > 256) fail('track.pads','expected at most 256 pads.');
+    const ids = new Set();
+    result.pads = input.pads.map((p,i) => {
+      const path = 'track.pads['+i+']'; record(p,path); knownFields(p,['id','type','progress','offset','routeId'],path);
+      const id = text(p.id,path+'.id'); if(ids.has(id)) fail(path,'duplicate pad id.'); ids.add(id);
+      if(!['boost','brake'].includes(p.type)) fail(path,'expected boost or brake.');
+      const progress = number(p.progress,path+'.progress',0.001,0.999);
+      const pad = {id,type:p.type,progress,offset:number(p.offset,path+'.offset',-48,48)};
+      if(p.routeId !== undefined) {
+        const branch = result.branches?.find(b=>b.id===p.routeId);
+        if(!branch || progress <= branch.start || progress >= branch.end) fail(path,'pad must lie inside its route.');
+        pad.routeId = p.routeId;
+      } else if(result.gaps?.some(g=>progress>=g.start && progress<=g.end)) fail(path,'pad cannot lie in a gap.');
+      return pad;
+    });
+  }
+  validatePads(result);
   return result;
 }
 
@@ -145,10 +172,11 @@ export function decodeTrack(value) {
   record(value, 'file');
   if ('format' in value || 'version' in value || 'track' in value) {
     if (value.format !== TRACK_FORMAT) fail('file.format', `expected ${TRACK_FORMAT}.`);
-    if (![1, 2, TRACK_VERSION].includes(value.version)) fail('file.version', `unsupported version ${String(value.version)}; this editor supports versions 1–${TRACK_VERSION}.`);
+    if (![1, 2, 3, TRACK_VERSION].includes(value.version)) fail('file.version', `unsupported version ${String(value.version)}; this editor supports versions 1–${TRACK_VERSION}.`);
     knownFields(value, ['format', 'version', 'track'], 'file');
     if (value.version === 1 && (value.track?.magnetic !== undefined || value.track?.gaps !== undefined)) fail('file.version', 'magnetic road and gaps require version 2.');
     if (value.version < 3 && value.track?.branches !== undefined) fail('file.version', 'branches require version 3.');
+    if (value.version < 4 && ['pointWidths','pads','roadStyle'].some(k=>value.track?.[k] !== undefined)) fail('file.version','widths, pads and road styles require version 4.');
     return normalizeTrack(value.track);
   }
   return normalizeTrack(value);

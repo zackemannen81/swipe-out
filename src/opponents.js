@@ -1,3 +1,4 @@
+import { getTrackWidth } from './track-path.js';
 import * as THREE from 'three';
 import { getRacerFrame, getRacerWidth, nextBranch, canFinishRace, nextGap } from './track-path.js';
 import { createCraft } from './craft.js';
@@ -89,6 +90,7 @@ function decide(opponent, opponents, player, curve, pads, trackWidth, elapsed) {
   let nextPad = null;
   let nearestPad = Infinity;
   for (const pad of pads) {
+    if (pad.type === 'brake') continue;
     if ((pad.routeId ?? null) !== (ship.route?.id ?? null)) continue;
     const aheadDistance = (pad.d - ship.distance % length + length) % length;
     if (aheadDistance < nearestPad && aheadDistance < Math.max(45, ship.speed * 1.15)) {
@@ -99,6 +101,15 @@ function decide(opponent, opponents, player, curve, pads, trackWidth, elapsed) {
   if (nextPad && Math.abs(turn) < 0.65 + opponent.risk * 0.3) {
     opponent.targetLane = clamp(nextPad.offset, -edge, edge);
     opponent.strategy = 'boost-pad';
+  }
+
+  for (const pad of pads) {
+    if(pad.type !== 'brake' || (pad.routeId ?? null) !== (ship.route?.id ?? null)) continue;
+    const aheadDistance=(pad.d-ship.distance%length+length)%length;
+    if(aheadDistance < Math.max(35,ship.speed*0.9) && Math.abs(opponent.targetLane-pad.offset)<2) {
+      const candidates=[pad.offset-2.5,pad.offset+2.5].filter(lane=>Math.abs(lane)<=edge);
+      if(candidates.length) {opponent.targetLane=candidates.sort((a,b)=>Math.abs(a-ship.lateralOffset)-Math.abs(b-ship.lateralOffset))[0];opponent.strategy='avoid-brake';}
+    }
   }
 
   // Traffic decisions are separate from the shared, leader-relative catch-up.
@@ -153,7 +164,7 @@ function decide(opponent, opponents, player, curve, pads, trackWidth, elapsed) {
   }
   if (approachingJunction) {
     const takeBranch = shortcutChoice(opponent, junction.lap);
-    opponent.targetLane = junction.branch.side * curve.track.width * (takeBranch ? 0.3 : -0.2);
+    opponent.targetLane = junction.branch.side * getTrackWidth(curve, junction.branch.start) * (takeBranch ? 0.3 : -0.2);
     opponent.strategy = takeBranch ? 'shortcut-entry' : 'main-route';
   }
   if (ship.route) opponent.targetLane = clamp(opponent.targetLane, -edge * 0.65, edge * 0.65);

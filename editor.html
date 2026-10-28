@@ -50,6 +50,8 @@
   <label>X <input id="point-x" type="number" step="1" /></label>
   <label>HEIGHT (Y) <input id="point-y" type="number" step="1" /></label>
   <label>Z <input id="point-z" type="number" step="1" /></label>
+  <label>POINT WIDTH <input id="point-width" type="number" min="4" max="100" step="0.5" placeholder="Inherit road width" /></label>
+  <p class="field-help">Empty = global width. Width blends smoothly between points.</p>
   <label>BANK / ROLL (°) <input id="point-bank" type="number" min="-3600" max="3600" step="15" /></label>
   <p class="field-help">With magnetic road enabled, 0 → 90 → 180 → 270 → 360 makes a full roll. Keep 360 on later points to stay upright.</p>
   
@@ -70,6 +72,14 @@
             <p class="field-help">Orange = takeoff, green = landing. Positions are % of one lap. Leave room to accelerate and land.</p>
             <button id="add-gap-button">+ GAP AT SELECTED POINT</button>
             <div id="gap-list"></div>
+          </div>
+          <div class="gap-editor">
+            <div class="subheading">ROAD MARKINGS &amp; PADS</div>
+            <label>STYLE <select id="road-style"><option value="classic">Classic</option><option value="raceway">Raceway · slim centre line / turn arrows</option></select></label>
+            <p class="field-help">Green chevrons accelerate; orange bars reduce speed once by 28%. Positions are shared lap %. Editing pads replaces automatic placement. Suggestions add boosts only on clear acceleration corridors.</p>
+            <div class="button-row"><button id="add-boost">+ BOOST</button><button id="add-brake">+ BRAKE</button></div>
+            <div class="button-row"><button id="suggest-pads">SUGGEST BOOSTS</button><button id="auto-pads">RESTORE AUTO PADS</button></div>
+            <div id="pad-list"></div>
           </div>
           <div class="primitive-editor">
             <div class="subheading">3D PRIMITIVES</div>

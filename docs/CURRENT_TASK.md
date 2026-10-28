@@ -1,29 +1,25 @@
 # Current Task
 
-Task ID: CPU-001
+Task ID: EDITOR-006
 Status: Complete
 Created: 2026-10-28
 
 ## Scope
 
-Stage B: saved Rookie/Pilot/Elite selection, behavior-based CPU difficulty and
-separate driver risk personalities. Lower shared catch-up on Elite. Preserve
-user-tuned craft caps/acceleration, player handling, countdown and Time Attack.
-User has playtested and accepted stage A including wipeoutStyle start.
+Add object surface and emissive color controls and cyan/pink/lime/amber neon
+presets. Reuse existing color/emissive fields; honor them for textured objects.
+Preserve defaults, textures, clone/history and saved tracks.
 
 ## Definition of done
 
-- [x] Race selection persists safely; solo disables difficulty and catch-up.
-- [x] Braking, precision, traffic/shortcut decisions and mistakes vary by level
-      and personality without teleportation or hidden top-speed increases.
-- [x] Elite uses reduced catch-up equally for CPU and player.
-- [x] Repeatable multi-track simulations compare times, wall hits, pads/routes;
-      lifecycle, storage and browser menu/retry flows verified.
-- [x] Tests/build and continuity/roadmap updated; human balance limits recorded.
+- [x] Selected objects support custom surface/glow color, glow off and neon presets.
+- [x] Editor and game materials honor colors, including textured objects.
+- [x] Browser verifies edits, undo/clone/save/reload/export and material values.
+- [x] Build and relevant regression checks pass; continuity docs updated.
 
 ## Verification
 
-79 Node tests and build pass (existing bundle warning). All 108 measured CPU
-runs finish across three tracks and three levels; results in CPU_DIFFICULTY.md.
-Browser persistence/retry/runtime/solo/quota flows pass; menu screenshots checked.
-Countdown code identity and diff checked. Human balance is still a playtest item.
+86 Node tests pass; build passes with existing chunk-size warning. Browser checks
+all five presets, custom surface color, undo, clone, textured material RGB/emission,
+glow off, save/reload, JSON export and default reset. No page errors. Editor
+screenshot inspected; race and editor share the tested scenery renderer.

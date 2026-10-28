@@ -356,3 +356,11 @@ implementation step, but that does not establish the complete version 0.5
 acceptance criteria or interactive/device verification. See
 `CURRENT_STATUS.md` for verified repository state and `SYSTEMDOC.md` for
 durable product and technical direction.
+
+## Stage C implemented prototype — 2026-10-28
+
+Raceway Workshop (track16) demonstrates variable main-road width, optional new
+markings, authored boost and brake pads. Brakes remove 28% of speed once per
+plate/lap and cancel boost; acceleration can immediately recover. CPU uses the
+same effects and attempts avoidance. These values and sign readability await
+human balance testing. Authoring, constraints and evidence: TRACK_WORKSHOP.md.

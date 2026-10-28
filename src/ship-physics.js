@@ -30,7 +30,7 @@ export function createShipPhysics(baseSpeed, tuning = {}) {
     previousDistance: 0,
     previousLateralOffset: 0,
     previousVerticalOffset: 0,
-    lastBoostKey: null,
+    lastBoostKey: null, lastBrakeKey: null, brakePadCount: 0, padPassages: {},
     boostCount: 0,
     wallHits: 0,
     craftHits: 0,

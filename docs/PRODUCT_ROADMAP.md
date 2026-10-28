@@ -40,7 +40,8 @@ visuellt innan den fastställs. Läs [aktuell status](CURRENT_STATUS.md) och
 
 Varje etapp kan delas i mindre leveranser. Mät prestanda under arbetet; slutpasset
 ersätter inte löpande kontroll. Etapp A är implementerad och godkänd i användarens provspelning. Etapp B är
-implementerad 2026-10-28 (CPU-001), med mänsklig balansering kvar. Övriga etapper är öppna.
+implementerad och godkänd efter provkörning av alla nivåer. Etapp C är implementerad
+2026-10-28 (TRACK-005); mänsklig provbalansering återstår. Se TRACK_WORKSHOP.md.
 
 ## A — Resultatskärm och startintro
 
@@ -64,23 +65,23 @@ implementerad 2026-10-28 (CPU-001), med mänsklig balansering kvar. Övriga etap
   Ändra inte accepterad spelarstyrning för att skapa svårighet.
 - [x] Jämför varvtider, spridning, väggkontakter, boostträffar och genvägsval över
   upprepade lopp på samma banor. Se [mätresultat och guide](CPU_DIFFICULTY.md).
-- [ ] Mänsklig provkörning: skillnaden ska kännas lagom och begriplig.
+- [x] Mänsklig provkörning: användaren har godkänt samtliga nivåer.
 
 ## C — Banverktyg, plattor och läsbarhet
 
-- [ ] Bredd per kontrollpunkt med mjuka övergångar. Samma bredd måste användas av
+- [x] Bredd per kontrollpunkt med mjuka övergångar. Samma bredd måste användas av
   väg, räcken, kollision, CPU, körlinje, boostplacering och branchanslutningar.
-- [ ] Versionera format vid behov, läs gamla banor med oförändrad global bredd.
+- [x] Versionera format vid behov, läs gamla banor med oförändrad global bredd.
   Editor, undo/redo, sparning och import/export ska bevara de nya egenskaperna.
-- [ ] Tydliga varningspilar före skarpa svängar, placerade med hänsyn till fart,
+- [x] Tydliga varningspilar före skarpa svängar, placerade med hänsyn till fart,
   sikt, bank och loopar. Komplettera befintliga HUD-varningar.
-- [ ] Smartare och redigerbar boostplacering: belöna bra utgång ur kurvan och
+- [x] Smartare och redigerbar boostplacering: belöna bra utgång ur kurvan och
   alternativa linjer. Undvik plattor som leder rakt in i räcke eller omöjligt hopp.
-- [ ] Animerade boost-plattor med tydlig riktning och aktiv yta. Animationen får
+- [x] Animerade boost-plattor med tydlig riktning och aktiv yta. Animationen får
   inte ändra den fysiska träffytan eller skapa blinkande visuell förvirring.
-- [ ] Prova bromsplattor som första hinder. De ska kunna upptäckas och undvikas,
+- [x] Prova bromsplattor som första hinder. De ska kunna upptäckas och undvikas,
   påverka CPU och spelare enligt samma regler och inte skapa permanent fastlåsning.
-- [ ] Prova en sammanhållen stil för vägmarkeringar, pilar, boost-zoner och mittens
+- [x] Prova en sammanhållen stil för vägmarkeringar, pilar, boost-zoner och mittens
   rutor på en bana innan hela biblioteket ändras. Behåll tydlig färg/funktionskod.
 
 ## D — Combat som ett taktiskt lopp
@@ -149,7 +150,7 @@ Dela gärna upp i D1 (träffar/hot/flares) och D2 (vapenplattor).
 
 ## Genomförande och verifiering
 
-Nästa implementation är **C: banverktyg, plattor och läsbarhet**. Sätt
+Nästa implementation är **D1: combat, träffeffekter, hot och flares**. Sätt
 exakt omfattning och acceptans i [CURRENT_TASK](CURRENT_TASK.md) före kodändring.
 Efter varje leverans: relevanta automatiska kontroller, visuell kontroll av ändrade
 flöden och ärlig dokumentation av vad som återstår för mänsklig provkörning.

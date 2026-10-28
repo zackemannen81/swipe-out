@@ -1,3 +1,5 @@
+import { suggestBoostPads } from './track-pads.js';
+import { createTrack, disposeTrackGroup } from './track.js';
 import { BUILTIN_TRACKS, readTrackLibrary, saveTrack, resetTrack } from './track-library.js';
 import { normalizeTrack, parseTrack, serializeTrack, MAX_TRACK_BYTES } from './track-format.js';
 import { createHistory } from './editor-history.js';
@@ -79,6 +81,10 @@ function render() {
   $('#reset-button').textContent = BUILTIN_TRACKS[currentKey] ? 'RESTORE BUILT-IN' : 'REMOVE CUSTOM';
   const pointIndex = selection.kind === 'point' ? selection.index : 0;
   const point = selection.kind === 'branch' ? value.branches[selection.branch].points[selection.index] : value.centerline[pointIndex];
+  setValue('#point-width', value.pointWidths?.[pointIndex] ?? '');
+  $('#point-width').disabled = selection.kind !== 'point';
+  setValue('#road-style', value.roadStyle ?? 'classic');
+  renderPads();
   setValue('#point-bank', point[3] ?? 0);
   $('#point-bank').disabled = selection.kind !== 'point' || !value.magnetic;
   $('#selected-point').textContent = selection.kind === 'point' ? String(pointIndex + 1).padStart(2, '0') : selection.kind === 'branch' ? `ROUTE POINT ${selection.index+1}` : 'OBJECT SELECTED';
@@ -116,7 +122,7 @@ function renderBranches() {
   side.add(new Option('Approach LEFT','1'));side.add(new Option('Approach RIGHT','-1')); side.value=String(branch.side);
   side.addEventListener('change',()=>{const value=Number(side.value);side.blur();edit(next=>{next.branches[selection.branch].side=value;});});panel.append(side);
   const remove=document.createElement('button'); remove.textContent='REMOVE ROUTE'; remove.id='remove-branch-button';
-  remove.addEventListener('click',()=>{const index=selection.branch;selection={kind:'point',index:0};edit(next=>next.branches.splice(index,1));});panel.append(remove);
+  remove.addEventListener('click',()=>{const index=selection.branch;selection={kind:'point',index:0};edit(next=>{ const id=next.branches[index].id; next.branches.splice(index,1); if(next.pads) next.pads=next.pads.filter(p=>p.routeId!==id); });});panel.append(remove);
 }
 
 $('#branch-select').addEventListener('change',event=>{
@@ -190,6 +196,30 @@ function renderObjectInspector() {
     });
     row.append(section);
   }
+  const colors = document.createElement('div'); colors.className = 'object-colors';
+  const hex = value => typeof value === 'number' ? '#'+value.toString(16).padStart(6,'0') : value.length === 4 ? '#'+[...value.slice(1)].map(c=>c+c).join('') : value;
+  const defaultColor = object.texture ? 0xffffff : object.type === 'cylinder' ? 0xffd166 : object.type === 'sphere' ? 0xb58cff : 0xff7aa8;
+  for (const [key, title, fallback] of [['color','SURFACE COLOR',defaultColor],['emissive','GLOW COLOR',0x000000]]) {
+    const label = document.createElement('label'); label.textContent = title;
+    const input = document.createElement('input'); input.type = 'color'; input.value = hex(object[key] ?? fallback);
+    input.setAttribute('aria-label',title); input.id = 'object-'+key;
+    input.addEventListener('change',()=>{const value=input.value; input.blur(); edit(next=>{next.objects[selection.index][key]=value;});});
+    label.append(input); colors.append(label);
+  }
+  const presets = document.createElement('div'); presets.className = 'neon-presets';
+  for(const [name,color] of [['Cyan','#00e5ff'],['Pink','#ff269e'],['Lime','#a3ff12'],['Amber','#ffb020'],['Violet','#9c55ff']]) {
+    const button = document.createElement('button'); button.textContent = name; button.style.setProperty('--swatch',color);
+    button.setAttribute('aria-label','Neon '+name);
+    button.addEventListener('click',()=>edit(next=>{Object.assign(next.objects[selection.index],{color,emissive:color});}));
+    presets.append(button);
+  }
+  colors.append(presets);
+  const off = document.createElement('button'); off.textContent='GLOW OFF'; off.id='object-glow-off';
+  off.addEventListener('click',()=>edit(next=>{next.objects[selection.index].emissive=0x000000;})); colors.append(off);
+  const reset = document.createElement('button'); reset.textContent='DEFAULT COLORS'; reset.id='object-color-reset';
+  reset.addEventListener('click',()=>edit(next=>{delete next.objects[selection.index].color;delete next.objects[selection.index].emissive;})); colors.append(reset);
+  const help = document.createElement('p'); help.className='field-help'; help.textContent='Neon sets surface and glow together. Surface color tints any texture; glow is self-lit. The race adds bloom around bright objects.';
+  colors.append(help); row.append(colors);
   const opacityLabel = document.createElement('label'); opacityLabel.textContent = 'OPACITY';
   const opacity = document.createElement('input');
   Object.assign(opacity, { type: 'number', min: 0, max: 1, step: 0.05, value: object.opacity });
@@ -288,10 +318,11 @@ $('#add-point-btn').addEventListener('click', () => {
     const point = a.slice(0, 3).map((n, axis) => (n + b[axis]) / 2);
     if (a.length === 4) point.push(a[3]);
     points.splice(index + 1, 0, point);
+    if(selection.kind === 'point' && next.pointWidths) next.pointWidths.splice(index+1,0,next.pointWidths[index]);
   });
   selection.index = index + 1; render(); view.select(selection);
 });
-$('#del-point-btn').addEventListener('click', () => edit(next => { pointCollection(next).splice(selection.index, 1); }));
+$('#del-point-btn').addEventListener('click', () => edit(next => { pointCollection(next).splice(selection.index, 1); if(selection.kind==='point') next.pointWidths?.splice(selection.index,1); }));
 for (const button of document.querySelectorAll('[data-primitive]')) {
   button.addEventListener('click', () => {
     const position = track().centerline[selection.kind === 'point' ? selection.index : 0].slice(0, 3);
@@ -374,3 +405,50 @@ window.addEventListener('beforeunload', event => {
 });
 render(); view.setTrack(track(), selection); view.fit();
 if (library.issues.length) message(library.issues.join(' '), true);
+
+function authoredPads(next) {
+  if(next.pads) return;
+  const assets=createTrack(next);
+  next.pads=assets.boostPads.filter(p=>p.d/assets.length>0.001 && p.d/assets.length<0.999).map(p=>({id:crypto.randomUUID(),type:'boost',progress:p.d/assets.length,offset:p.offset,...(p.routeId?{routeId:p.routeId}:{})}));
+  disposeTrackGroup(assets.group);
+}
+$('#point-width').addEventListener('change',event=>{
+  const value=event.target.value===''?null:event.target.valueAsNumber; event.target.blur();
+  edit(next=>{next.pointWidths??=next.centerline.map(()=>null);next.pointWidths[selection.index]=value;});
+});
+$('#road-style').addEventListener('change',event=>{const value=event.target.value;edit(next=>{next.roadStyle=value;});});
+for(const type of ['boost','brake']) $('#add-'+type).addEventListener('click',()=>{
+  const curve=createTrackCurve(track());
+  const branch=selection.kind==='branch'?curve.track.branches[selection.branch]:null;
+  const progress=branch?(branch.start+branch.end)/2:Math.max(0.01,Math.min(0.99,progressAtControlPoint(curve,selection.kind==='point'?selection.index:0)));
+  edit(next=>{authoredPads(next);next.pads.push({id:crypto.randomUUID(),type,progress,offset:0,...(branch?{routeId:branch.id}:{})});});
+});
+$('#auto-pads').addEventListener('click',()=>edit(next=>{delete next.pads;}));
+$('#suggest-pads').addEventListener('click',()=>edit(next=>{
+  next.pads??=[];
+  next.pads.push(...suggestBoostPads(next).map(p=>({...p,id:crypto.randomUUID()})));
+}));
+function renderPads() {
+  const list=$('#pad-list'); if(list.contains(document.activeElement)) return;
+  list.replaceChildren();
+  if(!track().pads) {list.textContent='Automatic legacy boost placement';return;}
+  if(!track().pads.length) {list.textContent='No pads. Add one or suggest boosts.';return;}
+  track().pads.forEach((pad,index)=>{
+    const row=document.createElement('div'); row.className='gap-row';
+    const type=document.createElement('select'); type.setAttribute('aria-label','Pad '+(index+1)+' type');
+    for(const value of ['boost','brake']) type.add(new Option(value.toUpperCase(),value)); type.value=pad.type;
+    type.onchange=()=>{const value=type.value;type.blur();edit(next=>{next.pads[index].type=value;});}; row.append(type);
+    for(const key of ['progress','offset']) {
+      const label=document.createElement('label');label.textContent=key==='progress'?'LAP %':'OFFSET';
+      const input=document.createElement('input'); Object.assign(input,{type:'number',step:0.1,value:key==='progress'?(pad.progress*100).toFixed(3):pad.offset});
+      input.setAttribute('aria-label','Pad '+(index+1)+' '+key);
+      input.onchange=()=>{const value=input.valueAsNumber/(key==='progress'?100:1);input.blur();edit(next=>{next.pads[index][key]=value;});};label.append(input);row.append(label);
+    }
+    const route=document.createElement('select');route.setAttribute('aria-label','Pad '+(index+1)+' route');route.add(new Option('Main road',''));
+    for(const b of track().branches??[])route.add(new Option(b.name,b.id));route.value=pad.routeId??'';
+    route.onchange=()=>{const value=route.value;route.blur();edit(next=>{const p=next.pads[index];if(value){const b=next.branches.find(b=>b.id===value);p.routeId=value;p.progress=(b.start+b.end)/2;p.offset=0;}else delete p.routeId;});};row.append(route);
+    const focus=document.createElement('button');focus.textContent='FOCUS';focus.onclick=()=>view.focusPad(pad);row.append(focus);
+    const remove=document.createElement('button');remove.textContent='REMOVE';remove.onclick=()=>edit(next=>{next.pads.splice(index,1);});row.append(remove);
+    list.append(row);
+  });
+}
