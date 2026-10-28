@@ -1,6 +1,18 @@
 import * as THREE from 'three';
 import { getRacerFrame, routeMetric, activeBranch, recordRaceProgress } from './track-path.js';
 import { getRacerTopSpeed } from './catch-up.js';
+import { particleSystem, scene } from './game.js';
+import { sparks_material } from './shaders.js';
+
+
+// Skapa materialet för gnistorna en gång i minnet
+const sparkMaterial = new THREE.PointsMaterial({
+    size: 0.1,
+    color: 0xffbb00, // Guld/Orange färg
+    transparent: true,
+    depthWrite: false,
+    blending: THREE.AdditiveBlending
+});
 
 export const BOOST = { duration: 1, entryMultiplier: 1.3, maxMultiplier: 1.5, halfWidth: 1.2 };
 const clamp = THREE.MathUtils.clamp;
@@ -13,6 +25,79 @@ function settleClassicWallAttitude(ship, side) {
   if (ship.yawVelocity * side > 0) ship.yawVelocity = 0;
 }
 
+function spawnScrapeSparks(position, inward, tangent, up, speed, strength, delta) {
+  // Antal gnistor per sekund, inte per kollision.
+  const expected = (120 + strength * 450) * delta;
+  const count = Math.floor(expected) +
+    (Math.random() < expected % 1 ? 1 : 0);
+
+  for (let i = 0; i < count; i++) {
+    const spawnPos = position.clone()
+      .addScaledVector(tangent, (Math.random() - 0.5) * speed * delta)
+      .addScaledVector(up, (Math.random() - 0.5) * 0.3);
+
+    // Låt gnistorna röra sig långsammare än skeppet,
+    // så ett långt spår bildas bakom det.
+    const vel = tangent.clone().multiplyScalar(
+      speed * (0.05 + Math.random() * 0.18)
+    );
+
+    // Studsa bort från räcket.
+    vel.addScaledVector(inward, 2 + Math.random() * 10);
+
+    // Spridning relativt banans yta.
+    vel.addScaledVector(up, (Math.random() - 0.25) * 8);
+
+    particleSystem.createParticle(
+      spawnPos,
+      vel,
+      sparks_material,
+      0.5 + Math.random() * 0.5,
+      1,
+      0.25 + Math.random() * 0.35,
+      1,
+      0
+    );
+  }
+}
+
+function spawnImpactSparks(position, normal, velocity, strength) {
+  const count = Math.floor(strength * 100) + 100;
+  
+  // Lista ut vilket håll skeppet åker åt
+  const forward = velocity.clone().normalize();
+
+  for (let i = 0; i < count; i++) {
+    // Vänd riktningen motsatt skeppets riktning..
+    const direction = forward.clone().multiplyScalar(-1.0);  
+    direction.add(new THREE.Vector3(
+      (Math.random() - 0.5) * 1.4,
+      Math.random() - 0.4 * 1.4, // Inte säker på att det ska vara nån fart upp... kanske till o med ner!?!?
+      (Math.random() - 0.5) * 1.4
+    ));
+    direction.normalize();
+    const sparkSpeed =  Math.random() * 2;
+    direction.multiplyScalar(sparkSpeed);
+    direction.addScaledVector(velocity, 0.3);
+
+    const spawnPos = position.clone().add(new THREE.Vector3(
+  (Math.random() - 0.5) * 0.8,
+  (Math.random() - 0.5) * 0.5,
+  (Math.random() - 0.5) * 0.8
+));
+    particleSystem.createParticle(
+      spawnPos,
+      direction,
+      sparkMaterial,
+      0.5 + Math.random() * 0.5,
+      1,
+      0.25 + Math.random() * 0.35,
+      1,  
+      0   
+    );
+  }
+}
+
 export function registerImpact(ship, strength, side = 0) {
   ship.impactStrength = Math.max(ship.impactStrength, clamp(strength, 0, 1));
   ship.impactSerial++;
@@ -20,13 +105,51 @@ export function registerImpact(ship, strength, side = 0) {
   ship.lastImpact = 0.3;
   ship.yawVelocity += side * strength * 0.75;
   ship.roll += side * strength * 0.16;
+
 }
 
-export function resolveWallImpact(ship, trackWidth = 10) {
+
+export function resolveWallImpact(
+  ship,
+  trackWidth = 10,
+  curve = null,
+  delta = 1 / 60
+) {
   if (ship.flight || ship.recoveryTimer > 0) return false;
   const edge = Math.max(0.5, trackWidth / 2 - 0.85);
   if (Math.abs(ship.lateralOffset) <= edge || ship.verticalOffset > 1.4) return false;
   const side = Math.sign(ship.lateralOffset);
+
+  if (curve) {
+  const frame = getRacerFrame(curve, ship);
+
+  // Kontaktpunkten ute vid räcket.
+  const contact = frame.center.clone()
+    .addScaledVector(frame.right, side * edge)
+    .addScaledVector(frame.normal, 0.55);
+
+  // Normalen pekar in mot banans mitt.
+  const inward = frame.right.clone().multiplyScalar(-side);
+
+  // Fortsätt gnista även under crashCooldown.
+  const scrapeStrength = THREE.MathUtils.clamp(
+    (Math.abs(ship.lateralVelocity) +
+      Math.abs(ship.yaw) * ship.speed * 0.15) / 8,
+    0.15,
+    1
+  );
+
+  spawnScrapeSparks(
+    contact,
+    inward,
+    frame.tangent,
+    frame.normal,
+    ship.speed,
+    scrapeStrength,
+    delta
+  );
+}
+
   const classic = ship.handlingMode === 'wipeout';
   ship.lateralOffset = side * edge;
   if (ship.crashCooldown > 0) {
@@ -48,6 +171,14 @@ export function resolveWallImpact(ship, trackWidth = 10) {
   }
   ship.crashCooldown = 0.3;
   ship.wallHits++;
+  //spawnImpactSparks(ship.position,ship.velocity,severity);
+spawnImpactSparks(
+  ship.previousPosition.clone(),
+  new THREE.Vector3(0, 1, 0),
+  ship.velocity,
+  severity
+);
+  
   registerImpact(ship, severity, classic ? 0 : -side);
   if (classic) ship.roll -= side * severity * 0.16; // Keep visible impact without a steering kick.
   return true;
@@ -166,5 +297,17 @@ export function resolveRacerCollisions(racers, curve, delta, state) {
     sa.craftHits++;
     sb.craftHits++;
     state.cooldowns.set(key, 0.12);
+  spawnImpactSparks(
+  sa.previousPosition.clone(),
+  new THREE.Vector3(0, 1, 0),
+  sa.velocity,
+  severity
+);
+  spawnImpactSparks(
+  sb.previousPosition.clone(),
+  new THREE.Vector3(0, -1, 0),
+  sb.velocity,
+  severity
+);
   }
 }

@@ -105,7 +105,7 @@ fragmentShader: `
   // Generera en mjuk glöd-textur direkt i minnet
 export function createGlowTexture() {
     const canvas = document.createElement('canvas');
-    canvas.width = 96; canvas.height = 96;
+    canvas.width = 64; canvas.height = 64;
     const ctx = canvas.getContext('2d');
     
     // Mjukare övergångar skapar illusionen av gas/plasma
@@ -116,7 +116,7 @@ export function createGlowTexture() {
     grad.addColorStop(1, 'rgb(240, 195, 230)');
     
     ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, 96, 96);
+    ctx.fillRect(0, 0, 64, 64);
     
     const texture = new THREE.CanvasTexture(canvas);
     texture.needsUpdate = true;
@@ -197,3 +197,59 @@ export function createGlowTexture() {
       depthWrite: false,
       transparent: true
   });
+export const sparks_material = new THREE.ShaderMaterial({
+    uniforms: {
+        pointTexture: { value: createGlowTexture() } 
+    },
+    vertexShader: `
+        attribute float size;
+        attribute float alpha; 
+        
+        varying vec2 vUv;
+        varying float vAlpha;  
+        
+        void main() {
+            vUv = uv;
+            vAlpha = alpha;    
+            
+            vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+            gl_PointSize = size * (350.0 / -mvPosition.z);
+            gl_Position = projectionMatrix * mvPosition;
+        }
+    `,
+    fragmentShader: `
+        uniform sampler2D pointTexture;
+        varying vec2 vUv;
+        varying float vAlpha; 
+        
+        void main() {
+            // Skapa en perfekt cirkel
+            vec2 pt = gl_PointCoord - vec2(0.5);
+            float sqDist = dot(pt, pt);
+            if (sqDist > 0.25) discard; 
+            
+            // Beräkna avstånd från mitten för att skapa en glöd
+            float dist = sqrt(sqDist) * 2.0;
+            
+            // Vitglödande kärna och mjuk kant
+            float core = 1.0 - smoothstep(0.0, 0.4, dist); 
+            float edge = 1.0 - smoothstep(0.1, 1.0, dist); 
+            
+            vec3 coreColor = vec3(1.0, 1.0, 1.0); // Kritvit
+            vec3 edgeColor = vec3(1.0, 0.4, 0.0); // Orange-röd
+            
+            // Mixa färgerna baserat på avståndet från centrum
+            vec3 finalColor = mix(edgeColor, coreColor, core);
+            
+            // Applicera glöd, textur och partikelsystemets alpha (uttoning över tid)
+            vec4 texColor = texture2D(pointTexture, gl_PointCoord);
+            float finalAlpha = edge * texColor.a * vAlpha;
+            
+            // Premultiplicerad färg för AdditiveBlending
+            gl_FragColor = vec4(finalColor * finalAlpha, finalAlpha);
+        }
+    `,
+    blending: THREE.AdditiveBlending,
+    depthWrite: false,
+    transparent: true
+});

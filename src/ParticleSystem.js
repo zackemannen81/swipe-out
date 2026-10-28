@@ -124,6 +124,7 @@ export class ParticleSystem {
 
         const points = new THREE.Points(geometry, material);
         points.frustumCulled = false;
+        geometry.setDrawRange(0, this.maxParticles);
 
         if (this.scene) {
             this.scene.add(points);
@@ -135,6 +136,7 @@ export class ParticleSystem {
     }
 
 createParticle(position, velocity, material, size, scale, lifetime, startAlpha, endAlpha) { // NYTT
+    this._getOrCreateBatch(material);
         for (let i = 0; i < this.maxParticles; i++) {
             const p = this.particles[i];
             if (!p.active) {

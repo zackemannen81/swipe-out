@@ -20,6 +20,8 @@ import { loadDrivingSettings, saveDrivingSettings, cameraProfile, readClassicGam
 import { getRacerWidth, nextBranch, canFinishRace } from './track-path.js';
 import { createCombat, createCombatView, WEAPONS, COMBAT } from './combat.js';
 import { createPracticeUI, lapTime } from './time-attack-ui.js';
+import { ParticleSystem } from './ParticleSystem.js';
+
 
 
 const canvas = document.querySelector('#game-canvas');
@@ -36,7 +38,7 @@ const speedDisplay = document.querySelector('#race-speed');
 const minimapRoute = document.querySelector('#minimap-route');
 const minimapStart = document.querySelector('#minimap-start');
 const minimapPlayer = document.querySelector('#minimap-player');
-
+let combatBlockedFlag = false;
 // Högst upp bland DOM-elementen:
 const countdownOverlay = document.querySelector('#countdown-overlay');
 
@@ -127,11 +129,13 @@ if (menuButton) {
 }
 
 export const SPEEDCALIBRATION = 78; // Justera detta värde för att kalibrera spelets hastighe
-const scene = new THREE.Scene();
+export const scene = new THREE.Scene();
 //scene.background = new THREE.Color(0x080c0a);
 scene.background = new THREE.Color(0x000000);
 scene.fog = new THREE.FogExp2(0x080d18, 0.0035);
 //scene.fog = new THREE.Fog(0x080c0a,350,420);
+export const particleSystem = new ParticleSystem(2048, scene);
+particleSystem.initParticleSystem(); // MÅSTE LÄGGAS TILL
 
 const loadedTracks = readTrackLibrary(localStorage);
 let drivingSettings = loadDrivingSettings(localStorage);
@@ -521,6 +525,7 @@ if (this.mode === 'cockpit' || this.mode === 'internal') {
   }
 };
 const baseSpeed = 65; 
+let raycastFrameCounter = 0;
 const drag = { active: false, lastX: 0, pointerId: null, throttle: 0 };
 const heldKeys = new Set();
 let classicGamepadInput = readClassicGamepad(null);
@@ -545,15 +550,57 @@ const targetReticle = document.querySelector('#target-reticle');
 function combatRacers() {
   return [{...playerRacer,player:true,finished:race.state==='finished'},...(practice.active?[]:opponents).map(o=>({id:o.name,physics:o.physics,group:o.group,finished:o.finishTime!==null}))];
 }
+function combatBlocked(from, to) {
+  const key = `${from.x.toFixed(1)},${from.y.toFixed(1)},${from.z.toFixed(1)}|${to.x.toFixed(1)},${to.y.toFixed(1)},${to.z.toFixed(1)}`;
+  
+  if (combatSightCache.has(key)) {
+    return combatSightCache.get(key);
+  }  
+  
+  const delta = to.clone().sub(from);
+  const distance = delta.length();  
+  if (distance < 0.3) return false;
+  
+  combatRay.set(from, delta.divideScalar(distance));
+  combatRay.near = 0.15;
+  combatRay.far = distance;
+  
+  const objects = scene.getObjectByName('customTrackObjects');
+  const blocked = combatRay.intersectObjects(objects ? [track, objects] : [track], true)
+    .some(hit => hit.object.visible && (hit.object.material?.opacity ?? 1) > 0.3);
+    
+  combatSightCache.set(key, blocked);
+  return blocked;
+}
+
+/*
 function combatBlocked(from,to) {
   const key=from.toArray().concat(to.toArray()).map(n=>n.toFixed(2)).join(',');
-  if(combatSightCache.has(key))return combatSightCache.get(key);
-  const delta=to.clone().sub(from),distance=delta.length();if(distance<0.3)return false;
-  combatRay.set(from,delta.divideScalar(distance));combatRay.near=0.15;combatRay.far=distance;
+  if(combatSightCache.has(key))
+    {
+    return combatSightCache.get(key);
+    }  
+  const delta=to.clone().sub(from),distance=delta.length();  
+  if(distance<0.3)
+    {
+      return false;
+    }
+  combatRay.set(from,delta.divideScalar(distance));
+  combatRay.near=0.15;combatRay.far=distance;
   const objects=scene.getObjectByName('customTrackObjects');
   const blocked=combatRay.intersectObjects(objects?[track,objects]:[track],true).some(hit=>hit.object.visible && (hit.object.material?.opacity??1)>0.3);
-  combatSightCache.set(key,blocked);return blocked;
+  combatSightCache.set(key,blocked);
+
+  return blocked;
 }
+*/
+
+/*
+function combatBlocked(from, to) {
+  return false;
+}
+*/
+
 function updateCombatHud() {
   combatHud.hidden=!combat.enabled || !['racing','countdown'].includes(race.state);
   targetReticle.hidden=true;
@@ -1360,7 +1407,7 @@ for (const ghost of ghostPool) {
       finished: opponent.finishTime !== null,
     }))];
     resolveRacerCollisions(racers, curve, delta, collisionState);
-    for (const racer of racers) if (!racer.finished) resolveWallImpact(racer.physics, getRacerWidth(curve,racer.physics,trackWidth));
+    for (const racer of racers) if (!racer.finished) resolveWallImpact(racer.physics, getRacerWidth(curve,racer.physics,trackWidth),curve,delta);
     updateCraftPose(0);
     crossedFinish ||= canFinishRace(curve, shipPhysics, totalLaps);
     for (const opponent of racingOpponents) syncOpponentPose(opponent, curve, trackWidth);
@@ -1435,8 +1482,20 @@ for (const ghost of ghostPool) {
     crossedFinish=practice.session.done;
   }
   if (crossedFinish) finishRace();
-  combatSightCache.clear();
-  combat.step(delta,combatRacers(),curve,{active:race.state==='racing',fire:firing||touchFiring,blocked:combatBlocked});
+  
+//  combatSightCache.clear();
+
+raycastFrameCounter++;
+if (raycastFrameCounter % 15=== 0) {
+    combatSightCache.clear();
+    combatBlockedFlag=combatBlocked;
+
+}
+
+  combat.step(delta,combatRacers(),curve,{
+    active:race.state==='racing',fire:firing || touchFiring, blocked:combatBlockedFlag
+  });
+
   for(const event of combat.events){
     const owner=event.owner==='player'?craft:opponents.find(o=>o.name===event.owner)?.group;
     if(owner && owner.position.distanceTo(craft.position)<180)raceAudio.playWeapon(event.weapon,event.owner==='player'?1:0.22);
@@ -1537,6 +1596,8 @@ if (thrustFill) {
   speedDisplay.textContent = race.state === 'racing'
     ? `${shipPhysics.recoveryTimer > 0 ? 'RECOVERING' : race.airborne ? 'AIR' : race.throttleTarget > 0.1 ? 'THRUST' : race.throttleTarget < -0.1 ? 'BRAKE' : 'AUTO'} · ${Math.round(race.currentSpeed * 36)} KM/H`
     : 'AUTO · READY';
+
+  particleSystem.updateSystem(delta);
     composer.render();
   requestAnimationFrame(render);
 }
