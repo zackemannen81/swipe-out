@@ -228,7 +228,13 @@
           <label for="race-mode-select">EVENT
             <select id="race-mode-select"><option value="race">Race · CPU rivals</option><option value="time-attack">Time Attack · solo</option></select>
           </label>
+          <label for="cpu-difficulty-select">CPU DIFFICULTY
+            <select id="cpu-difficulty-select" aria-describedby="cpu-difficulty-description">
+              <option value="rookie">Rookie</option><option value="pilot">Pilot</option><option value="elite">Elite</option>
+            </select>
+          </label>
         </div>
+        <p id="cpu-difficulty-description" class="driving-description" aria-live="polite"></p>
         <div id="practice-options" class="practice-options" hidden>
           <label><input id="practice-ghost" type="checkbox" checked /> PB GHOST</label>
           <label><input id="practice-line" type="checkbox" checked /> RACING LINE</label>

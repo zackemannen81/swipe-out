@@ -39,7 +39,8 @@ visuellt innan den fastställs. Läs [aktuell status](CURRENT_STATUS.md) och
 | G | Menyer, miljöer och prestandapass | Sammanhängande presentation med mätbar mobilbudget |
 
 Varje etapp kan delas i mindre leveranser. Mät prestanda under arbetet; slutpasset
-ersätter inte löpande kontroll. Etapp A är implementerad 2026-10-28 (PRESENT-001); övriga etapper är öppna.
+ersätter inte löpande kontroll. Etapp A är implementerad och godkänd i användarens provspelning. Etapp B är
+implementerad 2026-10-28 (CPU-001), med mänsklig balansering kvar. Övriga etapper är öppna.
 
 ## A — Resultatskärm och startintro
 
@@ -55,14 +56,15 @@ ersätter inte löpande kontroll. Etapp A är implementerad 2026-10-28 (PRESENT-
 
 ## B — CPU-svårighet och förarpersonlighet
 
-- [ ] Rookie bromsar tidigare och ger större marginaler. Pilot kör mer precist.
+- [x] Rookie bromsar tidigare och ger större marginaler. Pilot kör mer precist.
   Elite har bättre bromspunkter, omkörningar och konsekvens; ingen dold teleport.
-- [ ] Skilj svårighetsnivå från personlighet: aggressiv förare tar fler risker och
+- [x] Skilj svårighetsnivå från personlighet: aggressiv förare tar fler risker och
   genvägar, försiktig förare är jämnare. Misstag ska ha verklig kostnad.
-- [ ] Minska catch-up på Elite; håll inställningarna synliga och samlade.
+- [x] Minska catch-up på Elite; håll inställningarna synliga och samlade.
   Ändra inte accepterad spelarstyrning för att skapa svårighet.
-- [ ] Jämför varvtider, spridning, väggkontakter, boostträffar och genvägsval över
-  upprepade lopp på samma banor. Skillnaden ska också kännas vid mänsklig provkörning.
+- [x] Jämför varvtider, spridning, väggkontakter, boostträffar och genvägsval över
+  upprepade lopp på samma banor. Se [mätresultat och guide](CPU_DIFFICULTY.md).
+- [ ] Mänsklig provkörning: skillnaden ska kännas lagom och begriplig.
 
 ## C — Banverktyg, plattor och läsbarhet
 
@@ -147,7 +149,7 @@ Dela gärna upp i D1 (träffar/hot/flares) och D2 (vapenplattor).
 
 ## Genomförande och verifiering
 
-Nästa implementation är **B: CPU-svårighet och förarpersonlighet**. Sätt
+Nästa implementation är **C: banverktyg, plattor och läsbarhet**. Sätt
 exakt omfattning och acceptans i [CURRENT_TASK](CURRENT_TASK.md) före kodändring.
 Efter varje leverans: relevanta automatiska kontroller, visuell kontroll av ändrade
 flöden och ärlig dokumentation av vad som återstår för mänsklig provkörning.

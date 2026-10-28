@@ -7,7 +7,7 @@ with nose steering, momentum and independent airbrakes.
 
 **Current playable development build · 27 October 2026.** Fifteen built-in tracks,
 one selectable player craft (**Racer**) and one speed class (**Standard**).
-Cup progression and selectable CPU difficulty are still planned.
+Rookie, Pilot and Elite CPU difficulties are selectable; cup progression is planned.
 
 ## Run locally
 
@@ -132,19 +132,25 @@ shared race progress determines timing gates and position.
 
 ### CPU racers, impacts and catch-up
 
+Select **CPU DIFFICULTY** before a Race: Rookie brakes earlier and leaves larger
+margins, Pilot balances pace and risk, and Elite reacts faster and drives more
+precisely. The choice persists locally and is disabled in Time Attack. Driver
+personalities separately affect overtaking, shortcuts and mistakes. See the
+[CPU difficulty guide and measurements](docs/CPU_DIFFICULTY.md).
+
 Vanta, Kestrel, Orca and Nexus-9 have different speed caps, acceleration, mass and
 driving profiles. They brake, steer, seek boost pads, react to traffic, choose
 routes and can make mistakes or hit walls. Boost pads and craft collisions affect
 actual motion. Wipeout has its own tuned rail response; Swipeout and CPU craft
 retain their existing wall behavior.
 
-The player's normal top-speed setting is **143 world units/s**, before boosts or
-catch-up. CPU normal caps are **129, 130, 135 and 136**. These are internal physics
+The player's normal top-speed setting is **151 world units/s**, before boosts or
+catch-up. CPU normal caps are **134, 136, 138 and 141**. These are internal physics
 values, not the scaled HUD speed readout. Profiles live in
 [src/opponents.js](src/opponents.js).
 
 Race catch-up grants both the player and CPU racers up to **8%** extra attainable
-top speed. It begins at an estimated two-second gap to the leader, reaches its full
+top speed on Rookie/Pilot, or **2%** on Elite. It begins at an estimated two-second gap to the leader, reaches its full
 target at eight seconds and smooths changes over time. Acceleration, braking and
 impact losses still apply; there is no negative leader penalty. Tune `CATCH_UP` in
 [src/catch-up.js](src/catch-up.js); set `maxBonus` to `0` to disable it. Time Attack
@@ -243,11 +249,10 @@ node tools/verify-time-attack.mjs
 
 Scripts write captures into task-specific directories under the system temporary
 folder. See [Current status](docs/CURRENT_STATUS.md) for dated evidence and limits.
-The latest recorded gameplay verification, **DRIVE-002 on 27 October 2026**, passed
-**71 Node tests** and the production build. The existing large-chunk warning
-remains. Browser flows were verified in earlier stages; the wall fix did not
-receive a new browser or physical-device playtest. This README refresh changes
-only documentation.
+The latest recorded gameplay verification, **CPU-001 on 28 October 2026**, passed
+**79 Node tests** and the production build. The existing large-chunk warning
+remains. Browser checks cover race presentation and CPU difficulty settings/retry/solo
+isolation. Physical-device performance and difficulty balance still need playtesting.
 
 ## Project guide
 
@@ -278,11 +283,11 @@ documents are not evidence that a feature is already implemented.
 The expanded [product roadmap](docs/PRODUCT_ROADMAP.md), updated 28 October 2026,
 adds race intro/results, track tools, combat countermeasures and weapon pickups,
 ship unlocks and animated menus. Stage A (results layout and a skippable camera intro) is implemented;
-CPU difficulty is next. The existing countdown is preserved. The longer-term goals
+Stage B adds saved CPU difficulty and risk personalities; track tools are next. The existing countdown is preserved. The longer-term goals
 following the completed handling and Time Attack stages include:
 
-1. **Rookie / Pilot / Elite CPU difficulty:** precision, braking, overtaking,
-   shortcut decisions and risk profiles.
+1. **Rookie / Pilot / Elite CPU difficulty — implemented:** precision, braking,
+   overtaking, shortcut decisions and risk profiles; human balance tuning remains.
 2. **A three-track cup:** points, final standings, medals and unlockable liveries.
 3. **Richer audio and feedback:** engine load, airbrakes, rail scraping, landings
    and clearer race/result cues.
@@ -290,6 +295,6 @@ following the completed handling and Time Attack stages include:
    expanded saved settings, a separate test-track category, graphics options,
    adjustable shake/bloom and measurements on physical phones.
 
-These stages are planned, not current menu features. Combat balance, custom-track
+Cup progression and the later polish stages remain planned. Combat balance, custom-track
 guidance and camera/ghost comfort still need human playtesting. A simulated mobile
 viewport does not establish physical-phone performance.

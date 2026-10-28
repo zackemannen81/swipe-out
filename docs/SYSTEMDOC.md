@@ -156,6 +156,15 @@ and nominal leader speed. It adjusts caps/demand rather than assigning velocity;
 normal acceleration, braking and impact consequences remain. Current profile
 values and verification boundaries are in CURRENT_STATUS.
 
+CPU difficulty now belongs to cpu-difficulty.js: saved Rookie/Pilot/Elite
+selection configures driving decisions at race reset, independently of driver
+risk personality and physical craft performance. Traffic checks both passing
+lanes; deterministic choices/errors vary with lap and simulation time. Elite
+reduces the shared catch-up ceiling to 2%; Rookie/Pilot retain 8%. The per-race
+ceiling applies equally to the player and CPU without changing global tuning.
+Time Attack retains no CPU simulation or catch-up and ignores this preference
+for record identity. CPU_DIFFICULTY.md records the initial balance and limits.
+
 Thruster presentation is owned by `src/thrusters.js` and orchestrated by the game
 after player and CPU transforms are finalized. All five craft share procedural
 plasma and particle materials. Fixed-rate world-space history supplies continuous

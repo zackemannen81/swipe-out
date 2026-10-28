@@ -1,5 +1,14 @@
 # File Structure
 
+## 2026-10-28 — CPU-001 difficulty and personalities
+
+- `src/cpu-difficulty.js` — profiles, safe preference persistence and route choices
+- `docs/CPU_DIFFICULTY.md` — user/tuning guide and measured race comparisons
+- `tests/cpu-difficulty.test.js` — settings, reset, traffic, catch-up, routes and full races
+- `tools/measure-cpu-difficulty.mjs` — repeatable multi-track CPU race measurements
+- `tools/verify-cpu-difficulty.mjs` — browser settings/retry/solo/storage acceptance
+- `docs/archive/PRESENT-002.md` — completed start-view correction, user approved
+
 ## 2026-10-28 — PRESENT-002 start-view correction
 
 - `docs/archive/PRESENT-001.md` — completed intro/results implementation record

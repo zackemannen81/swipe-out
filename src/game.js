@@ -21,6 +21,7 @@ import { createClassicCamera } from './classic-camera.js';
 import { loadDrivingSettings, saveDrivingSettings, cameraProfile, readClassicGamepad } from './driving-settings.js';
 import { getRacerWidth, nextBranch, canFinishRace } from './track-path.js';
 import { createCombat, createCombatView, WEAPONS, COMBAT } from './combat.js';
+import { CPU_DIFFICULTIES, cpuDifficulty, loadCpuDifficulty, saveCpuDifficulty } from './cpu-difficulty.js';
 import { createPracticeUI, lapTime } from './time-attack-ui.js';
 import { ParticleSystem } from './ParticleSystem.js';
 
@@ -143,6 +144,25 @@ configureImpactParticles(particleSystem, sparks_material);
 const loadedTracks = readTrackLibrary(localStorage);
 let drivingSettings = loadDrivingSettings(localStorage);
 let activeDrivingSettings = { ...drivingSettings };
+let selectedCpuDifficulty = loadCpuDifficulty(localStorage);
+let activeCpuDifficulty = selectedCpuDifficulty;
+const cpuDifficultySelect = document.querySelector('#cpu-difficulty-select');
+cpuDifficultySelect.value = selectedCpuDifficulty;
+let cpuStorageWarning = false;
+function updateCpuDescription() {
+  const solo = document.querySelector('#race-mode-select').value === 'time-attack';
+  cpuDifficultySelect.disabled = solo;
+  document.querySelector('#cpu-difficulty-description').textContent = (solo
+    ? 'Solo practice: no CPU racers or catch-up. Your Race difficulty is retained.'
+    : CPU_DIFFICULTIES[selectedCpuDifficulty].description)
+    + (cpuStorageWarning ? ' Applies this session; browser storage is unavailable.' : '');
+}
+cpuDifficultySelect.addEventListener('change', () => {
+  selectedCpuDifficulty = cpuDifficulty(cpuDifficultySelect.value);
+  cpuStorageWarning = !saveCpuDifficulty(localStorage, selectedCpuDifficulty);
+  updateCpuDescription();
+});
+document.querySelector('#race-mode-select').addEventListener('change', updateCpuDescription);
 const handlingSelect = document.querySelector('#handling-select');
 const cameraFollowSelect = document.querySelector('#camera-follow-select');
 const laneAssistSelect = document.querySelector('#assist-select');
@@ -669,6 +689,7 @@ const practice = createPracticeUI(scene,craft,localStorage,()=>({
   track:getActiveTrackData(initialTrackSelect.value),handling:drivingSettings.handling,
   assist:drivingSettings.assist,topSpeed:baseSpeed+SPEEDCALIBRATION,
 }));
+updateCpuDescription();
 let viewportWidth = window.innerWidth;
 let viewportHeight = window.innerHeight;
 
@@ -859,7 +880,8 @@ Object.assign(shipPhysics, createShipPhysics(baseSpeed+SPEEDCALIBRATION));
   race.keyboardThrottle = 0;
   document.querySelector('#race-lap-time').textContent='00:00.00';
   race.playerFinishTime = null;
-  resetOpponents(opponents);
+  activeCpuDifficulty = selectedCpuDifficulty;
+  resetOpponents(opponents, activeCpuDifficulty);
   firing=touchFiring=false;
   combat.reset(!practice.active&&document.querySelector('#combat-enabled').checked,combatRacers());
   combatView.update(combat);updateCombatHud();
@@ -1304,7 +1326,7 @@ function render() {
     ...opponents.map(opponent => ({
       physics: opponent.physics, topSpeed: opponent.topSpeed, finished: opponent.finishTime !== null,
     })),
-  ], delta, curve.getLength() * totalLaps, race.state === 'racing');
+  ], delta, curve.getLength() * totalLaps, race.state === 'racing', CPU_DIFFICULTIES[activeCpuDifficulty].catchUp);
 
   if (race.state === 'countdown') {
    

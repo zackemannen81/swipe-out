@@ -5,21 +5,23 @@ import { createShipPhysics, stepShipPhysics } from './ship-physics.js';
 import { collectBoostPad } from './race-interactions.js';
 import { getRacerTopSpeed } from './catch-up.js';
 
+import { CPU_DIFFICULTIES, cpuDifficulty, shortcutChoice } from './cpu-difficulty.js';
+
 const TOTAL_LAPS = 3;
 const clamp = THREE.MathUtils.clamp;
 
-// World units/second and world units/second². Player's normal speed cap is 133.
+// User-tuned physical performance; difficulty changes driving decisions, not these caps.
 export const RACER_DEFINITIONS = [
-  { name: 'Vanta', topSpeed: 134, acceleration: 24, mass: 1.05, reaction: 0.34,
+  { name: 'Vanta', personality: 'Balanced', risk: 0.5, topSpeed: 134, acceleration: 24, mass: 1.05, reaction: 0.34,
     cornering: 0.76, precision: 0.3, lane: -2.4, gridDistance: 6, phase: 0.4,
     modelUrl: '/models/racer_optimized-team2.glb', accentColor: 0xe811ff },
-  { name: 'Kestrel', topSpeed: 136, acceleration: 31, mass: 0.9, reaction: 0.23,
+  { name: 'Kestrel', personality: 'Precise', risk: 0.35, topSpeed: 136, acceleration: 31, mass: 0.9, reaction: 0.23,
     cornering: 0.9, precision: 0.18, lane: 2.4, gridDistance: 6, phase: 2.2,
     modelUrl: '/models/racer_optimized-team3.glb', accentColor: 0x00f4e8 },
-  { name: 'Orca', topSpeed: 138, acceleration: 21, mass: 1.3, reaction: 0.4,
+  { name: 'Orca', personality: 'Cautious', risk: 0.15, topSpeed: 138, acceleration: 21, mass: 1.3, reaction: 0.4,
     cornering: 0.72, precision: 0.38, lane: -2.4, gridDistance: 12, phase: 4.1,
     modelUrl: '/models/racer_optimized-team4.glb', accentColor: 0xff4b11 },
-  { name: 'Nexus-9', topSpeed: 141, acceleration: 27, mass: 1.0, reaction: 0.3,
+  { name: 'Nexus-9', personality: 'Aggressive', risk: 0.85, topSpeed: 141, acceleration: 27, mass: 1.0, reaction: 0.3,
     cornering: 0.82, precision: 0.28, lane: 2.4, gridDistance: 12, phase: 5.8,
     modelUrl: '/models/racer_optimized-team5.glb', accentColor: 0x00f4e8 },
 ];
@@ -41,8 +43,14 @@ export async function createOpponents() {
     createOpponentState(definition, await createCraft(definition))));
 }
 
-export function resetOpponents(opponents) {
+export function resetOpponents(opponents, difficulty = 'pilot') {
   for (const opponent of opponents) {
+    opponent.difficulty = cpuDifficulty(difficulty);
+    opponent.ai = CPU_DIFFICULTIES[opponent.difficulty];
+    opponent.risk ??= 0.5;
+    opponent.mistakeUntil = 0;
+    opponent.nextMistake = 5 + opponent.phase * 2;
+    opponent.mistakes = 0;
     opponent.physics = createShipPhysics(opponent.topSpeed * 0.8, {
       engineForce: opponent.acceleration + opponent.topSpeed * 0.045,
       brakeForce: 32, mass: opponent.mass, centeringStrength: 0,
@@ -65,14 +73,15 @@ export function resetOpponents(opponents) {
 function decide(opponent, opponents, player, curve, pads, trackWidth, elapsed) {
   const length = curve.getLength();
   const ship = opponent.physics;
-  const lookDistance = Math.max(18, ship.speed * (0.4 + opponent.reaction));
+  const lookDistance = Math.max(18, ship.speed * (0.4 + opponent.reaction) * opponent.ai.anticipation);
   trackWidth = getRacerWidth(curve, ship, trackWidth);
   const here = getRacerFrame(curve, ship);
   const ahead = getRacerFrame(curve, ship, (ship.distance + lookDistance) / length);
   const turn = here.tangent.dot(ahead.right);
   const edge = Math.max(0.4, trackWidth / 2 - 1.2);
-  const cornerSlowdown = Math.abs(turn) * (0.7 - opponent.cornering * 0.3);
-  opponent.targetSpeed = opponent.topSpeed * clamp(1 - cornerSlowdown, 0.65, 1);
+  const cornerSlowdown = Math.abs(turn) * (0.7 - opponent.cornering * 0.3)
+    * opponent.ai.cornerPenalty * (1.08 - opponent.risk * 0.16);
+  opponent.targetSpeed = opponent.topSpeed * opponent.ai.pace * clamp(1 - cornerSlowdown, 0.6, 1);
   opponent.targetLane = clamp(opponent.lane * 0.35 - turn * 2.4, -edge, edge);
   opponent.strategy = 'race';
   opponent.trafficSpeedLimit = Infinity;
@@ -87,14 +96,14 @@ function decide(opponent, opponents, player, curve, pads, trackWidth, elapsed) {
       nextPad = pad;
     }
   }
-  if (nextPad && Math.abs(turn) < 0.8) {
+  if (nextPad && Math.abs(turn) < 0.65 + opponent.risk * 0.3) {
     opponent.targetLane = clamp(nextPad.offset, -edge, edge);
     opponent.strategy = 'boost-pad';
   }
 
   // Traffic decisions are separate from the shared, leader-relative catch-up.
   let blocker = null;
-  let nearest = 24;
+  let nearest = 20 + opponent.risk * 12;
   for (const other of [...opponents, ...(player ? [player] : [])]) {
     if (other === opponent || other.finishTime != null) continue;
     if ((other.physics.route?.id ?? null) !== (ship.route?.id ?? null)) continue;
@@ -106,29 +115,55 @@ function decide(opponent, opponents, player, curve, pads, trackWidth, elapsed) {
   }
   if (blocker) {
     const lane = blocker.physics.lateralOffset;
-    const leftSpace = lane + edge;
-    const rightSpace = edge - lane;
-    opponent.targetLane = clamp(lane + (rightSpace >= leftSpace ? 2.6 : -2.6), -edge, edge);
-    opponent.strategy = 'overtake';
-    if (nearest < 7) opponent.trafficSpeedLimit = blocker.physics.speed * 0.94;
+    const clearance = opponent.ai.passingSpace + (0.5 - opponent.risk) * 0.4;
+    const candidates = [lane - clearance, lane + clearance]
+      .filter(target => Math.abs(target) <= edge)
+      .filter(target => ![...opponents, ...(player ? [player] : [])].some(other => {
+        if (other === opponent || other === blocker || other.finishTime != null ||
+            (other.physics.route?.id ?? null) !== (ship.route?.id ?? null)) return false;
+        const gap = ((other.physics.distance - ship.distance + length * 1.5) % length) - length * 0.5;
+        return Math.abs(gap) < 12 && Math.abs(other.physics.lateralOffset - target) < clearance;
+      }))
+      .sort((a,b) => Math.abs(a - ship.lateralOffset) - Math.abs(b - ship.lateralOffset));
+    if (candidates.length) {
+      opponent.targetLane = candidates[0];
+      opponent.strategy = 'overtake';
+    } else {
+      opponent.targetLane = ship.lateralOffset;
+      opponent.strategy = 'follow';
+    }
+    if (!candidates.length || nearest < 10 - opponent.risk * 4)
+      opponent.trafficSpeedLimit = blocker.physics.speed * 0.94;
   }
-  // Smooth driver error and finite reaction time can produce imperfect lines and wall scrapes.
-  opponent.targetLane += Math.sin(elapsed * 1.7 + opponent.phase) * opponent.precision;
   const junction = nextBranch(curve, ship.distance);
-  if (junction && junction.distance - ship.distance < Math.max(220, ship.speed * 2.2)) {
-    const takeBranch = (Math.floor(opponent.phase) + junction.lap) % 2 === 0;
+  const approachingJunction = junction && junction.distance - ship.distance < Math.max(220, ship.speed * 2.2);
+  const gap = ship.flight?.gap ?? nextGap(curve, ship.distance);
+  const approachingGap = gap && (ship.flight || gap.start - ship.distance < Math.max(110, ship.speed * 1.1));
+  // Smooth driver error and finite reaction time can produce imperfect lines and wall scrapes.
+  opponent.targetLane += Math.sin(elapsed * 1.7 + opponent.phase) * opponent.precision * opponent.ai.error;
+  // Occasional overcommitment is an input error with a real recovery cost.
+  if (elapsed >= opponent.nextMistake && Math.abs(turn) > 0.12 && !ship.flight && !approachingGap && !approachingJunction) {
+    opponent.mistakeUntil = elapsed + 0.45 + opponent.risk * 0.45;
+    opponent.nextMistake = elapsed + opponent.ai.mistakeInterval * (1.3 - opponent.risk * 0.65);
+    opponent.mistakes++;
+  }
+  if (elapsed < opponent.mistakeUntil) {
+    opponent.targetLane += Math.sign(turn) * opponent.ai.mistakeSize * (0.6 + opponent.risk);
+    opponent.targetSpeed *= 0.94;
+  }
+  if (approachingJunction) {
+    const takeBranch = shortcutChoice(opponent, junction.lap);
     opponent.targetLane = junction.branch.side * curve.track.width * (takeBranch ? 0.3 : -0.2);
     opponent.strategy = takeBranch ? 'shortcut-entry' : 'main-route';
   }
   if (ship.route) opponent.targetLane = clamp(opponent.targetLane, -edge * 0.65, edge * 0.65);
-  const gap = ship.flight?.gap ?? nextGap(curve, ship.distance);
-  if (gap && (ship.flight || gap.start - ship.distance < Math.max(110, ship.speed * 1.1))) {
+  if (approachingGap) {
     opponent.targetLane = 0;
     opponent.targetSpeed = opponent.topSpeed;
     opponent.trafficSpeedLimit = Infinity;
     opponent.strategy = ship.flight ? 'air-control' : 'gap-runup';
   }
-  opponent.decisionTimer += opponent.reaction;
+  opponent.decisionTimer += opponent.reaction * opponent.ai.reaction;
 }
 
 function drive(opponent, curve, dt) {

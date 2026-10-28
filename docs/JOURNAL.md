@@ -471,3 +471,19 @@
 - Updated browser expectations; full presentation acceptance passes, including
   intro/retry mode and unchanged countdown sounds/source. Syntax/diff pass.
   This checks view selection, not high-speed curve visibility on every circuit.
+
+## 2026-10-28 — CPU-001 difficulty and personality
+
+- User accepted stage A in-game. Implemented saved Rookie/Pilot/Elite (Pilot
+  default), safe preference fallback, per-race reset and disabled solo control.
+- Added behavior profiles and separate risk personalities, occupied-lane checks,
+  lap-varying shortcuts and recoverable input mistakes. Preserved user-tuned craft
+  performance and player handling. Protected jump runups. Elite shared catch-up
+  is 2%, Rookie/Pilot 8%; solo remains isolated.
+- All 108 measured three-lap CPU runs completed on three tracks with zero gap
+  recovery. Rookie/Pilot/Elite mean times ordered as intended; Elite trades more
+  shortcut entries for some extra rail hits. Published reproducible measurements.
+- 79 Node tests and build pass, existing chunk warning retained. Browser verifies
+  save/reload/retry/runtime profiles/solo isolation/storage failure. Inspected
+  desktop/landscape menu. Human race/combat balance and physical-phone testing
+  remain; track tools/readability is next. Countdown and player controls unchanged.

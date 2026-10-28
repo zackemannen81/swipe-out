@@ -1,5 +1,35 @@
 # Current Status
 
+## 2026-10-28 — CPU-001: difficulty and driver personalities
+
+User confirmed stage A, including the corrected wipeoutStyle start, works in-game.
+Stage B now adds saved Rookie/Pilot/Elite selection (Pilot default), disabled in
+Time Attack while retaining the Race preference. Storage failures retain the
+session choice with a message. Retry applies the selected level through reset.
+
+Difficulty adjusts desired pace, reaction, corner anticipation/braking, line
+error, passing clearance, shortcut frequency and occasional driving mistakes.
+Vanta is balanced, Kestrel precise, Orca cautious and Nexus-9 aggressive. Drivers
+check passing lanes and follow when both are occupied. Gap approach prioritizes
+straight launch and sufficient speed. Existing user-tuned top speeds, acceleration,
+mass, player controls, camera and countdown remain unchanged. No teleportation.
+Rookie/Pilot share up to 8% catch-up; Elite up to 2%, equally for player and CPU.
+Solo still has no CPU simulation or catch-up; record identity is unchanged.
+
+Three deterministic phase variants per level on Neon Causeway, Split Decision
+and Ion Foundry completed all 108 CPU runs (three laps each), with no gap recovery.
+Mean finish times are ordered Rookie > Pilot > Elite on all three tracks.
+Foundry means: 154.58 / 132.59 / 127.39 seconds. Elite takes more shortcuts and can
+hit more rails; the Pilot/Elite difference is small on Neon. Detailed times,
+spread, wall/pad/route counts and methodology are in CPU_DIFFICULTY.md.
+
+79 Node tests and production build pass (existing large-bundle warning). Browser
+acceptance passed persisted selection/reload, runtime Elite and retry, disabled
+solo choice, frozen hidden CPU/no catch-up, returning to Race and quota failure.
+Inspected menu/landscape screenshots in temporary swipe-out-cpu001. Syntax and
+diff checks pass. Human balance, combat races and physical-phone performance
+remain unverified; next planned stage is track tools/readability.
+
 ## 2026-10-28 — PRESENT-002: preferred start camera
 
 Corrected beginRace's view reset from external to wipeoutStyle, matching the
