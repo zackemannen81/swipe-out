@@ -12,7 +12,21 @@ export async function createCraft(definition = {}) {
     console.warn(`Unable to load model`, error);
   }
 
+  // Hämta accentfärgen från definitionen
   const color = new THREE.Color(definition.accentColor || 0x43f6ea);
+
+  // --- NYTT: Underglow-ljus ---
+  // Parametrar: färg, intensitet, max-räckvidd i meter
+
+  const underGlow = new THREE.PointLight(color, 1.8, 4);
+  
+  // 2. Flytta upp ljuset närmare skeppets "mage" (-0.1 istället för -0.6).
+  // Då får ljusstrålarna mer utrymme att sprida sig åt sidorna innan de träffar banan!
+  underGlow.position.set(0, -0.01, 0.1);
+
+
+  // Lägg till ljuset i skeppets grupp så det följer med per automatik
+  group.add(underGlow);
 
   return { group, color };
 }

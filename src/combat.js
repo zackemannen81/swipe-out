@@ -3,8 +3,8 @@ import { getRacerFrame } from './track-path.js';
 import { registerImpact } from './race-interactions.js';
 
 export const WEAPONS = {
-  rocket: {name:'ROCKET',clip:6,cooldown:0.7,reload:5,speed:190,life:2.6,loss:0.16,knock:3.5,color:0xffa044},
-  homing: {name:'HOMING',clip:4,cooldown:1.1,reload:7,speed:160,life:3.4,loss:0.12,knock:2.5,color:0xff51ae},
+  rocket: {name:'ROCKET',clip:3,cooldown:1.7,reload:5,speed:190,life:2.6,loss:0.16,knock:3.5,color:0xffa044},
+  homing: {name:'HOMING',clip:1,cooldown:2.1,reload:7,speed:160,life:3.4,loss:0.6,knock:12.5,color:0xff51ae},
   minigun: {name:'MINIGUN',clip:50,cooldown:0.11,reload:4,speed:600,life:0.65,loss:0.035,knock:0.7,color:0x8cffff},
 };
 export const COMBAT = {maxProjectiles:48,maxEffects:24,lockSeconds:0.9,range:280,lockCone:0.965,turnRate:2.1};
@@ -130,8 +130,8 @@ export function createCombat() {
 export function createCombatView(scene) {
   const group=new THREE.Group();scene.add(group);
   const material=new THREE.MeshBasicMaterial({color:0xffffff,vertexColors:false,toneMapped:false});
-  const bullets=new THREE.InstancedMesh(new THREE.SphereGeometry(1,8,6),material,COMBAT.maxProjectiles);
-  const bursts=new THREE.InstancedMesh(new THREE.SphereGeometry(1,12,8),new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:0.65,blending:THREE.AdditiveBlending,depthWrite:false,toneMapped:false}),COMBAT.maxEffects);
+  const bullets=new THREE.InstancedMesh(new THREE.SphereGeometry(0.5,8,6),material,COMBAT.maxProjectiles);
+  const bursts=new THREE.InstancedMesh(new THREE.SphereGeometry(0.5,12,8),new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:0.65,blending:THREE.AdditiveBlending,depthWrite:false,toneMapped:false}),COMBAT.maxEffects);
   bullets.count=bursts.count=0;bullets.frustumCulled=bursts.frustumCulled=false;group.add(bullets,bursts);
   const matrix=new THREE.Matrix4(),rotation=new THREE.Quaternion(),scale=new THREE.Vector3(),z=new THREE.Vector3(0,0,1);
   return {update(combat){

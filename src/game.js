@@ -128,7 +128,7 @@ if (menuButton) {
   });
 }
 
-export const SPEEDCALIBRATION = 78; // Justera detta värde för att kalibrera spelets hastighe
+export const SPEEDCALIBRATION = 90; // Justera detta värde för att kalibrera spelets hastighe
 export const scene = new THREE.Scene();
 //scene.background = new THREE.Color(0x080c0a);
 scene.background = new THREE.Color(0x000000);
@@ -551,7 +551,7 @@ const targetReticle = document.querySelector('#target-reticle');
 function combatRacers() {
   return [{...playerRacer,player:true,finished:race.state==='finished'},...(practice.active?[]:opponents).map(o=>({id:o.name,physics:o.physics,group:o.group,finished:o.finishTime!==null}))];
 }
-function combatBlocked(from, to) {
+function combatBlocked2(from, to) {
   const key = `${from.x.toFixed(1)},${from.y.toFixed(1)},${from.z.toFixed(1)}|${to.x.toFixed(1)},${to.y.toFixed(1)},${to.z.toFixed(1)}`;
   
   if (combatSightCache.has(key)) {
@@ -596,11 +596,11 @@ function combatBlocked(from,to) {
 }
 */
 
-/*
+
 function combatBlocked(from, to) {
   return false;
 }
-*/
+
 
 function updateCombatHud() {
   combatHud.hidden=!combat.enabled || !['racing','countdown'].includes(race.state);

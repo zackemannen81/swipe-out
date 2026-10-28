@@ -10,18 +10,18 @@ const clamp = THREE.MathUtils.clamp;
 
 // World units/second and world units/second². Player's normal speed cap is 133.
 export const RACER_DEFINITIONS = [
-  { name: 'Vanta', topSpeed: 129, acceleration: 24, mass: 1.05, reaction: 0.34,
+  { name: 'Vanta', topSpeed: 134, acceleration: 24, mass: 1.05, reaction: 0.34,
     cornering: 0.76, precision: 0.3, lane: -2.4, gridDistance: 6, phase: 0.4,
-    modelUrl: '/models/racer_optimized-team2.glb', accentColor: 0xff4b91 },
-  { name: 'Kestrel', topSpeed: 130, acceleration: 31, mass: 0.9, reaction: 0.23,
+    modelUrl: '/models/racer_optimized-team2.glb', accentColor: 0xe811ff },
+  { name: 'Kestrel', topSpeed: 136, acceleration: 31, mass: 0.9, reaction: 0.23,
     cornering: 0.9, precision: 0.18, lane: 2.4, gridDistance: 6, phase: 2.2,
-    modelUrl: '/models/racer_optimized-team3.glb', accentColor: 0x63f4e8 },
-  { name: 'Orca', topSpeed: 135, acceleration: 21, mass: 1.3, reaction: 0.4,
+    modelUrl: '/models/racer_optimized-team3.glb', accentColor: 0x00f4e8 },
+  { name: 'Orca', topSpeed: 138, acceleration: 21, mass: 1.3, reaction: 0.4,
     cornering: 0.72, precision: 0.38, lane: -2.4, gridDistance: 12, phase: 4.1,
-    modelUrl: '/models/racer_optimized-team4.glb', accentColor: 0xff4b91 },
-  { name: 'Nexus-9', topSpeed: 136, acceleration: 27, mass: 1.0, reaction: 0.3,
+    modelUrl: '/models/racer_optimized-team4.glb', accentColor: 0xff4b11 },
+  { name: 'Nexus-9', topSpeed: 141, acceleration: 27, mass: 1.0, reaction: 0.3,
     cornering: 0.82, precision: 0.28, lane: 2.4, gridDistance: 12, phase: 5.8,
-    modelUrl: '/models/racer_optimized-team5.glb', accentColor: 0x63f4e8 },
+    modelUrl: '/models/racer_optimized-team5.glb', accentColor: 0x00f4e8 },
 ];
 
 export function createOpponentState(definition, craft = { group: new THREE.Group() }) {
