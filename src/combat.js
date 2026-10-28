@@ -3,9 +3,9 @@ import { getRacerFrame } from './track-path.js';
 import { registerImpact } from './race-interactions.js';
 
 export const WEAPONS = {
-  rocket: {name:'ROCKET',clip:3,cooldown:1.7,reload:5,speed:190,life:2.6,loss:0.16,knock:3.5,color:0xffa044},
-  homing: {name:'HOMING',clip:1,cooldown:2.1,reload:7,speed:160,life:3.4,loss:0.6,knock:12.5,color:0xff51ae},
-  minigun: {name:'MINIGUN',clip:50,cooldown:0.11,reload:4,speed:600,life:0.65,loss:0.035,knock:0.7,color:0x8cffff},
+  rocket: {name:'ROCKET',clip:3,cooldown:1.7,reload:5,speed:160,life:2.6,loss:0.16,knock:3.5,color:0xffa044},
+  homing: {name:'HOMING',clip:1,cooldown:2.1,reload:7,speed:120,life:3.4,loss:0.6,knock:12.5,color:0xff51ae},
+  minigun: {name:'MINIGUN',clip:30,cooldown:0.11,reload:4,speed:600,life:0.65,loss:0.035,knock:0.7,color:0x8cffff},
 };
 export const COMBAT = {maxProjectiles:48,maxEffects:24,lockSeconds:0.9,range:280,lockCone:0.965,turnRate:2.1};
 const clamp=THREE.MathUtils.clamp;
