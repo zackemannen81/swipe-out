@@ -79,3 +79,6 @@ footer { margin-top: 21px; color: #758891; font-size: 9px; } footer span { color
 .object-colors input[type="color"] { width: 70px; height: 32px; padding: 2px; cursor: pointer; }
 .neon-presets { display: flex; flex-wrap: wrap; gap: 6px; }
 .neon-presets button { flex: 1 1 70px; border-bottom: 3px solid var(--swatch); }
+
+#glb-path { display:block; width:100%; margin:8px 0; padding:9px; background:#10202a; color:#eef; border:1px solid #304650; font:11px monospace; }
+#add-glb-path { width:100%; margin-bottom:8px; }

@@ -387,3 +387,77 @@ Race/combat/practice voices share saved volume with countdown, default 35%.
 Imminent missile warnings take precedence over routine messages. Short-lived
 queues and per-event cooldowns prevent chatter; pause discards stale speech.
 Cup voices remain prepared assets. Human mix validation remains. See ANNOUNCER.md.
+
+## E1 cup prototype — 2026-10-29
+
+Foundry Cup uses Neon Causeway, Split Decision and Ion Foundry, with 10/7/5/3/1
+points and podium medals. CPU level, handling/assist and Combat stay fixed for
+three rounds. DNF earns zero; countback then latest race resolves ties. Active
+cup and best placement persist. Cosmetic/ship unlocks and time medals remain
+future E work. Details and verification limits: CUP.md.
+
+
+## 2026-10-29 — Necros foundation
+
+World 01: Necros, The Eternal Dominion, Vhar-Keth. The Conquest Spire combines parade, technical cathedral, core shortcut, climbing spiral and descent. Greybox track17 exists; final imperial gothic art, machine hazards and cinematic are future work. See NECROS.md.
+
+
+## 2026-10-29 — NECROS-002
+
+Necros route correction: parade is a launch straight, followed by outside/inside cathedral, tower spiral with interior and summit passages, near-vertical dive, flat monuments and sharp return. No scenery in this iteration; prior jump/shortcut removed.
+
+
+## 2026-10-29 — PHYSICS-001: slope momentum
+
+Shared Swipeout/Wipeout and CPU road physics now apply gravity along the tangent.
+Engine thrust tapers over the last 5% of its speed range; full throttle balances
+flat-road drag at the engine limit. Above it, the engine adds no force and never
+clamps momentum. Drag is weak linear plus quadratic; braking remains effective.
+Boost expiration and catch-up changes do not clip speed. Existing minimum forward
+speed 12 remains (no stalling/reversing). Gap flight retains ballistic gravity;
+nonmagnetic airborne motion does not receive road-slope gravity a second time.
+CPU permits overspeed on clear straights; corner and traffic braking still apply.
+Time Attack physics keys changed for both modes; old saved records are retained
+but no longer compared with new-physics laps.
+
+113 tests/build pass (existing chunk warning). Browser Necros coast from dive to
+monuments accelerated from ~140 to ~258 world units/s without throttle, with no
+recovery/page errors. Human balance and mobile performance remain unmeasured.
+Tuning: src/longitudinal-physics.js, LONGITUDINAL gravity/drag/taper constants.
+
+
+## 2026-10-29 — HUD-001: speed units
+
+Current speed now reuses the same converted value as race MAX: world speed *
+3.25 metres/unit * 3.6. Trip distance already uses 3.25. A later HUD write used
+*36 and overstated current speed by 36/11.7 (~3.08). MAX is the race peak, not
+engine limit. Rendering-only correction; physics and record identities unchanged.
+
+
+## 2026-10-29 — EDIT-CAMERA-COMBAT-001
+
+Editor supports static GLB scenery, embedded files up to 8 MB or local public
+paths (e.g. /models/necros.glb). Existing position/rotation/scale inspector,
+translation gizmo, selection, cloning, undo and save/export apply. Materials are
+preserved; no model animation playback or collision. GLBs must embed textures
+and buffers; Draco/Meshopt/KTX2 assets need an uncompressed export. Version 6
+track documents add model/type fields and still read versions 1–5. Total JSON
+limit remains 16 MB; large models should use public paths, especially for local
+storage quotas. Referenced files must accompany shared tracks. Loading errors
+appear in the editor; scene disposal cancels late attachment and frees assets.
+Transform edits reuse loaded model instances instead of fetching again.
+
+Magnetic Swipeout-camera follow now uses damped world-position lag (bounded for
+loops), filtered road-up and ship heading, with road clearance and respawn reset.
+Nonmagnetic and Classic camera profiles and magnetic ship adhesion are unchanged.
+
+Automatic weapon stations are single centre pads at 460 rather than 230 world
+units on main/branch routes. Authored pads remain as authored. An equipped weapon
+with ammo ignores same-type pickups without refill, pad cooldown or pickup event
+(and therefore no announcer); different weapons still replace the slot.
+
+118 tests pass; build passes with existing chunk warning. Isolated browser checks
+cover GLB path/file import, transforms, cloning, JSON export, save/reload and game
+loading; Necros magnetic descent and editor pass without page errors. Camera
+loop/roll, transient smoothing and recovery are tested. Human camera feel and
+physical-phone performance remain for playtesting.

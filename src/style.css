@@ -658,3 +658,16 @@ select option { color: #eaf3f5; background: #080d14; }
 .announcer-setting input { flex:1; min-width:60px; accent-color:var(--cyan); }
 #pause-screen #pause-heading { font-size:clamp(26px,4vw,42px); line-height:1.08; }
 @media(max-height:500px) { #pause-screen { padding:14px 18px; } #pause-screen #pause-heading { font-size:26px; } #pause-screen .announcer-setting { margin:8px 0; } }
+
+#cup-options { padding:12px; border:1px solid var(--cyan-dim); margin:12px 0; font:11px/1.6 monospace; }
+#cup-options[hidden], #cup-results[hidden] { display:none; }
+#cup-options small { display:block; opacity:.75; }
+#cup-new { margin-top:8px; padding:8px; background:transparent; color:var(--cyan); border:1px solid var(--cyan-dim); cursor:pointer; }
+#cup-results { font:12px/1.6 monospace; }
+#cup-results table { width:100%; border-collapse:collapse; }
+#cup-results td,#cup-results th { text-align:left; padding:5px; border-bottom:1px solid #ffffff22; }
+.cup-player { color:var(--cyan); font-weight:bold; }
+.results-actions button:disabled { opacity:.4; cursor:wait; }
+.cup-selected #start-screen h1 { font-size:42px; line-height:.94; }
+.cup-selected #start-screen .description { margin-top:10px; }
+.cup-selected #track-select { display:none; }

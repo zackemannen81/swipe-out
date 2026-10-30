@@ -3,6 +3,7 @@ import { BOOST, resolveWallImpact } from './race-interactions.js';
 import { getRacerTopSpeed } from './catch-up.js';
 import { getRacerFrame, getRacerWidth, advanceRouteDistance, recordRaceProgress, gapAt, nextGap } from './track-path.js';
 import { launchAcrossGap, stepGapFlight, flightPose } from './gap-flight.js';
+import { stepLongitudinalSpeed } from './longitudinal-physics.js';
 import { CLASSIC_HANDLING, stepClassicAttitude, stepClassicMomentum, stepClassicRoll } from './classic-handling.js';
 
 // Konstanter för svävaren (kan flyttas överst i filen)
@@ -149,16 +150,15 @@ ship.boostTimer = Math.max(0, ship.boostTimer - dt);
 
   // Longitudinal force balance: thrust, drag and braking. Speed is in the
   // existing SwipeOut world scale, rather than the original PS1 fixed-point scale.
-  const throttleForce = ship.thrust * (ship.tuning.engineForce ?? (classic ? CLASSIC_HANDLING.engineForce : 10));
-  const baselineDrag = ship.speed * 0.045;
-  const brakingForce = brake * (ship.tuning.brakeForce ?? 18);
-  ship.speed += (throttleForce - baselineDrag - brakingForce) * dt;
-  const maxSpeed = getRacerTopSpeed(ship, baseSpeed) * (ship.boostTimer > 0 ? BOOST.maxMultiplier : 1);
-  ship.speed = THREE.MathUtils.clamp(ship.speed, 12, maxSpeed);
-
-  // Find the current local track frame and preserve the original jump response
-  // to a sharp downward change in track tangent.
   let frame = getFrame(curve, ship.distance, ship);
+  const engineLimit = getRacerTopSpeed(ship, baseSpeed) * (ship.boostTimer > 0 ? BOOST.maxMultiplier : 1);
+  ship.speed = stepLongitudinalSpeed(ship.speed, {
+    throttle: ship.thrust,
+    engineForce: ship.tuning.engineForce ?? (classic ? CLASSIC_HANDLING.engineForce : 10),
+    engineLimit, brakeForce: brake * (ship.tuning.brakeForce ?? 18),
+    slope: ship.airborne && !curve.track?.magnetic ? 0 : frame.tangent.y,
+  }, dt);
+
   // --- 1. KANTER OCH KRÖN-DETEKTION (Tröghetsöverföring) ---
   const currentSlope = frame.tangent.y;
   const slopeChange = (currentSlope - ship.previousSlope) / Math.max(dt, 0.001);

@@ -6,7 +6,7 @@ import { TransformControls } from 'three/addons/controls/TransformControls.js';
 import { createTrack, spawnTrackObjects, disposeTrackGroup } from './track.js';
 import { hasSurface, createTrackCurve } from './track-path.js';
 
-export function createEditorView(canvas, { onSelect, onMove, onCommit }) {
+export function createEditorView(canvas, { onSelect, onMove, onCommit, onError }) {
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -100,7 +100,7 @@ export function createEditorView(canvas, { onSelect, onMove, onCommit }) {
     const scenery = scene.getObjectByName('customTrackObjects');
     const objectHit = scenery && raycaster.intersectObjects(scenery.children)[0];
     if (pointHit) onSelect({ ...markerSelections[markers.children.indexOf(pointHit.object)] });
-    else if (objectHit) onSelect({ kind: 'object', index: scenery.children.indexOf(objectHit.object) });
+    else if (objectHit) {let root=objectHit.object;while(root.parent!==scenery)root=root.parent;onSelect({kind:'object',index:scenery.children.indexOf(root)});}
   });
 
   function setTrack(value, nextSelection = selection) {
@@ -155,6 +155,8 @@ export function createEditorView(canvas, { onSelect, onMove, onCommit }) {
     }
     updateTrackPresentation(road, performance.now()/1000);
     updateWeaponPads(road, performance.now()/1000, null, true);
+    const errors=scene.getObjectByName('customTrackObjects')?.userData.loadErrors;
+    if(errors?.length)onError?.('GLB: '+errors.splice(0).join('; '));
     renderer.render(scene, camera);
   });
   return {

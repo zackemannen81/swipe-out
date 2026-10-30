@@ -1,3 +1,5 @@
+import { createCupUI } from './cup-ui.js';
+import { BUILTIN_TRACKS } from './track-library.js';
 import { VOICE_VOLUME_KEY } from './announcer.js';
 import { WEAPON_ICONS } from './weapon-icons.js';
 import { updateWeaponPads } from './weapon-pads.js';
@@ -132,6 +134,7 @@ if (menuButton) {
     setScreen(resultsScreen, false);
     setScreen(startScreen, true);
     practice.menu();
+    cup.menu();
   });
 }
 
@@ -139,7 +142,7 @@ export const SPEEDCALIBRATION = 86; // Justera detta värde för att kalibrera s
 export const scene = new THREE.Scene();
 //scene.background = new THREE.Color(0x080c0a);
 scene.background = new THREE.Color(0x000000);
-scene.fog = new THREE.FogExp2(0x080d18, 0.0035);
+scene.fog = new THREE.FogExp2(0x381834, 0.0040);
 //scene.fog = new THREE.Fog(0x080c0a,350,420);
 export const particleSystem = new ParticleSystem(2048, scene);
 particleSystem.initParticleSystem();
@@ -404,7 +407,7 @@ const cameraSystem = {
     }
     if (curve.track?.magnetic) {
       const frame = race.poseFrame ?? trackFrame;
-      magneticCamera.update(camera, craftPosition, frame, delta, this.mode, shipPhysics.respawnSerial);
+      magneticCamera.update(camera, craftPosition, frame, delta, this.mode, shipPhysics.respawnSerial, craftQuaternion);
       if (this.shakeTimer > 0) {
         this.shakeTimer = Math.max(0, this.shakeTimer - delta);
         const strength = this.shakeIntensity * this.shakeTimer;
@@ -808,7 +811,10 @@ for (const [key, offset] of Object.entries(offsets)) {
   return pose;
 }
 
+const cup=createCupUI(localStorage,()=>({difficulty:selectedCpuDifficulty,handling:drivingSettings.handling,assist:Number(laneAssistSelect.value),combat:document.querySelector('#combat-enabled').checked}),id=>BUILTIN_TRACKS[id].name);
+
 function beginRace() {
+  const cupRound=cup.prepare();
   isPaused=false;setScreen(pauseScreen,false);
   pauseToggleButton?.setAttribute('aria-pressed', 'false');
   if (pauseToggleButton) pauseToggleButton.textContent = 'PAUSE ⏸';
@@ -816,14 +822,14 @@ function beginRace() {
   cameraSystem.mode = 'wipeoutStyle';
   magneticCamera.reset();
   classicCamera.reset();
-  activeDrivingSettings = { ...drivingSettings };
+  activeDrivingSettings = { ...drivingSettings, ...(cupRound?{handling:cupRound.settings.handling,assist:cupRound.settings.assist}:{}) };
   classicGamepadInput = readClassicGamepad(null);
   race.gamepadThrottle = 0;
   cameraSystem.shakeTimer = 0;
   // Läs av vilken bana som valts
   const trackSelect = document.querySelector('#track-select');
-  currentTrackId = trackSelect.value;
-  const trackData = getActiveTrackData(currentTrackId);
+  currentTrackId = cupRound?.track ?? trackSelect.value;
+  const trackData = cupRound ? BUILTIN_TRACKS[currentTrackId].data : getActiveTrackData(currentTrackId);
   //const trackData = TRACK_CONFIG[currentTrackId].data;
 // Hämta banans namn och gör det till stora bokstäver
   const trackName = trackData.name.toUpperCase();
@@ -901,7 +907,7 @@ Object.assign(shipPhysics, createShipPhysics(baseSpeed+SPEEDCALIBRATION));
   // Läs av hur mycket styrhjälp spelaren vill ha
   const assistSelect = document.querySelector('#assist-select');
   if (assistSelect) {
-    shipPhysics.assistLevel = parseFloat(assistSelect.value);
+    shipPhysics.assistLevel = cupRound?.settings.assist ?? parseFloat(assistSelect.value);
   }
   
   race.state = 'intro';
@@ -921,10 +927,10 @@ Object.assign(shipPhysics, createShipPhysics(baseSpeed+SPEEDCALIBRATION));
   race.keyboardThrottle = 0;
   document.querySelector('#race-lap-time').textContent='00:00.00';
   race.playerFinishTime = null;
-  activeCpuDifficulty = selectedCpuDifficulty;
+  activeCpuDifficulty = cupRound?.settings.difficulty ?? selectedCpuDifficulty;
   resetOpponents(opponents, activeCpuDifficulty);
   firing=touchFiring=false;
-  combat.reset(!practice.active&&document.querySelector('#combat-enabled').checked,combatRacers(),race.weaponPads);
+  combat.reset(!practice.active&&(cupRound?.settings.combat??document.querySelector('#combat-enabled').checked),combatRacers(),race.weaponPads);
   combatView.update(combat);updateCombatHud();
   collisionState.cooldowns.clear();
   race.lastImpactSerial = 0;
@@ -1004,6 +1010,7 @@ function finishRace() {
   if(practice.active)resultDisplay.textContent=lapTime(bestLap);
   setScreen(resultsScreen, true);
   retryButton.focus({ preventScroll: true });
+  cup.finish();
 }
 
 startButton.addEventListener('click', () => {
@@ -1370,7 +1377,7 @@ function render() {
       }
       
       // 2. Scrolla texturer om materialet har en map
-      if (mesh.material.map) {
+      if (mesh.material?.map) {
         if (anim === 'scroll-y') {
           mesh.material.map.offset.y = (time * -0.6) % 1; // Hastighet -0.6
         } else if (anim === 'scroll-x') {
@@ -1612,6 +1619,10 @@ for (const ghost of ghostPool) {
     if(lap>spokenLap){spokenLap=lap;if(lap===3)raceAudio.announce('final_lap');}
   }
   if (crossedFinish) finishRace();
+  if(race.state==='finished')cup.update([
+    {id:'player',time:race.playerFinishTime,distance:Math.min(race.distance,curve.getLength()*3)},
+    ...opponents.map(o=>({id:o.name,time:o.finishTime,distance:Math.min(o.distance,curve.getLength()*3)})),
+  ],race.finishElapsed);
   
 //  combatSightCache.clear();
 
@@ -1651,10 +1662,10 @@ if (raycastFrameCounter % 15=== 0) {
     raceAudio.playSfx('crash');
   }
 
-  // 1. Beräkna nuvarande hastighet i KM/H
-const displaySpeed = Math.round(race.currentSpeed * 3.6 * 3.25);
+  // Match the trip meter: 3.25 metres per world unit, then m/s to km/h.
+  // Reuse this value for both current speed and the race peak.
+  const displaySpeed = Math.round(race.currentSpeed * 3.25 * 3.6);
   race.topSpeed = Math.max(race.topSpeed, displaySpeed);
-  speedDisplay.textContent = String(displaySpeed);
   document.querySelector('#race-top-speed').textContent = `MAX ${race.topSpeed} KM/H`;
   
   const thrustPercent = THREE.MathUtils.clamp(Math.max(0, race.throttleTarget), 0, 1);
@@ -1734,7 +1745,7 @@ if (thrustFill) {
   thrusters.update(delta, camera, renderer.domElement.height);
 
   speedDisplay.textContent = race.state === 'racing'
-    ? `${shipPhysics.recoveryTimer > 0 ? 'RECOVERING' : race.airborne ? 'AIR' : race.throttleTarget > 0.1 ? 'THRUST' : race.throttleTarget < -0.1 ? 'BRAKE' : 'AUTO'} · ${Math.round(race.currentSpeed * 36)} KM/H`
+    ? `${shipPhysics.recoveryTimer > 0 ? 'RECOVERING' : race.airborne ? 'AIR' : race.throttleTarget > 0.1 ? 'THRUST' : race.throttleTarget < -0.1 ? 'BRAKE' : 'AUTO'} · ${displaySpeed} KM/H`
     : 'AUTO · READY';
 
   updateTrackPresentation(track, performance.now()/1000);

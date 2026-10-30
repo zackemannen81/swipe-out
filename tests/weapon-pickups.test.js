@@ -45,7 +45,7 @@ test('fork and merge sweeps use correct route and physical pad length',()=>{
 });
 test('v5 weapon metadata round-trips and old versions reject new fields; fallback validates on all tracks',()=>{
  const data={...COMBAT_LAB,pads:[{id:'weapon',type:'weapon',weapon:'homing',progress:.1,offset:0}]};
- assert.equal(JSON.parse(serializeTrack(data)).version,5);assert.deepEqual(parseTrack(serializeTrack(data)).pads,data.pads);
+ assert.equal(JSON.parse(serializeTrack(data)).version,6);assert.deepEqual(parseTrack(serializeTrack(data)).pads,data.pads);
  assert.throws(()=>parseTrack(JSON.stringify({format:'swipe-out-track',version:4,track:data})),/version 5/);
  assert.throws(()=>normalizeTrack({...data,pads:[{...data.pads[0],weapon:'laser'}]}),/choose rocket/);
  for(const {data} of Object.values(BUILTIN_TRACKS)){const assets=createTrack(data);try{const pads=automaticWeaponPads(assets.curve,assets.boostPads);normalizeTrack({...data,pads});assert.ok(pads.length>0,data.name);}finally{disposeTrackGroup(assets.group);}}
@@ -73,5 +73,23 @@ test('CPU races seek, collect and fire finite weapons through the production upd
   if(opponents.every(o=>o.finishTime!==null))break;
  }
  assert.ok(opponents.every(o=>o.finishTime!==null));const states=[...combat.states.values()];
- assert.ok(states.every(s=>s.pickups>0));assert.ok(states.reduce((n,s)=>n+s.shots,0)>0);disposeTrackGroup(assets.group);
+ assert.ok(states.some(s=>s.pickups>0), 'scarce shared pads do not guarantee every racer a pickup');assert.ok(states.reduce((n,s)=>n+s.shots,0)>0);disposeTrackGroup(assets.group);
+});
+
+test('same equipped weapon is ignored without ammo refill, cooldown or announcer event',()=>{
+ for(const weapon of Object.keys(WEAPONS)) {
+  const a=setup([{id:'same',d:50,offset:0,type:'weapon',weapon}]);
+  a.combat.equip(a.r.id,weapon);a.s.ammo[weapon]=1;cross(a);
+  assert.equal(a.s.ammo[weapon],1);assert.equal(a.s.pickups,0);
+  assert.equal(a.combat.events.filter(e=>e.kind==='pickup').length,0);assert.equal(a.combat.padReady('same'),true);
+  const cpu=racer('cpu',false);a.combat.states.set(cpu.id,structuredClone(a.s));
+  a.combat.states.get(cpu.id).weapon=null;a.combat.states.get(cpu.id).padPassages={};
+  cpu.physics.distance=40;a.combat.capture([cpu]);cpu.physics.distance=65;
+  a.combat.step(1/60,[cpu],a.curve);assert.equal(a.combat.states.get(cpu.id).pickups,1);
+ }
+});
+test('automatic weapon stations are single pads at doubled spacing',()=>{
+ const c=createTrackCurve(COMBAT_LAB),pads=automaticWeaponPads(c);
+ assert.ok(pads.every(p=>p.offset===0));
+ for(let i=1;i<pads.length;i++)assert.ok((pads[i].progress-pads[i-1].progress)*c.getLength()>=459.99);
 });

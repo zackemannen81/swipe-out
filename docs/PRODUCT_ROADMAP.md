@@ -109,7 +109,11 @@ se WEAPON_PICKUPS.md. Den nya pickupbalansen återstår att provspela.
 
 ## E — Cup, medaljer och upplåsningar
 
-- [ ] Välj tre genomarbetade och provkörda banor; cup har poäng mellan loppen,
+E1 implementerad 2026-10-29: Foundry Cup, poäng/slutställning, placeringsmedaljer
+och versionssparad progression per konfiguration. Se CUP.md. Tidsmedaljer,
+lackeringar och skeppsupplåsningar återstår.
+
+- [x] Välj tre genomarbetade och provkörda banor; cup har poäng mellan loppen,
   slutplacering, definierad hantering av lika poäng och möjlighet att fortsätta.
 - [ ] Medaljer för tid och placering samt upplåsbara lackeringar. Visa nästa mål
   och vad som låstes upp direkt efter loppet.
@@ -154,7 +158,7 @@ kö och anti-spam. Musik/SFX-reglage samt hörlurs-/högtalarmix återstår. Se 
 
 ## Genomförande och verifiering
 
-Nästa implementation är **E: cup, medaljer och progression**, i avgränsade delar. Sätt
+Nästa implementation är **E2: tidsmedaljer och kosmetiska upplåsningar**. Sätt
 exakt omfattning och acceptans i [CURRENT_TASK](CURRENT_TASK.md) före kodändring.
 Efter varje leverans: relevanta automatiska kontroller, visuell kontroll av ändrade
 flöden och ärlig dokumentation av vad som återstår för mänsklig provkörning.

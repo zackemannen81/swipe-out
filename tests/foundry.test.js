@@ -44,7 +44,8 @@ test('both jumps land from normal race to boosted speed, and a slow miss recover
 test('player physics completes main and shortcut races with all six landings and ordered laps', () => {
   const { curve, boostPads, group } = createTrack(track), length = curve.getLength();
   for (const shortcut of [false, true]) {
-    const ship = createShipPhysics(100); ship.assistLevel = 0;
+    const ship = createShipPhysics(100); // Route traversal uses centering assist; neutral steering is not a skilled lap.
+    ship.assistLevel = 1;
     for (let i = 0; i < 120 * 180 && !canFinishRace(curve, ship); i++) {
       const u = (ship.distance % length) / length, b = curve.track.branches[0];
       // Set up the chosen approach lane. All travel/flight/gates use player physics.

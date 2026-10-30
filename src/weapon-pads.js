@@ -12,13 +12,12 @@ export function automaticWeaponPads(curve, existing=[]) {
     const pad={id:'auto-weapon-'+pads.length,type:'weapon',weapon:types[pads.length%types.length],progress:d/length,offset,...(routeId?{routeId}:{})};
     pads.push(pad);
   };
-  for(let d=95;d<length-25;d+=230){
+  for(let d=95;d<length-25;d+=460){
     if(!hasSurface(curve,d,40)||curve.track.branches.some(b=>[b.start,b.end].some(u=>Math.abs(d-u*length)<45)))continue;
     const f=getTrackFrame(curve,d/length);if(f.tangent.dot(getTrackFrame(curve,(d+25)/length).tangent)<.9||getTrackWidth(curve,d/length)<4)continue;
-    const width=getTrackWidth(curve,d/length);
-    if(width>=10){add(d,undefined,1,-Math.min(3,width/2-2));add(d,undefined,1,Math.min(3,width/2-2));}else add(d);
+    add(d);
   }
-  for(const b of curve.track.branches)for(let d=75;d<b.length-65;d+=230)add((b.start+(b.end-b.start)*d/b.length)*length,b.id,b.span/b.length);
+  for(const b of curve.track.branches)for(let d=75;d<b.length-65;d+=460)add((b.start+(b.end-b.start)*d/b.length)*length,b.id,b.span/b.length);
   return pads;
 }
 export function addWeaponPads(group,curve,definitions) {

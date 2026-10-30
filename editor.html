@@ -84,6 +84,10 @@
           <div class="primitive-editor">
             <div class="subheading">3D PRIMITIVES</div>
             <div class="button-row compact"><button data-primitive="box">+ BOX</button><button data-primitive="cylinder">+ CYLINDER</button><button data-primitive="sphere">+ SPHERE</button><button data-primitive="cone">+ CONE</button></div>
+            <div class="button-row"><button id="add-glb">+ GLB FILE</button><input id="glb-file" type="file" accept=".glb" hidden></div>
+            <label>GLB PATH <input id="glb-path" placeholder="/models/necros.glb"></label>
+            <button id="add-glb-path">ADD GLB FROM PATH</button>
+            <p class="field-help">Embedded GLB up to 8 MB. For larger models place the file in public/models and use its /models/name.glb path. Position, rotation and scale are below. Materials are preserved; scenery has no collision.</p>
             <label class="object-picker">SCENERY <select id="object-select" aria-label="Select scenery"></select></label>
             <div id="primitive-list"></div>
           </div>

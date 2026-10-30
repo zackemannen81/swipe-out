@@ -1,0 +1,30 @@
+import assert from 'node:assert/strict';
+import {readFile,mkdir} from 'node:fs/promises';
+import {pathToFileURL} from 'node:url';
+const {chromium}=await import(pathToFileURL(process.env.PLAYWRIGHT_MODULE).href);
+const browser=await chromium.launch({channel:'chrome',headless:true,args:['--use-angle=d3d11']});
+const context=await browser.newContext({viewport:{width:1440,height:1000},acceptDownloads:true});
+const errors=[];context.on('page',p=>p.on('pageerror',e=>errors.push(e.message)));
+await context.route('**/src/editor-view.js*',async route=>{const r=await route.fetch();let s=(await r.text()).replace(/\r\n/g,'\n');s=s.replace('  return {\n    setTrack, fit,',`  window.__scenery=()=>scene.getObjectByName('customTrackObjects')?.children.map(o=>({loaded:o.userData.loaded,position:o.position.toArray(),scale:o.scale.toArray(),rotation:o.rotation.toArray().slice(0,3)}));\n  return {\n    setTrack, fit,`);await route.fulfill({response:r,body:s});});
+await context.route('**/src/game.js*',async route=>{const r=await route.fetch();await route.fulfill({response:r,body:await r.text()+`\nwindow.__models=()=>scene.getObjectByName('customTrackObjects')?.children.map(o=>({loaded:o.userData.loaded,scale:o.scale.toArray()}));`});});
+try{
+ const page=await context.newPage();await page.goto('http://127.0.0.1:5173/editor.html?track=track17');
+ await page.locator('#glb-path').fill('/models/2.glb');await page.locator('#add-glb-path').click();
+ await page.waitForFunction(()=>window.__scenery?.()?.[0]?.loaded);
+ await page.getByLabel('POSITION X',{exact:true}).fill('30');await page.getByLabel('POSITION X',{exact:true}).press('Tab');
+ await page.getByLabel('ROTATION (DEG) Y',{exact:true}).fill('90');await page.getByLabel('ROTATION (DEG) Y',{exact:true}).press('Tab');
+ await page.getByLabel('SCALE X',{exact:true}).fill('3');await page.getByLabel('SCALE X',{exact:true}).press('Tab');
+ assert.equal((await page.evaluate(()=>window.__scenery()))[0].rotation[1],Math.PI/2);
+ await page.locator('#clone-object-button').click();await page.waitForFunction(()=>window.__scenery?.()?.length===2&&window.__scenery().every(o=>o.loaded));
+ await page.locator('#glb-file').setInputFiles('public/models/2.glb');
+ await page.waitForFunction(()=>window.__scenery?.()?.length===3&&window.__scenery().every(o=>o.loaded));
+ const download=page.waitForEvent('download');await page.locator('#download-button').click();const d=await download;const path=await d.path();const exported=JSON.parse(await readFile(path,'utf8'));
+ assert.equal(exported.version,6);assert.equal(exported.track.objects.length,3);assert.match(exported.track.objects[2].model,/^data:model/);assert.deepEqual(exported.track.objects[0].scale,[3,1,1]);
+ await page.locator('#save-button').click();await page.reload();await page.waitForFunction(()=>window.__scenery?.()?.length===3&&window.__scenery().every(o=>o.loaded));
+ await page.locator('#object-select').selectOption('0');
+ await mkdir(process.env.TEMP+'/swipe-glb',{recursive:true});await page.screenshot({path:process.env.TEMP+'/swipe-glb/editor.png'});
+ await page.goto('http://127.0.0.1:5173/?track=track17');await page.locator('#start-button').click();await page.waitForFunction(()=>window.__models?.()?.length===3&&window.__models().every(o=>o.loaded));
+ assert.equal((await page.evaluate(()=>window.__models()))[0].scale[0],3);
+ await page.screenshot({path:process.env.TEMP+'/swipe-glb/game.png'});
+ assert.deepEqual(errors,[]);console.log('PASS GLB path/file, position/rotation/scale, clone, export, save/reload and game load; no page errors');
+}catch(e){for(const p of context.pages()){console.log(await p.locator('#status').textContent().catch(()=>''),await p.evaluate(()=>typeof window.__scenery),errors);await p.screenshot({path:process.env.TEMP+'/glb-failure.png'});}throw e;}finally{await browser.close();}

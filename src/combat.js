@@ -46,7 +46,9 @@ export function createCombat() {
       candidates.sort((a,b)=>a.fraction-b.fraction||a.r.id.localeCompare(b.r.id));
       for(const {r,pad,lap,fraction} of candidates){
         const time=this.time+dt*fraction;if((this.padReadyAt.get(pad.id)??0)>time)continue;
-        const s=this.states.get(r.id);this.equip(r.id,pad.weapon);s.pickups++;s.pickupTime=2;s.lastPickup=pad.weapon;s.padPassages[pad.id]=lap;
+        const s=this.states.get(r.id);
+        if(s.weapon===pad.weapon && s.ammo[pad.weapon]>0){s.padPassages[pad.id]=lap;continue;}
+        this.equip(r.id,pad.weapon);s.pickups++;s.pickupTime=2;s.lastPickup=pad.weapon;s.padPassages[pad.id]=lap;
         this.padReadyAt.set(pad.id,time+WEAPON_PAD_COOLDOWN);this.events.push({kind:'pickup',owner:r.id,weapon:pad.weapon});
       }
       this.movement.clear();this.time+=dt;

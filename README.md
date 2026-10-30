@@ -119,6 +119,7 @@ The library includes the original ten circuits, four mechanic test circuits and
 | `track14` | TEST · Crossfire Circuit | Combat practice and open sightlines |
 | `track15` | Ion Foundry | Two gaps, banked corners, technical S bends, reactor loop and Needle Skyway shortcut |
 | `track16` | TEST · Raceway Workshop | Variable width, editable boost/brake pads, turn arrows and shortcut |
+| `track17` | Necros · The Conquest Spire | Route foundation: long parade, cathedral circuit/interior, tower crossings and steep dive |
 
 For Ion Foundry, take the **left** approach lane at the amber fork to enter the
 narrow elevated shortcut. Keep throttle through the jumps. Open
@@ -200,7 +201,7 @@ height changes and loops.
 - **Save to Game** persists the selected track locally. **Save & Test** saves and
   opens the game with that track selected. **Restore Built-in** resets only the
   selected built-in track; **Remove Custom** removes the selected custom track.
-- **Download** and **Copy JSON** export version 5 `swipe-out-track` documents.
+- **Download** and **Copy JSON** export version 6 `swipe-out-track` documents.
   **Import JSON as New Track** also accepts v1/v2 and older plain JSON exports,
   validates them, and creates a separate unsaved track without replacing others.
 
@@ -291,14 +292,16 @@ following the completed handling and Time Attack stages include:
 
 1. **Rookie / Pilot / Elite CPU difficulty — implemented:** precision, braking,
    overtaking, shortcut decisions and risk profiles; human balance tuning remains.
-2. **A three-track cup:** points, final standings, medals and unlockable liveries.
+2. **Cup progression:** the three-race cup, points and placement medals are implemented;
+   time medals and unlockable liveries remain.
 3. **Richer audio and feedback:** engine load, airbrakes, rail scraping, landings
    and clearer race/result cues.
 4. **Presentation and performance:** track previews, clearer ship selection,
    expanded saved settings, a separate test-track category, graphics options,
    adjustable shake/bloom and measurements on physical phones.
 
-Cup progression and the later polish stages remain planned. Combat balance, custom-track
+Foundry Cup and saved placement medals are implemented; cosmetic/ship progression
+and the later polish stages remain planned. Combat balance, custom-track
 guidance and camera/ghost comfort still need human playtesting. A simulated mobile
 viewport does not establish physical-phone performance.
 
@@ -315,3 +318,34 @@ Announcer voices cover combat threats/pickups, final lap, Time Attack records
 and race results. **ANNOUNCER** in start/pause controls all voices including the
 original countdown; default 35%, saved locally. Music/SFX levels are separate
 from this control. See [Announcer guide](docs/ANNOUNCER.md).
+
+**Foundry Cup** is available under EVENT: three built-in circuits, cumulative
+points, podium medals and saved progress. Resume restarts the unfinished round;
+completed races retain their points. CPU/handling/assist/Combat stay fixed for
+the cup. Cosmetic/ship unlocks remain planned. See [Cup guide](docs/CUP.md).
+
+Necros is a playable greybox; see [Necros guide](docs/NECROS.md) for layout, editing and remaining art.
+
+### Slope momentum
+
+Downhill gravity can carry player and CPU ships above engine top speed. Uphill
+slopes reduce speed; flat-road momentum decays slowly through drag. Boost expiry
+does not clip speed. Brakes work above engine top speed in both handling modes.
+Tuning lives in `src/longitudinal-physics.js`. Time Attack records now use separate
+physics identities; previous records remain stored but are not used for new laps.
+
+### GLB scenery
+
+Use **+ GLB FILE** in the editor for a self-contained model up to 8 MB, or place
+larger files in `public/models` and enter `/models/name.glb` under **GLB PATH**.
+Select the model to edit POSITION, ROTATION (DEG) and SCALE; the translation gizmo,
+clone and undo work as for primitives. Original materials are kept. Static scenery
+has no collision. Export uncompressed GLB with embedded textures/buffers.
+Embedded models travel in track JSON (16 MB total); path references require the
+model files alongside the game. Browser storage quotas can be smaller: use public
+paths or download JSON if Save to Game reports insufficient space.
+
+Automatic weapon pickups now use one pad every 460 world units, subject to safe
+placement. Same-type pickups are ignored while that weapon still has ammunition.
+Authored editor pads keep their positions. Magnetic camera follow is now damped
+while retaining local-up support for loops; magnetic adhesion is unchanged.

@@ -118,7 +118,7 @@ test('physical pads combine multiplicatively with catch-up for both player and C
     assert.ok(Math.abs(ship.speed - topSpeed * 1.08 * 1.3) < 1e-9);
     ship.speed = 1000;
     stepShipPhysics(ship, { steer: 0, thrust: 1 }, 1 / 60, straight, topSpeed);
-    assert.ok(Math.abs(ship.speed - getRacerTopSpeed(ship, topSpeed) * 1.5) < 1e-9);
+    assert.ok(ship.speed > 999 && ship.speed < 1000, 'boost must not clamp externally earned overspeed');
   }
 });
 

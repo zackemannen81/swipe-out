@@ -192,7 +192,11 @@ function drive(opponent, curve, dt) {
   const cornerTarget = opponent.targetSpeed * topSpeed / opponent.topSpeed;
   const speedTarget = Math.min(opponent.trafficSpeedLimit,
     ship.boostTimer > 0 ? Math.max(cornerTarget, topSpeed * 1.3) : cornerTarget);
-  const braking = ship.speed > speedTarget + 3;
+  // Keep downhill momentum on clear straights. Corners and traffic still
+  // require deliberate braking, independent of the engine's nominal limit.
+  const cornerNeedsBraking = cornerTarget < topSpeed * opponent.ai.pace * 0.96;
+  const safeSpeed = Math.min(opponent.trafficSpeedLimit, cornerNeedsBraking ? speedTarget : Infinity);
+  const braking = ship.speed > safeSpeed + 3;
   opponent.input = {
     steer, thrust: braking ? 0 : clamp((speedTarget - ship.speed) / 12 + 0.3, 0.15, 1),
     brakeLeft: braking, brakeRight: braking,

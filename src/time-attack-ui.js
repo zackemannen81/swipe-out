@@ -12,7 +12,7 @@ const $=id=>document.getElementById(id);
 
 export function createPracticeUI(scene,craft,storage,selection) {
   let preferences={mode:'race',line:true,warnings:true,ghost:true};
-  try { const v=JSON.parse(storage.getItem(PREF_KEY)); if(v)preferences={mode:v.mode==='time-attack'?'time-attack':'race',
+  try { const v=JSON.parse(storage.getItem(PREF_KEY)); if(v)preferences={mode:['race','time-attack','cup'].includes(v.mode)?v.mode:'race',
     ...Object.fromEntries(['line','warnings','ghost'].map(k=>[k,typeof v[k]==='boolean'?v[k]:true]))}; } catch { /* Defaults remain usable. */ }
   $('race-mode-select').value=preferences.mode;
   for(const name of ['line','warnings','ghost'])$(`practice-${name}`).checked=preferences[name];

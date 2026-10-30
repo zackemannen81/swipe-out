@@ -1,5 +1,14 @@
 # File Structure
 
+## 2026-10-29 — CUP-001
+
+- `src/cup.js` — cup configuration, validated persistence and scoring
+- `src/cup-ui.js` — selection, continuation and results UI
+- `tests/cup.test.js` — scoring/ties/DNF/persistence/failure coverage
+- `tools/verify-cup.mjs` — browser three-round/resume/medal/isolation checks
+- `docs/CUP.md` — rules and validation limits
+- `docs/archive/AUDIO-002.md` — accepted announcer integration task
+
 ## 2026-10-29 — AUDIO-002
 
 - `src/announcer.js` — voice policy, queue, loading and shared gain
@@ -241,3 +250,36 @@ Do not list planned paths as if they already exist.
   attainable speed, physical consequences, pad stacking and traffic regressions
 - `docs/archive/RACE-002.md` — completed CPU/interaction task record
 - `docs/CURRENT_TASK.md` — RACE-003 catch-up scope and verification
+
+
+## 2026-10-29 — Necros foundation
+
+- `src/track-necros.js`: track17 authored layout and procedural primitive scenery.
+- `public/images/necros/`: three propaganda PNG textures and SVG sources.
+- `tests/necros.test.js`: geometry, clearance, jumps and route/CPU traversal.
+- `tools/verify-necros.mjs`: isolated browser/editor acceptance and screenshots.
+- `docs/NECROS.md`: design, editing, validation and remaining art.
+- `docs/archive/CUP-001.md`: completed prior task.
+
+
+## 2026-10-29 — NECROS-002
+
+`src/track-necros.js` now contains only track geometry, named anchors and pads. `tests/necros.test.js` and `tools/verify-necros.mjs` verify continuous route/dive instead of the removed gap/shortcut. `docs/archive/NECROS-001.md` preserves the prior task.
+
+
+## PHYSICS-001
+- `src/longitudinal-physics.js`: shared road gravity, engine envelope, drag/braking.
+- `tests/longitudinal.test.js`: slopes, overspeed, both handling modes and CPU levels.
+- `docs/archive/NECROS-002.md`: prior task record.
+
+
+## HUD-001
+`docs/archive/PHYSICS-001.md` preserves the prior task. Existing game HUD and
+Necros browser verification now share/check current and peak speed scaling.
+
+
+## EDIT-CAMERA-COMBAT-001
+- `src/glb-scenery.js`: self-contained GLB validation/loading, shared by editor/game.
+- `tests/glb-scenery.test.js`: model format, loader, instances and lifecycle.
+- `tools/verify-glb.mjs`: isolated UI import/transform/clone/save/export/game checks.
+- `docs/archive/HUD-001.md`: prior task record.

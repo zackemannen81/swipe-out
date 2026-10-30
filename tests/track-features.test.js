@@ -189,8 +189,8 @@ test('magnetic chase camera follows the local up direction through loops/rolls a
     const frame = getTrackFrame(loopCurve, d / loopCurve.getLength());
     const position = frame.center.clone().addScaledVector(frame.normal, 0.62);
     follow.update(camera, position, frame, 1 / 120);
-    assert.ok(camera.up.dot(frame.normal) > 0.99999);
-    assert.ok(camera.position.distanceTo(position) < 8);
+    assert.ok(camera.up.dot(frame.normal) > 0.85);
+    assert.ok(camera.position.distanceTo(position) < 15);
     assert.ok(camera.position.clone().sub(position).dot(frame.normal) > 1);
     if (previous) assert.ok(Math.abs(previous.dot(camera.quaternion)) > 0.99);
     previous = camera.quaternion.clone();
@@ -198,4 +198,15 @@ test('magnetic chase camera follows the local up direction through loops/rolls a
   const frame = getTrackFrame(gapCurve, 0.1);
   follow.update(camera, frame.center, frame, 1 / 120, 'external', 1);
   assert.ok(camera.position.clone().sub(frame.center).dot(frame.normal) > 3);
+});
+
+test('magnetic camera filters abrupt bank changes and preserves reset/paused pose',()=>{
+ const camera=new THREE.PerspectiveCamera(),follow=createTrackCamera(),f=getTrackFrame(loopCurve,0);
+ const p=f.center.clone();follow.update(camera,p,f,1/60,'wipeoutStyle');
+ const before=camera.quaternion.clone(),changed={...f,rotation:f.rotation.clone().multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,0,1),.6))};
+ changed.normal=new THREE.Vector3(0,1,0).applyQuaternion(changed.rotation);
+ follow.update(camera,p,changed,1/60,'wipeoutStyle');
+ assert.ok(before.angleTo(camera.quaternion)<.15);assert.ok(camera.up.dot(changed.normal)<.99);
+ const paused=camera.position.clone();follow.update(camera,p,changed,0,'wipeoutStyle');assert.ok(paused.distanceTo(camera.position)<1e-9);
+ follow.update(camera,p,changed,1/60,'wipeoutStyle',1);assert.ok(camera.up.dot(changed.normal)>.999);
 });

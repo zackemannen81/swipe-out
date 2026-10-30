@@ -1,3 +1,4 @@
+import { loadGlb, validateGlb } from './glb-scenery.js';
 import { suggestBoostPads } from './track-pads.js';
 import { createTrack, disposeTrackGroup } from './track.js';
 import { BUILTIN_TRACKS, readTrackLibrary, saveTrack, resetTrack } from './track-library.js';
@@ -22,6 +23,7 @@ const isDirty = draft => draft.saved !== JSON.stringify(draft.track);
 const status = $('#status');
 function message(text, error = false) { status.textContent = text; status.classList.toggle('error', error); }
 const view = createEditorView($('#editor-canvas'), {
+  onError(error) { message(error, true); },
   onSelect(value) { selection = value; render(); view.select(selection); },
   onMove(value, position) {
     edit(next => {
@@ -196,6 +198,7 @@ function renderObjectInspector() {
     });
     row.append(section);
   }
+  if (object.type !== 'glb') {
   const colors = document.createElement('div'); colors.className = 'object-colors';
   const hex = value => typeof value === 'number' ? '#'+value.toString(16).padStart(6,'0') : value.length === 4 ? '#'+[...value.slice(1)].map(c=>c+c).join('') : value;
   const defaultColor = object.texture ? 0xffffff : object.type === 'cylinder' ? 0xffd166 : object.type === 'sphere' ? 0xb58cff : 0xff7aa8;
@@ -251,6 +254,7 @@ function renderObjectInspector() {
     const image = document.createElement('img'); image.src = object.texture; image.alt = 'Object texture'; image.className = 'texture-preview'; row.append(image);
     const clear = document.createElement('button'); clear.textContent = 'CLEAR TEXTURE';
     clear.addEventListener('click', () => edit(next => { next.objects[selection.index].texture = null; })); row.append(clear);
+  }
   }
   const remove = document.createElement('button'); remove.textContent = 'REMOVE OBJECT';
   remove.addEventListener('click', () => {
@@ -457,3 +461,33 @@ function renderPads() {
     list.append(row);
   });
 }
+
+async function addGlb(source) {
+  const key=currentKey, draft=track();
+  const model=await loadGlb(source);disposeTrackGroup(model);
+  if(key!==currentKey || draft!==track())throw new Error('Draft changed during import. Please try again.');
+  const position=[...track().centerline[0].slice(0,3)];
+  if(selection.kind==='point')position.splice(0,3,...track().centerline[selection.index].slice(0,3));
+  const object={id:crypto.randomUUID(),type:'glb',model:source,position,rotation:[0,0,0],scale:[1,1,1]};
+  // Verify portable export budget before changing the draft.
+  serializeTrack({...track(),objects:[...track().objects,object]});
+  edit(next=>next.objects.push(object));
+  selection={kind:'object',index:track().objects.length-1};render();view.select(selection);view.focus();
+}
+$('#add-glb').onclick=()=>$('#glb-file').click();
+$('#glb-file').onchange=async event=>{
+ const file=event.target.files[0];event.target.value='';if(!file)return;
+ try {
+  if(file.size>8*1024*1024)throw new Error('GLB exceeds 8 MB. Use a public/models path for larger models.');
+  validateGlb(await file.arrayBuffer());
+  const source=await new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve('data:model/gltf-binary;base64,'+r.result.split(',')[1]);r.onerror=reject;r.readAsDataURL(file);});
+  await addGlb(source);
+ }catch(error){message(error.message,true);}
+};
+$('#add-glb-path').onclick=async()=>{
+ try {
+  const source=$('#glb-path').value.trim();
+  normalizeTrack({...track(),objects:[{type:'glb',model:source,position:[0,0,0]}]});
+  await addGlb(source);
+ }catch(error){message(error.message,true);}
+};

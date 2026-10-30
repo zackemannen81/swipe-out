@@ -1,7 +1,7 @@
 import { Quaternion, Vector3 } from 'three';
 
-export const TIME_ATTACK = Object.freeze({ version: 1, physics: 'drive-001-v1', sampleHz: 20,
-  classicPhysics: 'drive-002-wall-v2',
+export const TIME_ATTACK = Object.freeze({ version: 1, physics: 'gravity-001-swipeout', sampleHz: 20,
+  classicPhysics: 'gravity-001-wipeout',
   maxLapSeconds: 600, maxSamples: 12004, timedLaps: 3, prefix: 'swipe-out:lap:v1:' });
 
 function stable(value) {

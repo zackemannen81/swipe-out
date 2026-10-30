@@ -575,3 +575,54 @@
   volume, threats/preemption, pause/mute/retry/solo; no page errors. Desktop and
   small-landscape screenshots inspected. Human listening and physical phone remain.
 - Updated guide/README/roadmap and continuity. Next: E cup/progression.
+
+## 2026-10-29 — CUP-001: Foundry Cup E1
+
+- User accepted announcer as-is; left runtime voice code and tuning unchanged.
+- Added cup selection and three built-in rounds (track1/13/15), fixed settings,
+  points/countback, actual finish-time standings and 60-second DNF closure.
+- Versioned active round and configuration-specific best placement persist.
+  Podium earns gold/silver/bronze; interrupted rounds restart without double points.
+- 107 tests/build pass (existing chunk warning). Browser controlled finishes
+  cover complete cup, DNF, reload/resume, medal, saved best and Race/TA isolation.
+  No page errors; desktop and small-landscape result layout inspected.
+- Updated roadmap/guide/README/continuity. Human full-cup balance remains.
+  E2: time medals/cosmetic unlocks, followed by ship progression.
+
+## 2026-10-29 - NECROS-001: playable track foundation
+
+- Archived CUP-001 and built editable track17 from the supplied Necros concepts.
+- 5.38 km, 73 points, 582 primitives; jump, core shortcut, banked cathedral,
+  two-turn ascent and gated descent. Three local propaganda textures.
+- Adjusted jump landing clearance and removed a vault pier crossing the shortcut.
+- 112 Node tests pass; build passes with existing chunk warning. Browser confirms
+  assets, intro/racing, real jump landing and editor export/save/reload, no errors.
+- Inspected game/editor screenshots. Final models, sky, cinematic, human balance
+  and phone performance remain. Existing handling/countdown/cup left unchanged.
+
+## 2026-10-29 - NECROS-002: corrected route-only foundation
+
+- Followed user clarification: long parade, around/through cathedral, rising tower
+  spiral with through passages, summit exit/dive, monuments and sharp return.
+- Removed placed scenery, jump and branch. 88 points, approximately 9.15 km.
+- 110 tests and build pass; existing chunk warning. Browser live dive, sector
+  captures and editor export/save/reload pass without errors.
+- Preserved user browser saves; documented Restore Built-in for old overrides.
+  Final buildings, human balance and physical-phone performance remain.
+
+## 2026-10-29 - PHYSICS-001: slope momentum
+
+- Shared tangential gravity and weak drag; engine limit no longer caps momentum.
+- CPU keeps downhill speed on clear straights across all three difficulties.
+- New Time Attack identities isolate old physics records without deleting them.
+- 113 tests/build pass. Browser coasting Necros dive: ~140 to ~258 world units/s,
+  no recovery/errors. Brake/boost expiry, modes, slopes and frame rates checked.
+- Foundry traversal harness uses centering assist for neutral steering at new
+  downhill speeds; original six landing and route requirements still pass.
+
+## 2026-10-29 - HUD-001: consistent speed units
+
+- Found current-speed overwrite used *36 while MAX/trip use 3.25m/world unit.
+- Current HUD now reuses MAX conversion (*3.25*3.6); physics unchanged.
+- Build passes (existing chunk warning). Browser dive HUD: current 3014, peak
+  3016 km/h, consistent conversion; no page errors, editor checks pass.

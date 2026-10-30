@@ -1,3 +1,5 @@
+import { loadGlb } from './glb-scenery.js';
+import { clone as cloneModel } from 'three/addons/utils/SkeletonUtils.js';
 import { automaticWeaponPads, addWeaponPads } from './weapon-pads.js';
 import * as THREE from 'three';
 import { addAuthoredPads, addCornerSigns } from './track-pads.js';
@@ -301,6 +303,7 @@ return { group, curve, length: curve.getLength(), boostPads: boostPadPlacements,
 
 const textureLoader = new THREE.TextureLoader();
 export function disposeTrackGroup(group) {
+  group.userData.disposed = true;
   const geometries = new Set(), materials = new Set(), textures = new Set();
   group.traverse(object => {
     if (object.geometry) geometries.add(object.geometry);
@@ -401,13 +404,27 @@ if (obj.type === 'cylinder') {
 }*/
 export function spawnTrackObjects(scene, trackData) {
   const existingGroup = scene.getObjectByName('customTrackObjects');
+  const contentKey=JSON.stringify((trackData?.objects??[]).map(({position,rotation,scale,...content})=>content));
+  const setTransform=(holder,obj)=>{
+    const h=trackData.horizontalScale??1;
+    holder.position.set(obj.position[0]*h,obj.position[1],obj.position[2]*h);
+    holder.rotation.set(...(obj.rotation??[0,0,0]).map(THREE.MathUtils.degToRad));
+    holder.scale.set(...(obj.scale??[1,1,1]));holder.userData.baseScale=[...(obj.scale??[1,1,1])];
+  };
+  // Keep loaded models/materials alive while dragging or changing transforms.
+  if(existingGroup?.userData.contentKey===contentKey){
+    (trackData?.objects??[]).forEach((obj,i)=>setTransform(existingGroup.children[i],obj));return;
+  }
   if (existingGroup) { scene.remove(existingGroup); disposeTrackGroup(existingGroup); }
 
   if (!trackData || !Array.isArray(trackData.objects)) return;
 
   const objectGroup = new THREE.Group();
   objectGroup.name = 'customTrackObjects';
+  objectGroup.userData.contentKey=contentKey;
 
+  const modelLoads = new Map();
+  objectGroup.userData.loadErrors = [];
   const hScale = trackData.horizontalScale ?? 1;
 
   // Ownership stays inside this group so editor rebuilds / track changes can
@@ -416,6 +433,25 @@ export function spawnTrackObjects(scene, trackData) {
   const geometries = new Map(), textures = new Map(), materials = new Map();
 
   trackData.objects.forEach((obj) => {
+    if (obj.type === 'glb') {
+      const holder = new THREE.Group();
+      holder.position.set(obj.position[0]*hScale,obj.position[1],obj.position[2]*hScale);
+      holder.rotation.set(...obj.rotation.map(THREE.MathUtils.degToRad));
+      holder.scale.set(...obj.scale);holder.userData.baseScale=[...obj.scale];
+      objectGroup.add(holder);
+      if(!modelLoads.has(obj.model))modelLoads.set(obj.model,loadGlb(obj.model).then(model=>{
+        if(objectGroup.userData.disposed){disposeTrackGroup(model);return null;}return model;
+      }));
+      modelLoads.get(obj.model).then(model=>{
+        if(!model || objectGroup.userData.disposed)return;
+        holder.add(cloneModel(model));holder.userData.loaded=true;
+      }).catch(error=>{
+        if(objectGroup.userData.disposed)return;
+        holder.userData.error=error.message;objectGroup.userData.loadErrors.push(error.message);
+        console.warn('Scenery GLB:', error.message);
+      });
+      return;
+    }
     let geometry = geometries.get(obj.type);
     if (!geometry && obj.type === 'cylinder') {
       geometry = new THREE.CylinderGeometry(0.5, 0.5, 1, 32);

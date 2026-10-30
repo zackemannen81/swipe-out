@@ -228,7 +228,7 @@
 
         <div class="driving-settings">
           <label for="race-mode-select">EVENT
-            <select id="race-mode-select"><option value="race">Race · CPU rivals</option><option value="time-attack">Time Attack · solo</option></select>
+            <select id="race-mode-select"><option value="race">Race · CPU rivals</option><option value="cup">Foundry Cup · 3 races</option><option value="time-attack">Time Attack · solo</option></select>
           </label>
           <label for="cpu-difficulty-select">CPU DIFFICULTY
             <select id="cpu-difficulty-select" aria-describedby="cpu-difficulty-description">
@@ -243,6 +243,7 @@
           <label><input id="practice-warnings" type="checkbox" checked /> CORNER WARNINGS</label>
           <small>Recommended line: cyan = flow · amber = lift · pink = brake.</small>
         </div>
+        <section id="cup-options" hidden><p id="cup-summary"></p><small>POINTS 10 / 7 / 5 / 3 / 1 · DNF 0 · Ties: best finishes, then latest race. Interrupted races restart; completed rounds are saved.</small><button id="cup-new" type="button" hidden>NEW CUP</button></section>
         <p id="practice-preview" class="driving-description" hidden></p>
         <div class="driving-settings">
           <label for="handling-select">CONTROL MODE
@@ -279,6 +280,7 @@
         <strong class="result-time" id="result-position">1 / 5</strong>
         <p class="result-label" id="result-time-label">YOUR TIME</p>
         <strong class="result-time" id="result-time">00:00.00</strong>
+        <section id="cup-results" hidden><p id="cup-result-summary" aria-live="polite"></p><table><thead><tr><th>Rank</th><th>Pilot</th><th>Finish</th><th>Race pts</th><th>Total</th></tr></thead><tbody id="cup-standings"></tbody></table></section>
         <section id="practice-results" hidden>
           <p id="practice-result-summary"></p><p id="practice-result-best"></p>
           <table><thead><tr><th>Lap</th><th>Time</th><th>S1</th><th>S2</th><th>S3</th><th>Status</th></tr></thead><tbody id="practice-result-laps"></tbody></table>

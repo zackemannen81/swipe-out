@@ -1,5 +1,93 @@
 # Current Status
 
+## 2026-10-29 — EDIT-CAMERA-COMBAT-001
+
+Editor supports static GLB scenery, embedded files up to 8 MB or local public
+paths (e.g. /models/necros.glb). Existing position/rotation/scale inspector,
+translation gizmo, selection, cloning, undo and save/export apply. Materials are
+preserved; no model animation playback or collision. GLBs must embed textures
+and buffers; Draco/Meshopt/KTX2 assets need an uncompressed export. Version 6
+track documents add model/type fields and still read versions 1–5. Total JSON
+limit remains 16 MB; large models should use public paths, especially for local
+storage quotas. Referenced files must accompany shared tracks. Loading errors
+appear in the editor; scene disposal cancels late attachment and frees assets.
+Transform edits reuse loaded model instances instead of fetching again.
+
+Magnetic Swipeout-camera follow now uses damped world-position lag (bounded for
+loops), filtered road-up and ship heading, with road clearance and respawn reset.
+Nonmagnetic and Classic camera profiles and magnetic ship adhesion are unchanged.
+
+Automatic weapon stations are single centre pads at 460 rather than 230 world
+units on main/branch routes. Authored pads remain as authored. An equipped weapon
+with ammo ignores same-type pickups without refill, pad cooldown or pickup event
+(and therefore no announcer); different weapons still replace the slot.
+
+118 tests pass; build passes with existing chunk warning. Isolated browser checks
+cover GLB path/file import, transforms, cloning, JSON export, save/reload and game
+loading; Necros magnetic descent and editor pass without page errors. Camera
+loop/roll, transient smoothing and recovery are tested. Human camera feel and
+physical-phone performance remain for playtesting.
+
+
+## 2026-10-29 — HUD-001: speed units
+
+Current speed now reuses the same converted value as race MAX: world speed *
+3.25 metres/unit * 3.6. Trip distance already uses 3.25. A later HUD write used
+*36 and overstated current speed by 36/11.7 (~3.08). MAX is the race peak, not
+engine limit. Rendering-only correction; physics and record identities unchanged.
+
+
+## 2026-10-29 — PHYSICS-001: slope momentum
+
+Shared Swipeout/Wipeout and CPU road physics now apply gravity along the tangent.
+Engine thrust tapers over the last 5% of its speed range; full throttle balances
+flat-road drag at the engine limit. Above it, the engine adds no force and never
+clamps momentum. Drag is weak linear plus quadratic; braking remains effective.
+Boost expiration and catch-up changes do not clip speed. Existing minimum forward
+speed 12 remains (no stalling/reversing). Gap flight retains ballistic gravity;
+nonmagnetic airborne motion does not receive road-slope gravity a second time.
+CPU permits overspeed on clear straights; corner and traffic braking still apply.
+Time Attack physics keys changed for both modes; old saved records are retained
+but no longer compared with new-physics laps.
+
+113 tests/build pass (existing chunk warning). Browser Necros coast from dive to
+monuments accelerated from ~140 to ~258 world units/s without throttle, with no
+recovery/page errors. Human balance and mobile performance remain unmeasured.
+Tuning: src/longitudinal-physics.js, LONGITUDINAL gravity/drag/taper constants.
+
+
+## 2026-10-29 — NECROS-002: corrected route-only layout
+
+Track17 now follows the user clarification: unbroken parade, outside/inside
+cathedral, tower spiral with interior crossings, summit passage, steep dive,
+flat monuments and sharp return. 88 points, 9.15 km, zero scenery; previous jump
+and shortcut removed. 110 tests/build pass. Browser live dive and editor
+export/save/reload pass without errors. See NECROS.md; saved overrides are kept.
+
+
+## 2026-10-29 — NECROS-001: playable foundation
+
+Added track17: 5.38 km, 73 points, 582 editable primitives, variable widths and
+banking, parade jump, cathedral core shortcut, two-turn ascent and gated drop.
+Propaganda textures and simple city landmarks; detailed models/sky/intro deferred.
+112 tests/build pass; isolated WebGL game/editor verification passes, including
+real jump landing and export/save/reload. Human balance and phone performance
+remain. Existing cup/handling/countdown unchanged. Details: NECROS.md.
+
+## 2026-10-29 — CUP-001: Foundry Cup E1
+
+User accepted announcer without further tuning. Added three-round cup using
+built-in track1/13/15, locked CPU/handling/assist/combat settings, 10/7/5/3/1 points,
+countback/latest-race ties and podium medals. Actual finish times determine race
+results; remaining CPUs become DNF after 60s following player finish, scoring 0.
+Versioned progress resumes interrupted rounds from the start; finalized results
+score once. Best final placement is saved per configuration. Storage errors are
+visible and keep session progress. Cup does not modify solo records or announcer.
+107 tests and build pass (existing chunk warning). Browser controlled finishes
+exercise three rounds, DNF, reload/resume, medal and Race/TA isolation. Result
+layout inspected on desktop/568x320; human full-cup balance remains. See CUP.md.
+Next E work: time medals/cosmetic unlocks, then ship progression.
+
 ## 2026-10-29 — AUDIO-002: runtime announcer
 
 Shared saved voice volume in start/pause defaults to 35%, including countdown.

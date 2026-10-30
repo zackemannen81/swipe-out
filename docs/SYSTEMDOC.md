@@ -213,3 +213,74 @@ Announcer production tooling uses an editable 49-line catalog and accepted
 voice/SoX recipe. Runtime playback now uses a bounded priority/expiry queue and
 shared saved voice gain, including original countdown sounds. Countdown triggers
 remain outside the queue and preserve their timing. See ANNOUNCER.md.
+
+Cup progression owns versioned active-round results and best placements separately
+from Time Attack. Built-in course definitions and fixed race settings keep a cup
+consistent across reloads. Only finalized rounds commit points; interrupted races
+restart. Finish-time scoring, DNF and countback rules are specified in CUP.md.
+
+
+## 2026-10-29 — Necros foundation
+
+Necros content foundation uses ordinary track data and editable primitives. Detailed model scenery is a later art pass; the race/physics systems are unchanged. See NECROS.md.
+
+
+## 2026-10-29 — NECROS-002
+
+Necros now uses a route-only definition with no scenery. Architecture is deferred until the corrected driving layout is accepted.
+
+
+## 2026-10-29 — PHYSICS-001: slope momentum
+
+Shared Swipeout/Wipeout and CPU road physics now apply gravity along the tangent.
+Engine thrust tapers over the last 5% of its speed range; full throttle balances
+flat-road drag at the engine limit. Above it, the engine adds no force and never
+clamps momentum. Drag is weak linear plus quadratic; braking remains effective.
+Boost expiration and catch-up changes do not clip speed. Existing minimum forward
+speed 12 remains (no stalling/reversing). Gap flight retains ballistic gravity;
+nonmagnetic airborne motion does not receive road-slope gravity a second time.
+CPU permits overspeed on clear straights; corner and traffic braking still apply.
+Time Attack physics keys changed for both modes; old saved records are retained
+but no longer compared with new-physics laps.
+
+113 tests/build pass (existing chunk warning). Browser Necros coast from dive to
+monuments accelerated from ~140 to ~258 world units/s without throttle, with no
+recovery/page errors. Human balance and mobile performance remain unmeasured.
+Tuning: src/longitudinal-physics.js, LONGITUDINAL gravity/drag/taper constants.
+
+
+## 2026-10-29 — HUD-001: speed units
+
+Current speed now reuses the same converted value as race MAX: world speed *
+3.25 metres/unit * 3.6. Trip distance already uses 3.25. A later HUD write used
+*36 and overstated current speed by 36/11.7 (~3.08). MAX is the race peak, not
+engine limit. Rendering-only correction; physics and record identities unchanged.
+
+
+## 2026-10-29 — EDIT-CAMERA-COMBAT-001
+
+Editor supports static GLB scenery, embedded files up to 8 MB or local public
+paths (e.g. /models/necros.glb). Existing position/rotation/scale inspector,
+translation gizmo, selection, cloning, undo and save/export apply. Materials are
+preserved; no model animation playback or collision. GLBs must embed textures
+and buffers; Draco/Meshopt/KTX2 assets need an uncompressed export. Version 6
+track documents add model/type fields and still read versions 1–5. Total JSON
+limit remains 16 MB; large models should use public paths, especially for local
+storage quotas. Referenced files must accompany shared tracks. Loading errors
+appear in the editor; scene disposal cancels late attachment and frees assets.
+Transform edits reuse loaded model instances instead of fetching again.
+
+Magnetic Swipeout-camera follow now uses damped world-position lag (bounded for
+loops), filtered road-up and ship heading, with road clearance and respawn reset.
+Nonmagnetic and Classic camera profiles and magnetic ship adhesion are unchanged.
+
+Automatic weapon stations are single centre pads at 460 rather than 230 world
+units on main/branch routes. Authored pads remain as authored. An equipped weapon
+with ammo ignores same-type pickups without refill, pad cooldown or pickup event
+(and therefore no announcer); different weapons still replace the slot.
+
+118 tests pass; build passes with existing chunk warning. Isolated browser checks
+cover GLB path/file import, transforms, cloning, JSON export, save/reload and game
+loading; Necros magnetic descent and editor pass without page errors. Camera
+loop/roll, transient smoothing and recovery are tested. Human camera feel and
+physical-phone performance remain for playtesting.
