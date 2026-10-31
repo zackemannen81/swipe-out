@@ -6,14 +6,13 @@ import { updateWeaponPads } from './weapon-pads.js';
 import { updateTrackPresentation } from './track-pads.js';
 import * as THREE from 'three';
 import { load, parse } from 'opentype.js'
-import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
-import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { createRenderPipeline } from './render-pipeline.js';
 import { RaceAudio } from './audio.js';
 import './style.css';
 
 import { spawnTrackObjects, createTrack, getTrackFrame, disposeTrackGroup } from './track.js';
 import { readTrackLibrary } from './track-library.js';
+import { loadTrackLibrary } from './track-storage.js';
 import { createShipPhysics, stepShipPhysics } from './ship-physics.js';
 import { createOpponents, getPlayerPosition, resetOpponents, updateOpponents, syncOpponentPose } from './opponents.js';
 import { createCraft } from './craft.js';
@@ -30,6 +29,8 @@ import { createCombat, createCombatView, WEAPONS, COMBAT } from './combat.js';
 import { CPU_DIFFICULTIES, cpuDifficulty, loadCpuDifficulty, saveCpuDifficulty } from './cpu-difficulty.js';
 import { createPracticeUI, lapTime } from './time-attack-ui.js';
 import { ParticleSystem } from './ParticleSystem.js';
+import * as CONTROLS from './controls.js'
+import * as GFX from './gfx.js'
 
 
 
@@ -104,13 +105,10 @@ fullscreenButton?.addEventListener('click', toggleFullscreenAndLock);
 document.addEventListener('fullscreenchange', syncFullscreenButton);
 document.addEventListener('webkitfullscreenchange', syncFullscreenButton);
 
-
-
 function getActiveTrackData(trackId) {
-  const latest = readTrackLibrary(localStorage);
-  const entry = latest.entries[trackId] ?? latest.entries.track1;
-  TRACK_CONFIG[trackId] = entry;
-  return entry.data;
+  // IndexedDB tracks are loaded before game initialization (including large
+  // embedded textures/models). A Save & Test opens a fresh game tab.
+  return (TRACK_CONFIG[trackId] ?? TRACK_CONFIG.track1).data;
 }
 
 function triggerCountdownAnim(text, isGo = false) {
@@ -139,23 +137,37 @@ if (menuButton) {
 }
 
 export const SPEEDCALIBRATION = 86; // Justera detta värde för att kalibrera spelets hastighe
+// Phase 1: renderer / projection. No scene draw or postprocessing yet.
 export const scene = new THREE.Scene();
-//scene.background = new THREE.Color(0x080c0a);
-scene.background = new THREE.Color(0x000000);
-scene.fog = new THREE.FogExp2(0x381834, 0.0040);
-//scene.fog = new THREE.Fog(0x080c0a,350,420);
+scene.fog = new THREE.FogExp2(0x282832, 0.0045);
+const initialWidth = Math.max(1, window.innerWidth);
+const initialHeight = Math.max(1, window.innerHeight);
+const camera = new THREE.PerspectiveCamera(
+  initialWidth < 700 ? 54 : 46, initialWidth / initialHeight, 0.1, 512
+);
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, powerPreference: 'high-performance' });
+renderer.setPixelRatio(window.devicePixelRatio || 1);
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.25;
+renderer.shadowMap.enabled = false;
+renderer.setSize(initialWidth, initialHeight, false);
+
+// Phase 2: populate the scene. Lights, scenery and craft are objects, not passes.
 export const particleSystem = new ParticleSystem(2048, scene);
 particleSystem.initParticleSystem();
 configureImpactParticles(particleSystem, sparks_material);
 
-const loadedTracks = readTrackLibrary(localStorage);
+const loadedTracks = await loadTrackLibrary(localStorage);
 let drivingSettings = loadDrivingSettings(localStorage);
 let activeDrivingSettings = { ...drivingSettings };
 let selectedCpuDifficulty = loadCpuDifficulty(localStorage);
 let activeCpuDifficulty = selectedCpuDifficulty;
 const cpuDifficultySelect = document.querySelector('#cpu-difficulty-select');
 cpuDifficultySelect.value = selectedCpuDifficulty;
+
 let cpuStorageWarning = false;
+
 function updateCpuDescription() {
   const solo = document.querySelector('#race-mode-select').value === 'time-attack';
   cpuDifficultySelect.disabled = solo;
@@ -169,7 +181,9 @@ cpuDifficultySelect.addEventListener('change', () => {
   cpuStorageWarning = !saveCpuDifficulty(localStorage, selectedCpuDifficulty);
   updateCpuDescription();
 });
+
 document.querySelector('#race-mode-select').addEventListener('change', updateCpuDescription);
+
 const handlingSelect = document.querySelector('#handling-select');
 const cameraFollowSelect = document.querySelector('#camera-follow-select');
 const laneAssistSelect = document.querySelector('#assist-select');
@@ -229,24 +243,15 @@ const panoramaBackdrop = new THREE.Mesh(
     side: THREE.BackSide,
     depthWrite: false,
     depthTest: false,
+    toneMapped: true,
     fog:true,
   })
 );
+// Sky must render before opaque scenery; it does not participate in depth testing.
 panoramaBackdrop.renderOrder = -10;
 scene.add(panoramaBackdrop);
 
-const camera = new THREE.PerspectiveCamera(53, 1, 0.1, 512);
-const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
-//renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.25));
-renderer.setPixelRatio(window.devicePixelRatio);
-renderer.outputColorSpace = THREE.SRGBColorSpace;
-renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.25;
-const composer = new EffectComposer(renderer);
-composer.addPass(new RenderPass(scene, camera));
-const bloomPass = new UnrealBloomPass(new THREE.Vector2(1, 1), 0.6, 0.7, 0.78);
-composer.addPass(bloomPass);
-
+// Scene lights are ordinary objects and may be created before the camera moves.
 scene.add(new THREE.HemisphereLight(0x98c8ff, 0x111421, 1.8));
 const keyLight = new THREE.DirectionalLight(0xd8e8ff, 2.8);
 keyLight.position.set(-15, 28, 12);
@@ -869,7 +874,12 @@ const trackAssets = createTrack(trackData);
   });
   spawnTrackObjects(scene, trackData);
   scene.add(track);
-
+  /*
+scene.traverse(obj => {
+  if (obj.isMesh || obj.isLine || obj.isPoints) {
+    obj.frustumCulled = false;
+  }
+});*/
   // Uppdatera minimappen för den nya banan
   setupMinimap();
 
@@ -1326,16 +1336,25 @@ function updateTrackSelection(event) {
 trackSelect.addEventListener('change', updateTrackSelection);
 updateTrackSelection({ target: trackSelect });
 
+// Phase 3: establish initial ship/camera pose after the world has been built.
+updateCraftPose(0);
+const initialFrame = race.poseFrame ?? getTrackFrame(curve, 0);
+cameraSystem.position.copy(craft.position)
+  .addScaledVector(initialFrame.tangent, -7)
+  .addScaledVector(initialFrame.normal, 3);
+cameraSystem.currentLook.copy(craft.position)
+  .addScaledVector(initialFrame.tangent, 9);
+camera.position.copy(cameraSystem.position);
+camera.up.copy(initialFrame.normal);
+camera.lookAt(cameraSystem.currentLook);
+panoramaBackdrop.position.copy(camera.position);
+
+// Phase 4: register all postprocessing only after the initial scene and camera.
+const graphics = createRenderPipeline({ scene, camera, renderer, getTrack: () => track });
 function resize() {
-  viewportWidth = window.innerWidth;
-  viewportHeight = window.innerHeight;
-  const width = Math.max(1, window.innerWidth);
-  const height = Math.max(1, window.innerHeight);
-  camera.aspect = width / height;
-  camera.fov = width < 700 ? 54 : 46;
-  camera.updateProjectionMatrix();
-  renderer.setSize(width, height, false);
-  composer.setSize(width, height);
+  const { width, height } = graphics.resize();
+  viewportWidth = width;
+  viewportHeight = height;
 }
 window.addEventListener('resize', resize, { passive: true });
 resize();
@@ -1344,7 +1363,7 @@ function render() {
   handleGamepadInput();
     // Om spelet är pausat, rita bara om bilden och avbryt funktionen
   if (isPaused) {
-    composer.render();
+    graphics.render();
     requestAnimationFrame(render);
     return; 
   }
@@ -1731,7 +1750,7 @@ if (thrustFill) {
 
   const kick = race.state === 'racing' ? raceAudio.channels.kick : { hitValue: 0 };
   const bass = race.state === 'racing' ? raceAudio.channels.bass : { value: 0 };
-  bloomPass.strength = 0.62 + kick.hitValue * 0.55 + bass.value * 0.12;
+  graphics.setBloomStrength(0.62 + kick.hitValue * 0.55 + bass.value * 0.12);
 
   // Update world-space exhaust only after player/CPU poses and the camera are final.
   const enginesRunning = ['countdown', 'racing', 'finished'].includes(race.state);
@@ -1751,10 +1770,11 @@ if (thrustFill) {
   updateTrackPresentation(track, performance.now()/1000);
   updateWeaponPads(track, combat.time, combat);
   particleSystem.updateSystem(delta);
-    composer.render();
+
+  // Phase 5: camera and world transforms are final; draw once, at frame end.
+  graphics.render();
   requestAnimationFrame(render);
 }
-updateCraftPose();
 render();
 // The model loaders above await several assets. Keep Start unavailable until
 // the race and its handlers exist, including when opened directly by the editor.
@@ -1765,6 +1785,7 @@ window.addEventListener('pagehide', () => {
   practice.dispose();
   thrusters.dispose();
   window.removeEventListener('resize', resize);
+  graphics.dispose();
   renderer.dispose();
   scene.traverse((object) => {
     if (!object.isMesh) return;

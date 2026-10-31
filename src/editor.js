@@ -1,7 +1,8 @@
 import { loadGlb, validateGlb } from './glb-scenery.js';
 import { suggestBoostPads } from './track-pads.js';
 import { createTrack, disposeTrackGroup } from './track.js';
-import { BUILTIN_TRACKS, readTrackLibrary, saveTrack, resetTrack } from './track-library.js';
+import { BUILTIN_TRACKS } from './track-library.js';
+import { loadTrackLibrary, persistTrack, removePersistedTrack } from './track-storage.js';
 import { normalizeTrack, parseTrack, serializeTrack, MAX_TRACK_BYTES } from './track-format.js';
 import { createHistory } from './editor-history.js';
 import { createEditorView } from './editor-view.js';
@@ -9,7 +10,7 @@ import { createTrackCurve, getTrackFrame, progressAtControlPoint } from './track
 import './editor.css';
 
 const $ = selector => document.querySelector(selector);
-const library = readTrackLibrary(localStorage);
+const library = await loadTrackLibrary(localStorage);
 const drafts = new Map();
 for (const [key, entry] of Object.entries(library.entries)) {
   drafts.set(key, { track: entry.data, saved: JSON.stringify(entry.data), history: createHistory(entry.data) });
@@ -354,23 +355,36 @@ $('#fit-button').addEventListener('click', () => view.fit());
 $('#top-button').addEventListener('click', () => view.fit(true));
 $('#side-button').addEventListener('click', () => view.fit('side'));
 $('#focus-button').addEventListener('click', () => view.focus());
-function save() {
+let saveInProgress = false;
+async function save() {
+  if (saveInProgress) return false;
+  saveInProgress = true;
+  const key = currentKey;
+  const snapshot = structuredClone(track());
   try {
-    const normalized = saveTrack(localStorage, currentKey, track());
-    current().track = normalized; current().saved = JSON.stringify(normalized);
-    render(); message('Saved to this browser. The track is now available in the race selector.');
+    const normalized = await persistTrack(localStorage, key, snapshot);
+    const draft = drafts.get(key);
+    draft.saved = JSON.stringify(normalized);
+    render();
+    message('Saved to IndexedDB in this browser. The track is now available in the race selector.');
     return true;
   } catch (error) { message(error.message, true); return false; }
+  finally { saveInProgress = false; }
 }
-$('#save-button').addEventListener('click', save);
-$('#test-button').addEventListener('click', () => {
-  if (save()) window.open(`./?track=${encodeURIComponent(currentKey)}&editor=1`, '_blank', 'noopener');
+$('#save-button').addEventListener('click', () => { void save(); });
+$('#test-button').addEventListener('click', async () => {
+  // Open synchronously to avoid popup blockers while IndexedDB writes asynchronously.
+  const tab = window.open('about:blank', '_blank');
+  if (await save()) {
+    if (tab) { tab.opener = null; tab.location.href = `./?track=${encodeURIComponent(currentKey)}&editor=1`; }
+    else window.location.href = `./?track=${encodeURIComponent(currentKey)}&editor=1`;
+  } else tab?.close();
 });
-$('#reset-button').addEventListener('click', () => {
+$('#reset-button').addEventListener('click', async () => {
   const builtIn = BUILTIN_TRACKS[currentKey];
   if (!window.confirm(builtIn ? 'Restore this built-in track and discard its saved override and draft? Other tracks are kept.' : 'Remove this custom track and its draft? Download it first if you want to keep a copy.')) return;
   try {
-    resetTrack(localStorage, currentKey);
+    await removePersistedTrack(localStorage, currentKey);
     if (builtIn) {
       const restored = normalizeTrack(builtIn.data);
       drafts.set(currentKey, { track: restored, saved: JSON.stringify(restored), history: createHistory(restored) });

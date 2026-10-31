@@ -20,12 +20,29 @@ function addInstances(group, geometry, material, transforms) {
   mesh.renderOrder = 4;
 }
 
+
 export function createTrack(definition = NEON_CAUSEWAY) {
   const curve = createTrackCurve(definition);
   const junctionClear = d => !curve.track.branches.some(b => [b.start,b.end].some(u => Math.abs(d-u*curve.getLength()) < 35));
   const group = new THREE.Group();
+  // Node-based physics/tests have no document or image loader.
+  const trackTexture = typeof document === 'undefined'
+    ? null : new THREE.TextureLoader().load('/images/track.png');
+  if (trackTexture) {
+    trackTexture.colorSpace = THREE.SRGBColorSpace;
+    trackTexture.wrapS = THREE.RepeatWrapping;
+    trackTexture.wrapT = THREE.ClampToEdgeWrapping;
+    trackTexture.anisotropy = 8;
+  }
+  // The source image is 3:1: horizontal = travel, vertical = track width.
+  // Round the count so the UV seam closes exactly where the lap closes.
+  const roadTextureRepeats = Math.max(
+    1, Math.round(curve.getLength() / (Math.max(1, getTrackWidth(curve, 0)) * 3))
+  );
+
   const roadMaterial = new THREE.MeshStandardMaterial({
-    color: curve.track.magnetic ? 0x24374b : 0x182234, metalness: 0.0, roughness: 0.48,
+    map: trackTexture,
+    color: 0xffffff, metalness: 0.18, roughness: 0.78,
     emissive: curve.track.magnetic ? 0x0b2138 : 0x06121c,
     emissiveIntensity: curve.track.magnetic ? 0.65 : 0.1,
     // An opaque, gently emissive magnetic deck stays legible on the dark side
@@ -49,6 +66,7 @@ export function createTrack(definition = NEON_CAUSEWAY) {
 
   function ribbon(offset, width, material, yOffset = 0.025, samples = 600) {
     const positions = [];
+    const uvs = [];
     const indices = [];
     const stops = [...new Set([...Array.from({ length: samples + 1 }, (_, i) => i / samples),
       ...curve.track.gaps.flatMap(gap => [gap.start, gap.end])])].sort((a, b) => a - b);
@@ -67,6 +85,10 @@ export function createTrack(definition = NEON_CAUSEWAY) {
         leftPoint.x, leftPoint.y, leftPoint.z,
         rightPoint.x, rightPoint.y, rightPoint.z,
       );
+      // UV x follows track distance; UV y spans the road from edge to edge.
+      // Only the road material samples the texture; other ribbons ignore UVs.
+      const uvAlong = u * roadTextureRepeats;
+      uvs.push(uvAlong, 0, uvAlong, 1);
       if (i < stops.length - 1 && hasSurface(curve, (u + stops[i + 1]) * 0.5 * curve.getLength())) {
         const a = i * 2;
         indices.push(a, a + 2, a + 1, a + 1, a + 2, a + 3);
@@ -74,6 +96,7 @@ export function createTrack(definition = NEON_CAUSEWAY) {
     }
     const geometry = new THREE.BufferGeometry();
     geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+    geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
     geometry.setIndex(indices);
     geometry.computeVertexNormals();
     group.add(new THREE.Mesh(geometry, material));
