@@ -2,7 +2,9 @@ import { validatePads } from './track-pads.js';
 // Version 6 adds GLB scenery; previous versions remain readable.
 export const TRACK_FORMAT = 'swipe-out-track';
 export const TRACK_VERSION = 6;
-export const MAX_TRACK_BYTES = 16 * 1024 * 1024;
+// Cap portable JSON exports/imports, not the size of GLBs referenced via /models/.
+// Prefer external GLB paths for large models; the limit is only for embedded data.
+export const MAX_TRACK_BYTES = 64 * 1024 * 1024;
 
 function fail(path, reason) { throw new Error(`${path}: ${reason}`); }
 function record(value, path) {
@@ -192,7 +194,7 @@ export function decodeTrack(value) {
 }
 
 export function parseTrack(source) {
-  if (new TextEncoder().encode(source).length > MAX_TRACK_BYTES) fail('file', 'maximum size is 16 MB.');
+  if (new TextEncoder().encode(source).length > MAX_TRACK_BYTES) fail('file', `maximum JSON size is ${MAX_TRACK_BYTES / (1024 * 1024)} MB.`);
   let value;
   try { value = JSON.parse(source); } catch { fail('file', 'invalid JSON. Choose a downloaded track JSON file.'); }
   return decodeTrack(value);
@@ -204,6 +206,6 @@ export function trackDocument(track) {
 
 export function serializeTrack(track) {
   const source = JSON.stringify(trackDocument(track), null, 2);
-  if (new TextEncoder().encode(source).length > MAX_TRACK_BYTES) fail('file', 'maximum size is 16 MB. Reduce embedded textures.');
+  if (new TextEncoder().encode(source).length > MAX_TRACK_BYTES) fail('file', `maximum JSON size is ${MAX_TRACK_BYTES / (1024 * 1024)} MB. Use /models/*.glb paths instead of embedding large models.`);
   return source + '\n';
 }

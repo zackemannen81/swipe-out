@@ -42,7 +42,7 @@ export function createTrack(definition = NEON_CAUSEWAY) {
 
   const roadMaterial = new THREE.MeshStandardMaterial({
     map: trackTexture,
-    color: 0xffffff, metalness: 0.18, roughness: 0.78,
+    color: 0xffffff, metalness: 0.88, roughness: 0.78,
     emissive: curve.track.magnetic ? 0x0b2138 : 0x06121c,
     emissiveIntensity: curve.track.magnetic ? 0.65 : 0.1,
     // An opaque, gently emissive magnetic deck stays legible on the dark side

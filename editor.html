@@ -87,7 +87,16 @@
             <div class="button-row"><button id="add-glb">+ GLB FILE</button><input id="glb-file" type="file" accept=".glb" hidden></div>
             <label>GLB PATH <input id="glb-path" placeholder="/models/necros.glb"></label>
             <button id="add-glb-path">ADD GLB FROM PATH</button>
-            <p class="field-help">Embedded GLB up to 8 MB. For larger models place the file in public/models and use its /models/name.glb path. Position, rotation and scale are below. Materials are preserved; scenery has no collision.</p>
+            <div class="cathedral-kit">
+              <div class="subheading">NECROS CATHEDRAL · 6 MODELS</div>
+              <label>CATHEDRAL PART <select id="cathedral-model" aria-label="Cathedral part"></select></label>
+              <div class="button-row">
+                <button id="add-cathedral-part">+ SELECTED PART</button>
+                <button id="add-cathedral-all">+ ALL 6 PARTS</button>
+              </div>
+              <p class="field-help">Uses GLBs in public/models as file references (no base64). New parts are staged beside the selected track point; move and scale them to assemble the cathedral. The two largest GLBs are 80 and 114 MB and may take time to load. Keep public/models with the game when distributing it.</p>
+            </div>
+            <p class="field-help">Embedded GLB up to 8 MB. For larger models use its /models/name.glb path. Materials are preserved; scenery has no collision.</p>
             <label class="object-picker">SCENERY <select id="object-select" aria-label="Select scenery"></select></label>
             <div id="primitive-list"></div>
           </div>
@@ -98,7 +107,7 @@
           <p class="status" id="status" role="status">Select a point and drag its axes. Save &amp; Test opens this track in the game.</p>
         </aside>
       </section>
-      <footer>LOCAL DEV TOOL <span>·</span> EDITOR DATA IS STORED IN LOCAL STORAGE</footer>
+      <footer>LOCAL DEV TOOL <span>·</span> TRACKS ARE SAVED IN INDEXEDDB · GLB PATHS REQUIRE THE PUBLIC/MODELS FILES</footer>
     </main>
     <script type="module" src="/src/editor.js"></script>
   </body>

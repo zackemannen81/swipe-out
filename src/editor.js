@@ -1,4 +1,5 @@
 import { loadGlb, validateGlb } from './glb-scenery.js';
+import { CATHEDRAL_KIT, createCathedralObjects } from './cathedral-kit.js';
 import { suggestBoostPads } from './track-pads.js';
 import { createTrack, disposeTrackGroup } from './track.js';
 import { BUILTIN_TRACKS } from './track-library.js';
@@ -167,7 +168,7 @@ function renderGaps() {
 
 function renderObjectInspector() {
   const select = $('#object-select');
-  select.replaceChildren(new Option('Select scenery…', ''), ...track().objects.map((object, i) => new Option(`${i + 1}. ${object.type.toUpperCase()}`, String(i))));
+  select.replaceChildren(new Option('Select scenery…', ''), ...track().objects.map((object, i) => new Option(`${i + 1}. ${object.type === 'glb' ? (CATHEDRAL_KIT.find(part => part.model === object.model)?.label ?? 'GLB') : object.type.toUpperCase()}`, String(i))));
   select.value = selection.kind === 'object' ? String(selection.index) : '';
   const panel = $('#primitive-list');
   // Keep a focused numeric control alive while a value is being entered.
@@ -410,7 +411,7 @@ $('#import-button').addEventListener('click', () => $('#import-file').click());
 $('#import-file').addEventListener('change', async event => {
   const file = event.target.files[0]; event.target.value = ''; if (!file) return;
   try {
-    if (file.size > MAX_TRACK_BYTES) throw new Error('File exceeds 16 MB.');
+    if (file.size > MAX_TRACK_BYTES) throw new Error(`File exceeds ${MAX_TRACK_BYTES / (1024 * 1024)} MB.`);
     const value = parseTrack(await file.text());
     const key = `custom-${crypto.randomUUID()}`;
     drafts.set(key, { track: value, saved: null, history: createHistory(value) });
@@ -488,6 +489,55 @@ async function addGlb(source) {
   edit(next=>next.objects.push(object));
   selection={kind:'object',index:track().objects.length-1};render();view.select(selection);view.focus();
 }
+
+// Cathedral kit: paths point to GLBs already present under public/models.
+// A 114 MB GLB becomes a short string in the track JSON rather than ~152 MB
+// of embedded base64. Both one-at-a-time and six-at-once staging are supported.
+const cathedralSelector = $('#cathedral-model');
+cathedralSelector.replaceChildren(...CATHEDRAL_KIT.map((part, index) => new Option(part.label, String(index))));
+async function stageCathedral(parts) {
+  const currentModels = new Set(track().objects.filter(obj => obj.type === 'glb').map(obj => obj.model));
+  const missing = parts.filter(part => !currentModels.has(part.model));
+  if (!missing.length) { message('These Cathedral GLBs are already in the track. Select them under SCENERY to reposition or clone.'); return; }
+
+  const requestedKey = currentKey;
+  const initialDraft = track();
+  const anchor = selection.kind === 'object'
+    ? track().objects[selection.index]?.position
+    : selection.kind === 'branch'
+      ? track().branches[selection.branch].points[selection.index]
+      : track().centerline[selection.index];
+  if (!anchor) { message('Select a control point first.', true); return; }
+  const existing = CATHEDRAL_KIT.filter(part => currentModels.has(part.model)).length;
+
+  try {
+    // Check file availability without downloading the huge meshes twice.
+    await Promise.all(missing.map(async part => {
+      const response = await fetch(part.model, { method: 'HEAD' });
+      if (!response.ok) throw new Error(`${part.label}: GLB not found at ${part.model} (${response.status})`);
+    }));
+    if (requestedKey !== currentKey || initialDraft !== track()) throw new Error('The draft changed during model checks; retry the import.');
+    const additions = createCathedralObjects(missing, anchor, track().horizontalScale, existing).map(obj => ({
+      ...obj, id: crypto.randomUUID()
+    }));
+    // Validate the portable file before changing the draft. GLB data stays on disk.
+    serializeTrack({ ...track(), objects: [...track().objects, ...additions] });
+    const firstIndex = track().objects.length;
+    edit(next => { next.objects.push(...additions); });
+    selection = {kind:'object',index:firstIndex};
+    render(); view.select(selection);
+    message(`Staged ${additions.length} Cathedral GLB reference(s) by the selected point. Move/scale each piece under SCENERY, then Save to Game. Models remain in public/models.`);
+  } catch (error) { message(`Cathedral import failed: ${error.message}`, true); }
+}
+$('#add-cathedral-part').addEventListener('click', () => {
+  const part = CATHEDRAL_KIT[Number(cathedralSelector.value)];
+  if (part) void stageCathedral([part]);
+});
+$('#add-cathedral-all').addEventListener('click', () => {
+  if (!window.confirm('Stage all six Cathedral models? Two files are 80 MB and 114 MB; loading both into the editor may be demanding. The existing track will not be overwritten until you press Save to Game.')) return;
+  void stageCathedral(CATHEDRAL_KIT);
+});
+
 $('#add-glb').onclick=()=>$('#glb-file').click();
 $('#glb-file').onchange=async event=>{
  const file=event.target.files[0];event.target.value='';if(!file)return;
