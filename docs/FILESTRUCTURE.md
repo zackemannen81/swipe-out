@@ -283,3 +283,17 @@ Necros browser verification now share/check current and peak speed scaling.
 - `tests/glb-scenery.test.js`: model format, loader, instances and lifecycle.
 - `tools/verify-glb.mjs`: isolated UI import/transform/clone/save/export/game checks.
 - `docs/archive/HUD-001.md`: prior task record.
+
+## MENU-001
+
+- `src/front-end.js` / `src/front-end.css`: screen navigation and menu presentation.
+- `src/garage.js`: bounded hangar scene, existing craft/facade assets and materials.
+- `src/career.js`: profile validation, loadout and campaign reward rules.
+- `tests/career.test.js`: persistence, unlocks, replay and factory isolation.
+- `tools/verify-menu.mjs`: isolated browser menu/campaign/garage acceptance.
+- `public/audio/necros-trailer.mp3`: user-supplied To Death and Beyond trailer.
+- `docs/MENUS_GARAGE.md`: feature rules, verification and remaining work.
+- `docs/archive/RENDER-001.md`: completed HDR-default task.
+- `docs/archive/EDIT-CAMERA-COMBAT-001.md`: prior task record preserved as-is.
+
+- `docs/archive/MENU-001.md`: completed menu/garage task record.

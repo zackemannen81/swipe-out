@@ -10,10 +10,11 @@ import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 // Nothing is drawn here: effects run exclusively inside render().
 export function createRenderPipeline({ scene, camera, renderer, getTrack }) {
   const composer = new EffectComposer(renderer);
-  composer.addPass(new RenderPass(scene, camera));
+  const scenePass = new RenderPass(scene, camera);
+  composer.addPass(scenePass);
 
-  // Diagnostic: a corrupt/negative/NaN HDR pixel can spread over many pixels
-  // during multi-resolution bloom filtering. F5 enables this safety pass.
+  // A corrupt/negative/NaN HDR pixel can spread over many pixels during bloom
+  // filtering. Protect every fresh session; F5 toggles a diagnostic comparison.
   // It operates on the fully rendered HDR image, not individual materials.
   const hdrSanitizer = new ShaderPass({
     name: 'HDRFiniteSanitizer',
@@ -44,7 +45,7 @@ export function createRenderPipeline({ scene, camera, renderer, getTrack }) {
       }
     `,
   });
-  hdrSanitizer.enabled = false;
+  hdrSanitizer.enabled = true;
   composer.addPass(hdrSanitizer);
 
   const unrealBloom = new UnrealBloomPass(new THREE.Vector2(1, 1), 0.6, 0.7, 0.78);
@@ -66,12 +67,14 @@ export function createRenderPipeline({ scene, camera, renderer, getTrack }) {
     'composer + standard BloomPass + output',
   ];
   let mode = 0;
-  let sanitizeHDR = false;
+  let sanitizeHDR = true;
   const nativePixelRatio = renderer.getPixelRatio();
   const resolutionScales = [1, 0.75, 0.5, 0.25];
   let resolutionIndex = 0;
   const configuredFog = scene.fog;
+  let bloomEnabled = true;
   const label = document.createElement('div');
+  label.className = 'render-debug';
   Object.assign(label.style, {
     position: 'fixed', bottom: '36px', left: '14px', zIndex: '99999',
     color: '#4ef4e5', background: '#07131de0', padding: '7px 10px',
@@ -94,7 +97,7 @@ export function createRenderPipeline({ scene, camera, renderer, getTrack }) {
     } else if (event.code === 'F10') {
       event.preventDefault();
       resolutionIndex = (resolutionIndex + 1) % resolutionScales.length;
-      composer.setPixelRatio(nativePixelRatio * resolutionScales[resolutionIndex]);
+      composer.setPixelRatio(renderer.getPixelRatio() * resolutionScales[resolutionIndex]);
       console.log('[Render debug] framebuffer:', composer.readBuffer.width, composer.readBuffer.height,
         'screen:', renderer.domElement.width, renderer.domElement.height);
       updateLabel();
@@ -128,7 +131,7 @@ export function createRenderPipeline({ scene, camera, renderer, getTrack }) {
     camera.fov = width < 700 ? 54 : 46;
     camera.updateProjectionMatrix();
     renderer.setSize(width, height, false);
-    composer.setPixelRatio(nativePixelRatio * resolutionScales[resolutionIndex]);
+    composer.setPixelRatio(renderer.getPixelRatio() * resolutionScales[resolutionIndex]);
     composer.setSize(width, height);
     console.log('[Render debug] framebuffer:', composer.readBuffer.width, composer.readBuffer.height,
       'screen:', renderer.domElement.width, renderer.domElement.height);
@@ -140,16 +143,17 @@ export function createRenderPipeline({ scene, camera, renderer, getTrack }) {
   }
 
   // Called once per frame, strictly after physics, scene transforms and camera.
-  function render() {
+  function render(activeScene = scene, activeCamera = camera) {
+    scenePass.scene=activeScene;scenePass.camera=activeCamera;
     if (mode === 1) {
       renderer.setRenderTarget(null);
-      renderer.render(scene, camera);
+      renderer.render(activeScene, activeCamera);
       return;
     }
     composer.renderToScreen = true;
     hdrSanitizer.enabled = sanitizeHDR && (mode === 0 || mode === 4 || mode === 5);
-    unrealBloom.enabled = mode === 0 || mode === 4;
-    standardBloom.enabled = mode === 5;
+    unrealBloom.enabled = bloomEnabled && (mode === 0 || mode === 4);
+    standardBloom.enabled = bloomEnabled && mode === 5;
     output.enabled = mode >= 3;
     composer.render();
   }
@@ -160,5 +164,11 @@ export function createRenderPipeline({ scene, camera, renderer, getTrack }) {
     composer.dispose();
   }
 
-  return { resize, setBloomStrength, render, dispose };
+  function setPreferences(settings) {
+    bloomEnabled=settings.bloom;
+    resolutionIndex={high:0,balanced:1,low:2}[settings.quality]??0;
+    renderer.setPixelRatio(Math.min(nativePixelRatio,{high:2,balanced:1.5,low:1}[settings.quality]??2));
+    resize();
+  }
+  return { resize, setBloomStrength, render, dispose, setPreferences };
 }

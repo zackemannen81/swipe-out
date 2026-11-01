@@ -1,3 +1,8 @@
+import { createFrontEnd } from './front-end.js';
+import { createGarage } from './garage.js';
+import { recordKey } from './time-attack.js';
+import { CLASSIC_HANDLING } from './classic-handling.js';
+let frontEnd = null;
 import { createCupUI } from './cup-ui.js';
 import { BUILTIN_TRACKS } from './track-library.js';
 import { VOICE_VOLUME_KEY } from './announcer.js';
@@ -133,6 +138,7 @@ if (menuButton) {
     setScreen(startScreen, true);
     practice.menu();
     cup.menu();
+    frontEnd?.open();
   });
 }
 
@@ -591,7 +597,8 @@ if (this.mode === 'cockpit' || this.mode === 'internal') {
   this.orbitAngle = 0;
   }
 };
-const baseSpeed = 65; 
+const baseSpeed = 65;
+let activeTopSpeed = baseSpeed + SPEEDCALIBRATION;
 let raycastFrameCounter = 0;
 const drag = { active: false, lastX: 0, pointerId: null, throttle: 0 };
 const heldKeys = new Set();
@@ -779,8 +786,8 @@ function updateCraftPose(delta = 0) {
     pitch: ((heldKeys.has('r') ? 1 : 0) - (heldKeys.has('f') ? 1 : 0)) || classicGamepadInput.pitch,
   };
 const pose = (race.state === 'racing' || race.state === 'finished') && delta > 0
-    ? stepShipPhysics(shipPhysics, input, delta, curve, baseSpeed+SPEEDCALIBRATION, trackWidth)
-    : stepShipPhysics(shipPhysics, input, 0, curve, baseSpeed+SPEEDCALIBRATION, trackWidth);
+    ? stepShipPhysics(shipPhysics, input, delta, curve, activeTopSpeed, trackWidth)
+    : stepShipPhysics(shipPhysics, input, 0, curve, activeTopSpeed, trackWidth);
 
   race.distance = shipPhysics.distance;
   race.poseFrame = pose.frame;
@@ -825,6 +832,7 @@ function beginRace() {
   if (pauseToggleButton) pauseToggleButton.textContent = 'PAUSE ⏸';
   raceIntro.restore(camera);
   cameraSystem.mode = 'wipeoutStyle';
+  camera.clearViewOffset();camera.fov=window.innerWidth<700?54:46;camera.updateProjectionMatrix();
   magneticCamera.reset();
   classicCamera.reset();
   activeDrivingSettings = { ...drivingSettings, ...(cupRound?{handling:cupRound.settings.handling,assist:cupRound.settings.assist}:{}) };
@@ -837,6 +845,10 @@ function beginRace() {
   const trackData = cupRound ? BUILTIN_TRACKS[currentTrackId].data : getActiveTrackData(currentTrackId);
   //const trackData = TRACK_CONFIG[currentTrackId].data;
 // Hämta banans namn och gör det till stora bokstäver
+  const loadout = frontEnd.begin(currentTrackId, recordKey({track:trackData}), {difficulty:cupRound?.settings.difficulty ?? selectedCpuDifficulty,handling:activeDrivingSettings.handling,assist:activeDrivingSettings.assist,combat:document.querySelector('#combat-enabled').checked});
+  activeTopSpeed = (baseSpeed + SPEEDCALIBRATION) * loadout.speed;
+  applyPlayerLoadout(loadout);
+  document.querySelector('#career-result')?.remove();
   const trackName = trackData.name.toUpperCase();
 
   // Uppdatera texten i toppmenyn
@@ -909,9 +921,11 @@ scene.traverse(obj => {
     (error) => console.warn('Unable to load new panorama backdrop.', error)
   );
   
+  raceAudio.audio.volume = frontEnd.profile.settings.music;
   raceAudio.play().catch((error) => console.warn('Unable to start race music.', error));
   race.state = 'racing';
-Object.assign(shipPhysics, createShipPhysics(baseSpeed+SPEEDCALIBRATION));
+const tuning = loadout.ship === 'racer' && loadout.force === 1 ? {} : {mass:loadout.mass,engineForce:(activeDrivingSettings.handling==='wipeout'?CLASSIC_HANDLING.engineForce:10)*loadout.force};
+Object.assign(shipPhysics, createShipPhysics(activeTopSpeed,tuning));
   shipPhysics.handlingMode = activeDrivingSettings.handling;
   
   // Läs av hur mycket styrhjälp spelaren vill ha
@@ -1021,6 +1035,7 @@ function finishRace() {
   setScreen(resultsScreen, true);
   retryButton.focus({ preventScroll: true });
   cup.finish();
+  if(!practice.active)frontEnd.finish(getPlayerPosition(opponents,race.distance,race.playerFinishTime),race.playerFinishTime);
 }
 
 startButton.addEventListener('click', () => {
@@ -1316,6 +1331,7 @@ musicSelect.addEventListener('change', async (event) => {
   raceAudio.stop();
   raceAudio = new RaceAudio(newAudioUrl);
   raceAudio.setVoiceVolume(selectedVoiceVolume);
+  raceAudio.audio.volume = frontEnd.profile.settings.music;
   
   if (!isPaused) {
     await raceAudio.play();
@@ -1359,7 +1375,43 @@ function resize() {
 window.addEventListener('resize', resize, { passive: true });
 resize();
 
+
+const craftTemplates = {racer:craft.clone(true),kestrel:opponents.find(o=>o.name==='Kestrel').group.clone(true),orca:opponents.find(o=>o.name==='Orca').group.clone(true)};
+const garage = createGarage(craftTemplates);
+let playerMaterials=[];
+function applyPlayerLoadout(spec){
+  playerMaterials.forEach(m=>m.dispose());playerMaterials=[];
+  craft.clear();
+  for(const child of craftTemplates[spec.ship].children){const copy=child.clone(true);copy.traverse(o=>{if(o.isMesh){const materials=(Array.isArray(o.material)?o.material:[o.material]).map(m=>{const c=m.clone();if(spec.paint&&c.color)c.color.multiply(new THREE.Color(spec.paint));playerMaterials.push(c);return c;});o.material=Array.isArray(o.material)?materials:materials[0];}});craft.add(copy);}
+  for(const ghost of ghostPool){scene.remove(ghost.group);ghost.material.dispose();}ghostPool.length=0;createGhostPool();
+}
+let previewStart=0;
+frontEnd=createFrontEnd({garage,tracks:TRACK_CONFIG,
+ onSettings(settings){graphics.setPreferences(settings);raceAudio.audio.volume=settings.music;document.body.classList.toggle('reduce-menu-motion',!settings.motion);},
+ onPreview(enabled,id){
+  if(!enabled){craft.visible=true;for(const o of opponents)o.group.visible=true;return;}
+  const data=getActiveTrackData(id);scene.remove(track);disposeTrackGroup(track);
+  const assets=createTrack(data);track=assets.group;curve=assets.curve;trackWidth=data.width??10;scene.add(track);spawnTrackObjects(scene,data);setupMinimap();
+  craft.visible=false;for(const o of opponents)o.group.visible=false;previewStart=performance.now()/1000;
+ }
+});
+
+const pauseMenuButton=document.createElement('button');
+pauseMenuButton.id='pause-menu-button';pauseMenuButton.type='button';pauseMenuButton.className='action-button';pauseMenuButton.textContent='ABANDON RACE · MENU';
+pauseMenuButton.addEventListener('click',()=>{isPaused=false;setScreen(pauseScreen,false);introOverlay.hidden=true;menuButton.click();});
+pauseScreen.append(pauseMenuButton);
+
 function render() {
+  if(frontEnd?.visible){
+    clock.getDelta();
+    const t=performance.now()/1000;
+    if(frontEnd.preview){
+      const progress=((t-previewStart)/40)%1;
+      const frame=getTrackFrame(curve,progress),ahead=getTrackFrame(curve,(progress+.008)%1);
+      camera.up.copy(frame.normal);camera.position.copy(frame.center).addScaledVector(frame.normal,18).addScaledVector(frame.right,12).addScaledVector(frame.tangent,-20);camera.lookAt(ahead.center);camera.fov=54;camera.updateProjectionMatrix();panoramaBackdrop.position.copy(camera.position);updateTrackPresentation(track,t);graphics.render();
+    }else garage.render(renderer,t,frontEnd.profile.settings.motion&&!matchMedia('(prefers-reduced-motion: reduce)').matches,(s,c)=>graphics.render(s,c));
+    requestAnimationFrame(render);return;
+  }
   handleGamepadInput();
     // Om spelet är pausat, rita bara om bilden och avbryt funktionen
   if (isPaused) {
@@ -1408,7 +1460,7 @@ function render() {
 
   if(practice.active){shipPhysics.catchUpBonus=shipPhysics.catchUpGap=0;}
   else updateCatchUp([
-    { physics: shipPhysics, topSpeed: baseSpeed + SPEEDCALIBRATION, finished: race.playerFinishTime !== null },
+    { physics: shipPhysics, topSpeed: activeTopSpeed, finished: race.playerFinishTime !== null },
     ...opponents.map(opponent => ({
       physics: opponent.physics, topSpeed: opponent.topSpeed, finished: opponent.finishTime !== null,
     })),
@@ -1540,7 +1592,7 @@ for (const ghost of ghostPool) {
   const trackFrame = getTrackFrame(curve, race.distance / curve.getLength());
 
   if (race.state === 'racing') {
-    if (collectBoostPad(shipPhysics, race.boostPads, curve.getLength(), baseSpeed + SPEEDCALIBRATION)) {
+    if (collectBoostPad(shipPhysics, race.boostPads, curve.getLength(), activeTopSpeed)) {
       raceAudio.playSfx('boost');
       cameraSystem.shakeTimer = 0.3;
       cameraSystem.shakeIntensity = 0.35;
@@ -1737,6 +1789,7 @@ if (thrustFill) {
 
   // Kör det nya integrerade kamerapasset
   raceIntro.restore(camera);
+  if(frontEnd&&!frontEnd.profile.settings.shake)cameraSystem.shakeTimer=0;
   cameraSystem.update(craft.position, craft.quaternion, shipPhysics.velocity, delta, trackFrame);
   if (race.state === 'intro' && raceIntro.update(camera, craft.position, race.poseFrame ?? trackFrame, delta)) {
     race.state = 'countdown';
@@ -1782,6 +1835,7 @@ startButton.innerHTML = 'START RACE <span aria-hidden="true">↗</span>';
 startButton.disabled = false;
 
 window.addEventListener('pagehide', () => {
+  frontEnd?.dispose();
   practice.dispose();
   thrusters.dispose();
   window.removeEventListener('resize', resize);

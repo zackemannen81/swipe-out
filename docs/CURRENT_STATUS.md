@@ -1,5 +1,30 @@
 # Current Status
 
+## 2026-10-31 — MENU-001
+
+Animated main/setup/campaign/garage/trophies/settings views now share a 3D
+Necros service hangar. Garage chassis, paint and one earned performance module
+apply to Quick Race and Campaign. Factory performance remains in TA/cup.
+Necros preview selects saved custom scenery when available, with looping fly-by
+and supplied trailer audio. Finish/podium/win/Elite campaign milestones persist
+unlocks and local records. Music, quality, bloom, shake and menu motion save;
+existing handling/camera/assist/announcer controls are reused. Pause can return
+to menu. Countdown and user track storage are unchanged.
+
+Build/19 targeted tests and isolated browser flow pass; desktop/small landscape
+inspected. Full suite 121/122: Foundry CPU recovery test also fails on HEAD
+9c91816, independently reproduced. Human balance/device testing remain.
+See MENUS_GARAGE.md for rules, validation and preview camera limitations.
+
+
+## 2026-10-31 — RENDER-001
+
+HDR sanitizing now defaults ON before bloom on every load, using the existing
+user-verified shader. F5 remains a diagnostic toggle. Build and isolated WebGL
+fresh-load/reload/toggle checks pass. No custom track storage changes. Menu
+overhaul, ambient drones/lights, amber turn signs and world intro remain pending.
+
+
 ## 2026-10-29 — EDIT-CAMERA-COMBAT-001
 
 Editor supports static GLB scenery, embedded files up to 8 MB or local public
@@ -707,3 +732,10 @@ zero for the leader, and a decay from ~6.5% to ~4.9% after the player took the l
 Pause preserved all values; restart cleared all five. No console errors or failed
 requests. Build, syntax and whitespace checks pass; existing bundle-size warning
 remains. Human balance testing and physical-device performance remain unverified.
+
+## CAMPAIGN-002 — exact Dark PRIME circuit
+
+Campaign and fly-by now require custom-e7ead7a3-b303-4c3d-9464-ca52f28e8386.
+Same-name tracks and the track17 prototype cannot substitute. Missing local
+data disables entry/preview and explains browser-origin storage separation.
+Saved track names and data are unchanged; campaign label is Dark PRIME.

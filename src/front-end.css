@@ -1,0 +1,63 @@
+/* Front end owns its scroll region; racing overlays keep their existing layout. */
+#start-screen.front-end {inset:0;transform:none;width:100%;height:100%;max-height:none;padding:0;border:0;background:linear-gradient(90deg,#050b13f5 0%,#07111cdd 27%,#08111a55 55%,transparent 78%);backdrop-filter:none;box-shadow:none;overflow:hidden;display:grid;grid-template-rows:76px minmax(0,1fr) 48px;}
+.front-end [hidden] {display:none!important;}
+.menu-header {display:flex;justify-content:space-between;align-items:center;margin:0 4%;border-bottom:1px solid #78b4c833;gap:20px;}
+.menu-header a {color:#eefeff;text-decoration:none;font:22px Induction,sans-serif;letter-spacing:2px;}
+.menu-header a span {display:block;font:9px monospace;letter-spacing:4px;color:#73a4af;margin-top:5px;}
+#menu-location {font:10px monospace;letter-spacing:2px;color:#81a4ac;}
+#menu-pages {overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#38616b transparent;min-height:0;padding:24px 5%;}
+.menu-page,#menu-race {width:min(470px,46vw);animation:menu-arrive .3s ease-out;}
+#start-screen.front-end h2,#start-screen.front-end #headline {font:clamp(24px,3.5vw,48px)/1.1 Induction,sans-serif;overflow-wrap:anywhere;letter-spacing:0;margin:10px 0 20px;}
+.front-end h2 em {color:var(--cyan);font-style:normal;}
+.front-end h3 {font:10px monospace;letter-spacing:2px;color:#7ca4b4;margin:24px 0 10px;}
+.front-end p {font-size:12px;line-height:1.7;}
+.front-end .menu-kicker {font:10px monospace;letter-spacing:2px;color:#70c5c6;}
+.front-end .menu-lead {font-size:14px;color:#c6d8e2;line-height:1.6;}
+.menu-muted {color:#879cab;font-size:11px!important;line-height:1.6;}
+.menu-nav,.menu-stack {display:grid;gap:7px;}
+.front-end button {cursor:pointer;}
+.menu-nav button,.menu-stack button,.menu-swatches button,#menu-back {background:#0b1821c9;border:1px solid #75b8c333;color:#d8e6ed;padding:12px 14px;text-align:left;font:12px monospace;transition:background .18s,border .18s,transform .18s;}
+.menu-nav button {display:grid;grid-template-columns:24px 1fr;gap:2px 12px;min-height:53px;}
+.menu-nav b {grid-row:span 2;color:#50818b;font:10px monospace;align-self:center;}
+.menu-nav small {grid-column:2;font:8px monospace;letter-spacing:2px;color:#7f9aa9;}
+.menu-nav button:hover,.menu-stack button:hover:not(:disabled),.menu-swatches button:hover:not(:disabled),#menu-back:hover {background:#17404ac9;border-color:var(--cyan);transform:translateX(3px);}
+.front-end button:focus-visible,.front-end a:focus-visible,.front-end input:focus-visible,.front-end select:focus-visible {outline:2px solid var(--cyan);outline-offset:3px;}
+.front-end button[aria-pressed=true] {border-color:var(--cyan);color:var(--cyan);background:#19424bcc;}
+.front-end button:disabled {opacity:.45;cursor:not-allowed;}
+.front-end h1:focus,.front-end h2:focus {outline:0;}
+.menu-primary {display:block;width:100%;padding:14px;margin:12px 0;border:1px solid var(--cyan);background:#61e6dd;color:#06171c;font:12px monospace;letter-spacing:1px;}
+.menu-swatches {display:flex;flex-wrap:wrap;gap:7px;}
+.menu-swatches button {border-top:4px solid var(--swatch,#9aabb4);padding:10px;font-size:10px;}
+.garage-stat {display:flex;justify-content:space-between;gap:15px;margin:9px 0;font:10px monospace;color:#a9c8d1;}
+.garage-stat meter {width:46%;accent-color:var(--cyan);}
+.career-goal {padding:12px;border-left:2px solid #43525b;background:#0b1821b8;color:#8496a3;margin:0;}
+.career-goal[data-earned=true] {border-color:#deb86b;color:#efd59e;}
+.menu-setting {display:flex;align-items:center;justify-content:space-between;gap:12px;margin:14px 0;font:11px monospace;color:#bfd4df;}
+.menu-setting select {max-width:220px;padding:9px;background:#10222c;border:1px solid #42626c;color:#bbeae8;}
+.menu-setting input[type=range] {width:45%;accent-color:var(--cyan);}
+.menu-setting input[type=checkbox] {accent-color:var(--cyan);}
+.menu-footer {margin:0 4%;display:flex;align-items:center;justify-content:space-between;gap:12px;border-top:1px solid #78b4c833;font:8px monospace;letter-spacing:1px;color:#7898a3;}
+#menu-back {padding:8px 12px;font-size:10px;}
+#profile-status {color:#ffc07a;letter-spacing:0;}
+#menu-race .track-select-wrapper {grid-template-columns:1fr;}
+#menu-race #headline {font-size:32px;}
+.front-end .action-button {min-width:0;width:100%;font:12px monospace;}
+#world-preview-overlay {position:absolute;inset:0;z-index:35;pointer-events:none;}
+#world-preview-overlay[hidden] {display:none;}
+#world-preview-overlay>div {display:flex;justify-content:space-between;padding:24px 5%;background:linear-gradient(#03080fdd,transparent);font:12px monospace;letter-spacing:2px;color:#d8eeee;}
+#end-world-preview {pointer-events:auto;padding:12px;background:#0b1821;border:1px solid #6acbc5;color:#aef9ef;}
+body.in-menu #hud-layer,body.in-menu .hud-controls,body.in-menu #mobile-controls,body.in-menu .topbar,body.in-menu .footer-bar,body.in-menu #route-hint,body.in-menu .render-debug {display:none!important;}
+body.reduce-menu-motion .menu-page,body.reduce-menu-motion #menu-race {animation:none;}
+@keyframes menu-arrive {from{opacity:0;transform:translateX(-14px)}to{opacity:1;transform:none}}
+@media(max-width:900px),(max-height:650px){#start-screen.front-end{grid-template-rows:54px minmax(0,1fr) 40px}.menu-header a{font-size:16px}#menu-pages{padding:14px 4%}.menu-page,#menu-race{width: min(440px,52vw)}.menu-nav{gap:5px}.menu-nav button{padding:9px;min-height:43px}.front-end h2{font-size:28px;margin:8px 0 12px}.front-end h3{margin-top:16px}.menu-header a span{font-size:8px}#menu-location{font-size:8px}.menu-footer{font-size:7px}}
+@media(max-width:600px){.menu-page,#menu-race{width:60vw}.front-end h2{font-size:23px}.menu-header{margin:0 3%}#menu-location{display:none}.menu-footer>span:last-child{display:none}.menu-nav small{font-size:7px;letter-spacing:0}.front-end .driving-settings{grid-template-columns:1fr}.menu-setting{flex-wrap:wrap}.menu-setting select{max-width:100%}.front-end p{font-size:11px}}
+@media(prefers-reduced-motion:reduce){.menu-page,#menu-race{animation:none}.front-end button{transition:none}}
+
+body.in-menu #race-intro,body.in-menu #race-messages,body.in-menu #combat-hud,body.in-menu #time-attack-hud,body.in-menu #corner-warning {display:none!important;}
+#start-screen.front-end h2 {font-size:clamp(23px,2.7vw,38px);overflow-wrap:normal;}
+
+#garage-modules small {display:block;margin-top:6px;color:#93abb6;line-height:1.5;font-size:10px;}
+
+#front-loading {position:fixed;inset:0;z-index:100;background:#070d15;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:22px;color:#60eee6;}
+#front-loading strong {font:clamp(24px,5vw,54px) Induction,sans-serif;}
+#front-loading span {font:10px monospace;letter-spacing:3px;color:#90aebc;}

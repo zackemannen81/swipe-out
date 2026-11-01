@@ -461,3 +461,11 @@ cover GLB path/file import, transforms, cloning, JSON export, save/reload and ga
 loading; Necros magnetic descent and editor pass without page errors. Camera
 loop/roll, transient smoothing and recovery are tested. Human camera feel and
 physical-phone performance remain for playtesting.
+
+## 2026-10-31 — Garage and campaign preview
+
+Necros/Dark Prime is the first playable campaign preview. Finish, podium and win
+unlock two chassis, two mutually exclusive modules and a gold finish; Elite win
+adds a trophy. Garage paint is a material tint, not a livery editor. Menu fly-by
+uses supplied trailer audio, independently of the accepted race countdown.
+Tuning and validation limits are recorded in MENUS_GARAGE.md.

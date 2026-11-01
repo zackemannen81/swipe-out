@@ -626,3 +626,35 @@
 - Current HUD now reuses MAX conversion (*3.25*3.6); physics unchanged.
 - Build passes (existing chunk warning). Browser dive HUD: current 3014, peak
   3016 km/h, consistent conversion; no page errors, editor checks pass.
+
+## 2026-10-31 - RENDER-001: HDR protection enabled by default
+
+- User confirms F5 HDR sanitize prevents black rectangular artifacts on Necros.
+- Existing safety shader now starts enabled; diagnostic toggling retained.
+- Build passes with existing bundle warning. Isolated WebGL two-load/toggle
+  checks pass without page errors. Initial test instrumentation used a duplicate
+  ShaderPass module; corrected to inspect the actual pipeline pass.
+- Preserved prior task record as-is; no new completion claim for its stale status.
+- Custom saved tracks, countdown and rendering shader math unchanged.
+
+## 2026-10-31 - MENU-001: hangar, menus and campaign preview
+
+- Added animated front-end views and separate 3D hangar sharing the HDR pipeline.
+- Reused craft assets and a Necros facade; added paint, earned chassis/modules,
+  campaign trophies and configuration-specific fastest results with local saves.
+- Added saved display/music preferences, reused existing flight/voice controls,
+  preserved countdown and isolated factory performance for TA/cup.
+- Campaign fly-by uses the supplied trailer and saved custom Necros when present.
+- Browser verifies navigation, preview, finish rewards, persistence, loadouts and
+  factory isolation without page errors; desktop/small landscape inspected.
+- 19 focused tests pass. Full suite 121/122: Foundry CPU zero-recovery expectation
+  also fails at HEAD 9c91816 in a separate baseline copy. Not caused by this wave.
+- Build passes with existing chunk warning. No user track saves or commits made.
+
+## 2026-10-31 - CAMPAIGN-002: pin Dark PRIME
+- User supplied exact custom ID; campaign and preview now use that ID only.
+- Missing data disables entry/preview; message explains origin-local saves.
+- Campaign rewards require exact ID; saved track names/data unchanged.
+- Build, two career tests and isolated Chrome menu checks pass, no page errors.
+- Same-name test fixtures confirm selection; actual authored scene not inspected.
+

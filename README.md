@@ -349,3 +349,11 @@ Automatic weapon pickups now use one pad every 460 world units, subject to safe
 placement. Same-type pickups are ignored while that weapon still has ammunition.
 Authored editor pads keep their positions. Magnetic camera follow is now damped
 while retaining local-up support for loops; magnetic adhesion is unchanged.
+
+## Garage and campaign preview
+
+The new main menu includes Campaign, Quick Race, Time Attack, Cup, Garage,
+Trophies and Settings. Complete Necros campaign milestones to earn chassis,
+performance modules and a gold finish. Watch the course fly-by with its trailer
+from Campaign. See [Menus and garage](docs/MENUS_GARAGE.md) for rewards, settings
+and the factory-performance rule for Time Attack/cup.

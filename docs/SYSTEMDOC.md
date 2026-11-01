@@ -284,3 +284,18 @@ cover GLB path/file import, transforms, cloning, JSON export, save/reload and ga
 loading; Necros magnetic descent and editor pass without page errors. Camera
 loop/roll, transient smoothing and recovery are tested. Human camera feel and
 physical-phone performance remain for playtesting.
+
+## Front-end and career presentation
+
+The hangar is a separate scene rendered through the shared HDR-safe pipeline.
+Menus reuse live preference controls. Career progression is local and versioned,
+separate from lap records, cup progress and authored tracks. Earned performance
+applies to Campaign/Quick Race; TA/cup retain factory performance. Necros is one
+preview campaign event, not a completed multi-world campaign. See MENUS_GARAGE.md.
+
+## CAMPAIGN-002 — exact Dark PRIME circuit
+
+Campaign and fly-by now require custom-e7ead7a3-b303-4c3d-9464-ca52f28e8386.
+Same-name tracks and the track17 prototype cannot substitute. Missing local
+data disables entry/preview and explains browser-origin storage separation.
+Saved track names and data are unchanged; campaign label is Dark PRIME.
