@@ -19,5 +19,7 @@ export async function loadGlb(source) {
   const response=await fetch(source);
   if(!response.ok)throw new Error(`GLB load failed (${response.status}).`);
   const buffer=await response.arrayBuffer();validateGlb(buffer);
-  return (await new GLTFLoader().parseAsync(buffer,'')).scene;
+  const gltf=await new GLTFLoader().parseAsync(buffer,'');
+  gltf.scene.animations=gltf.animations;
+  return gltf.scene;
 }

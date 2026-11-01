@@ -7,7 +7,7 @@ export function createGarage(templates){
  const camera=new THREE.PerspectiveCamera(40,1,.1,100);const root=new THREE.Group();scene.add(root);
  const stone=new THREE.MeshStandardMaterial({color:'#27333e',metalness:.65,roughness:.5});
  const dark=new THREE.MeshStandardMaterial({color:'#111920',metalness:.55,roughness:.68});
- const red=new THREE.MeshBasicMaterial({color:new THREE.Color('#bb263a').multiplyScalar(2)}),cyan=new THREE.MeshBasicMaterial({color:new THREE.Color('#63fff2').multiplyScalar(2)});
+ const red=new THREE.MeshBasicMaterial({color:new THREE.Color('#bb263a').multiplyScalar(12)}),cyan=new THREE.MeshBasicMaterial({color:new THREE.Color('#63fff2').multiplyScalar(2)});
  function box(x,y,z,w,h,d,mat=stone){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat);m.position.set(x,y,z);root.add(m);return m;}
  box(0,-.7,0,34,.4,50,dark);
  for(let z=-24;z<=12;z+=6){
@@ -47,5 +47,5 @@ export function createGarage(templates){
  function render(renderer,time,motion,draw){const w=window.innerWidth,h=window.innerHeight;camera.aspect=w/h;camera.updateProjectionMatrix();const a=motion?Math.sin(time*.13)*.18:0;
  camera.position.set(7*Math.cos(a)-5*Math.sin(a),3.5,7*Math.sin(a)+5*Math.cos(a));camera.lookAt(-1.4,2.1,0);camera.setViewOffset(w,h,-w*.16,0,w,h);
  ship.position.y=1.25+(motion?Math.sin(time*.8)*.08:0);dust.rotation.y=motion?time*.015:0;draw(scene,camera);}
- return {setCraft,render,dispose(){disposed=true;if(backdrop)releaseModel(backdrop);owned.forEach(m=>m.dispose());root.traverse(o=>o.geometry?.dispose());pg.dispose();pm.dispose();stone.dispose();dark.dispose();red.dispose();cyan.dispose();}};
+ return {setCraft,render,setGlow(value){red.color.set('#bb263a').multiplyScalar(12*value);cyan.color.set('#63fff2').multiplyScalar(2*value);},dispose(){disposed=true;if(backdrop)releaseModel(backdrop);owned.forEach(m=>m.dispose());root.traverse(o=>o.geometry?.dispose());pg.dispose();pm.dispose();stone.dispose();dark.dispose();red.dispose();cyan.dispose();}};
 }

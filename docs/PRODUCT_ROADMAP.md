@@ -109,57 +109,49 @@ se WEAPON_PICKUPS.md. Den nya pickupbalansen återstår att provspela.
 
 ## E — Cup, medaljer och upplåsningar
 
-E1 implementerad 2026-10-29: Foundry Cup, poäng/slutställning, placeringsmedaljer
-och versionssparad progression per konfiguration. Se CUP.md. Tidsmedaljer,
-lackeringar och skeppsupplåsningar återstår.
+Implementerat i CUP-001, MENU-001 och FINISH-001; tidsgränserna behöver fortfarande
+mänsklig provbalansering. Tidigare öppna rutor för garage/progression var inaktuella.
 
-- [x] Välj tre genomarbetade och provkörda banor; cup har poäng mellan loppen,
-  slutplacering, definierad hantering av lika poäng och möjlighet att fortsätta.
-- [ ] Medaljer för tid och placering samt upplåsbara lackeringar. Visa nästa mål
-  och vad som låstes upp direkt efter loppet.
-- [ ] Rekommendation: lås först upp skepp med olika styrkor (acceleration, fart,
-  grepp, luftbromsar eller massa). Startskeppet ska fortfarande vara användbart.
-- [ ] Uppgraderingar till befintligt skepp är ett separat alternativ att prova,
-  inte ett beslutat parallellt ekonomisystem. Visa kompromisser och undvik att
-  obegränsade fartökningar ersätter skicklighet.
-- [ ] Spara progression med versionshantering. Separera Time Attack-rekord efter
-  faktisk skeppskonfiguration/uppgradering och fysik; jämför inte olika prestanda.
-- [ ] Resultat visar placering, bästa varv, rekordförbättring och cup-poäng utan
-  att återinföra klippningen från etapp A.
+- [x] Foundry Cup: tre banor, poäng, placeringsmedaljer, lika poäng och återupptagning.
+- [x] Tidsmedaljer i trevarvslopp, synliga måltider före start och efter loppet.
+  Gold/Silver/Bronze baseras initialt på banlängd / 110, 95 respektive 80 world
+  units/s. Necros Gold-tid låser upp Spire Silver; se FINISHING_PASS.md.
+- [x] Kestrel/Orca och två moduler låses upp i kampanjen; originalskeppet finns kvar.
+- [x] Dominion Gold-lackering, troféer och nästa kampanjmål på resultatskärmen.
+- [x] Versionssparad progression; Race-rekord separeras efter bana/revision,
+  svårighet, kontrolläge, assist, combat och loadout. TA/cup använder fabriksskepp.
+- [x] Lokal RECORDS-sida, personbästa/differens och bästa varv; cup behåller poäng.
 
 ## F — Ljud och återkoppling
 
-Announcer integrerad 2026-10-29: sparad röstvolym inklusive nedräkning, prioriterad
-kö och anti-spam. Musik/SFX-reglage samt hörlurs-/högtalarmix återstår. Se ANNOUNCER.md.
+- [x] Motorvolym följer gaspådrag; luftbroms-, skrap- och landningsljud kompletterar
+  befintliga boost-/kollisionsljud. Procedurala effekter är första ljudversionen.
+- [x] Befintlig prioriterad announcer och anti-spam för sista varv, PB och hot.
+- [x] Hotljud dämpar upprepade vapeneffekter; nya korta effekter har röstbudget.
+- [x] Sparad musik-, effekt- och röstvolym, mute samt effektdynamik för hörlurar/
+  högtalare. Nedräkningens klipp, timing och animation är oförändrade.
+- [ ] Mänsklig lyssningskontroll på högtalare och hörlurar; slutlig ljudbalans.
 
-- [ ] Motor reagerar på belastning; luftbromsar susar, boost har tydligt påslag,
-  räcken ger metallskrap och landning har ett distinkt ljud.
-- [x] Korta signaler för sista varvet, personbästa och inkommande missil, samordnade
-  med befintliga ljud så att samma händelse inte annonseras flera gånger.
-- [ ] Prioritera farovarningar över upprepade lågprioriterade effekter. Begränsa
-  samtidiga röster och kontrollera mix med musik på både högtalare och hörlurar.
-- [ ] Sparade nivåer för musik/effekter och mute. Nedräkningens ljud/timing bevaras.
+## G — Presentation och prestanda
 
-## G — Sammanhängande presentation och stabil prestanda
-
-- [ ] Enhetliga animerade start-, paus-, val- och resultatmenyer med gemensam
-  typografi, knappar och övergångar. Responsiva på touch, tangentbord och gamepad;
-  stöd minskad rörelse och undvik att animation blockerar input.
-- [ ] Banval visar förhandsbild, svårighet och relevant rekord. Samla mekanikernas
-  testbanor i egen kategori. Skeppsval förklarar styrkor och svagheter.
-- [ ] Bättre bakgrunder och levande omgivningar, exempelvis långsam maskinrörelse,
-  trafik på avstånd och ljusvariation. Börja med en sammanhållen miljö per bana;
-  behåll fri sikt mot väg, landningsyta, varningar och mål.
-- [ ] Spara ljud-, assist-, kamera- och grafikval. Erbjud grafiknivåer samt
-  inställningar för kameraskakning och bloom utan att ändra tävlingsfysiken.
-- [ ] Mät bildrutetid, minne, laddning och värme över längre pass på namngiven fysisk
-  telefon. Bestäm mål utifrån den enheten; verifiera Race med CPU/combat/partiklar,
-  Time Attack med ghost och en tung bana. Dokumentera faktiska resultat.
+- [x] Gemensam menytypografi, övergångar, touch/tangentbord och gamepadnavigering;
+  minskad rörelse respekteras. Fysisk handkontroll behöver fortfarande provas.
+- [x] Banval med miljöbild (inte en skärmbild av banan), längd, geometribaserad
+  svårighetsindikator, aktuellt Race-PB och kategorier för egna/testbanor.
+- [x] Necros: blodröda räcken, justerbar glow och musikpuls, höga patrullfarkoster,
+  upphöjda amber-skyltar. Editorn kan placera ljus, maskinrörelser och GLB-klipp.
+- [x] Befintlig skippbar banpreview med trailer och skeppsintro före oförändrad
+  nedräkning; kamera för handförfattad filmsekvens är framtida innehåll.
+- [x] Sparade ljud-, assist-, kamera-, grafik-, bloom- och skakningsinställningar.
+- [ ] Fysisk telefon: bildrutetid, minne, laddning och värme under längre pass
+  med CPU/combat, TA/ghost och tung bana. Ingen emulering räknas som telefonmätning.
+- [ ] Mänsklig kontroll av skyltplacering, flygtrafik och medaljgränser på den
+  senaste lokalt sparade Dark PRIME-banan. Den finns bara i användarens browser.
 
 ## Genomförande och verifiering
 
-Nästa implementation är **E2: tidsmedaljer och kosmetiska upplåsningar**. Sätt
-exakt omfattning och acceptans i [CURRENT_TASK](CURRENT_TASK.md) före kodändring.
+Funktionsluckorna E–G är åtgärdade i FINISH-001. Återstående rutor ovan är
+provkörning på fysisk utrustning och innehållsbalans; de är inte verifierade här.
 Efter varje leverans: relevanta automatiska kontroller, visuell kontroll av ändrade
 flöden och ärlig dokumentation av vad som återstår för mänsklig provkörning.
 

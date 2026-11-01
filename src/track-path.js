@@ -9,6 +9,7 @@ export function createTrackCurve(definition) {
   const curve = new THREE.CatmullRomCurve3(points, true, 'catmullrom', 0.42);
   curve.arcLengthDivisions = 1800;
   curve.track = {
+    name: definition.name,
     magnetic: definition.magnetic === true,
     banks: definition.centerline.map(point => point[3] ?? 0),
     gaps: (definition.gaps ?? []).map(gap => ({ ...gap })),

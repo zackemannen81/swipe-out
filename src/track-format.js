@@ -1,7 +1,7 @@
 import { validatePads } from './track-pads.js';
-// Version 6 adds GLB scenery; previous versions remain readable.
+// Version 7 adds light sources and object motion; previous versions remain readable.
 export const TRACK_FORMAT = 'swipe-out-track';
-export const TRACK_VERSION = 6;
+export const TRACK_VERSION = 7;
 // Cap portable JSON exports/imports, not the size of GLBs referenced via /models/.
 // Prefer external GLB paths for large models; the limit is only for embedded data.
 export const MAX_TRACK_BYTES = 64 * 1024 * 1024;
@@ -74,8 +74,8 @@ export function normalizeTrack(input) {
   const objects = sourceObjects.map((object, i) => {
     const path = `track.objects[${i}]`;
     record(object, path);
-    knownFields(object, ['id', 'type', 'position', 'rotation', 'scale', 'texture', 'animType', 'opacity', 'color', 'emissive', 'model'], path);
-    if (!['box', 'sphere', 'cylinder', 'cone', 'glb'].includes(object.type)) fail(`${path}.type`, 'expected box, sphere, cylinder, cone or glb.');
+    knownFields(object, ['id', 'type', 'position', 'rotation', 'scale', 'texture', 'animType', 'opacity', 'color', 'emissive', 'model', 'lightIntensity', 'lightRange', 'motion', 'playClip', 'clipSpeed'], path);
+    if (!['box', 'sphere', 'cylinder', 'cone', 'glb', 'light'].includes(object.type)) fail(`${path}.type`, 'expected box, sphere, cylinder, cone or glb.');
     const animType = object.animType ?? 'none';
     if (!['none', 'scroll-x', 'scroll-y', 'pulse'].includes(animType)) fail(`${path}.animType`, 'unknown animation.');
     const result = {
@@ -93,11 +93,29 @@ export function normalizeTrack(input) {
         fail(`${path}.model`, 'use /models/name.glb or an embedded GLB.');
       result.model = object.model;
     } else if (object.model !== undefined) fail(`${path}.model`, 'only GLB objects have a model.');
+    if (object.type === 'light') {
+      result.lightIntensity = number(object.lightIntensity ?? 100, `${path}.lightIntensity`, 0, 10000);
+      result.lightRange = number(object.lightRange ?? 50, `${path}.lightRange`, 1, 2000);
+    }
+    if (object.motion !== undefined) {
+      record(object.motion, `${path}.motion`);
+      knownFields(object.motion, ['type','period','distance','axis'], `${path}.motion`);
+      const m=object.motion;
+      if (!['none','spin','shuttle','orbit'].includes(m.type)) fail(`${path}.motion.type`, 'unknown motion.');
+      if (!['x','y','z'].includes(m.axis)) fail(`${path}.motion.axis`, 'expected x, y or z.');
+      result.motion={type:m.type,axis:m.axis,period:number(m.period,`${path}.motion.period`,0.2,600),distance:number(m.distance,`${path}.motion.distance`,0,5000)};
+    }
+    if (object.playClip !== undefined) {
+      if(object.type!=='glb'||typeof object.playClip!=='boolean') fail(`${path}.playClip`, 'expected boolean on a GLB.');
+      result.playClip=object.playClip;
+    }
+    if (object.clipSpeed !== undefined) result.clipSpeed=number(object.clipSpeed,`${path}.clipSpeed`,0,10);
     if (object.id !== undefined) result.id = text(object.id, `${path}.id`);
     if (object.color !== undefined) result.color = color(object.color, `${path}.color`);
     if (object.emissive !== undefined) result.emissive = color(object.emissive, `${path}.emissive`);
     return result;
   });
+  if(objects.filter(o=>o.type==='light').length>16) fail('track.objects','maximum 16 point lights.');
   const result = { id, name, width, horizontalScale, centerline, objects };
   if (input.magnetic !== undefined) {
     if (typeof input.magnetic !== 'boolean') fail('track.magnetic', 'expected true or false.');
@@ -181,11 +199,12 @@ export function decodeTrack(value) {
   record(value, 'file');
   if ('format' in value || 'version' in value || 'track' in value) {
     if (value.format !== TRACK_FORMAT) fail('file.format', `expected ${TRACK_FORMAT}.`);
-    if (![1, 2, 3, 4, 5, TRACK_VERSION].includes(value.version)) fail('file.version', `unsupported version ${String(value.version)}; this editor supports versions 1–${TRACK_VERSION}.`);
+    if (![1, 2, 3, 4, 5, 6, TRACK_VERSION].includes(value.version)) fail('file.version', `unsupported version ${String(value.version)}; this editor supports versions 1–${TRACK_VERSION}.`);
     knownFields(value, ['format', 'version', 'track'], 'file');
     if (value.version === 1 && (value.track?.magnetic !== undefined || value.track?.gaps !== undefined)) fail('file.version', 'magnetic road and gaps require version 2.');
     if (value.version < 3 && value.track?.branches !== undefined) fail('file.version', 'branches require version 3.');
     if (value.version < 4 && ['pointWidths','pads','roadStyle'].some(k=>value.track?.[k] !== undefined)) fail('file.version','widths, pads and road styles require version 4.');
+    if(value.version<7 && value.track?.objects?.some(o=>o.type==='light'||o.motion!==undefined||o.playClip!==undefined||o.clipSpeed!==undefined))fail('file.version','lights and motion require version 7.');
     if(value.version<6 && value.track?.objects?.some(o=>o.type==='glb'))fail('file.version','GLB scenery requires version 6.');
     if(value.version<5 && value.track?.pads?.some(p=>p.type==='weapon'))fail('file.version','weapon pads require version 5.');
     return normalizeTrack(value.track);

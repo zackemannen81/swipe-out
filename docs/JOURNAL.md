@@ -658,3 +658,23 @@
 - Build, two career tests and isolated Chrome menu checks pass, no page errors.
 - Same-name test fixtures confirm selection; actual authored scene not inspected.
 
+
+## 2026-11-01 - SCENERY-001
+- Added editable point lights, spin/shuttle/orbit, first embedded GLB clip playback.
+- Shared editor/game updater, editor-only light markers, frozen race pause, mixer disposal.
+- GLB UUID bindings remapped for cloned unnamed nodes; regression tests cover it.
+- Version 7 reads old tracks. Necros rails/edges now blood red.
+- Build and browser checks pass; 126/127 tests (known Foundry recovery failure).
+- User saves untouched; no commit or push.
+
+
+## 2026-11-01 - FINISH-001: roadmap completion pass
+- Audited E-G against implemented menus/garage/scenery; corrected stale checkboxes.
+- Added glow/music pulse, SFX/mute/mix, Race records, time medals and Silver unlock.
+- Added course cards/categories/current PB, gamepad navigation, Necros patrols/signs.
+- Added load-responsive engine and short brake/scrape/landing cues; closed replaced audio contexts.
+- Traced Foundry failure to downhill overspeed at gap; CPU now brakes on earlier run-up.
+- All 132 tests pass; original Foundry assertions unchanged. Build passes with bundle warning.
+- Isolated browser flows pass and screenshots inspected; user saves untouched.
+- Physical device, listening and human content balance remain explicit checks.
+

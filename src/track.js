@@ -1,3 +1,5 @@
+import {addWorldAmbience} from './world-ambience.js';
+import {bindScenery} from './scenery-motion.js';
 import { loadGlb } from './glb-scenery.js';
 import { clone as cloneModel } from 'three/addons/utils/SkeletonUtils.js';
 import { automaticWeaponPads, addWeaponPads } from './weapon-pads.js';
@@ -22,6 +24,7 @@ function addInstances(group, geometry, material, transforms) {
 
 
 export function createTrack(definition = NEON_CAUSEWAY) {
+  const necros=/necros/i.test(definition.name??'');
   const curve = createTrackCurve(definition);
   const junctionClear = d => !curve.track.branches.some(b => [b.start,b.end].some(u => Math.abs(d-u*curve.getLength()) < 35));
   const group = new THREE.Group();
@@ -51,11 +54,11 @@ export function createTrack(definition = NEON_CAUSEWAY) {
     depthWrite: curve.track.magnetic, side: curve.track.magnetic ? THREE.DoubleSide : THREE.FrontSide,
   });
   const cyanMaterial = new THREE.MeshStandardMaterial({
-    color: 0x58f4e8, emissive: 0x23dace, emissiveIntensity: 6.1,
+    color: (necros ? 0xa80010 : 0x58f4e8), emissive: (necros ? 0xa80010 : 0x23dace), emissiveIntensity: necros ? 12 : 6.1,
     metalness: 0.25, roughness: 0.32,
   });
   const pinkMaterial = new THREE.MeshStandardMaterial({
-    color: 0xff4b91, emissive: 0xd51e63, emissiveIntensity: 7.5,
+    color: (necros ? 0xa80010 : 0xff4b91), emissive: (necros ? 0xa80010 : 0xd51e63), emissiveIntensity: necros ? 12 : 7.5,
     metalness: 0.2, roughness: 0.36,
   });
   const darkMaterial = new THREE.MeshStandardMaterial({ color: 0x101827, metalness: 0.0, roughness: 0.38 });
@@ -115,13 +118,14 @@ export function createTrack(definition = NEON_CAUSEWAY) {
     color: 0x101827, metalness: 0.7, roughness: 0.38,
   });
   const pinkRailMaterial = new THREE.MeshStandardMaterial({
-    color: 0xff4b91, emissive: 0xff2678, emissiveIntensity: 7.5,
+    color: (necros ? 0xa80010 : 0xff4b91), emissive: (necros ? 0xa80010 : 0xff2678), emissiveIntensity: necros ? 12 : 7.5,
     metalness: 0.05, roughness: 0.3,
   });
   const cyanRailMaterial = new THREE.MeshStandardMaterial({
-    color: 0x58f4e8, emissive: 0x23dace, emissiveIntensity: 8.5,
+    color: (necros ? 0xa80010 : 0x58f4e8), emissive: (necros ? 0xa80010 : 0x23dace), emissiveIntensity: necros ? 12 : 8.5,
     metalness: 0.05, roughness: 0.3,
   });
+  group.userData.railMaterials=[cyanMaterial,pinkMaterial,pinkRailMaterial,cyanRailMaterial];
   const railGeometry = new THREE.CylinderGeometry(0.07, 0.07, 8.5, 8);
   const railTransforms = [];
   for (let distance = 4.25; distance < curve.getLength(); distance += 34) {
@@ -315,10 +319,11 @@ export function createTrack(definition = NEON_CAUSEWAY) {
   
   addBranchGeometry(group, curve, boostPadPlacements, definition.pads === undefined);
   if (definition.pads) addAuthoredPads(group, curve, definition.pads.filter(p=>p.type!=='weapon'), boostPadPlacements);
-  if (definition.roadStyle === 'raceway') addCornerSigns(group, curve);
+  if (definition.roadStyle === 'raceway' || necros) addCornerSigns(group, curve);
   if (definition.pads) boostPadPlacements.sort((a,b)=>a.d-b.d);
   const authoredWeapons=definition.pads?.filter(p=>p.type==='weapon')??[];
   const weaponPads=addWeaponPads(group,curve,authoredWeapons.length?authoredWeapons:automaticWeaponPads(curve,boostPadPlacements));
+  addWorldAmbience(group,curve);
 return { group, curve, length: curve.getLength(), boostPads: boostPadPlacements, weaponPads };
 }
 
@@ -329,6 +334,7 @@ export function disposeTrackGroup(group) {
   group.userData.disposed = true;
   const geometries = new Set(), materials = new Set(), textures = new Set();
   group.traverse(object => {
+    if(object.userData.mixer){object.userData.mixer.stopAllAction();object.userData.mixer.uncacheRoot(object.userData.mixer.getRoot());delete object.userData.mixer;}
     if (object.geometry) geometries.add(object.geometry);
     for (const material of (Array.isArray(object.material) ? object.material : [object.material])) {
       if (!material) continue;
@@ -420,6 +426,7 @@ if (obj.type === 'cylinder') {
     }
 
     mesh.userData = { animType: obj.animType || 'none' };
+    bindScenery(mesh,obj);
     objectGroup.add(mesh);
   });
 
@@ -432,7 +439,7 @@ export function spawnTrackObjects(scene, trackData) {
     const h=trackData.horizontalScale??1;
     holder.position.set(obj.position[0]*h,obj.position[1],obj.position[2]*h);
     holder.rotation.set(...(obj.rotation??[0,0,0]).map(THREE.MathUtils.degToRad));
-    holder.scale.set(...(obj.scale??[1,1,1]));holder.userData.baseScale=[...(obj.scale??[1,1,1])];
+    holder.scale.set(...(obj.scale??[1,1,1]));holder.userData.baseScale=[...(obj.scale??[1,1,1])];bindScenery(holder,obj);
   };
   // Keep loaded models/materials alive while dragging or changing transforms.
   if(existingGroup?.userData.contentKey===contentKey){
@@ -456,18 +463,38 @@ export function spawnTrackObjects(scene, trackData) {
   const geometries = new Map(), textures = new Map(), materials = new Map();
 
   trackData.objects.forEach((obj) => {
+    if(obj.type==='light'){
+      const holder=new THREE.Group();setTransform(holder,obj);
+      const light=new THREE.PointLight(obj.color??0xb60012,obj.lightIntensity??100,obj.lightRange??50,2);
+      const marker=new THREE.Mesh(new THREE.SphereGeometry(.35,12,8),new THREE.MeshBasicMaterial({color:obj.color??0xb60012}));
+      holder.add(light,marker);holder.userData.light=light;holder.userData.marker=marker;
+      marker.visible=false;objectGroup.add(holder);return;
+    }
     if (obj.type === 'glb') {
       const holder = new THREE.Group();
       holder.position.set(obj.position[0]*hScale,obj.position[1],obj.position[2]*hScale);
       holder.rotation.set(...obj.rotation.map(THREE.MathUtils.degToRad));
       holder.scale.set(...obj.scale);holder.userData.baseScale=[...obj.scale];
+      setTransform(holder,obj);
       objectGroup.add(holder);
       if(!modelLoads.has(obj.model))modelLoads.set(obj.model,loadGlb(obj.model).then(model=>{
         if(objectGroup.userData.disposed){disposeTrackGroup(model);return null;}return model;
       }));
       modelLoads.get(obj.model).then(model=>{
         if(!model || objectGroup.userData.disposed)return;
-        holder.add(cloneModel(model));holder.userData.loaded=true;
+        const instance=cloneModel(model);holder.add(instance);holder.userData.loaded=true;
+        if(obj.playClip && model.animations.length){
+          const mixer=new THREE.AnimationMixer(instance);
+          // Unnamed GLTF nodes use UUID bindings; clones receive new UUIDs.
+          const originals=[],copies=[];model.traverse(n=>originals.push(n));instance.traverse(n=>copies.push(n));
+          const clip=model.animations[0].clone();
+          for(const track of clip.tracks){
+            const node=THREE.PropertyBinding.parseTrackName(track.name).nodeName;
+            const index=originals.findIndex(n=>n.uuid===node);
+            if(index>=0)track.name=track.name.replace(node,copies[index].uuid);
+          }
+          mixer.clipAction(clip).play();holder.userData.mixer=mixer;
+        }
       }).catch(error=>{
         if(objectGroup.userData.disposed)return;
         holder.userData.error=error.message;objectGroup.userData.loadErrors.push(error.message);
@@ -565,6 +592,7 @@ export function spawnTrackObjects(scene, trackData) {
       baseScale: obj.scale ? [...obj.scale] : [1, 1, 1]
     };
     
+    bindScenery(mesh,obj);
     objectGroup.add(mesh);
   });
 

@@ -1,3 +1,5 @@
+import {updateRailGlow} from './rail-glow.js';
+import {updateScenery} from './scenery-motion.js';
 import { createFrontEnd } from './front-end.js';
 import { createGarage } from './garage.js';
 import { recordKey } from './time-attack.js';
@@ -785,6 +787,7 @@ function updateCraftPose(delta = 0) {
     brakeRight: Math.max(heldKeys.has('e') || race.throttleTarget < -0.1 ? 1 : 0, classicGamepadInput.brakeRight),
     pitch: ((heldKeys.has('r') ? 1 : 0) - (heldKeys.has('f') ? 1 : 0)) || classicGamepadInput.pitch,
   };
+const wasAirborne=shipPhysics.airborne;
 const pose = (race.state === 'racing' || race.state === 'finished') && delta > 0
     ? stepShipPhysics(shipPhysics, input, delta, curve, activeTopSpeed, trackWidth)
     : stepShipPhysics(shipPhysics, input, 0, curve, activeTopSpeed, trackWidth);
@@ -793,6 +796,8 @@ const pose = (race.state === 'racing' || race.state === 'finished') && delta > 0
   race.poseFrame = pose.frame;
   race.currentSpeed = shipPhysics.speed;
   race.lateralVelocity = shipPhysics.lateralVelocity;
+  if(wasAirborne&&!shipPhysics.airborne&&delta>0&&race.state==='racing')raceAudio.surfaceSound('land');
+  if(delta>0&&race.state==='racing'&&(input.brakeLeft||input.brakeRight))raceAudio.surfaceSound('brake');
   race.airborne = shipPhysics.airborne;
   race.airWorldY = shipPhysics.verticalOffset;
   race.roll = shipPhysics.roll;
@@ -848,7 +853,7 @@ function beginRace() {
   const loadout = frontEnd.begin(currentTrackId, recordKey({track:trackData}), {difficulty:cupRound?.settings.difficulty ?? selectedCpuDifficulty,handling:activeDrivingSettings.handling,assist:activeDrivingSettings.assist,combat:document.querySelector('#combat-enabled').checked});
   activeTopSpeed = (baseSpeed + SPEEDCALIBRATION) * loadout.speed;
   applyPlayerLoadout(loadout);
-  document.querySelector('#career-result')?.remove();
+  document.querySelector('#career-result')?.remove();document.querySelector('#race-record-result')?.remove();document.querySelector('#result-best-lap')?.remove();
   const trackName = trackData.name.toUpperCase();
 
   // Uppdatera texten i toppmenyn
@@ -896,8 +901,9 @@ scene.traverse(obj => {
   setupMinimap();
 
   // Byt musik
-  raceAudio.stop();
+  raceAudio.dispose();
   raceAudio = new RaceAudio(TRACK_CONFIG[currentTrackId].defaultAudio);
+  raceAudio.setPreferences(frontEnd.profile.settings);
   raceAudio.setVoiceVolume(selectedVoiceVolume);spokenLap=1;voiceCombatPrevious={};
   // Läs av sökvägen till den nya bakgrundsbilden
   const backdropUrl = TRACK_CONFIG[currentTrackId].backdrop;
@@ -921,7 +927,7 @@ scene.traverse(obj => {
     (error) => console.warn('Unable to load new panorama backdrop.', error)
   );
   
-  raceAudio.audio.volume = frontEnd.profile.settings.music;
+  raceAudio.setPreferences(frontEnd.profile.settings);
   raceAudio.play().catch((error) => console.warn('Unable to start race music.', error));
   race.state = 'racing';
 const tuning = loadout.ship === 'racer' && loadout.force === 1 ? {} : {mass:loadout.mass,engineForce:(activeDrivingSettings.handling==='wipeout'?CLASSIC_HANDLING.engineForce:10)*loadout.force};
@@ -940,7 +946,7 @@ Object.assign(shipPhysics, createShipPhysics(activeTopSpeed,tuning));
   race.countdownTimer = 4.0; // 3 sekunders nedräkning
   shipPhysics.previousSlope = getTrackFrame(curve, 0).tangent.y;
   race.distance = 0;
-  race.elapsed = 0;
+  race.elapsed = 0;race.recordLaps=[];race.recordLapStart=0;
   race.steering = 0;
   race.targetSteering = 0;
   race.lateralVelocity = 0;
@@ -1034,8 +1040,9 @@ function finishRace() {
   if(practice.active)resultDisplay.textContent=lapTime(bestLap);
   setScreen(resultsScreen, true);
   retryButton.focus({ preventScroll: true });
+  const lapSummary=document.createElement('p');lapSummary.id='result-best-lap';lapSummary.textContent='BEST LAP · '+lapTime(practice.active?bestLap:race.recordLaps?.length?Math.min(...race.recordLaps):null);resultsScreen.querySelector('.results-details').append(lapSummary);
   cup.finish();
-  if(!practice.active)frontEnd.finish(getPlayerPosition(opponents,race.distance,race.playerFinishTime),race.playerFinishTime);
+  if(!practice.active)frontEnd.finish(getPlayerPosition(opponents,race.distance,race.playerFinishTime),race.playerFinishTime,race.recordLaps?.length?Math.min(...race.recordLaps):null);
 }
 
 startButton.addEventListener('click', () => {
@@ -1328,10 +1335,10 @@ function togglePause() {
 // Byt låt direkt när man ändrar i pausmenyn
 musicSelect.addEventListener('change', async (event) => {
   const newAudioUrl = event.target.value;
-  raceAudio.stop();
+  raceAudio.dispose();
   raceAudio = new RaceAudio(newAudioUrl);
   raceAudio.setVoiceVolume(selectedVoiceVolume);
-  raceAudio.audio.volume = frontEnd.profile.settings.music;
+  raceAudio.setPreferences(frontEnd.profile.settings);
   
   if (!isPaused) {
     await raceAudio.play();
@@ -1387,7 +1394,7 @@ function applyPlayerLoadout(spec){
 }
 let previewStart=0;
 frontEnd=createFrontEnd({garage,tracks:TRACK_CONFIG,
- onSettings(settings){graphics.setPreferences(settings);raceAudio.audio.volume=settings.music;document.body.classList.toggle('reduce-menu-motion',!settings.motion);},
+ onSettings(settings){graphics.setPreferences(settings);raceAudio.setPreferences(settings);garage.setGlow(settings.glow);document.body.classList.toggle('reduce-menu-motion',!settings.motion);},
  onPreview(enabled,id){
   if(!enabled){craft.visible=true;for(const o of opponents)o.group.visible=true;return;}
   const data=getActiveTrackData(id);scene.remove(track);disposeTrackGroup(track);
@@ -1401,20 +1408,40 @@ pauseMenuButton.id='pause-menu-button';pauseMenuButton.type='button';pauseMenuBu
 pauseMenuButton.addEventListener('click',()=>{isPaused=false;setScreen(pauseScreen,false);introOverlay.hidden=true;menuButton.click();});
 pauseScreen.append(pauseMenuButton);
 
+let sceneryTime=0;
 function render() {
   if(frontEnd?.visible){
+    frontEnd.gamepad();
     clock.getDelta();
     const t=performance.now()/1000;
     if(frontEnd.preview){
-      const progress=((t-previewStart)/40)%1;
+      const progress=((t-previewStart)/60)%1;
       const frame=getTrackFrame(curve,progress),ahead=getTrackFrame(curve,(progress+.008)%1);
-      camera.up.copy(frame.normal);camera.position.copy(frame.center).addScaledVector(frame.normal,18).addScaledVector(frame.right,12).addScaledVector(frame.tangent,-20);camera.lookAt(ahead.center);camera.fov=54;camera.updateProjectionMatrix();panoramaBackdrop.position.copy(camera.position);updateTrackPresentation(track,t);graphics.render();
+      camera.up.copy(frame.normal);
+      
+      camera.position.copy(frame.center)
+      .addScaledVector(frame.normal,60)
+      .addScaledVector(frame.right,12)
+      .addScaledVector(frame.tangent,-20);
+      
+      camera.lookAt(ahead.center);
+      camera.fov=54;
+      camera.updateProjectionMatrix();
+     
+
+      panoramaBackdrop.position.copy(camera.position);
+      updateTrackPresentation(track,t);
+      updateRailGlow(track,frontEnd.profile.settings);
+      updateScenery(scene,t-previewStart);
+      graphics.render();
     }else garage.render(renderer,t,frontEnd.profile.settings.motion&&!matchMedia('(prefers-reduced-motion: reduce)').matches,(s,c)=>graphics.render(s,c));
     requestAnimationFrame(render);return;
   }
-  handleGamepadInput();
+  if(race.state==='finished')frontEnd.gamepad(resultsScreen,()=>menuButton.click());
+  else handleGamepadInput();
     // Om spelet är pausat, rita bara om bilden och avbryt funktionen
   if (isPaused) {
+    frontEnd.gamepad(pauseScreen,togglePause);
     graphics.render();
     requestAnimationFrame(render);
     return; 
@@ -1429,34 +1456,7 @@ function render() {
   const drivingPads=combat.enabled?[...race.boostPads,...race.weaponPads]:race.boostPads;
   const racingOpponents=practice.active?[]:opponents;
   let crossedFinish = false;
-  // --- ANIMERA BANE-OBJEKT ---
-  const customObjects = scene.getObjectByName('customTrackObjects');
-  if (customObjects && !isPaused) {
-    const time = clock.elapsedTime;
-    
-    customObjects.children.forEach(mesh => {
-      const anim = mesh.userData.animType;
-      
-      // 1. Skala upp och ner pulserande objekt
-      if (anim === 'pulse') {
-        const s = 1 + Math.sin(time * 3.5) * 0.15; // Pulserar +/- 15%
-        mesh.scale.set(
-          mesh.userData.baseScale[0] * s,
-          mesh.userData.baseScale[1] * s,
-          mesh.userData.baseScale[2] * s
-        );
-      }
-      
-      // 2. Scrolla texturer om materialet har en map
-      if (mesh.material?.map) {
-        if (anim === 'scroll-y') {
-          mesh.material.map.offset.y = (time * -0.6) % 1; // Hastighet -0.6
-        } else if (anim === 'scroll-x') {
-          mesh.material.map.offset.x = (time * -0.6) % 1;
-        }
-      }
-    });
-  }
+  sceneryTime+=delta;updateScenery(scene, sceneryTime);
 
   if(practice.active){shipPhysics.catchUpBonus=shipPhysics.catchUpGap=0;}
   else updateCatchUp([
@@ -1526,15 +1526,16 @@ if (countVal !== prevCount) {
     );
     updateCraftPose(delta);
     // Uppdatera motorljudet
-    raceAudio.updateEngine(race.currentSpeed, shipPhysics.boostTimer > 0, true);
+    raceAudio.updateEngine(race.currentSpeed, shipPhysics.boostTimer > 0, true,Math.max(0,race.throttleTarget));
 
     const completedLaps = Math.floor(race.distance / curve.getLength());
+    if(completedLaps>race.recordLaps.length){const crossing=race.elapsed-Math.max(0,race.distance-completedLaps*curve.getLength())/Math.max(1,race.currentSpeed);race.recordLaps.push(crossing-race.recordLapStart);race.recordLapStart=crossing;}
     const currentLap = Math.min(completedLaps + 1, totalLaps);
     const lapProgress = race.distance / curve.getLength() - completedLaps;
     timerDisplay.textContent = formatTime(race.elapsed);
     lapDisplay.textContent = `${String(currentLap).padStart(2, '0')} / ${String(totalLaps).padStart(2, '0')}${currentLap === totalLaps && lapProgress >= 0.72 ? ' · FINAL' : ''}`;
     //crossedFinish = race.distance >= curve.getLength() * totalLaps;
-    raceAudio.updateEngine(race.currentSpeed, shipPhysics.boostTimer > 0, true);
+    raceAudio.updateEngine(race.currentSpeed, shipPhysics.boostTimer > 0, true,Math.max(0,race.throttleTarget));
     crossedFinish = canFinishRace(curve, shipPhysics, totalLaps);
 
   } else if (race.state === 'finished') {
@@ -1730,7 +1731,7 @@ if (raycastFrameCounter % 15=== 0) {
     race.lastImpactSerial = shipPhysics.impactSerial;
     cameraSystem.shakeIntensity = 0.12 + shipPhysics.impactStrength * 0.55;
     cameraSystem.setShake(0.16 + shipPhysics.impactStrength * 0.25);
-    raceAudio.playSfx('crash');
+    raceAudio.playSfx('crash');raceAudio.surfaceSound('scrape');
   }
 
   // Match the trip meter: 3.25 metres per world unit, then m/s to km/h.
@@ -1803,7 +1804,8 @@ if (thrustFill) {
 
   const kick = race.state === 'racing' ? raceAudio.channels.kick : { hitValue: 0 };
   const bass = race.state === 'racing' ? raceAudio.channels.bass : { value: 0 };
-  graphics.setBloomStrength(0.62 + kick.hitValue * 0.55 + bass.value * 0.12);
+  updateRailGlow(track,frontEnd?.profile.settings,{kick,bass});
+  graphics.setBloomStrength(0.62 + (frontEnd?.profile.settings.musicPulse===false?0:kick.hitValue * 0.55 + bass.value * 0.12));
 
   // Update world-space exhaust only after player/CPU poses and the camera are final.
   const enginesRunning = ['countdown', 'racing', 'finished'].includes(race.state);

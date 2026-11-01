@@ -357,3 +357,13 @@ Trophies and Settings. Complete Necros campaign milestones to earn chassis,
 performance modules and a gold finish. Watch the course fly-by with its trailer
 from Campaign. See [Menus and garage](docs/MENUS_GARAGE.md) for rewards, settings
 and the factory-performance rule for Time Attack/cup.
+
+
+### Presentation and records update
+Settings now includes Neon glow, music-reactive rails, effects volume, mute and
+headphones/speakers effects dynamics. RECORDS keeps local per-configuration Race
+bests; time medals can earn Spire Silver in Necros. Course selection shows an
+environment preview, length, difficulty estimate and current Race PB. Necros
+has elevated amber corner signs and distant patrols. See
+[completion pass](docs/FINISHING_PASS.md) and [roadmap](docs/PRODUCT_ROADMAP.md)
+for delivered features and remaining human/device checks.

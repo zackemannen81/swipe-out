@@ -21,7 +21,8 @@ export function addBranchGeometry(group, curve, boostPads, includePads = true) {
       group.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(points),new THREE.LineBasicMaterial({color:0xffc468})));
     }
     const railGeometry = new THREE.BoxGeometry(0.18,0.8,5);
-    const railMaterial = new THREE.MeshStandardMaterial({color:0xffbc53,emissive:0xff922c,emissiveIntensity:2});
+    const railMaterial = new THREE.MeshStandardMaterial({color:/necros/i.test(curve.track.name)?0xa80010:0xffbc53,emissive:/necros/i.test(curve.track.name)?0xa80010:0xff922c,emissiveIntensity:/necros/i.test(curve.track.name)?12:2});
+    (group.userData.railMaterials??=[]).push(railMaterial);
     const railMatrices = [], matrix = new THREE.Matrix4();
     for (let d = 35; d < branch.length - 35; d += Math.max(6, branch.length/2400)) {
       const u = d / branch.length, frame = branch.frame(u);

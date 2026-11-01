@@ -1,3 +1,4 @@
+import {updateWorldAmbience} from './world-ambience.js';
 import * as THREE from 'three';
 import { createTrackCurve, getTrackFrame, getTrackWidth, hasSurface } from './track-path.js';
 
@@ -79,6 +80,7 @@ export function addAuthoredPads(group, curve, pads, placements) {
 }
 
 export function updateTrackPresentation(group, seconds) {
+  updateWorldAmbience(group,seconds);
   for(const [i,material] of (group?.userData.padMaterials??[]).entries()) material.emissiveIntensity=1.7+0.65*(1+Math.sin(seconds*5-i));
 }
 
@@ -92,6 +94,15 @@ export function addCornerSigns(group, curve) {
     const turn=ahead.tangent.dot(frame.right);
     if(Math.abs(turn)<0.45 || d-last<120 || !hasSurface(curve,d,15) || curve.track.branches.some(b=>[b.start,b.end].some(u=>Math.abs(d-u*length)<40))) continue;
     last=d;
+    if(/necros/i.test(curve.track.name)){
+      const panel=new THREE.Mesh(new THREE.BoxGeometry(7,3,.25),new THREE.MeshStandardMaterial({color:0x101114,roughness:.8}));
+      panel.position.copy(frame.center).addScaledVector(frame.right,-Math.sign(turn)*(getTrackWidth(curve,d/length)/2+4)).addScaledVector(frame.normal,3);
+      panel.quaternion.copy(frame.rotation);panel.userData.cornerSign=true;group.add(panel);
+      for(let n=-1;n<=1;n++)for(const side of [-1,1]){
+        const bar=new THREE.Mesh(new THREE.BoxGeometry(1.5,.22,.15),material);
+        bar.position.set(n*2,side*.45,-.22);bar.rotation.z=-side*Math.sign(turn)*.65;panel.add(bar);
+      }
+    }
     for(let n=0;n<3;n++) {
       const f=getTrackFrame(curve,(d+n*4)/length);
       for(const side of [-1,1]) {

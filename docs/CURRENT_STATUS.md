@@ -1,5 +1,20 @@
 # Current Status
 
+## 2026-11-01 — FINISH-001 (latest)
+
+Roadmap E–G audited and updated. Added local Race records, time medals and
+Spire Silver unlock; course cards/categories/current-setup PB; persisted glow,
+music pulse, SFX/mute/effects mix; procedural airbrake/scrape/landing cues;
+Necros patrols and raised amber signs; shared gamepad menu navigation.
+The former Foundry CPU failure is fixed by braking overspeed before gap run-up,
+without changing player physics or weakening tests. All 132 tests pass.
+Production build passes (existing chunk warning). Isolated Chrome verifies
+settings persistence, records/rewards, preview, factory TA/cup isolation and
+menu navigation without page errors. Visual screenshots inspected.
+Actual phone measurements, physical-controller comfort, listening and medal/
+content balancing remain human validation. See FINISHING_PASS.md and updated
+PRODUCT_ROADMAP.md. Earlier dated entries below are historical snapshots.
+
 ## 2026-10-31 — MENU-001
 
 Animated main/setup/campaign/garage/trophies/settings views now share a 3D
@@ -739,3 +754,12 @@ Campaign and fly-by now require custom-e7ead7a3-b303-4c3d-9464-ca52f28e8386.
 Same-name tracks and the track17 prototype cannot substitute. Missing local
 data disables entry/preview and explains browser-origin storage separation.
 Saved track names and data are unchanged; campaign label is Dark PRIME.
+
+## 2026-11-01 — SCENERY-001
+
+Editor now creates point lights (color/intensity/range, maximum 16) and authors
+spin/shuttle/orbit motion plus first embedded GLB clip playback. Shared preview
+and race updater restores authored transforms and freezes on race pause.
+Version 7 track documents preserve settings and read versions 1–6. Necros-named
+tracks use blood-red edge/rail lights; saved track geometry is unchanged.
+See SCENERY_ANIMATION.md for controls, limitations and verification.

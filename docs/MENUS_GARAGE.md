@@ -60,5 +60,6 @@ No physical-phone performance claim is made.
   menu overflow or page errors. Controlled finishes are not human balance tests.
 - Set PLAYWRIGHT_MODULE to your installed Playwright module before running it.
 
-Remaining: campaign balancing, more authored worlds, custom cinematic camera
-anchors, physical mobile testing, world drone patrols and authored amber signs.
+Updated by FINISH-001: records/time medals, audio/glow controls, generated Necros
+patrols and amber signs are implemented. See FINISHING_PASS.md. Remaining content
+work: human balancing, additional worlds, bespoke camera paths and phone testing.

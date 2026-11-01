@@ -61,3 +61,13 @@ body.in-menu #race-intro,body.in-menu #race-messages,body.in-menu #combat-hud,bo
 #front-loading {position:fixed;inset:0;z-index:100;background:#070d15;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:22px;color:#60eee6;}
 #front-loading strong {font:clamp(24px,5vw,54px) Induction,sans-serif;}
 #front-loading span {font:10px monospace;letter-spacing:3px;color:#90aebc;}
+
+#course-card{margin:16px 0;border:1px solid #27414b;padding:12px;}
+#course-card img{width:100%;height:110px;object-fit:cover;opacity:.75;}
+#race-record-list p{overflow-wrap:anywhere;line-height:1.6;}
+#results-screen,#pause-screen{max-height:90vh;overflow:auto;animation:menu-arrive .25s ease-out;}
+@keyframes menu-arrive{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){#results-screen,#pause-screen{animation:none}}
+body.reduce-menu-motion #results-screen,body.reduce-menu-motion #pause-screen{animation:none}
+
+#menu-race #start-button{position:sticky;bottom:0;z-index:2;box-shadow:0 -8px 16px #071019;margin-bottom:6px;}

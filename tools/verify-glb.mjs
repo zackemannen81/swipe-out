@@ -19,7 +19,7 @@ try{
  await page.locator('#glb-file').setInputFiles('public/models/2.glb');
  await page.waitForFunction(()=>window.__scenery?.()?.length===3&&window.__scenery().every(o=>o.loaded));
  const download=page.waitForEvent('download');await page.locator('#download-button').click();const d=await download;const path=await d.path();const exported=JSON.parse(await readFile(path,'utf8'));
- assert.equal(exported.version,6);assert.equal(exported.track.objects.length,3);assert.match(exported.track.objects[2].model,/^data:model/);assert.deepEqual(exported.track.objects[0].scale,[3,1,1]);
+ assert.equal(exported.version,7);assert.equal(exported.track.objects.length,3);assert.match(exported.track.objects[2].model,/^data:model/);assert.deepEqual(exported.track.objects[0].scale,[3,1,1]);
  await page.locator('#save-button').click();await page.reload();await page.waitForFunction(()=>window.__scenery?.()?.length===3&&window.__scenery().every(o=>o.loaded));
  await page.locator('#object-select').selectOption('0');
  await mkdir(process.env.TEMP+'/swipe-glb',{recursive:true});await page.screenshot({path:process.env.TEMP+'/swipe-glb/editor.png'});

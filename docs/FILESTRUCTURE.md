@@ -297,3 +297,19 @@ Necros browser verification now share/check current and peak speed scaling.
 - `docs/archive/EDIT-CAMERA-COMBAT-001.md`: prior task record preserved as-is.
 
 - `docs/archive/MENU-001.md`: completed menu/garage task record.
+
+## SCENERY-001
+- `src/scenery-motion.js`: shared authored transform and clip playback.
+- `tests/scenery-motion.test.js`: lights, motion, format, rails and real GLB clip.
+- `tools/verify-scenery.mjs`: isolated editor and game browser acceptance.
+- `docs/SCENERY_ANIMATION.md`: authoring controls and limits.
+- `docs/archive/CAMPAIGN-002.md`: completed campaign identity task.
+
+## 2026-11-01 — FINISH-001
+Roadmap E–G reconciled with implemented garage/scenery features. Added glow/pulse
+and sound controls, local Race records, time medals/Spire Silver, course cards,
+gamepad menu navigation, Necros patrols/amber signs and CPU gap overspeed fix.
+See FINISHING_PASS.md for behavior, validation and real-device limitations.
+New modules: src/rail-glow.js, src/race-records.js, src/world-ambience.js.
+New regression tests: tests/finish-features.test.js. Prior task archived in
+ docs/archive/SCENERY-001.md.

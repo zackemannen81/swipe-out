@@ -203,7 +203,7 @@ function renderObjectInspector() {
   if (object.type !== 'glb') {
   const colors = document.createElement('div'); colors.className = 'object-colors';
   const hex = value => typeof value === 'number' ? '#'+value.toString(16).padStart(6,'0') : value.length === 4 ? '#'+[...value.slice(1)].map(c=>c+c).join('') : value;
-  const defaultColor = object.texture ? 0xffffff : object.type === 'cylinder' ? 0xffd166 : object.type === 'sphere' ? 0xb58cff : 0xff7aa8;
+  const defaultColor = object.type==='light'?0xb60012:object.texture ? 0xffffff : object.type === 'cylinder' ? 0xffd166 : object.type === 'sphere' ? 0xb58cff : 0xff7aa8;
   for (const [key, title, fallback] of [['color','SURFACE COLOR',defaultColor],['emissive','GLOW COLOR',0x000000]]) {
     const label = document.createElement('label'); label.textContent = title;
     const input = document.createElement('input'); input.type = 'color'; input.value = hex(object[key] ?? fallback);
@@ -212,7 +212,7 @@ function renderObjectInspector() {
     label.append(input); colors.append(label);
   }
   const presets = document.createElement('div'); presets.className = 'neon-presets';
-  for(const [name,color] of [['Cyan','#00e5ff'],['Pink','#ff269e'],['Lime','#a3ff12'],['Amber','#ffb020'],['Violet','#9c55ff']]) {
+  for(const [name,color] of [['Blood red','#a80010'],['Cyan','#00e5ff'],['Pink','#ff269e'],['Lime','#a3ff12'],['Amber','#ffb020'],['Violet','#9c55ff']]) {
     const button = document.createElement('button'); button.textContent = name; button.style.setProperty('--swatch',color);
     button.setAttribute('aria-label','Neon '+name);
     button.addEventListener('click',()=>edit(next=>{Object.assign(next.objects[selection.index],{color,emissive:color});}));
@@ -258,6 +258,30 @@ function renderObjectInspector() {
     clear.addEventListener('click', () => edit(next => { next.objects[selection.index].texture = null; })); row.append(clear);
   }
   }
+  function numeric(label,key,value,min,max,step,apply){
+    const wrap=document.createElement('label');wrap.textContent=label;
+    const input=document.createElement('input');Object.assign(input,{type:'number',value,min,max,step});input.setAttribute('aria-label',label);
+    input.addEventListener('change',()=>{const v=input.valueAsNumber;input.blur();edit(next=>apply(next.objects[selection.index],v));});wrap.append(input);row.append(wrap);
+  }
+  if(object.type==='light'){
+    numeric('LIGHT INTENSITY','lightIntensity',object.lightIntensity,0,10000,10,(o,v)=>o.lightIntensity=v);
+    numeric('LIGHT RANGE','lightRange',object.lightRange,1,2000,5,(o,v)=>o.lightRange=v);
+  }
+  const motion=object.motion??{type:'none',axis:'y',period:20,distance:50};
+  function motionSelect(label,key,values){
+    const wrap=document.createElement('label');wrap.textContent=label;const select=document.createElement('select');select.setAttribute('aria-label',label);
+    for(const v of values)select.add(new Option(v.toUpperCase(),v));select.value=motion[key];
+    select.addEventListener('change',()=>{const value=select.value;select.blur();edit(next=>next.objects[selection.index].motion={...motion,[key]:value});});wrap.append(select);row.append(wrap);
+  }
+  motionSelect('MOVEMENT','type',['none','spin','shuttle','orbit']);motionSelect('MOVEMENT AXIS','axis',['x','y','z']);
+  numeric('CYCLE SECONDS','period',motion.period,.2,600,1,(o,v)=>o.motion={...motion,period:v});
+  numeric('TRAVEL / RADIUS (WORLD UNITS)','distance',motion.distance,0,5000,5,(o,v)=>o.motion={...motion,distance:v});
+  if(object.type==='glb'){
+    const wrap=document.createElement('label');wrap.textContent='PLAY FIRST GLB ANIMATION';const input=document.createElement('input');input.type='checkbox';input.checked=object.playClip??false;
+    input.addEventListener('change',()=>{const checked=input.checked;edit(next=>next.objects[selection.index].playClip=checked);});wrap.append(input);row.append(wrap);
+    numeric('GLB PLAYBACK SPEED','clipSpeed',object.clipSpeed??1,0,10,.1,(o,v)=>o.clipSpeed=v);
+  }
+  const motionHelp=document.createElement('p');motionHelp.className='field-help';motionHelp.textContent='Shuttle moves back and forth along a world axis. Orbit circles around the chosen axis, starting at the saved position. Rotation uses the saved orientation. GLB playback needs an animation clip in the file.';row.append(motionHelp);
   const remove = document.createElement('button'); remove.textContent = 'REMOVE OBJECT';
   remove.addEventListener('click', () => {
     const index = selection.index;
@@ -333,7 +357,7 @@ for (const button of document.querySelectorAll('[data-primitive]')) {
   button.addEventListener('click', () => {
     const position = track().centerline[selection.kind === 'point' ? selection.index : 0].slice(0, 3);
     position[1] += 2;
-    edit(next => next.objects.push({ id: crypto.randomUUID(), type: button.dataset.primitive, position, scale: [5, 5, 5] }));
+    edit(next => next.objects.push({ id: crypto.randomUUID(), type: button.dataset.primitive, position, scale: button.dataset.primitive==='light'?[1,1,1]:[5,5,5] }));
     selection = { kind: 'object', index: track().objects.length - 1 };
     render(); view.select(selection);
   });

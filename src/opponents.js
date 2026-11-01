@@ -150,7 +150,7 @@ function decide(opponent, opponents, player, curve, pads, trackWidth, elapsed) {
   const junction = nextBranch(curve, ship.distance);
   const approachingJunction = junction && junction.distance - ship.distance < Math.max(220, ship.speed * 2.2);
   const gap = ship.flight?.gap ?? nextGap(curve, ship.distance);
-  const approachingGap = gap && (ship.flight || gap.start - ship.distance < Math.max(110, ship.speed * 1.1));
+  const approachingGap = gap && (ship.flight || gap.start - ship.distance < Math.max(180, ship.speed * 2.4));
   // Smooth driver error and finite reaction time can produce imperfect lines and wall scrapes.
   opponent.targetLane += Math.sin(elapsed * 1.7 + opponent.phase) * opponent.precision * opponent.ai.error;
   // Occasional overcommitment is an input error with a real recovery cost.
@@ -195,7 +195,8 @@ function drive(opponent, curve, dt) {
   // Keep downhill momentum on clear straights. Corners and traffic still
   // require deliberate braking, independent of the engine's nominal limit.
   const cornerNeedsBraking = cornerTarget < topSpeed * opponent.ai.pace * 0.96;
-  const safeSpeed = Math.min(opponent.trafficSpeedLimit, cornerNeedsBraking ? speedTarget : Infinity);
+  const gapRunup=opponent.strategy==='gap-runup';
+  const safeSpeed = Math.min(opponent.trafficSpeedLimit, gapRunup?topSpeed:cornerNeedsBraking ? speedTarget : Infinity);
   const braking = ship.speed > safeSpeed + 3;
   opponent.input = {
     steer, thrust: braking ? 0 : clamp((speedTarget - ship.speed) / 12 + 0.3, 0.15, 1),

@@ -1,0 +1,38 @@
+import assert from 'node:assert/strict';
+import {readFile} from 'node:fs/promises';
+import {pathToFileURL} from 'node:url';
+const {chromium}=await import(pathToFileURL(process.env.PLAYWRIGHT_MODULE).href);
+const browser=await chromium.launch({channel:'chrome',headless:true,args:['--use-angle=d3d11']});
+const context=await browser.newContext({viewport:{width:1440,height:1000},serviceWorkers:'block'});
+const errors=[];
+await context.route('**/src/editor-view.js*',async route=>{const r=await route.fetch();const s=(await r.text()).replace(/\r\n/g,'\n').replace('  return {\n    setTrack, fit,','  window.__scene=scene;\n  return {\n    setTrack, fit,');await route.fulfill({response:r,body:s});});
+await context.route('**/src/game.js*',async route=>{const r=await route.fetch();await route.fulfill({response:r,body:await r.text()+'\nwindow.__scene=scene;window.__pauseScenery=v=>isPaused=v;'});});
+try{
+ const page=await context.newPage();page.on('pageerror',e=>errors.push(e.message));
+ await page.goto('http://127.0.0.1:5173/editor.html?track=track17');
+ await page.locator('[data-primitive=light]').click();
+ await page.getByLabel('LIGHT INTENSITY',{exact:true}).fill('500');await page.getByLabel('LIGHT INTENSITY',{exact:true}).press('Tab');
+ await page.getByLabel('MOVEMENT',{exact:true}).selectOption('shuttle');
+ await page.getByLabel('MOVEMENT AXIS',{exact:true}).selectOption('x');
+ const snapshot=()=>page.evaluate(()=>{const o=window.__scene.getObjectByName('customTrackObjects').children[0];return {x:o.position.x,base:o.userData.scenery.position.x,intensity:o.userData.light.intensity};});
+ assert.equal((await snapshot()).intensity,500);
+ await page.locator('#scenery-preview').check();await page.waitForTimeout(300);assert.notEqual((await snapshot()).x,(await snapshot()).base);
+ await page.locator('#scenery-preview').uncheck();await page.waitForTimeout(100);assert.equal((await snapshot()).x,(await snapshot()).base);
+ await page.locator('#glb-path').fill('/models/2.glb');await page.locator('#add-glb-path').click();
+ await page.getByLabel('PLAY FIRST GLB ANIMATION',{exact:true}).waitFor();
+ await page.getByLabel('MOVEMENT',{exact:true}).selectOption('orbit');
+ await page.getByLabel('PLAY FIRST GLB ANIMATION',{exact:true}).check();
+ const download=page.waitForEvent('download');await page.locator('#download-button').click();const file=await download;const doc=JSON.parse(await readFile(await file.path(),'utf8'));
+ assert.equal(doc.version,7);assert.equal(doc.track.objects[0].lightIntensity,500);assert.equal(doc.track.objects[1].motion.type,'orbit');assert.equal(doc.track.objects[1].playClip,true);
+ await page.locator('#save-button').click();await page.reload();await page.waitForFunction(()=>window.__scene?.getObjectByName('customTrackObjects')?.children.length===2);
+ assert.equal((await snapshot()).intensity,500);
+ await page.locator('#object-select').selectOption('0');await page.screenshot({path:process.env.TEMP+'/swipe-scenery-editor.png'});
+ await page.goto('http://127.0.0.1:5173/?track=track17');await page.locator('[data-event=race]').click();
+ await page.evaluate(()=>{document.documentElement.requestFullscreen=async()=>{};});await page.locator('#start-button').click();
+ await page.waitForFunction(()=>window.__scene?.getObjectByName('customTrackObjects')?.children.length===2);
+ const before=(await snapshot()).x;await page.waitForTimeout(300);assert.notEqual((await snapshot()).x,before);
+ assert.equal(await page.evaluate(()=>window.__scene.getObjectByName('customTrackObjects').children[0].userData.marker.visible),false);
+ await page.evaluate(()=>window.__pauseScenery(true));const frozen=(await snapshot()).x;await page.waitForTimeout(300);assert.equal((await snapshot()).x,frozen);
+ await page.evaluate(()=>window.__pauseScenery(false));await page.waitForTimeout(100);assert.notEqual((await snapshot()).x,frozen);
+ assert.deepEqual(errors,[]);console.log('PASS editor light creation, controls, motion preview/reset, GLB movement, export, save/reload; no page errors');
+}catch(e){for(const p of context.pages())console.log(await p.locator('#status').textContent(),errors);throw e;}finally{await browser.close();}

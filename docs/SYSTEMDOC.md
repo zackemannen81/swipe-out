@@ -299,3 +299,21 @@ Campaign and fly-by now require custom-e7ead7a3-b303-4c3d-9464-ca52f28e8386.
 Same-name tracks and the track17 prototype cannot substitute. Missing local
 data disables entry/preview and explains browser-origin storage separation.
 Saved track names and data are unchanged; campaign label is Dark PRIME.
+
+## 2026-11-01 — SCENERY-001
+
+Editor now creates point lights (color/intensity/range, maximum 16) and authors
+spin/shuttle/orbit motion plus first embedded GLB clip playback. Shared preview
+and race updater restores authored transforms and freezes on race pause.
+Version 7 track documents preserve settings and read versions 1–6. Necros-named
+tracks use blood-red edge/rail lights; saved track geometry is unchanged.
+See SCENERY_ANIMATION.md for controls, limitations and verification.
+
+## 2026-11-01 — FINISH-001
+Roadmap E–G reconciled with implemented garage/scenery features. Added glow/pulse
+and sound controls, local Race records, time medals/Spire Silver, course cards,
+gamepad menu navigation, Necros patrols/amber signs and CPU gap overspeed fix.
+See FINISHING_PASS.md for behavior, validation and real-device limitations.
+New modules: src/rail-glow.js, src/race-records.js, src/world-ambience.js.
+New regression tests: tests/finish-features.test.js. Prior task archived in
+ docs/archive/SCENERY-001.md.

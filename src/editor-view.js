@@ -1,3 +1,4 @@
+import {updateScenery} from './scenery-motion.js';
 import { updateWeaponPads } from './weapon-pads.js';
 import { updateTrackPresentation, padPlacement } from './track-pads.js';
 import * as THREE from 'three';
@@ -157,6 +158,7 @@ export function createEditorView(canvas, { onSelect, onMove, onCommit, onError }
     updateWeaponPads(road, performance.now()/1000, null, true);
     const errors=scene.getObjectByName('customTrackObjects')?.userData.loadErrors;
     if(errors?.length)onError?.('GLB: '+errors.splice(0).join('; '));
+    updateScenery(scene, performance.now()/1000, {preview:document.getElementById('scenery-preview')?.checked,helpers:true});
     renderer.render(scene, camera);
   });
   return {

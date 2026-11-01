@@ -1,17 +1,30 @@
 # Current Task
-Task ID: CAMPAIGN-002
+Task ID: FINISH-001
 Status: Complete
 
 ## Scope
-Pin Necros - Dark PRIME campaign and fly-by to user-confirmed custom-e7ead7a3-b303-4c3d-9464-ca52f28e8386. Remove name/prototype fallback. Explain missing local track and block unavailable event. Preserve authored saves and countdown.
+Audit remaining product roadmap E–G and Necros presentation requests against
+implementation. Complete available local features: glow/music response controls,
+audio settings, records/results, course selection, world presentation and menu
+consistency. Preserve accepted countdown/handling and authored saves. Physical
+phone measurements, human balancing and additional authored worlds must remain
+explicit external/content work, not falsely completed.
 
 ## Acceptance
-Browser checks missing track, same-name duplicates, exact preview/event selection, rewards and existing menu flows. Production build passes.
+Focused tests and isolated browser flows for new controls/persistence/results.
+Build, visual inspection, corrected roadmap with explicit remaining items.
 
-## Verification
-Production build, career tests (2/2) and diff check pass. Isolated Chrome menu
-acceptance passes with no page errors, including unavailable campaign, two
-same-name custom fixtures, exact event ID, fly-by, rewards, settings and loadout
-persistence, factory TA/cup and small-screen overflow. Fixture geometry uses
-track17; the user-authored scene remains only in their browser storage and was
-not inspected or modified. Existing bundle-size warning remains.
+## Delivered / verification
+Local E–G features completed and roadmap reconciled; see FINISHING_PASS.md.
+132/132 tests pass, including the unmodified Foundry zero-recovery acceptance
+that failed before this wave. Production build passes with existing bundle
+warning. Isolated Chrome checks persisted SFX/glow/mute/mix, previews, records,
+reward/loadout reload, standard TA/cup, gamepad focus and small menu overflow.
+Desktop home/settings/course/results screenshots inspected; final browser run
+recorded in journal. No user saves modified, no commit/push.
+
+## Explicit external follow-up
+Physical phone frame-time/heat/memory measurements, real-device/controller
+comfort, headphones/speakers listening and authored-world medal/sign balancing.
+These cannot be replaced with synthetic browser tests. More worlds and bespoke
+cinematic anchors remain content work beyond the existing one-world preview.
