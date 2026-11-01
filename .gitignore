@@ -2,3 +2,7 @@ node_modules/
 dist/
 .vite/
 .DS_Store
+
+# Large local scenery assets (excluded from GitHub)
+/public/models/Meshy_AI_Crimson_Citadel_1031114657_texture.glb
+/public/models/Meshy_AI_Urban_Spire_1031114834_texture.glb
