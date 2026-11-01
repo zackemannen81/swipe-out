@@ -1,5 +1,13 @@
 # Current Status
 
+## 2026-11-01 — GIT-001
+
+Removed oversized Crimson Citadel and Urban Spire GLBs from unpublished Git
+history and ignored their exact paths. Assets remain local; fresh clones do not
+include these two models. All other committed content preserved. Normal push
+to origin/main succeeded; local backup branch retained.
+
+
 ## 2026-11-01 — FINISH-001 (latest)
 
 Roadmap E–G audited and updated. Added local Race records, time medals and

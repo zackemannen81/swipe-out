@@ -678,3 +678,9 @@
 - Isolated browser flows pass and screenshots inspected; user saves untouched.
 - Physical device, listening and human content balance remain explicit checks.
 
+
+## 2026-11-01 - GIT-001
+- Removed two oversized GLBs from four unpublished commits; retained local files and backup branch.
+- Exact paths ignored; all other committed content preserved; largest outgoing blob 13.95 MB.
+- Normal push to origin/main succeeded without force.
+
