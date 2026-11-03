@@ -1,0 +1,970 @@
+[
+  {
+    "id": "TB-DECK-01",
+    "kind": "deck",
+    "label": "Huvuddäck",
+    "position": [
+      0,
+      -0.3,
+      0
+    ],
+    "description": "Slitna modulära metallplattor, kabelrännor och gångmarkeringar.",
+    "priority": "P1",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      46,
+      0.64,
+      66
+    ]
+  },
+  {
+    "id": "TB-ROOF-01",
+    "kind": "roof",
+    "label": "Hangartak",
+    "position": [
+      0,
+      0,
+      0
+    ],
+    "description": "Mörka takpaneler bakom bärverket, med plats för ventilation och kabelstegar.",
+    "priority": "P2",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      44.27,
+      10.53,
+      66
+    ]
+  },
+  {
+    "id": "TB-RIB-01",
+    "kind": "rib",
+    "label": "Bärande valvbåge",
+    "position": [
+      0,
+      0,
+      26
+    ],
+    "description": "Återanvändbar industribåge med pelarfot, snedsträva och takbalk.",
+    "priority": "P1",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      46.2,
+      21.64,
+      2
+    ]
+  },
+  {
+    "id": "TB-RIB-02",
+    "kind": "rib",
+    "label": "Bärande valvbåge",
+    "position": [
+      0,
+      0,
+      15
+    ],
+    "description": "Återanvändbar industribåge med pelarfot, snedsträva och takbalk.",
+    "priority": "P1",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      46.2,
+      21.64,
+      2
+    ]
+  },
+  {
+    "id": "TB-RIB-03",
+    "kind": "rib",
+    "label": "Bärande valvbåge",
+    "position": [
+      0,
+      0,
+      4
+    ],
+    "description": "Återanvändbar industribåge med pelarfot, snedsträva och takbalk.",
+    "priority": "P1",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      46.2,
+      21.64,
+      2
+    ]
+  },
+  {
+    "id": "TB-RIB-04",
+    "kind": "rib",
+    "label": "Bärande valvbåge",
+    "position": [
+      0,
+      0,
+      -7
+    ],
+    "description": "Återanvändbar industribåge med pelarfot, snedsträva och takbalk.",
+    "priority": "P1",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      46.2,
+      21.64,
+      2
+    ]
+  },
+  {
+    "id": "TB-RIB-05",
+    "kind": "rib",
+    "label": "Bärande valvbåge",
+    "position": [
+      0,
+      0,
+      -18
+    ],
+    "description": "Återanvändbar industribåge med pelarfot, snedsträva och takbalk.",
+    "priority": "P1",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      46.2,
+      21.64,
+      2
+    ]
+  },
+  {
+    "id": "TB-RIB-06",
+    "kind": "rib",
+    "label": "Bärande valvbåge",
+    "position": [
+      0,
+      0,
+      -29
+    ],
+    "description": "Återanvändbar industribåge med pelarfot, snedsträva och takbalk.",
+    "priority": "P1",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      46.2,
+      21.64,
+      2
+    ]
+  },
+  {
+    "id": "TB-GALLERY-L",
+    "kind": "gallery",
+    "label": "Servicebalkong",
+    "position": [
+      -20,
+      0,
+      0
+    ],
+    "description": "Gångbrygga med räcke och tekniska skåp längs hangaren.",
+    "priority": "P2",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      4.07,
+      1.85,
+      63
+    ]
+  },
+  {
+    "id": "TB-WALL-L",
+    "kind": "wall",
+    "label": "Hangarvägg",
+    "position": [
+      -23,
+      0,
+      0
+    ],
+    "description": "Paneler, serviceöppningar och ventilationsfält.",
+    "priority": "P2",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      1,
+      18,
+      66
+    ]
+  },
+  {
+    "id": "TB-GALLERY-R",
+    "kind": "gallery",
+    "label": "Servicebalkong",
+    "position": [
+      20,
+      0,
+      0
+    ],
+    "description": "Gångbrygga med räcke och tekniska skåp längs hangaren.",
+    "priority": "P2",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      4.07,
+      1.85,
+      63
+    ]
+  },
+  {
+    "id": "TB-WALL-R",
+    "kind": "wall",
+    "label": "Hangarvägg",
+    "position": [
+      23,
+      0,
+      0
+    ],
+    "description": "Paneler, serviceöppningar och ventilationsfält.",
+    "priority": "P2",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      1,
+      18,
+      66
+    ]
+  },
+  {
+    "id": "TB-PAD-01",
+    "kind": "pad",
+    "label": "Spelarens serviceplattform",
+    "position": [
+      4,
+      0,
+      4
+    ],
+    "description": "Låg rund lyftplattform med belysta kanter, anslutningar och åtkomstpaneler.",
+    "priority": "P1",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      8.6,
+      0.58,
+      8.6
+    ]
+  },
+  {
+    "id": "TB-RACER-01",
+    "kind": "racer",
+    "label": "Utrustat racerskepp",
+    "position": [
+      4,
+      1.15,
+      4
+    ],
+    "description": "Visar spelarens befintliga valda skepp och finish. Återanvänd spelets racer; ingen ny modell behövs.",
+    "priority": "P1",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "TB-DOCK-01",
+    "kind": "dock",
+    "label": "Bakgrundsdocka",
+    "position": [
+      -12,
+      0,
+      -4
+    ],
+    "description": "Rektangulär parkeringsplats med laststöd. Generiska serviceskyttlar, inte nya upplåsta racers.",
+    "priority": "P2",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      8,
+      0.34,
+      7
+    ]
+  },
+  {
+    "id": "TB-SHUTTLE-01",
+    "kind": "shuttle",
+    "label": "Serviceskyttel",
+    "position": [
+      -12,
+      1,
+      -4
+    ],
+    "description": "Enkel transportfarkost som skapar skala och aktivitet. Byt mot optimerad bakgrundsmodell.",
+    "priority": "P2",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      5,
+      1.38,
+      5.1
+    ]
+  },
+  {
+    "id": "TB-DOCK-02",
+    "kind": "dock",
+    "label": "Bakgrundsdocka",
+    "position": [
+      -12,
+      0,
+      -14
+    ],
+    "description": "Rektangulär parkeringsplats med laststöd. Generiska serviceskyttlar, inte nya upplåsta racers.",
+    "priority": "P2",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      8,
+      0.34,
+      7
+    ]
+  },
+  {
+    "id": "TB-SHUTTLE-02",
+    "kind": "shuttle",
+    "label": "Serviceskyttel",
+    "position": [
+      -12,
+      1,
+      -14
+    ],
+    "description": "Enkel transportfarkost som skapar skala och aktivitet. Byt mot optimerad bakgrundsmodell.",
+    "priority": "P2",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      5,
+      1.38,
+      5.1
+    ]
+  },
+  {
+    "id": "TB-DOCK-03",
+    "kind": "dock",
+    "label": "Bakgrundsdocka",
+    "position": [
+      -12,
+      0,
+      -24
+    ],
+    "description": "Rektangulär parkeringsplats med laststöd. Generiska serviceskyttlar, inte nya upplåsta racers.",
+    "priority": "P2",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      8,
+      0.34,
+      7
+    ]
+  },
+  {
+    "id": "TB-SHUTTLE-03",
+    "kind": "shuttle",
+    "label": "Serviceskyttel",
+    "position": [
+      -12,
+      1,
+      -24
+    ],
+    "description": "Enkel transportfarkost som skapar skala och aktivitet. Byt mot optimerad bakgrundsmodell.",
+    "priority": "P2",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      5,
+      1.38,
+      5.1
+    ]
+  },
+  {
+    "id": "TB-CRANE-01",
+    "kind": "crane",
+    "label": "Traverskran",
+    "position": [
+      4,
+      13,
+      4
+    ],
+    "description": "Takbalk med löpvagn, dubbla vajrar och serviceok.",
+    "priority": "P1",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      30,
+      6.5,
+      2
+    ]
+  },
+  {
+    "id": "TB-CONSOLE-01",
+    "kind": "console",
+    "label": "Utrustningsterminal",
+    "position": [
+      9,
+      0,
+      6
+    ],
+    "description": "Lutande skärm på stativ intill spelarens plattform. Öppnar garage.",
+    "priority": "P1",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      1.5,
+      1.4,
+      0.98
+    ]
+  },
+  {
+    "id": "TB-NEXUS-01",
+    "kind": "nexus",
+    "label": "Briefingbord",
+    "position": [
+      12,
+      0,
+      -15
+    ],
+    "description": "Runt hologrambord med planetprojektion. Välj Necros eller Vitrum.",
+    "priority": "P1",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      5.2,
+      3.18,
+      5.2
+    ]
+  },
+  {
+    "id": "TB-BANNER-01",
+    "kind": "banner",
+    "label": "Civilisationsfana",
+    "position": [
+      -19.5,
+      0,
+      -18
+    ],
+    "description": "Vertikal fana för en av de fyra offentliga civilisationerna. Symboler ersätts senare.",
+    "priority": "P2",
+    "rotation": [
+      0,
+      -1.5707963267948966,
+      0
+    ],
+    "size": [
+      0.16,
+      4.18,
+      2
+    ]
+  },
+  {
+    "id": "TB-BANNER-02",
+    "kind": "banner",
+    "label": "Civilisationsfana",
+    "position": [
+      -19.5,
+      0,
+      -6
+    ],
+    "description": "Vertikal fana för en av de fyra offentliga civilisationerna. Symboler ersätts senare.",
+    "priority": "P2",
+    "rotation": [
+      0,
+      -1.5707963267948966,
+      0
+    ],
+    "size": [
+      0.16,
+      4.18,
+      2
+    ]
+  },
+  {
+    "id": "TB-BANNER-03",
+    "kind": "banner",
+    "label": "Civilisationsfana",
+    "position": [
+      19.5,
+      0,
+      -18
+    ],
+    "description": "Vertikal fana för en av de fyra offentliga civilisationerna. Symboler ersätts senare.",
+    "priority": "P2",
+    "rotation": [
+      0,
+      1.5707963267948966,
+      0
+    ],
+    "size": [
+      0.16,
+      4.18,
+      2
+    ]
+  },
+  {
+    "id": "TB-BANNER-04",
+    "kind": "banner",
+    "label": "Civilisationsfana",
+    "position": [
+      19.5,
+      0,
+      -6
+    ],
+    "description": "Vertikal fana för en av de fyra offentliga civilisationerna. Symboler ersätts senare.",
+    "priority": "P2",
+    "rotation": [
+      0,
+      1.5707963267948966,
+      0
+    ],
+    "size": [
+      0.16,
+      4.18,
+      2
+    ]
+  },
+  {
+    "id": "TB-LOUNGE-01",
+    "kind": "lounge",
+    "label": "Loungepodie",
+    "position": [
+      -14,
+      0,
+      14
+    ],
+    "description": "Upphöjt viloområde med sittplatser och lågt bord.",
+    "priority": "P2",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      11,
+      0.83,
+      11
+    ]
+  },
+  {
+    "id": "TB-SEAT-01",
+    "kind": "seat",
+    "label": "Pilotfåtölj",
+    "position": [
+      -14,
+      0,
+      17.5
+    ],
+    "description": "Modulär vilostol för lounge. Fristående säte, rygg och fot.",
+    "priority": "P2",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      1.3,
+      1.67,
+      1.32
+    ]
+  },
+  {
+    "id": "TB-SEAT-02",
+    "kind": "seat",
+    "label": "Pilotfåtölj",
+    "position": [
+      -10.671302192966962,
+      0,
+      15.081559480312317
+    ],
+    "description": "Modulär vilostol för lounge. Fristående säte, rygg och fot.",
+    "priority": "P2",
+    "rotation": [
+      0,
+      1.2566370614359172,
+      0
+    ],
+    "size": [
+      1.66,
+      1.67,
+      1.65
+    ]
+  },
+  {
+    "id": "TB-SEAT-03",
+    "kind": "seat",
+    "label": "Pilotfåtölj",
+    "position": [
+      -11.942751616976343,
+      0,
+      11.168440519687685
+    ],
+    "description": "Modulär vilostol för lounge. Fristående säte, rygg och fot.",
+    "priority": "P2",
+    "rotation": [
+      0,
+      2.5132741228718345,
+      0
+    ],
+    "size": [
+      1.83,
+      1.67,
+      1.84
+    ]
+  },
+  {
+    "id": "TB-SEAT-04",
+    "kind": "seat",
+    "label": "Pilotfåtölj",
+    "position": [
+      -16.057248383023655,
+      0,
+      11.168440519687683
+    ],
+    "description": "Modulär vilostol för lounge. Fristående säte, rygg och fot.",
+    "priority": "P2",
+    "rotation": [
+      0,
+      3.7699111843077517,
+      0
+    ],
+    "size": [
+      1.83,
+      1.67,
+      1.84
+    ]
+  },
+  {
+    "id": "TB-SEAT-05",
+    "kind": "seat",
+    "label": "Pilotfåtölj",
+    "position": [
+      -17.328697807033038,
+      0,
+      15.081559480312315
+    ],
+    "description": "Modulär vilostol för lounge. Fristående säte, rygg och fot.",
+    "priority": "P2",
+    "rotation": [
+      0,
+      5.026548245743669,
+      0
+    ],
+    "size": [
+      1.66,
+      1.67,
+      1.65
+    ]
+  },
+  {
+    "id": "TB-CARGO-01",
+    "kind": "cargo",
+    "label": "Reservdelscontainer",
+    "position": [
+      17,
+      0,
+      14
+    ],
+    "description": "Stapelbar låda med lås, hörnskydd och märkning. En modell kan återanvändas.",
+    "priority": "P2",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      1.5,
+      1.4,
+      2.1
+    ]
+  },
+  {
+    "id": "TB-CARGO-02",
+    "kind": "cargo",
+    "label": "Reservdelscontainer",
+    "position": [
+      19,
+      0,
+      14
+    ],
+    "description": "Stapelbar låda med lås, hörnskydd och märkning. En modell kan återanvändas.",
+    "priority": "P2",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      1.5,
+      1.4,
+      2.1
+    ]
+  },
+  {
+    "id": "TB-CARGO-03",
+    "kind": "cargo",
+    "label": "Reservdelscontainer",
+    "position": [
+      17,
+      0,
+      10
+    ],
+    "description": "Stapelbar låda med lås, hörnskydd och märkning. En modell kan återanvändas.",
+    "priority": "P2",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      1.5,
+      1.4,
+      2.1
+    ]
+  },
+  {
+    "id": "TB-CARGO-04",
+    "kind": "cargo",
+    "label": "Reservdelscontainer",
+    "position": [
+      19,
+      0,
+      10
+    ],
+    "description": "Stapelbar låda med lås, hörnskydd och märkning. En modell kan återanvändas.",
+    "priority": "P2",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      1.5,
+      1.4,
+      2.1
+    ]
+  },
+  {
+    "id": "TB-CARGO-05",
+    "kind": "cargo",
+    "label": "Reservdelscontainer",
+    "position": [
+      17,
+      0,
+      6
+    ],
+    "description": "Stapelbar låda med lås, hörnskydd och märkning. En modell kan återanvändas.",
+    "priority": "P2",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      1.5,
+      1.4,
+      2.1
+    ]
+  },
+  {
+    "id": "TB-CARGO-06",
+    "kind": "cargo",
+    "label": "Reservdelscontainer",
+    "position": [
+      19,
+      0,
+      6
+    ],
+    "description": "Stapelbar låda med lås, hörnskydd och märkning. En modell kan återanvändas.",
+    "priority": "P2",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      1.5,
+      1.4,
+      2.1
+    ]
+  },
+  {
+    "id": "TB-CARGO-07",
+    "kind": "cargo",
+    "label": "Reservdelscontainer",
+    "position": [
+      17,
+      0,
+      2
+    ],
+    "description": "Stapelbar låda med lås, hörnskydd och märkning. En modell kan återanvändas.",
+    "priority": "P2",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      1.5,
+      1.4,
+      2.1
+    ]
+  },
+  {
+    "id": "TB-WINDOW-01",
+    "kind": "window",
+    "label": "Orbitalfönstrets ram",
+    "position": [
+      0,
+      0,
+      -32
+    ],
+    "description": "Stor öppen fönsterram. Ingen tung genomskinlig glasruta behövs i prototypen.",
+    "priority": "P1",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      46,
+      19.5,
+      1
+    ]
+  },
+  {
+    "id": "TB-RAIL-01",
+    "kind": "rail",
+    "label": "Observationsräcke",
+    "position": [
+      0,
+      0,
+      -27
+    ],
+    "description": "Lågt skyddsräcke längs planetvyn.",
+    "priority": "P2",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      40.09,
+      1.26,
+      0.11
+    ]
+  },
+  {
+    "id": "TB-PLANET-01",
+    "kind": "planet",
+    "label": "Planetkuliss",
+    "position": [
+      8,
+      7,
+      -88
+    ],
+    "description": "Procedural sfär som representerar aktuell destination, inte en färdig planetdesign.",
+    "priority": "P1",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      72.85,
+      54,
+      69.2
+    ]
+  },
+  {
+    "id": "TB-STARS-01",
+    "kind": "stars",
+    "label": "Stjärnfält",
+    "position": [
+      0,
+      0,
+      0
+    ],
+    "description": "Billig punktkuliss bakom orbitalfönstret. Behåll procedural eller ersätt med bakgrund.",
+    "priority": "P2",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      259.43,
+      159.1,
+      69.47
+    ]
+  }
+]

@@ -1,0 +1,351 @@
+SWIPEOUT 2026
+RACE FOR YOUR WORLD
+UNIVERSE  /  STORY  /  GAME BIBLE
+Arbetsversion 0.1  ·  3 november 2026
+Ett döende universum. Fyra civilisationer som satsar sina hemplaneter. Ett brutalt mästerskap i antigravitationsracing. Och en sista hemlighet som inte får avslöjas före finalen.
+YOUR SACRIFICE IS NOT OPTIONAL.
+Spoilervarning: Dokumentet innehåller huvudberättelsens slutliga avslöjande. Håll den publika loren och den hemliga finalen separerade.
+INNEHÅLL
+01  Spelets kärna & universums kris
+02  De fem tävlande civilisationerna
+03  Kampanj & dramaturgi
+04  Turnébussen – interaktivt nav
+05  Gameplay, progression & upplåsningar
+06  Musik, trailers & visuell filosofi
+07  Utvecklingsplan & öppna frågor
+
+Så ska dokumentet läsas
+[FASTSLAGET] – användaren har uttryckligen etablerat idén eller den syns som ett befintligt inslag i spelet.
+[BYGGT/VISAT] – något som har demonstrerats i skärmbilder eller beskrivits som implementerat; inte oberoende tekniskt verifierat här.
+[KONCEPT] – en idé eller kreativ riktning som diskuterats, men inte slutgiltigt beslutats.
+[ÖPPET] – en regel, detalj eller koppling som återstår att definiera.
+1. Spelets kärna
+Titel: SwipeOut 2026: Race For Your World Genre: Högfarts-antigravitationsracing med kampanj, distinkta civilisationer, upplåsbara skepp, garage/uppgraderingar och ett berättelsedrivet nav mellan världarna. Ton: Gravallvarligt, bombastiskt, påkostat och visuellt övertygande science fiction – med ett enormt, väl dolt lager absurd humor. Tagline: ONE PILOT. AN ENTIRE CIVILISATION. YOUR SACRIFICE IS NOT OPTIONAL.
+1.1 Elevator pitch
+Universum åldras. Stjärnor förlorar sin energi, hela solsystem förfaller och civilisationernas resursbas krymper. För att undvika krig som förintar mängder av världar utan någon säker vinnare har de största civilisationerna accepterat en absurd men formellt reglerad lösning: en mästerskapsturnering i antigravitationsracing.
+Varje civilisation satsar sin hemplanet. Förlorarnas världar upplöses och deras massa omvandlas till energi. Vinnaren får tillgång till den samlade energin och en chans att rädda sin egen civilisation.
+Spelaren färdas mellan planeterna med ett enormt interstellärt turneringsskepp, tävlar på banor som vuxit ur varje civilisations historia och låser upp nya skepp, delar, musik och berättelser.
+På ytan: ett episkt, desperat sci-fi-mästerskap om civilisationers överlevnad. I hemlighet: ett skämt som börjar på universums skala och slutar vid en stationär dator och ett RTX 3060 Ti.
+1.2 Den viktigaste kreativa principen
+Berätta historien på fullt allvar. Necken är tragiska på riktigt. Vitrum är främmande på riktigt. De andra civilisationerna har verkliga motiv att frukta undergången. Trailerrösten, musiken, miljöerna och mellansekvenserna ska kännas som en AAA-produktion.
+Humorn får inte bestå av att karaktärerna skämtar om hur löjlig premissen är. Humorn uppstår när spelaren så småningom ser helheten: civilisationernas episka ödeskamp har i själva verket ett fullständigt bisarrt slutmål.
+Publiken måste först köpa dramatiken för att slutskämtet ska fungera.
+2. Universum och krisen
+2.1 Ett gammalt universum [FASTSLAGET]
+Universum har blivit mycket gammalt.
+Flera stjärnor har tappat stora delar av sin energi, och andra har på olika sätt hamnat utanför civilisationernas fungerande energiekonomi; övergivna eller bortglömda Dyson-sfärer förekommer som idé i bakgrunden.
+Energi och resurser räcker inte längre till alla.
+Även mycket avancerade civilisationer står inför existentiell resursbrist.
+En vinnare kan tillföras energi genom att förlorarnas hemplaneter och deras massa bryts ned eller upplöses.
+Den principiella konflikten är alltså inte att deltagarna tävlar om status. De slåss om möjligheten att fortsätta existera.
+2.2 Varför en racingturnering? [FASTSLAGET]
+Den officiella motiveringen: omfattande krig mellan de största civilisationerna skulle kunna förinta många solsystem utan att någon vann de nödvändiga resurserna. En formaliserad tävling reducerar konflikterna till ett enda avgörande mästerskap.
+Världens gravallvarliga svar på en kosmisk energikris är antigravitationsracing. Ingen i universum uppfattar detta som ett skämt.
+2.3 Turneringsregler – etablerade och öppna delar
+Fastslaget:
+Varje deltagande civilisation riskerar sin hemplanet.
+Vinnaren får de resurser/den energi som frigörs när förlorarnas världar löses upp.
+Racing är det avgörande provet.
+Insatsen är inte frivillig: “Your sacrifice is not optional.”
+Fyra öppet presenterade utomjordiska civilisationer har var sin värld; den mänskliga, femte parten och dess verkliga funktion hålls dold.
+Öppet att precisera:
+Vem skapade turneringen, vem äger regelverket och vem styr det enorma energisystemet?
+Hur kvalificerar sig civilisationer? Exakt hur räknas totalpoäng och avgörs en slutvinnare?
+När och hur verkställs planeternas upplösning? Finns en formell nedräkning eller tribunal?
+Hur hanteras nederlag eller omspelningar i kampanjen?
+Är Turnébussen neutral mark, ägd av arrangören eller av en ännu okänd makt?
+2.4 Tid och mänsklighetens cykler [KONCEPT / ÖPPET]
+Ett tidigt intro nämner “the fourth cycle of humanity in the year 2026” och att ytterligare nio mänskliga cykler passerat. Den formuleringen är del av den skapade introtraditionen, men exakt vad en cykel betyder och hur den mänskliga tidslinjen relaterar till The Collective och den dolda femte deltagaren är inte färdigdefinierat. Behandla den inte som en komplett kronologi förrän den har beslutats.
+3. De fem deltagarna
+Publikt: fyra civilisationer står inför undergången. Hemlig metanivå: Rickard “Zacke” Zakrisson är den femte tävlande parten.
+3.1 NECKEN — De som besegrade döden
+Hemvärld: Necros. Viktig plats: Dark PRIME, den stora industristaden på Necros. Kampanjvärld: World 01. Citat: “We have transcended death itself.” / “Death conquered us. Our bodies simply refused to follow.”
+Biologi och historia [FASTSLAGET]
+Necken är ursprungligen biologiska varelser. Med hjälp av Forever-energy har de utvecklat en genetisk mekanism där celler omedelbart kan återskapas när celldöd inträffar. Deras verkliga liv börjar, i deras egen samhällssyn, efter deras första död, när de har förenats med Forever-energy och återuppstått. Livet före den händelsen tillmäts mycket litet värde.
+Deras stora tragedi är Theseus skepp: celler och vävnader kan fortsätta ersättas, men de exakta neurobiologiska samband som format minne, identitet och känsloliv bevaras inte fullständigt. Personligheten förvittrar stegvis. Kärlek och empati bleknar; hybris, överlägsenhet och förakt växer. De förstår inte själva att individen försvinner eftersom varje kontinuerligt fungerande kropp upplever sig som samma original.
+De har inte besegrat döden. De har förlorat förmågan att förstå varför livet var värdefullt.
+Kultur och formspråk [FASTSLAGET]
+Gigantiska katedraler, monument, gravliknande imperial arkitektur och nekromantisk industri.
+Mörka massor, stål, sten, gotiska bågar, fanor, pelare och överväldigande storskalighet.
+Kall, hård, dystopisk estetik med sparsamt rött ljus.
+Dark PRIME har ett starkt rött/ultraviolett ljusklimat som skulle vara mycket ogästvänligt för en oskyddad människa.
+Deras monument är i praktiken minnesmärken över ett folk som inte längre finns kvar, även om kropparna fortsätter fungera.
+Rasens skepp har mörka, kantiga, ritualiserade och nästan skelettliknande former; exempel är Necron Crimson Citadel.
+Banan och musiken [BYGGT/VISAT]
+Necros PRIME / Dark PRIME – The Conquest Spire. Racing genom parader, monument, katedral, industrialiserade stadsrum och en våldsam nedstigning, The Drop. Neonräcken, boosters, höjdskillnader, extrem fart och tät atmosfär. Trevarvsrace, CPU-motstånd, olika svårighetsgrader och styrhjälp har demonstrerats.
+Musikidentitet: gotisk industrial, hård techno, metalinslag, brutala synthar, tragiska kvinnliga röster och mekanisk precision. Verk/titlar som förekommit: “To Death and Beyond”, “Vi lever inte”, “Livlös”.
+Tonsättande citat:
+“SURVIVAL IS A PRIVILEGE.”
+“YOUR WORLD EXPECTS VICTORY. EXPECTATIONS ARE MANDATORY.”
+“TO DEATH AND BEYOND.”
+“CONSUME WORLDS.”
+Tematisk kärna
+En död civilisation som desperat bevarar sina kroppar.
+3.2 VITRUM LITHOFYTER — Den levande planeten
+Hemvärld: Namnet på själva planeten är ännu inte fastslaget; Vitrum Lithofyter är civilisationen. Kampanjvärld: World 02. Bana: Neural Ascent. Citat: “We have evolved beyond your understanding of existence.”
+Biologi och medvetande [FASTSLAGET]
+Vitrum Lithofyter representerar omkring två miljarder års evolution längs en radikalt främmande biologisk väg. De är delvis kisel-/silikatbaserade och utgör en symbios av växtliknande organismer, svampliknande identitetssystem, mycelnätverk och mineraliska strukturer.
+En individuell kropp är inte nödvändigtvis permanent. Organismer kan växa samman med växter och återgå till större biologiska nätverk. Deras identitet fungerar delvis som hos svampar: distribuerat, föränderligt och utan samma tydliga gräns mellan individ och kollektiv som hos människan.
+Teknologi är inte separerad från biologi. Deras arkitektur växer, deras infrastruktur lever och skogen tänker. Kristallina och silikatiska vävnader kan betraktas som nätverkets informations- och energibärare.
+Världens utseende [FASTSLAGET / BYGGT/VISAT]
+Psykedelisk, enorm, levande megaskog; inte en steril kristallplanet.
+Kolossala träd med enorma skiv-/svampliknande kronor.
+Gigantiska sammanflätade rötter, levande valv, svamptorn, hängande rankor, bladverk och bioluminescens.
+Mycel och mineraliska ådror med svagt pulserande cyan- eller turkosljus.
+Mossa, bärnstensgula undersidor på svampar, violett växtlighet, varmt naturligt ljus och atmosfäriskt dis.
+Känslan ska vara att spelaren färdas genom en planets nervsystem.
+Neural Ascent har visats i en fungerande 3D-editor och i spelet, med 32 banpunkter, hundratals scenobjekt i tidigare iterationer och därefter en mer koncentrerad version med 232 objekt, organiska vägbeläggningar, växtvalv, svampplattformar och täta skogskulisser.
+Världens komposition bygger även på medvetna 2,5D-trick: texturerade bakgrundsplan, skogssilhuetter, parallax, enklare modeller nära banan, skysphere och dimma. Mer partiklar, lätt animation och lokal belysning är planerade/utforskade förbättringar.
+Musik [FASTSLAGET / SKAPAT]
+“Neural Ascent”, “Manifest the Wind”, och varianter av “Fast as the Wind”. Musikidentiteten använder experimentell goa-/psytrance, progressiv trance och elektronisk racingmusik; didgeridoo-drön, sitar och modal melodik, glasharmoniska toner, kristallklockor, levande FM-synthar, mycelaktiga rytmer, insektlik mikropercussion och stundvis ordlös kör. Cirka 145–150 BPM förekommer i promptarna.
+Tematisk kärna
+En levande civilisation som inte behöver bevara sina kroppar för att bevara sin existens. Dess spegelbild är Necken.
+3.3 THE COLLECTIVE — Maskinernas arvingar
+Ursprung: En alternativ version av Tellus/Jorden, eventuellt i en accelererad tidslinje eller ett parallellt universum. Citat: “We have calculated 17 trillion possible outcomes.”
+Ursprung och karaktär [FASTSLAGET]
+The Collective är en postbiologisk civilisation av artificiella intelligenser och extremt avancerade neurala nätverk. Deras evolution har gått så långt att de inte längre behöver sina mänskliga skapare.
+De representerar en intelligens som försöker lösa existensen genom modellering, prediktion, beräkning och optimering.
+Visualisering och bana [KONCEPT]
+Möjlig riktning: geometrisk arkitektur, maskinell precision, enorma beräkningsstrukturer, gravitationsmässigt omöjliga men matematiskt strikta banor, kall belysning och visuellt kontrollerat kaos. Musik skulle kunna vara precis, algoritmisk, rytmiskt komplicerad och hypermodern.
+Öppet: hemplanetens slutliga namn, design, raceskepp, individuella karaktärer, bana och egen tragedi är ännu inte fastslagna.
+Tematisk kärna
+Intelligens som inte längre behöver sin upphovsman.
+3.4 VIRUZ-TECH — All materia som möjlig värd
+Ursprung: En långt driven evolution av viruskonceptet. Citat: “All matter shall become our host.”
+Mekanik [FASTSLAGET]
+Viruz-Tech kan infektera och etablera symbios eller kontroll över såväl biologiska organismer som teknologi och konstruerade system. En värd kan vara en dator, bil, ett träd, en svamp, ett djur eller en komplex maskin. Gränsen mellan teknisk och biologisk evolution har kollapsat.
+Den exakta förklaringsmodellen är öppen. En kombination av avancerade biologiska virus, självorganiserande nanotekniska mekanismer och en protomolekyl-liknande förmåga att omstrukturera materia har diskuterats som inspirationsriktning — inte som färdigt tekniskt regelverk.
+Visualisering och bana [KONCEPT]
+Möjlig riktning: infekterad infrastruktur, organism–maskin-hybrider, främmande material som växer in i maskiner, föränderlig arkitektur och strukturer som ser ut att ha övertagits snarare än tillverkats. Banor och miljöer kan kännas kontaminerade, adaptiva och instabila.
+Öppet: hemvärld, personligheter, racingestetik, specifika regler för infektion, musikidentitet och namn på bana.
+Tematisk kärna
+Allt kan bli värd. Ingenting är längre helt sitt eget.
+3.5 RICKARD “ZACKE” ZAKRISSON — Den dolda femte deltagaren
+Ursprung: Homo sapiens, Linköping, Tellus. Utrustning: En stationär dator med NVIDIA RTX 3060 Ti, level editor och styrhjälp. Citat: “Jaha. Men har ni testat banan med alla boosters på?” / “Förresten, vad får vinnaren? Jag behöver uppgradera grafikkortet.”
+Den verkliga rollen [FASTSLAGET — STOR SPOILER]
+Zackes lore och egentliga roll ska hållas dold ända tills spelaren vunnit alla lopp och hela huvudturneringen.
+Efter en till synes fullständigt seriös slutseger spelas en episk mellansekvens upp. De andra civilisationernas planeter börjar lösas upp. En enorm infrastruktur samlar upp och transporterar energin genom ofattbart avancerade ledningar och reaktorer. Kameran följer energin längre och längre in i systemet – tills den sista kabeln ansluts till en helt vanlig stationär dator.
+Där sitter Zacke och behöver energin för att driva sitt grafikkort / kunna spela sitt eget extremt krävande racingspel.
+Här slår hela spelets metahumor till: spelaren har deltagit i ett gravallvarligt kosmiskt drama, vars verkliga mottagare är någon som vill ha bättre FPS.
+Möjlig slutskylt [KONCEPT, ej beslutad]:
+POWER SOURCE: FOUR CIVILISATIONS
+GPU: NVIDIA RTX 3060 Ti
+GRAPHICS PRESET: ULTRA
+FPS: 59
+Viktig regel
+Detta får inte avslöjas i världsbeskrivningar, butikstexter, ordinära karaktärsdialoger, trailers eller vanlig kampanj-UI. Dokumentet behöver därför delas i publik lore och spoilersektion om det används för extern kommunikation.
+4. Den stora berättelsekurvan
+Akt I – Världarnas sista chans
+En episk berättarröst förklarar universums ålder, den döende stjärnenergin, resurskrisen och turneringens uppkomst. Tävlingen framställs som ett fruktansvärt men nödvändigt alternativ till totalt interstellärt krig. Spelaren introduceras till Turnébussen och det första stoppet, Necros.
+Akt II – Civilisationerna
+Spelaren besöker värld efter värld. Varje plats har distinkt biologi, historia, etik, arkitektur, musik och skepp. Piloterna och deras samhällen behandlar tävlingen med absolut allvar.
+Necros skildrar död, förlorad identitet, hybris och imperiets monumentalitet.
+Vitrum Lithofyter visar en levande, distribuerad och urgammal planetär intelligens.
+The Collective representerar det postbiologiska och matematiskt optimerade.
+Viruz-Tech visar upplösta gränser mellan organism och konstruktion.
+De exakta sista två världarnas ordning och mellansekvenser är öppna.
+Akt III – Den sista segern
+Finalen måste upplevas som den största möjliga sci-fi-triumfen. Berättelsen antyder planeternas verkliga öde och Turnébussens energihantering, men aldrig målet. Först när spelaren vunnit alla huvudlopp öppnas den slutliga cutscenen som avslöjar Zacke och PC:n.
+Dramaturgisk riktlinje: Det är inte ett skämt tills kameran når datorn. Där och då blir hela den tidigare berättelsen hysteriskt rolig i efterhand.
+5. TURNÉBUSSEN – Interstellar Championship Carrier
+Smeknamn: Turnébussen / The Tour Bus. Funktion: Mobil mästerskapscentral, hangarfartyg, tävlingsdepå, diplomatskepp, hem, transport och berättelsenav. Status: Grundkonceptet är fastslaget; detaljerad rumsorganisation och storlek är koncept/planering.
+5.1 Varför Turnébussen behövs [FASTSLAGET]
+Flottan tar med racingfarkoster, piloter och stödfunktioner från planet till planet. Den knyter samman samtliga världar och ger spelaren en anledning att träffa de andra raserna, låsa upp berättelser, köpa delar och uppgradera skepp. När flottiljen anländer till en ny värld kan en fullskalig planetvy genom observationsfönstren presentera nästa kapitel.
+Föreslagen navigationsprincip [KONCEPT]
+Primärt: klickbara 3D-miljöer med förbestämda kameravyer, smidiga övergångar och tydliga interaktionspunkter.
+Sekundärt: valfritt Explore Mode med fri förstapersonskamera/WASD senare.
+Ingen animerad tredjepersonskaraktär krävs för första versionen.
+En kompakt snabbnavigering gör att garage/race/uppgraderingar aldrig kräver långa korridorpromenader.
+5.2 Besökbara sektioner – konceptplan (16 utrymmen)
+01 – Huvudhangaren / Grand Hangar
+Central ankomst- och utgångspunkt. Gigantiska landningsplattformar, parkerade upplåsbara skepp, traverskranar, personal och skärmar. Skeppen ska stå i verklig skala. Klick på fartyg öppnar garage/utrustning; klick på avgångsplattform startar nästa race. Det här är spelarens primära hemvy.
+02 – Pilotlounge / Pilots' Lounge
+En gemensam samlingsplats för civilisationernas representanter. Här sker dialoger, motsättningar, rivalitet och upptäckten av de olika perspektiven på turneringen. Blandningen av inkompatibla livsformer kan vara både majestätisk och lätt absurd utan att deras dialoger blir komedisketcher.
+03 – Verkstad och uppgraderingar / Workshop
+Fysiska skepp på lyftplattformar. Motor, thrusters, acceleration, massa, färgsättning och prestandamoduler visas genom tydlig visuell återkoppling. Platsen för verklig tuning, inte bara en meny.
+04 – Reservdelsmarknad / Parts Market
+Handel med delar och teknologi från skilda civilisationer. Här kan ett byte till en Necken-komponent eller ett Vitrum-odlat system ha både mekanisk och kulturell innebörd. Ekonomi, priser och låskriterier återstår att definiera.
+05 – Briefinghall / Tournament Nexus
+Turneringens officiella centrum: galaktisk karta, aktuellt solsystem, regler, världarnas status, tävlingsschema, kvalifikationer och kampanjprogression. All presentation ska vara överdrivet seriös och officiell.
+06 – Observationsdäck / Observation Deck
+Panoramafönster mot aktuell planet. Här visas ankomstsekvenser, världstrailers, planetens miljö och dess förestående öde. Kan vara platsen där spelaren börjar känna ansvar för världarna.
+07 – Diplomatikorridoren / Diplomatic Corridor
+En hög, ceremoniell passage med varje civilisations emblem, fanor och egna arkitektoniska detaljer. En tydlig fysisk orienteringsaxel mellan flera rum.
+08 – Besättningshytter / Crew Quarters
+Vilorum, loggar, personliga tillhörigheter och små berättelser. Kan användas för subtil miljöberättelse om piloterna som saknas efter att en planet har gått under.
+09 – Medbay / Biological Adaptation Ward
+Medicinsk och bioteknisk avdelning som kan hantera mycket olika typer av liv. Ett naturligt sätt att visa Necken-regeneration, Lithofyternas symbioser, Viruz-Tech-kontaminering och skillnaden mot maskinintelligenser.
+10 – Arkiv och lore-kammare / Archive
+Bestiarium, civilisationernas historia, fynd, tidigare turneringar, ljudloggar, troféer och uppslagsverk. Lämpligt för frivillig deep lore utan att stoppa spelarens racingflöde.
+11 – Engineering Core
+Reaktorhallar och energidistribution. Här kan ledningar, omvandlare och anläggningar förekomma som verkar relevanta för flottans drift. De får inte förklara den hemliga slutdestinationen före finalen.
+12 – Cargo & Supply
+Förråd, containers, logistik, reservmateriel och transportflöden. En miljö som skapar illusionen av ett fungerande skepp även om spelaren bara besöker ett fåtal rum.
+13 – Dockningsportar / Shuttle Bay
+Transfer mellan Turnébussen, tävlingsvärldarna och eventuella mindre farkoster. Här kan återkommande avgångs- och ankomstsekvenser iscensättas.
+14 – Security & Restricted Access
+Säkerhetsnav med låsta dörrar, tillståndssystem och avstängda korridorer. Bra för mysterier och stegvis upplåsning.
+15 – VIP-läktare / Race Museum
+Hall of Fame, historiska skepp, medaljer, tidigare vinnare och troféer. Gör prestationer fysiska och synliga.
+16 – Hemliga zonen: DECK 3060 [HEMLIG SPOILER]
+En dold sektion, eventuellt introducerad genom diskreta skyltar utan begriplig förklaring. Ska användas oerhört sparsamt och helst vara otillgänglig fram till slutet. Kopplingen till grafikkortet får inte exponeras av menyer, objektmetadata eller oavsiktliga dialoger.
+5.3 Föreslagen däcksorganisation [KONCEPT]
+Däck 5: Observation, VIP/museum, panoramalounge.
+Däck 4: Piloter, diplomati, briefing, arkiv.
+Däck 3: Huvudhangar, verkstad, race-depå.
+Däck 2: Besättning, medbay, reservdelsmarknad, cargo.
+Däck 1: Engineering Core, shuttle, säkerhet och tekniska tunnlar.
+Däck 3060: Ej offentlig nivå / berättelsens hemliga destination.
+En storlek på ungefär 10–20 km har nämnts som kreativ riktning, men är inte en fastlagd teknisk dimension. Den framtagna översiktsbilden är en konceptskiss, inte en byggbar ritning.
+5.4 Turnébussens narrativa förändring
+Före första tävlingen är fartyget fullt av liv, trafik och konkurrerande civilisationer. Efter varje förlorad värld kan tomma hangarplatser, försvunna röster, övergivna hytter och släckta emblem göra konsekvenserna konkreta. Den mekaniken är ett koncept som matchar berättelsens ton och kräver beslut om hur kampanjen ska iscensättas.
+6. Spelupplägg och progression
+6.1 Primär gameplay-loop
+Anländ till en värld med Turnébussen. Se planeten och upplev världens trailer/lore.
+Utforska navet vid behov. Tala med piloter, läs arkiv och se nästa mål.
+Förbered skeppet. Välj upplåst racer, finish, modul och musik.
+Tävla. Antigravitationsracing på världens bana mot CPU eller klockan.
+Få resultat och belöningar. Medaljer, skepp, moduler, kosmetik, musik och utmaningar.
+Återvänd till Turnébussen. Nya dialoger och världsläge; därefter nästa tävling.
+6.2 Befintliga racingfunktioner [BYGGT/VISAT]
+Three.js-baserat racingspel med egen 3D-baneeditor.
+Riktiga höjdskillnader, bankning, gravitations- och flygfysik, drift och kollisioner.
+Trevarvsrace och CPU-motståndare.
+Flera svårighetsgrader, bland annat Rookie, Pilot och Elite.
+Styrassistans inklusive full Auto/High, samt möjlighet att köra med låg eller ingen assistans.
+Boost-plattor, uppgraderingsmoduler, olika kameror, minimap, HUD och musikval.
+Race, Time Attack och andra menyval/format har förekommit, inklusive Foundry Cup.
+Garage och belöningsbaserad upplåsning har visats i spelet.
+Mobila och desktop-orienterade styrmetoder har arbetats med.
+Racingfilosofi: Banorna ska kunna köras snabbt utan styrhjälp, men mastering kräver träning. Auto ska vara bekvämt, inte automatiskt optimalt: boosters kan ligga i alternativa racinglinjer så att en skicklig pilot kan slå automatiken.
+6.3 Necros-kampanjens etablerade utmaningar [BYGGT/VISAT]
+Against the Clock: Ta guldmedalj på en Necros-tid och lås upp Spire Silver.
+Survival Approved: Fullfölj Necros och lås upp Kestrel + Launch Capacitor.
+Recognised by the Dominion: Nå podiet och lås upp Orca + Overdrive.
+Your World Expects Victory: Vinn på Necros och lås upp Dominion Gold.
+To Death and Beyond: Vinn på Elite.
+NECROS MASTERY: Slutför samtliga fem för att låsa upp Necron Crimson Citadel och musikbelöningen “Vi lever inte”.
+Obs: Det här är den uppsättning som syns i tidigare visade kampanjskärmbilder; eventuell senare ombalansering återstår att kontrollera i projektkoden.
+6.4 Hemligt easter egg: THE SACRIFICE [FASTSLAGET / BYGGT/VISAT]
+Ett medvetet jumbopris, raka motsatsen till normalt skicklighetsspel.
+Upplåsningsvillkor:
+Fullfölj ett race på sista plats: 5/5.
+Kontrolläge: SwipeOut · assisted.
+Styrhjälp: High (Auto).
+CPU-svårighet: Rookie.
+Gäller enligt tidigare implementation både Quick Race och Campaign.
+Avbrutna lopp räknas inte.
+Resultatskärmen säger: “YOUR SACRIFICE HAS BEEN APPROVED.” Belöningen är det upplåsbara skeppet The Sacrifice.
+Det lustiga är att automatiken är så effektiv att spelaren i praktiken nästan måste bromsa sig genom loppet för att lyckas förlora. Detta är helt i linje med spelets subtila absurditet.
+6.5 Garage och skepp [BYGGT/VISAT / PÅGÅENDE]
+En växande uppsättning racerskepp tas fram med bild-till-3D-arbetsflöden i bland annat Meshy, ibland med ComfyUI som komplement. Skeppen har olika silhuetter, formspråk, motorer, färger och prestanda. Fordonsparken organiseras för ett större upplåsningssystem.
+Möjliga civilisationsteman för skepp [KONCEPT]:
+Necken: gotisk rustning, ornament, mörkt stål, röd energi.
+Vitrum: organiskt odlade strukturer, mineraliska nerver, levande stabilisatorer.
+Collective: optimerade, exakta, funktionella former.
+Viruz-Tech: infekterade hybrider och föränderliga värdskepp.
+Mänskligt: mer jordnära racingspråk och möjlighet till fullständigt absurda slutbelöningar.
+7. Musik, trailers och berättarröst
+7.1 Grundregler
+Musikaliskt måste varje civilisation ha ett eget ljudspråk.
+Trailerrösten får gärna vara djup, allvarlig, resonant och nästan överdrivet högtidlig.
+Presentationen ska vara filmisk med pauser, dramatisk stegring och tungt avslut.
+Komedin ligger i kontrasten mellan presentationens kvalitet och premissens absurditet, inte i medvetet komisk musik.
+7.2 Övergripande trailerfraser [FASTSLAGET / SKAPAT]
+“The universe is old.”
+“The stars are dying.”
+“Resources are running dry.”
+“Its engines starve.”
+“Only one world can be fed.”
+“Your home is the wager.”
+“Your sacrifice is not optional.”
+“Not for glory. Not for pride. But for the right to stay alive.”
+“RACE... FOR... YOUR... WORLD!”
+En tidigare trailer har också den medvetet absurda höjdpunkten: “The stakes are high, the speed is high, well EVERYTHING IS JUST FUCKING HIGH!” Detta är en tonal referens, inte en replik som måste användas överallt.
+7.3 World-trailer Necros
+“To Death and Beyond”: Kall, ondskefull, episk och gravallvarlig industrial-/gothic-sci-fi. Katedraler, monument och dödsförakt. Neckens självbedrägeri ska genomsyra känslan.
+7.4 World-trailer Vitrum [SKAPAT KONCEPTMANUS]
+Arbetsrubrik: The Forest Remembers. Utgångspunkt:
+“Before the first empires... Before the machines... Before the stars began to fade... There was life.”
+“No cities were constructed. They were grown.”
+“No networks were invented. They were born.”
+“Every root carries a memory. Every crystal carries a thought.”
+“The forest is alive. And now... IT MUST RACE.”
+“The forest remembers. Everything.”
+Musik: Neural Ascent och Manifest the Wind; organiskt, psykedeliskt, harmoniskt främmande och drivet av riktig racingenergi.
+8. Visuell utvecklingsfilosofi
+8.1 AAA-känsla utan AAA-kostnad [FASTSLAGET / ARBETSSÄTT]
+Spelet byggs med fokuserad konstnärlig riktning, modularitet och smarta illusioner snarare än att allt måste simuleras i full geometri.
+Demonstrerade eller diskuterade tekniker:
+GLB-modeller från bild-till-3D; återanvändbara moduler och relativt enkel geometri.
+Textur- och materialarbete utan onödigt tunga PBR-uppsättningar där de inte hjälper.
+Skysphere, dimma, point lights, emissive-material och bloom.
+Lager av texturerade plan och kuber för fjärran arkitektur eller vegetation.
+Skogssilhuetter, 2,5D-impostors och naturlig parallax genom att placera plan på olika djup.
+Partiklar, sporer, pollen och långsamt pulserande ljus som antyder biologisk aktivitet.
+Kluster och siktavbrott för att skapa illusionen av mycket större miljöer.
+Necros: stål, monument, död, mörker, hårda röda linjer. Vitrum: sammanhängande växtlighet, enorma organiska överhäng, levande ytor, mjuk dimma, varmt och kallt bioljus.
+8.2 Teknisk återhållsamhet
+Prioritera läsbar racinglinje och fartkänsla framför detaljmängd.
+Använd samma geometri/textur på upprepade småobjekt och instancing där det är möjligt.
+Låt de stora hjältelandsmärkena vara riktiga modeller; låt bakgrunden vara billig.
+För många skuggkastande punktljus, överdriven transparens eller stora GLB-assets kan påverka prestandan kraftigt.
+Använd dimma och bildlager som ett kompositionsverktyg, inte bara för att dölja problem.
+9. Prioriterad utvecklingskarta
+Etablerat eller pågående [BYGGT/VISAT]
+En omfattande racingmotor och 3D-editor.
+Necros/Dark PRIME, med etablerad kampanj, upplåsningar och unik audiovisuell identitet.
+Vitrum/Neural Ascent i aktiv utveckling och provkörning, med en tydlig levande megaskogsidentitet.
+Flera racingfarkoster och en växande modellkatalog, uppbyggd i Blender/Meshy.
+Musik, trailers, världskoncept och belöningssystem.
+Nästa naturliga milstolpe [PLAN]
+Turnébussen, version 1:
+En högkvalitativ huvudhanger som ersätter eller kompletterar den nuvarande traditionella huvudmenyn.
+Klickbar kamera-/rumsnavigation till minst Garage, Pilotlounge, Briefing och Observation Deck.
+Planetvy som byts när spelaren anländer till en ny värld.
+Integration med befintliga skepp, upplåsningar, tuning och racestart.
+En första lore-/dialoginteraktion per civilisation.
+Nästa världsarbete:
+Färdigställ Vitrum-atmosfären och tydlig skogsskala.
+Definiera The Collective och Viruz-Tech visuellt och mekaniskt.
+Säkra spoilergränserna runt huvudberättelsens slut.
+Avvakta till senare
+Fri förstapersonsexploration om klicknavigation redan löser användarbehovet.
+Kompletta NPC-rörelsesystem och tredjepersonskaraktär.
+Omfattande handel, crafting eller ekonomisystem utan färdig design.
+Fullt modellerad 10–20 km lång rymdfarkost; använd selektiva rum och kulisser.
+10. Beslut som återstår
+Vem arrangerar turneringen? Förbund, gammal AI, ett överlevnadskonsortium, Turnébussen själv eller något annat?
+Exakt tävlingsstruktur: Ett lopp per hemplanet, flera grenar per värld, poängtabell eller utslagsmodell?
+Den femte tävlande: Hur förklaras mänsklighetens deltagande i den publika turneringslogiken utan att Zackes hemlighet avslöjas?
+Mänsklighetens cykler: Vad innebär den fjärde cykeln år 2026 och de ytterligare nio cyklerna?
+The Collective kontra Tellus: Hur hänger deras alternativa jord och Zackes jord ihop?
+Energitekniken: Vilken mekanism omvandlar planetmassa till användbar energi, och är det samma som Forever-energy?
+Planeternas öde: När förstörs de och hur speglar Turnébussen förlusterna under kampanjen?
+The Collective: Hemvärld, bana, racerdesign, musik och central filosofisk konflikt.
+Viruz-Tech: Hemvärld, biologiskt/tekniskt infektionsregelverk, bana, racerdesign och musik.
+Turnébussens byggskala: Hur många fysiskt besökbara rum behövs i version 1?
+Lore-exponering: Hur mycket får spelaren veta via trailers, samtal, arkiv och ledtrådar?
+Slutsekvensens exakta dramaturgi: Visas Zacke, kabeln, energimätaren, datorn och skärmen i vilken ordning? Vilken sista replik blir roligast?
+11. Canon checklist – vad får aldrig tappas bort?
+En hel hemplanet är insatsen i varje civilisations deltagande.
+Förlorarnas planeter upplöses för att vinnaren ska få deras energi.
+Världen tror på turneringens logik; berättarrösten skrattar aldrig åt den.
+Necken överlever biologiskt men förlorar gradvis sin identitet: Theseus skepp.
+Vitrum är en levande megaskog, inte bara kristaller eller svampar som dekoration.
+The Collective kommer från en alternativ/avvikande Tellus och har gått bortom sina skapare.
+Viruz-Tech kan ta över både organiska och tekniska värdar.
+Turnébussen förbinder världarna och är både spelhub och berättelsens scen.
+The Sacrifice är ett avsiktligt jumbopris för en nästan omöjligt dålig prestation under maximal hjälp.
+Zackes egentliga identitet och syfte är en slutspoiler, inte publik kampanjlore.
+Det storslagna slutet leder till en stationär dator och en RTX 3060 Ti.
+Det ska se och låta som ett gravallvarligt AAA-epos – ända tills spelaren fattar vad allting betyder.
+En sista sammanfattning
+SwipeOut 2026: Race For Your World är ett kosmiskt racingspel där fyra ofattbart avancerade civilisationer satsar allt för rätten att överleva ett döende universum. Var och en har sin egen världsbild, biologi, arkitektur, musik och racingkultur. Mellan loppen färdas piloterna i Turnébussen, en enorm mobil mästerskapscentral där relationer, progression och universums berättelse växer fram.
+När alla lopp är vunna avslöjas den femte deltagarens egentliga roll. Då visar det sig att den mest episka uppoffringen i universums historia i slutändan handlade om en snubbe från Linköping som behövde driva sin dator.
+RACE FOR YOUR WORLD. YOUR SACRIFICE IS NOT OPTIONAL.
+
+Bilaga A – Turnébussen: översiktskoncept
+Visuell orienteringsskiss från konceptarbetet. Illustrativ – inte en slutligt fastställd planritning eller ett bindande måttunderlag.
+
+Turnébussen · preliminär rums- och däcksöversikt

@@ -4,6 +4,7 @@ import {updateScenery} from './scenery-motion.js';
 import {updateVitrumSpores} from './vitrum-spores.js';
 import { createFrontEnd } from './front-end.js';
 import { createGarage } from './garage.js';
+import { createTourBus } from './tour-bus-ui.js';
 import { recordKey } from './time-attack.js';
 import { CLASSIC_HANDLING } from './classic-handling.js';
 let frontEnd = null;
@@ -1478,6 +1479,7 @@ frontEnd=createFrontEnd({garage,tracks:TRACK_CONFIG,
  }
 });
 
+const tourBus=createTourBus({container:document.getElementById('tour-bus-view'),templates:craftTemplates,frontEnd,tracks:TRACK_CONFIG});
 const pauseMenuButton=document.createElement('button');
 pauseMenuButton.id='pause-menu-button';pauseMenuButton.type='button';pauseMenuButton.className='action-button';pauseMenuButton.textContent='ABANDON RACE · MENU';
 pauseMenuButton.addEventListener('click',()=>{isPaused=false;setScreen(pauseScreen,false);introOverlay.hidden=true;menuButton.click();});
@@ -1510,7 +1512,7 @@ function render() {
       updateRailGlow(track,frontEnd.profile.settings);
       updateScenery(scene,t-previewStart);
       graphics.render();
-    }else garage.render(renderer,t,frontEnd.profile.settings.motion&&!matchMedia('(prefers-reduced-motion: reduce)').matches,(s,c)=>graphics.render(s,c));
+    }else (frontEnd.view==='bus'?tourBus:garage).render(renderer,t,frontEnd.profile.settings.motion&&!matchMedia('(prefers-reduced-motion: reduce)').matches,(s,c)=>graphics.render(s,c));
     requestAnimationFrame(render);return;
   }
   if(race.state==='finished')frontEnd.gamepad(resultsScreen,()=>menuButton.click());
@@ -1915,6 +1917,7 @@ startButton.disabled = false;
 
 window.addEventListener('pagehide', () => {
   frontEnd?.dispose();
+  tourBus.dispose();
   practice.dispose();
   thrusters.dispose();
   window.removeEventListener('resize', resize);

@@ -1,0 +1,25 @@
+#start-screen.front-end[data-page="bus"]{background:linear-gradient(180deg,#030911c9,transparent 25%,transparent 65%,#030911c9);}
+.front-end[data-page="bus"] #menu-pages{padding:0;max-width:none;width:100%;overflow:visible;}
+#tour-bus-view{position:fixed;inset:76px 0 48px;pointer-events:none;}
+.bus-heading{position:absolute;left:4%;top:24px;text-shadow:0 2px 14px #000;}
+.bus-heading p,.bus-kicker{font:10px monospace!important;letter-spacing:2px;color:#9bcdc9;}
+#start-screen .bus-heading h2{font-size:clamp(22px,3vw,42px);margin:10px 0;}
+.bus-panel{position:absolute;left:4%;bottom:82px;width:min(330px,32vw);padding:22px;background:#07121deb;border:1px solid #517c8566;border-top:2px solid #79ddd3;pointer-events:auto;max-height:55vh;overflow:auto;}
+.bus-panel h3{font:18px monospace;margin:10px 0 15px;color:#f1f6f6;}
+.bus-panel p{font-size:12px;line-height:1.65;color:#b7c8cf;}
+.bus-panel button{display:block;width:100%;padding:12px 10px;margin-top:8px;text-align:left;background:#102b35;border:1px solid #547781;color:#d2e9ed;font:11px monospace;cursor:pointer;}
+.bus-panel button[aria-pressed=true],.bus-nav button[aria-pressed=true]{border-color:#8cfff1;color:#b7fff3;background:#1d4346;}
+.bus-panel button:disabled{opacity:.4;cursor:not-allowed;}
+.bus-nav{position:absolute;bottom:14px;left:4%;right:4%;display:flex;gap:8px;pointer-events:auto;}
+.bus-nav button{flex:1;padding:15px 6px;background:#091822ed;border:1px solid #547781;color:#c9dce4;font:10px monospace;cursor:pointer;}
+.bus-hotspots{position:fixed;inset:0;pointer-events:none;}
+.bus-hotspot{position:absolute;transform:translate(-50%,-50%);pointer-events:auto;padding:12px;background:#06151ddb;border:1px solid #7fddd3;color:#d3fff6;font:10px monospace;cursor:pointer;box-shadow:0 0 20px #0bdabb22;}
+.bus-hotspot::before{content:'◇';margin-right:8px;color:#7effed;}
+#tour-bus-view button:focus-visible{outline:2px solid #fff;outline-offset:3px;}
+.bus-quote{border-left:2px solid #d4ae73;padding-left:12px;color:#f0d1a2!important;}
+@media(max-width:700px){#tour-bus-view{top:64px}.bus-heading{top:8px}.bus-heading p{font-size:8px!important}.bus-panel{width:calc(92% - 32px);padding:16px;bottom:76px;max-height:31vh;background:#07121ded}.bus-nav{flex-wrap:wrap;gap:4px;bottom:6px}.bus-nav button{padding:10px 3px;font-size:8px;min-width:28%}.bus-hotspot{font-size:8px;padding:8px}.bus-panel p{margin:6px 0;font-size:11px}.bus-panel h3{margin:5px 0}.bus-panel button{padding:9px}.bus-heading h2{font-size:22px!important}}
+body.in-menu:has(#start-screen[data-page="bus"]) #rotate-device-overlay{display:none!important;}
+#menu-carrier{background:#0b1821c9;border:1px solid #75b8c333;color:#d8e6ed;padding:8px 12px;font:10px monospace;}
+#start-screen[data-page="home"] #menu-carrier,#start-screen[data-page="bus"] #menu-carrier{display:none;}
+#start-screen[data-page="bus"] #menu-location{font-size:0;}
+#start-screen[data-page="bus"] #menu-location::after{content:'INTERSTELLAR CHAMPIONSHIP CARRIER';font-size:10px;}

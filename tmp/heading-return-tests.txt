@@ -1,0 +1,31 @@
+✔ swipeout: banking follows steering regardless of sideslip direction (23.8577ms)
+✔ wipeout: banking follows steering regardless of sideslip direction (8.928ms)
+✔ Swipeout remains default; classic release straightens the nose without centering the lane (41.4602ms)
+✔ classic release is monotonic, mirrored and does not fight an airbrake or airborne heading (2.3203ms)
+✔ classic rail impact cannot start an uncommanded wall-to-wall oscillation, on either side or at 30/60/120 Hz (214.992ms)
+✔ classic contact preserves deliberate escape steering and cooldown contact stops only outward motion (1.0893ms)
+✔ after a classic wall hit a short steer-away followed by straightening is controllable without another hit (18.0365ms)
+✔ countersteer decelerates rotation faster; analog steering and airbrakes are independent (3.4712ms)
+✔ classic dynamics agree at 30/60/120 Hz, pause freezes, recovery resets transient state (37.8783ms)
+✔ classic player launches and lands both Foundry gaps at normal and boosted speed (58.737ms)
+✔ classic input-driven lap retains gates, branches, walls, gaps and reset integration (659.2178ms)
+✔ classic chase/cockpit follow heading, exclude hull roll from chase, and stay local through loops (39.2933ms)
+✔ preferences are independent and safe with malformed/unavailable storage; R2 never accelerates classic (4.1656ms)
+✔ classic weapons follow the nose while Swipeout keeps its existing track-forward aim (3.433ms)
+✔ mirrored bend drift cannot rotate or reverse a held inward heading (8.9094ms)
+✔ with neutral nose, curvature still pushes the whole ship outward (0.6917ms)
+✔ magnetic adhesion does not eliminate unassisted outward drift (60.2648ms)
+✔ Vitrum round-trips editor data, ships self-contained models and safe off-centre pads (720.3216ms)
+✔ Vitrum has seven ordered sectors, an upright smooth road, descent and no road overlap (31.0036ms)
+✔ Vitrum CPU field finishes three laps on Rookie, Pilot and Elite without recovery (4956.7423ms)
+✔ Vitrum player completes ordered three laps with both handling modes and assistance off (1144.5295ms)
+✔ all supplied GLB bounds leave the full racing corridor clear (1774.01ms)
+✔ organic passages leave real ship space open inside their enclosing bounds (22664.7361ms)
+ℹ tests 23
+ℹ suites 0
+ℹ pass 23
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 32078.5942

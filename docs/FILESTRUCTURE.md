@@ -408,3 +408,39 @@ New regression tests: tests/finish-features.test.js. Prior task archived in
 ## BANK-001
 - tests/banking.test.js: steering bank independent of sideslip in both modes.
 - docs/archive/VITRUM-009.md: previous feedback task.
+
+## YAW-001
+- tests/heading-drift.test.js: curve drift independent of nose heading.
+- docs/archive/BANK-001.md: previous banking task.
+
+## HANDLING-001
+- Existing src/classic-handling.js: independent steering-bank and curve-drift tuning.
+- docs/archive/YAW-001.md: previous heading task.
+
+## HANDLING-002
+- Existing tests/driving-modes.test.js: release-to-neutral and momentum regression checks.
+- docs/archive/HANDLING-001.md: previous tuning task.
+
+
+## HANDLING-003
+- docs/archive/HANDLING-002.md: rejected release-to-neutral trial.
+- tests/driving-modes.test.js: prior heading-preservation checks restored.
+
+- docs/archive/HANDLING-003.md: completed release-return rollback.
+
+- tests/camera-hop.test.js: projected vertical stability on full Vitrum traversal.
+
+- docs/archive/HOP-001.md: camera correction accepted by user.
+
+- docs/archive/GLOW-001.md: four-point underbody glow implementation.
+
+- docs/archive/THRUSTER-001.md: age-based ribbon taper.
+
+## TOUR-001
+- src/tour-bus.js: procedural carrier scene, named object registry and camera views.
+- src/tour-bus-ui.js / src/tour-bus.css: station UI, loadout clone and menu links.
+- docs/TOUR_BUS_OBJECTS.md / .json: Swedish object replacement guide and manifest.
+- tools/document-tour-bus.mjs: regenerate both inventory documents from scene.
+- tests/tour-bus.test.js: object identity and camera navigation checks.
+- tools/verify-tour-bus.mjs: isolated browser flow; requires PLAYWRIGHT_MODULE.
+- docs/archive/GLOW-002.md: prior single-light restoration task.

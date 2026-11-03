@@ -269,7 +269,10 @@ export class ThrusterSystem {
     this._view.subVectors(camera.position, center).normalize();
     this._side.crossVectors(tangent, this._view);
     if (this._side.lengthSq() < 1e-6) this._side.set(1, 0, 0).applyQuaternion(camera.quaternion);
-    this._side.normalize().multiplyScalar(width * (1 + age * 0.35));
+    // Narrow the actual ribbon (core and halo together), not just its opacity.
+    // Normalized age keeps the same tapered profile at every throttle/FPS.
+    const taper = Math.pow(1 - clamp(age, 0, 1), 1.2);
+    this._side.normalize().multiplyScalar(width * taper);
     const attributes = nozzle.geometry.attributes;
     for (let side = 0; side < 2; side++) {
       const vertex = index * 2 + side;

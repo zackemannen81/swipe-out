@@ -4,9 +4,10 @@ import * as THREE from 'three';
 // supplies pitch/bank/adhesion; yaw and lateral momentum remain independent.
 // Numbers are in Swipeout seconds/world units, not the reference's fixed scale.
 export const CLASSIC_HANDLING = Object.freeze({
-  turnAcceleration: 2.8, turnRate: 1.1, maxHeading: 0.65, engineForce: 20,
-  skidSeconds: 0.32, brakeSkidSeconds: 0.14, brakeYaw: 0.0032,
+  turnAcceleration: 2.8, turnRate: 0.8, maxHeading: 0.48, engineForce: 20,
+  skidSeconds: 0.32, brakeSkidSeconds: 0.14, brakeYaw: 0.0024,
   brakeRate: 3.75, maxLateralSpeed: 15, rollSpring: 36, rollDamping: 10,
+  curveDrift: 0.75, steeringBank: 0.32,
 });
 const clamp = THREE.MathUtils.clamp;
 const approach = (value, target, step) => value + clamp(target - value, -step, step);
@@ -25,12 +26,13 @@ export function stepClassicAttitude(ship, input, dt) {
 
 export function stepClassicMomentum(ship, frame, dt) {
   const t = CLASSIC_HANDLING;
-  // Re-express the previous heading/velocity in the new road frame. Vertical
-  // loops don't create artificial horizontal yaw as a world-Y angle would.
+  // Curve rotation contributes to sideslip only. Heading is a pilot-commanded
+  // offset from the road frame; rotating it here would steer the nose outward
+  // despite held inward steering. Keep the transported frame for loops/banks.
   const turn = ship.previousTangent
     ? Math.atan2(ship.previousTangent.dot(frame.right), ship.previousTangent.dot(frame.tangent)) : 0;
-  ship.yaw = clamp(ship.yaw + turn, -t.maxHeading, t.maxHeading);
-  ship.lateralVelocity += turn * ship.speed * 0.5;
+  ship.yaw = clamp(ship.yaw, -t.maxHeading, t.maxHeading);
+  ship.lateralVelocity += turn * ship.speed * t.curveDrift;
   if (!ship.previousTangent) ship.previousTangent = frame.tangent.clone();
   else ship.previousTangent.copy(frame.tangent);
 
@@ -46,7 +48,8 @@ export function stepClassicMomentum(ship, frame, dt) {
 export function stepClassicRoll(ship, dt) {
   const t = CLASSIC_HANDLING;
   // Sliding outward changes position, not the pilot's commanded bank.
-  const target = clamp(-ship.yawVelocity * 0.2, -0.28, 0.28);
+  // Normalize by turn rate so gentler nose rotation need not reduce banking.
+  const target = clamp(-ship.yawVelocity / t.turnRate, -1, 1) * t.steeringBank;
   ship.classicRollVelocity += ((target - ship.roll) * t.rollSpring - ship.classicRollVelocity * t.rollDamping) * dt;
   ship.roll += ship.classicRollVelocity * dt;
 }

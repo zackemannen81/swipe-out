@@ -26,7 +26,7 @@ try{
   const original=navigator.getGamepads.bind(navigator);let down=false;
   Object.defineProperty(navigator,'getGamepads',{configurable:true,value:()=>[{axes:[0,0],buttons:Array.from({length:16},(_,i)=>({pressed:down&&i===13}))}]});
   document.getElementById('menu-home').focus();down=true;window.__menuTest.frontEnd.gamepad();
-  if(document.activeElement.dataset.go!=='campaign')throw Error('Gamepad focus navigation failed');
+  if(document.activeElement.dataset.go!=='bus')throw Error('Gamepad focus navigation failed');
   down=false;window.__menuTest.frontEnd.gamepad();Object.defineProperty(navigator,'getGamepads',{configurable:true,value:original});
  });
  await mkdir(process.env.TEMP+'/swipe-menu',{recursive:true});await page.waitForTimeout(400);await page.screenshot({path:process.env.TEMP+'/swipe-menu/home.png'});

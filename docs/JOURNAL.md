@@ -874,3 +874,128 @@ checks in both modes, existing handling, magnetic drift and loop/camera tests.
 Production build passes with existing chunk warning. No browser visual playtest
 this pass; the behavioral regression is verified through production physics.
 Evidence: tmp/banking-tests.txt, tmp/banking-build.txt. No user saves modified.
+## 2026-11-03 - YAW-001 separate curve drift from nose heading
+Classic/Wipeout added road-frame turn to both yaw and lateral velocity. Removed
+only the yaw addition: heading now remains pilot/airbrake-controlled relative to
+the road, while curvature still pushes lateral momentum outward. Heading clamp,
+steering inertia, side grip, banking, adhesion and collision response retained.
+Standard Swipeout already lacked this curvature-to-yaw coupling and is unchanged.
+This intentionally uses track-relative heading, not inertially fixed world yaw.
+22 targeted tests pass: mirrored sustained inward steering with changing road
+frames, neutral-yaw outward drift, banking, driving modes, gaps, magnetic drift,
+Vitrum three-lap CPU/player and mesh checks. Production build passes with existing
+chunk warning. No browser playtest this pass; user's subjective handling remains
+to be tried. Evidence: tmp/heading-tests.txt and tmp/heading-build.txt.
+## 2026-11-03 - HANDLING-001 Wipeout tuning
+User requested less nose rotation, more bank and more outward drift. Classic
+turnRate 1.1 -> 0.8, maxHeading 0.65 -> 0.48, brakeYaw 0.0032 -> 0.0024.
+Steering bank is normalized by turnRate and targets 0.32 local roll at full
+input (formerly 0.22); makePose applies twice this angle, about 37 degrees
+versus 25. Curvature impulse coefficient 0.5 -> 0.75, grip unchanged. Nose,
+bank and curvature drift remain separate; standard Swipeout is unchanged.
+Turn acceleration remains 2.8: trial 2.2 caused the existing timed wall-escape
+regression to recontact a rail, so the original response was retained.
+22 targeted tests pass including wall recovery, mirrored yaw/drift, banking,
+frame rates, gaps, three-lap player/CPU simulations and original mesh checks.
+Final production build passes with existing large-chunk warning. No browser
+playtest this tuning pass; subjective balance needs user driving feedback.
+Evidence: tmp/handling-tune-tests.txt and tmp/handling-tune-build.txt.
+## 2026-11-03 - HANDLING-002 release-to-neutral trial
+Read tmp/src/wipeout/ship_player.c: steering acceleration/countersteer 167-194,
+velocity skid 365, banking and neutral-input angular braking 421-441. Original
+normal driving damps angular velocity and roll, not heading to track tangent;
+heading-to-track at 463 is rescue behavior, not player steering. This trial is
+an explicit user-requested ribbon-track adaptation, not claimed original parity.
+Classic now damps local yaw toward zero at rate 4.5/sec when steering is neutral
+(0.03 deadzone), differential brake is below .01 and ship is on the surface.
+About 90% of angle clears in .51 sec. Existing yaw-rate decay settles banking;
+release does not directly change lane position or sideways velocity. Active
+steering, differential airbrakes and airborne/flight heading retain integration.
+Previous stronger drift/bank and calmer nose tuning retained. Standard unchanged.
+23 tests pass including mirrored monotonic return, analog neutral noise, drift
+persistence/no lane centering, airbrakes, airborne exclusion, 30/60/120Hz, gaps,
+three-lap CPU/player and original scenery checks. Build passes (existing chunk
+warning). No browser/human playtest this pass; release timing awaits user feel.
+Evidence: tmp/heading-return-tests.txt and tmp/heading-return-build.txt.
+## 2026-11-03 - HANDLING-003: release-to-neutral trial reverted
+User reported HANDLING-002 felt worse. Removed automatic track-relative yaw
+return and its added steering deadzone. Restored prior yaw integration and
+heading-preservation tests. Neutral input damps angular velocity; it does not
+pull nose heading toward the track tangent. HANDLING-001 tuning (turnRate .8,
+maxHeading .48, brakeYaw .0024, curveDrift .75, steeringBank .32), independent
+banking and lateral drift remain. This supersedes HANDLING-002 behavior above.
+22 relevant tests pass; production build passes with existing chunk-size warning.
+No human playtest this pass. Evidence: tmp/heading-return-rollback-tests.txt and
+tmp/heading-return-rollback-build.txt.
+
+## 2026-11-03 - HOP-001 investigation
+User accepts both steering modes but reports occasional Swipeout hop. Inspected
+physics and cameras; no confirmed cause or implementation changes. Need track,
+motion direction and edge/open-road context to distinguish crest flight, impact
+or follow-camera clearance correction. Current task remains In Progress.
+
+## 2026-11-03 - HOP-001 camera correction implemented
+User clarified upward bump and supplied Desktop/skutten.mp4. Extracted overview
+and sequential frames show Vitrum forest driving. Camera-only Vitrum traversal
+at 240 units/sec reproduces screen-space vertical kicks without physics/impacts.
+At 60Hz the maximum change in successive projected vertical steps was .01021
+NDC (5.51px at 1080p). Track-camera now damps clearance in road-local height,
+retains horizontal world-space follow lag, and aims directly from the filtered
+camera position/up instead of applying a second world-space quaternion delay.
+Combined correction reduces measured kick to .000343 NDC (.185px); height-only
+trial did not solve it and rotation-only trial left clearance-related kicks.
+No ship physics or steering tuning changed. Wipeout camera untouched.
+27 tests pass including new full-Vitrum projected-motion regression at 30/60/120Hz,
+loop/roll clearance, pause/reset, handling, gaps and collisions. Build passes
+with existing chunk warning. Evidence: tmp/hop-tests.txt, tmp/hop-build.txt,
+tmp/hop-track-probe.mjs. No interactive post-change playtest yet; user confirmation
+that this resolves their recorded sensation remains pending.
+## 2026-11-03 - GLOW-001 neon underbody lighting
+User accepted HOP-001 camera improvement. Replaced craft.js additive flat glow
+plane with four accent-colored PointLights at x +/-0.55, y -0.12, z +/-0.85.
+Each uses intensity 4, distance 5.5, decay 2, no shadows; actual road materials
+receive overlapping light pools. Applies to player and CPU craft via createCraft.
+Build passes (existing chunk warning). Stub-loader runtime check confirms four
+lights, color/shadow settings and road clearance at normal +/-0.76 rad banking.
+Evidence: tmp/underglow-check.mjs and tmp/underglow-build.txt. Visual appearance
+and hardware FPS not verified in-browser; four lights per craft adds fragment
+lighting cost even with short range, and glossy surfaces may retain highlights.
+## 2026-11-03 - THRUSTER-001 age taper
+Changed ribbon half-width multiplier from 1 + age * .35 (expansion) to
+(1 - clamped normalized age)^1.2. Full width at nozzle, about 44% at half-life,
+3% at 95% lifetime and zero at expiry. Core and halo share tapered geometry.
+No lifetime/power/color/particle changes. Geometry test covers monotonic width
+and camera-aligned fallback. Six thruster tests pass; one pre-existing hull width
+expectation fails identically before/after (.775 actual vs .675 expected).
+Build passes with existing chunk warning. Evidence: tmp/thruster-taper-baseline.txt,
+tmp/thruster-taper-tests.txt, tmp/thruster-taper-build.txt. No visual playtest.
+## 2026-11-03 - GLOW-002 original single light restored
+User screenshot shows four distinct highlights and prefers original one-light
+underglow. Restored settings verified in 6d61365:src/craft.js: one accent-colored
+PointLight, intensity 1.8, distance 4, position (0,-.01,.1), no shadows. Removes
+four-light arrangement; no flat glow plane. Thruster taper/camera/physics retained.
+Production build passes (existing chunk warning), tmp/underglow-single-build.txt.
+Visual confirmation awaits user. Supersedes GLOW-001 lighting design.
+## 2026-11-03 - TOUR-001 Tour Bus blockout
+User accepts current tracks/handling/graphics and requested simple-geometry hub
+plus an object replacement document, guided by supplied carrier/hangar concepts.
+Implemented opt-in THE TOUR BUS home entry and return shortcut from submenus.
+Five camera stations: Grand Hangar, Service Bay, Tournament Nexus, Pilots Lounge,
+Observation. Equipped craft/paint cloned from existing assets; geometry shared,
+materials owned. Named geometry covers 44 replaceable groups; industrial ribs,
+docks, crane, lounge furniture, banners, console, planet/window and star field.
+World selection changes procedural planet tint. Necros delegates to exact saved
+Dark PRIME campaign flow and remains unavailable without that browser-local ID.
+Vitrum delegates to track18 open race; no new campaign rewards or progression.
+Lounge has four public lore transmissions; no spoiler content or full NPC system.
+Geometry/layout is a prototype, not final art; no new concept images or large
+models are shipped. Markdown and JSON asset inventories generated from live scene
+by tools/document-tour-bus.mjs, with Swedish purpose, dimensions, positions,
+replacement priorities and optimization targets. See docs/TOUR_BUS_OBJECTS.md.
+Validation: six scene/career tests pass; production build passes (existing chunk
+warning). Isolated Chrome verifies all stations, garage, Vitrum actual race start
+and abandon/menu return, missing Necros handling, seeded exact Necros setup,
+390x844 layout, reduced motion and Escape; zero page errors. Screenshots inspected;
+initial camera/pillar obstruction corrected. Hardware/mobile FPS not measured.
+Evidence: tmp/tour-tests.txt, tmp/tour-browser.txt, tmp/tour-build.txt,
+tmp/tour-hangar.png, tmp/tour-workshop.png and other station screenshots.

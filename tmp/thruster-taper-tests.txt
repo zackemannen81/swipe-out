@@ -1,0 +1,38 @@
+✔ ribbon core and halo narrow from full nozzle width to a fine aged tail (42.2123ms)
+✔ 30/60/120 Hz produce the same world-space wake and evenly staggered ages (124.4175ms)
+✔ idle stays visible; throttle and boost grow and decay smoothly (14.5884ms)
+✔ five ships fade after shutoff, reset without ghost trails, and release resources (41.137ms)
+✔ turns, teleports, camera along exhaust, and long runs keep geometry finite and bounded (201.5179ms)
+✔ reward hulls switch between four/five red outlets and factory twin outlets without leaked wakes (7.8999ms)
+✖ only reward hulls use red; wider jets and enlarged Crimson outlets retain original CPU accents (4.8229ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 6
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 797.2604
+
+✖ failing tests:
+
+test at tests\thrusters.test.js:149:1
+✖ only reward hulls use red; wider jets and enlarged Crimson outlets retain original CPU accents (4.8229ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  0.775 !== 0.675
+  
+      at TestContext.<anonymous> (file:///C:/code/swipe-out/tests/thrusters.test.js:153:55)
+      at Test.runInAsyncScope (node:async_hooks:228:14)
+      at Test.run (node:internal/test_runner/test:1118:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:787:18)
+      at Test.postRun (node:internal/test_runner/test:1247:19)
+      at Test.run (node:internal/test_runner/test:1175:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:787:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 0.775,
+    expected: 0.675,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

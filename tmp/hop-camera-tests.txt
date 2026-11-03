@@ -1,0 +1,18 @@
+✔ v2 round-trips gaps/magnetic/banks, v1 and legacy remain non-magnetic (13.1958ms)
+✔ transported frames remain orthonormal/continuous at verticals, inversion, roll and lap seam (63.5151ms)
+✔ gap cuts exact road mesh boundaries and removes fixtures/pads throughout the opening (92.6958ms)
+✔ real launch momentum and world gravity are independent of the invisible gap centerline (8.7206ms)
+✔ normal/boosted jumps land; low-speed and sideways misses recover before the gap without phantom sweeps (56.9241ms)
+✔ 30/60/120 Hz agree on free flight, landing and magnetic loop traversal (189.7806ms)
+✔ airborne collision impulses change real flight velocity and recovery craft are excluded (2.1434ms)
+✔ all CPU profiles complete three laps on both feature tracks with real pads and contacts (1784.8289ms)
+✔ magnetic chase camera follows the local up direction through loops/rolls and snaps safely on recovery (31.9464ms)
+✔ magnetic camera filters abrupt bank changes and preserves reset/paused pose (3.6316ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 10
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2739.2685

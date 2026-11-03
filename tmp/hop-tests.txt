@@ -1,0 +1,35 @@
+✔ swipeout: banking follows steering regardless of sideslip direction (16.0804ms)
+✔ wipeout: banking follows steering regardless of sideslip direction (7.3496ms)
+✔ Swipeout chase does not kick a surface-bound hull vertically on Vitrum rises (131.1339ms)
+✔ Swipeout remains default; classic keeps an offset and heading instead of centering (37.9956ms)
+✔ classic rail impact cannot start an uncommanded wall-to-wall oscillation, on either side or at 30/60/120 Hz (219.4237ms)
+✔ classic contact preserves deliberate escape steering and cooldown contact stops only outward motion (0.796ms)
+✔ after a classic wall hit a short steer-away followed by straightening is controllable without another hit (28.7736ms)
+✔ countersteer decelerates rotation faster; analog steering and airbrakes are independent (5.663ms)
+✔ classic dynamics agree at 30/60/120 Hz, pause freezes, recovery resets transient state (34.9043ms)
+✔ classic player launches and lands both Foundry gaps at normal and boosted speed (50.5389ms)
+✔ classic input-driven lap retains gates, branches, walls, gaps and reset integration (536.9221ms)
+✔ classic chase/cockpit follow heading, exclude hull roll from chase, and stay local through loops (33.2483ms)
+✔ preferences are independent and safe with malformed/unavailable storage; R2 never accelerates classic (4.0723ms)
+✔ classic weapons follow the nose while Swipeout keeps its existing track-forward aim (2.9127ms)
+✔ mirrored bend drift cannot rotate or reverse a held inward heading (17.2483ms)
+✔ with neutral nose, curvature still pushes the whole ship outward (0.811ms)
+✔ magnetic adhesion does not eliminate unassisted outward drift (56.0685ms)
+✔ v2 round-trips gaps/magnetic/banks, v1 and legacy remain non-magnetic (21.5233ms)
+✔ transported frames remain orthonormal/continuous at verticals, inversion, roll and lap seam (62.7924ms)
+✔ gap cuts exact road mesh boundaries and removes fixtures/pads throughout the opening (91.7906ms)
+✔ real launch momentum and world gravity are independent of the invisible gap centerline (6.6301ms)
+✔ normal/boosted jumps land; low-speed and sideways misses recover before the gap without phantom sweeps (52.6778ms)
+✔ 30/60/120 Hz agree on free flight, landing and magnetic loop traversal (203.2597ms)
+✔ airborne collision impulses change real flight velocity and recovery craft are excluded (2.1542ms)
+✔ all CPU profiles complete three laps on both feature tracks with real pads and contacts (1922.6078ms)
+✔ magnetic chase camera follows the local up direction through loops/rolls and snaps safely on recovery (20.5541ms)
+✔ magnetic camera filters abrupt bank changes and preserves reset/paused pose (0.8713ms)
+ℹ tests 27
+ℹ suites 0
+ℹ pass 27
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3249.6663

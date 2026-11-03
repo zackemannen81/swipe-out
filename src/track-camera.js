@@ -4,6 +4,7 @@ import * as THREE from 'three';
 // The road's up direction is filtered independently instead of snapping each frame.
 export function createTrackCamera() {
   let initialized=false, previousSerial=-1, previousMode='', angle=0;
+  let followHeight=0;
   const followPosition=new THREE.Vector3(), roadRotation=new THREE.Quaternion();
   return {
     reset(){initialized=false;angle=0;},
@@ -23,12 +24,22 @@ export function createTrackCamera() {
       const desired=position.clone().add(offset);
       if(snap||internal||mode==='circle'||mode==='static')followPosition.copy(desired);
       else followPosition.lerp(desired,1-Math.exp(-5.5*Math.max(0,dt)));
-      // World lag feels less rigid, but may not trail through the road on loops.
-      const relative=followPosition.clone().sub(position).clampLength(0,14);
-      if(!internal){const clearance=relative.dot(frame.normal);if(clearance<1.6)relative.addScaledVector(frame.normal,1.6-clearance);}
+      const relative=followPosition.clone().sub(position);
+      if(!internal){
+        // Keep horizontal chase lag, but follow elevation in the road frame.
+        // World-space vertical lag repeatedly hit the clearance floor on rises,
+        // making a surface-bound craft appear to hop when the camera was lifted.
+        const desiredHeight=Math.max(1.6,offset.dot(frame.normal));
+        followHeight=snap?desiredHeight:THREE.MathUtils.damp(followHeight,desiredHeight,5.5,Math.max(0,dt));
+        relative.addScaledVector(frame.normal,-relative.dot(frame.normal));
+        relative.clampLength(0,Math.sqrt(Math.max(0,14*14-followHeight*followHeight)));
+        relative.addScaledVector(frame.normal,followHeight);
+      }else relative.clampLength(0,14);
       followPosition.copy(position).add(relative);camera.position.copy(followPosition);camera.up.copy(up);
       const orientation=new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().lookAt(camera.position,target,up));
-      if(snap||internal)camera.quaternion.copy(orientation);else camera.quaternion.slerp(orientation,1-Math.exp(-10*Math.max(0,dt)));
+      // Position and road-up already have smoothing. Extra world-space angular
+      // lag made the hull jump on screen when track pitch changed beneath it.
+      camera.quaternion.copy(orientation);
       initialized=true;previousSerial=serial;previousMode=mode;
     },
   };

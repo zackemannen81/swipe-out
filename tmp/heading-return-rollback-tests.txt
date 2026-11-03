@@ -1,0 +1,30 @@
+✔ swipeout: banking follows steering regardless of sideslip direction (12.3749ms)
+✔ wipeout: banking follows steering regardless of sideslip direction (6.4265ms)
+✔ Swipeout remains default; classic keeps an offset and heading instead of centering (35.0636ms)
+✔ classic rail impact cannot start an uncommanded wall-to-wall oscillation, on either side or at 30/60/120 Hz (199.8579ms)
+✔ classic contact preserves deliberate escape steering and cooldown contact stops only outward motion (1.185ms)
+✔ after a classic wall hit a short steer-away followed by straightening is controllable without another hit (20.481ms)
+✔ countersteer decelerates rotation faster; analog steering and airbrakes are independent (4.0773ms)
+✔ classic dynamics agree at 30/60/120 Hz, pause freezes, recovery resets transient state (31.6757ms)
+✔ classic player launches and lands both Foundry gaps at normal and boosted speed (51.5599ms)
+✔ classic input-driven lap retains gates, branches, walls, gaps and reset integration (673.3315ms)
+✔ classic chase/cockpit follow heading, exclude hull roll from chase, and stay local through loops (41.6733ms)
+✔ preferences are independent and safe with malformed/unavailable storage; R2 never accelerates classic (4.3386ms)
+✔ classic weapons follow the nose while Swipeout keeps its existing track-forward aim (4.8301ms)
+✔ mirrored bend drift cannot rotate or reverse a held inward heading (6.3435ms)
+✔ with neutral nose, curvature still pushes the whole ship outward (0.5722ms)
+✔ magnetic adhesion does not eliminate unassisted outward drift (38.3657ms)
+✔ Vitrum round-trips editor data, ships self-contained models and safe off-centre pads (516.9995ms)
+✔ Vitrum has seven ordered sectors, an upright smooth road, descent and no road overlap (30.6289ms)
+✔ Vitrum CPU field finishes three laps on Rookie, Pilot and Elite without recovery (4409.8897ms)
+✔ Vitrum player completes ordered three laps with both handling modes and assistance off (1023.9486ms)
+✔ all supplied GLB bounds leave the full racing corridor clear (881.9462ms)
+✔ organic passages leave real ship space open inside their enclosing bounds (24622.6539ms)
+ℹ tests 22
+ℹ suites 0
+ℹ pass 22
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 32073.7375

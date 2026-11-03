@@ -1,0 +1,14 @@
+✔ career unlocks earned from campaign finishing, podium and Elite win; replay is idempotent (3.2767ms)
+✔ locked choices and malformed persistence fall back; earned loadout survives reload; standards isolate upgrades (3.0617ms)
+✔ all five Necros challenges unlock craft and soundtrack; partial/old profiles normalize correctly (3.1437ms)
+✔ preview grants only the two mastery rewards, persists, and never fakes trophies (0.6409ms)
+✔ The sacrifice requires completed last place, automatic full assist and Rookie in a race (1.4729ms)
+✔ Tour Bus replacement inventory covers named groups and navigation has finite camera poses (74.2414ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 335.5466

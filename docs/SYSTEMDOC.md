@@ -446,3 +446,87 @@ checks in both modes, existing handling, magnetic drift and loop/camera tests.
 Production build passes with existing chunk warning. No browser visual playtest
 this pass; the behavioral regression is verified through production physics.
 Evidence: tmp/banking-tests.txt, tmp/banking-build.txt. No user saves modified.
+## 2026-11-03 - YAW-001 separate curve drift from nose heading
+Classic/Wipeout added road-frame turn to both yaw and lateral velocity. Removed
+only the yaw addition: heading now remains pilot/airbrake-controlled relative to
+the road, while curvature still pushes lateral momentum outward. Heading clamp,
+steering inertia, side grip, banking, adhesion and collision response retained.
+Standard Swipeout already lacked this curvature-to-yaw coupling and is unchanged.
+This intentionally uses track-relative heading, not inertially fixed world yaw.
+22 targeted tests pass: mirrored sustained inward steering with changing road
+frames, neutral-yaw outward drift, banking, driving modes, gaps, magnetic drift,
+Vitrum three-lap CPU/player and mesh checks. Production build passes with existing
+chunk warning. No browser playtest this pass; user's subjective handling remains
+to be tried. Evidence: tmp/heading-tests.txt and tmp/heading-build.txt.
+## 2026-11-03 - HANDLING-001 Wipeout tuning
+User requested less nose rotation, more bank and more outward drift. Classic
+turnRate 1.1 -> 0.8, maxHeading 0.65 -> 0.48, brakeYaw 0.0032 -> 0.0024.
+Steering bank is normalized by turnRate and targets 0.32 local roll at full
+input (formerly 0.22); makePose applies twice this angle, about 37 degrees
+versus 25. Curvature impulse coefficient 0.5 -> 0.75, grip unchanged. Nose,
+bank and curvature drift remain separate; standard Swipeout is unchanged.
+Turn acceleration remains 2.8: trial 2.2 caused the existing timed wall-escape
+regression to recontact a rail, so the original response was retained.
+22 targeted tests pass including wall recovery, mirrored yaw/drift, banking,
+frame rates, gaps, three-lap player/CPU simulations and original mesh checks.
+Final production build passes with existing large-chunk warning. No browser
+playtest this tuning pass; subjective balance needs user driving feedback.
+Evidence: tmp/handling-tune-tests.txt and tmp/handling-tune-build.txt.
+## 2026-11-03 - HANDLING-002 release-to-neutral trial
+Read tmp/src/wipeout/ship_player.c: steering acceleration/countersteer 167-194,
+velocity skid 365, banking and neutral-input angular braking 421-441. Original
+normal driving damps angular velocity and roll, not heading to track tangent;
+heading-to-track at 463 is rescue behavior, not player steering. This trial is
+an explicit user-requested ribbon-track adaptation, not claimed original parity.
+Classic now damps local yaw toward zero at rate 4.5/sec when steering is neutral
+(0.03 deadzone), differential brake is below .01 and ship is on the surface.
+About 90% of angle clears in .51 sec. Existing yaw-rate decay settles banking;
+release does not directly change lane position or sideways velocity. Active
+steering, differential airbrakes and airborne/flight heading retain integration.
+Previous stronger drift/bank and calmer nose tuning retained. Standard unchanged.
+23 tests pass including mirrored monotonic return, analog neutral noise, drift
+persistence/no lane centering, airbrakes, airborne exclusion, 30/60/120Hz, gaps,
+three-lap CPU/player and original scenery checks. Build passes (existing chunk
+warning). No browser/human playtest this pass; release timing awaits user feel.
+Evidence: tmp/heading-return-tests.txt and tmp/heading-return-build.txt.
+## 2026-11-03 - HANDLING-003: release-to-neutral trial reverted
+User reported HANDLING-002 felt worse. Removed automatic track-relative yaw
+return and its added steering deadzone. Restored prior yaw integration and
+heading-preservation tests. Neutral input damps angular velocity; it does not
+pull nose heading toward the track tangent. HANDLING-001 tuning (turnRate .8,
+maxHeading .48, brakeYaw .0024, curveDrift .75, steeringBank .32), independent
+banking and lateral drift remain. This supersedes HANDLING-002 behavior above.
+22 relevant tests pass; production build passes with existing chunk-size warning.
+No human playtest this pass. Evidence: tmp/heading-return-rollback-tests.txt and
+tmp/heading-return-rollback-build.txt.
+
+## HOP-001 - Magnetic Swipeout follow camera
+Chase height is damped relative to the road, independent of horizontal lag.
+Camera aim uses the already-filtered position and road-up without a second
+world-space angular delay. Steering and ship physics are unchanged.
+
+
+## GLOW-001
+Craft underglow uses four overlapping short-range accent point lights, without
+shadows, replacing the flat additive plane. Road materials receive real light.
+
+
+## THRUSTER-001
+Thruster ribbons taper in geometric width with normalized age, full at the
+nozzle and narrowing to zero at expiry; existing alpha fade remains.
+
+## 2026-11-03 - GLOW-002 original single light restored
+User screenshot shows four distinct highlights and prefers original one-light
+underglow. Restored settings verified in 6d61365:src/craft.js: one accent-colored
+PointLight, intensity 1.8, distance 4, position (0,-.01,.1), no shadows. Removes
+four-light arrangement; no flat glow plane. Thruster taper/camera/physics retained.
+Production build passes (existing chunk warning), tmp/underglow-single-build.txt.
+Visual confirmation awaits user. Supersedes GLOW-001 lighting design.
+## TOUR-001 - Carrier hub prototype
+The Tour Bus is an optional 3D hub reachable from the main menu, with five
+clickable camera stations and keyboard-accessible controls. Simple named groups
+are replaceable independently using docs/TOUR_BUS_OBJECTS.md and its JSON manifest.
+Reuse existing loadout and race setup; preserve exact Necros saved-track identity.
+Vitrum is an open race destination until multi-world career progression is designed.
+Planet geometry, furnishings and background shuttles remain blockout art.
+Public civilisation transmissions only; do not expose finale material in this hub.

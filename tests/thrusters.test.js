@@ -21,6 +21,29 @@ function liveSamples(nozzle) {
   return nozzle.samples.filter(s => s.age < s.lifetime).sort((a, b) => a.age - b.age);
 }
 
+test('ribbon core and halo narrow from full nozzle width to a fine aged tail', () => {
+  const env = setup(), nozzle = env.emitters[0].nozzles[0];
+  const center = new THREE.Vector3(), tangent = new THREE.Vector3(0, 0, -1);
+  for (const cameraPosition of [new THREE.Vector3(3, 2, -5), new THREE.Vector3(0, 0, -5)]) {
+    env.camera.position.copy(cameraPosition);
+    const widths = [0, 0.25, 0.5, 0.75, 0.95, 1].map(age => {
+      env.system.writeSection(nozzle, 0, center, tangent, env.camera, age, 1, 0.42, new THREE.Color());
+      const positions = nozzle.geometry.attributes.position;
+      return new THREE.Vector3().fromBufferAttribute(positions, 0)
+        .distanceTo(new THREE.Vector3().fromBufferAttribute(positions, 1));
+    });
+    assert.ok(Math.abs(widths[0] - 0.84) < 1e-6, 'full diameter at nozzle');
+    widths.forEach((width, i) => {
+      assert.ok(Number.isFinite(width));
+      if (i) assert.ok(width < widths[i - 1], 'older sections must get narrower');
+    });
+    assert.ok(widths[2] < widths[0] * 0.5, 'visible taper halfway down trail');
+    assert.ok(widths[4] < widths[0] * 0.05, 'fine tail before expiry');
+    assert.equal(widths.at(-1), 0);
+  }
+  env.system.dispose();
+});
+
 test('30/60/120 Hz produce the same world-space wake and evenly staggered ages', () => {
   const snapshots = [30, 60, 120].map(fps => {
     const env = setup();
