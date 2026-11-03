@@ -240,6 +240,7 @@ function renderObjectInspector() {
   const textureLabel = document.createElement('label'); textureLabel.textContent = 'TEXTURE';
   const file = document.createElement('input');
   file.type = 'file'; file.accept = 'image/png,image/jpeg,image/webp,image/gif';
+  file.setAttribute('aria-label', 'Object texture');
   file.addEventListener('change', async () => {
     const image = file.files[0]; if (!image) return;
     if (image.size > 4 * 1024 * 1024) { message('Texture exceeds 4 MB. Choose a smaller image.', true); return; }
@@ -252,7 +253,17 @@ function renderObjectInspector() {
     file.blur(); edit(next => { next.objects[index].texture = data; });
   });
   textureLabel.append(file); row.append(textureLabel);
+  const textureHelp = document.createElement('p'); textureHelp.className = 'field-help';
+  textureHelp.textContent = 'Upload a PNG or WebP with a transparent background. Image transparency works at OPACITY 1; lower OPACITY fades the whole object.';
+  row.append(textureHelp);
   if (object.texture) {
+    const alphaLabel = document.createElement('label'); alphaLabel.textContent = 'TEXTURE ALPHA';
+    const alpha = document.createElement('select'); alpha.setAttribute('aria-label', 'Texture transparency');
+    alpha.add(new Option('Cutout · plants / silhouettes', 'cutout'));
+    alpha.add(new Option('Soft · mist / glass', 'blend'));
+    alpha.value = object.textureAlpha ?? 'cutout';
+    alpha.addEventListener('change', () => { const value = alpha.value; alpha.blur(); edit(next => { next.objects[selection.index].textureAlpha = value; }); });
+    alphaLabel.append(alpha); row.append(alphaLabel);
     const image = document.createElement('img'); image.src = object.texture; image.alt = 'Object texture'; image.className = 'texture-preview'; row.append(image);
     const clear = document.createElement('button'); clear.textContent = 'CLEAR TEXTURE';
     clear.addEventListener('click', () => edit(next => { next.objects[selection.index].texture = null; })); row.append(clear);

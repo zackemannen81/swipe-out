@@ -1,0 +1,31 @@
+Loaded {
+  state: 'racing',
+  objects: 229,
+  loaded: 227,
+  errors: [],
+  draws: 1,
+  triangles: 1
+}
+PASS decoded forest maps, data/color spaces, anisotropy and 1024px sky reflections
+Rootwake { frame: 7317, calls: 213, triangles: 2628117, points: 124, lines: 7 }
+The Great Canopy { frame: 8037, calls: 130, triangles: 1637912, points: 124, lines: 0 }
+Glassroot Ascent { frame: 8757, calls: 79, triangles: 944443, points: 124, lines: 0 }
+The Mycelium Veins { frame: 9413, calls: 93, triangles: 1028730, points: 124, lines: 0 }
+The Singing Ravine { frame: 10069, calls: 110, triangles: 1268269, points: 124, lines: 0 }
+Neural Bloom { frame: 10757, calls: 128, triangles: 1641263, points: 124, lines: 0 }
+The Canopy Return { frame: 11461, calls: 77, triangles: 936229, points: 124, lines: 0 }
+Mycelium interior { frame: 12165, calls: 106, triangles: 1160370, points: 124, lines: 0 }
+Bloom approach { frame: 12869, calls: 132, triangles: 1720640, points: 124, lines: 0 }
+Bloom heart { frame: 13573, calls: 162, triangles: 1850792, points: 124, lines: 0 }
+Ravine bottom { frame: 14293, calls: 79, triangles: 867315, points: 124, lines: 0 }
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+page.waitForFunction: Timeout 90000ms exceeded.
+    at C:\code\swipe-out\tools\verify-vitrum.mjs:42:15 {
+  log: [],
+  name: 'TimeoutError'
+}
+
+Node.js v24.14.1

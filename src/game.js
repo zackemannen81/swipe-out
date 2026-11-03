@@ -1,5 +1,7 @@
+import {selectedSoundtrack,REWARD_MUSIC,unlocked,saveProfile} from './career.js';
 import {updateRailGlow} from './rail-glow.js';
 import {updateScenery} from './scenery-motion.js';
+import {updateVitrumSpores} from './vitrum-spores.js';
 import { createFrontEnd } from './front-end.js';
 import { createGarage } from './garage.js';
 import { recordKey } from './time-attack.js';
@@ -25,7 +27,7 @@ import { createOpponents, getPlayerPosition, resetOpponents, updateOpponents, sy
 import { createCraft } from './craft.js';
 import { configureImpactParticles, collectBoostPad, createCollisionState, resolveRacerCollisions, resolveWallImpact } from './race-interactions.js';
 import { updateCatchUp } from './catch-up.js';
-import { ThrusterSystem } from './thrusters.js';
+import { ThrusterSystem, CRIMSON_VISUAL_SCALE } from './thrusters.js';
 import { sparks_material } from './shaders.js';
 import { createRaceIntro } from './race-intro.js';
 import { createTrackCamera } from './track-camera.js';
@@ -38,7 +40,7 @@ import { createPracticeUI, lapTime } from './time-attack-ui.js';
 import { ParticleSystem } from './ParticleSystem.js';
 import * as CONTROLS from './controls.js'
 import * as GFX from './gfx.js'
-
+import { BLOOD_RED } from './thrusters.js';
 
 
 const canvas = document.querySelector('#game-canvas');
@@ -147,7 +149,7 @@ if (menuButton) {
 export const SPEEDCALIBRATION = 86; // Justera detta värde för att kalibrera spelets hastighe
 // Phase 1: renderer / projection. No scene draw or postprocessing yet.
 export const scene = new THREE.Scene();
-scene.fog = new THREE.FogExp2(0x282832, 0.0045);
+scene.fog = new THREE.FogExp2(0x181822, 0.0039);
 const initialWidth = Math.max(1, window.innerWidth);
 const initialHeight = Math.max(1, window.innerHeight);
 const camera = new THREE.PerspectiveCamera(
@@ -221,7 +223,7 @@ initialTrackSelect.value = currentTrackId;
 const editorLink = document.querySelector('.editor-link');
 if (editorLink) editorLink.href = `./editor.html?track=${encodeURIComponent(currentTrackId)}`;
 // Ändra din raceAudio till att vara en let istället för const så vi kan byta ut den
-let raceAudio = new RaceAudio(TRACK_CONFIG[currentTrackId].defaultAudio);
+let raceAudio = new RaceAudio(selectedSoundtrack(frontEnd?.profile??{},TRACK_CONFIG[currentTrackId].defaultAudio));
 let selectedVoiceVolume=raceAudio.voiceVolume;
 function syncVoiceControls(){
   document.querySelectorAll('[data-voice-volume]').forEach(el=>el.value=Math.round(selectedVoiceVolume*100));
@@ -260,8 +262,9 @@ panoramaBackdrop.renderOrder = -10;
 scene.add(panoramaBackdrop);
 
 // Scene lights are ordinary objects and may be created before the camera moves.
-scene.add(new THREE.HemisphereLight(0x98c8ff, 0x111421, 1.8));
-const keyLight = new THREE.DirectionalLight(0xd8e8ff, 2.8);
+const hemisphereLight=new THREE.HemisphereLight(0x98c8ff, 0x111421, 0.8);
+scene.add(hemisphereLight);
+const keyLight = new THREE.DirectionalLight(0xd8e8ff, 0.08);
 keyLight.position.set(-15, 28, 12);
 scene.add(keyLight);
 const cyanLight = new THREE.PointLight(0x32f4e8, 80, 46);
@@ -327,15 +330,19 @@ for (const opponent of opponents) {
 // 1. Skapa en tom grupp för skeppet
 
 const ghostPool = [];
-const GHOST_POOL_SIZE = 8;
+const GHOST_POOL_SIZE = 7;
 
-function createGhostPool() {
+function createGhostPool(spec) {
   for (let i = 0; i < GHOST_POOL_SIZE; i++) {
     const group = craft.clone(true);
 
     // Ett material per ghost, delat mellan dess mesh-objekt.
+
+const ghostColor = new THREE.Color(0x58f442);
+//ghostColor.set(['the-sacrifice','necron-crimson-citadel'].includes(playerCraft.ship)?BLOOD_RED:playerCraft.accentColor); // Grön färg för ghost-effekten
+
     const material = new THREE.MeshBasicMaterial({
-      color: 0x58f442,
+      color: ghostColor,
       transparent: true,
       opacity: 0,
       blending: THREE.AdditiveBlending,
@@ -343,6 +350,8 @@ function createGhostPool() {
       wireframe: true,
       toneMapped: false
     });
+    
+    //material.set(['the-sacrifice','necron-crimson-citadel'].includes(ship)?BLOOD_RED:color);
 
     group.traverse((child) => {
       if (child.isMesh) {
@@ -606,7 +615,7 @@ const drag = { active: false, lastX: 0, pointerId: null, throttle: 0 };
 const heldKeys = new Set();
 let classicGamepadInput = readClassicGamepad(null);
 const mobileSteering = { pointerId: null, startX: 0 };
-const mobileInput = { throttle: 0, gyroEnabled: false, gyroSteering: 0, orientationHandler: null };
+const mobileInput = { throttle: 0, gyroEnabled: false, gyroSteering: 0, gyroNeutral: null, gyroSamples: 0, gyroLastEvent: 0 };
 const mobileControls = document.querySelector('#mobile-controls');
 const steeringZone = document.querySelector('#touch-steering-zone');
 const steeringIndicator = document.querySelector('#steering-indicator');
@@ -848,6 +857,15 @@ function beginRace() {
   const trackSelect = document.querySelector('#track-select');
   currentTrackId = cupRound?.track ?? trackSelect.value;
   const trackData = cupRound ? BUILTIN_TRACKS[currentTrackId].data : getActiveTrackData(currentTrackId);
+  const vitrumWorld=trackData.id==='vitrum-neural-ascent';
+  camera.far=vitrumWorld?2200:512;camera.updateProjectionMatrix();
+  scene.fog.color.setHex(vitrumWorld?0x263e38:0x282832);
+  scene.fog.density=vitrumWorld?0.0024:0.0039;
+  keyLight.color.setHex(vitrumWorld?0xffdfa0:0xd8e8ff);
+  keyLight.intensity=vitrumWorld?0.28:2.8;
+  hemisphereLight.color.setHex(vitrumWorld?0xc8d8ac:0x98c8ff);
+  hemisphereLight.groundColor.setHex(vitrumWorld?0x29351c:0x111421);
+  hemisphereLight.intensity=vitrumWorld?0.25:1.8;
   //const trackData = TRACK_CONFIG[currentTrackId].data;
 // Hämta banans namn och gör det till stora bokstäver
   const loadout = frontEnd.begin(currentTrackId, recordKey({track:trackData}), {difficulty:cupRound?.settings.difficulty ?? selectedCpuDifficulty,handling:activeDrivingSettings.handling,assist:activeDrivingSettings.assist,combat:document.querySelector('#combat-enabled').checked});
@@ -902,7 +920,8 @@ scene.traverse(obj => {
 
   // Byt musik
   raceAudio.dispose();
-  raceAudio = new RaceAudio(TRACK_CONFIG[currentTrackId].defaultAudio);
+  raceAudio = new RaceAudio(selectedSoundtrack(frontEnd?.profile??{},TRACK_CONFIG[currentTrackId].defaultAudio));
+  musicSelect.value=selectedSoundtrack(frontEnd.profile,TRACK_CONFIG[currentTrackId].defaultAudio);
   raceAudio.setPreferences(frontEnd.profile.settings);
   raceAudio.setVoiceVolume(selectedVoiceVolume);spokenLap=1;voiceCombatPrevious={};
   // Läs av sökvägen till den nya bakgrundsbilden
@@ -1042,17 +1061,27 @@ function finishRace() {
   retryButton.focus({ preventScroll: true });
   const lapSummary=document.createElement('p');lapSummary.id='result-best-lap';lapSummary.textContent='BEST LAP · '+lapTime(practice.active?bestLap:race.recordLaps?.length?Math.min(...race.recordLaps):null);resultsScreen.querySelector('.results-details').append(lapSummary);
   cup.finish();
-  if(!practice.active)frontEnd.finish(getPlayerPosition(opponents,race.distance,race.playerFinishTime),race.playerFinishTime,race.recordLaps?.length?Math.min(...race.recordLaps):null);
+  if(!practice.active)frontEnd.finish(getPlayerPosition(opponents,race.distance,race.playerFinishTime),race.playerFinishTime,race.recordLaps?.length?Math.min(...race.recordLaps):null,race.distance>=curve.getLength()*totalLaps);
 }
 
-startButton.addEventListener('click', () => {
-  toggleFullscreenAndLock();
-  beginRace();
-});
-retryButton.addEventListener('click', () => {
-  toggleFullscreenAndLock();
-  beginRace();
-});
+function startRaceSafely() {
+  try {
+    beginRace();
+    void toggleFullscreenAndLock();
+  } catch (error) {
+    console.error('Could not start race:', error);
+    frontEnd?.open();
+    const status = document.querySelector('#profile-status');
+    if (status) status.textContent = `RACE START FAILED: ${error?.message ?? String(error)}`;
+    const note = document.querySelector('#loadout-note');
+    if (note) {
+      note.textContent = `RACE START FAILED: ${error?.message ?? String(error)}`;
+      note.setAttribute('role', 'alert');
+    }
+  }
+}
+startButton.addEventListener('click', startRaceSafely);
+retryButton.addEventListener('click', startRaceSafely);
 
 canvas.addEventListener('pointerdown', (event) => {
   if (race.state !== 'racing' || event.button !== 0) return;
@@ -1167,7 +1196,7 @@ canvas.addEventListener('pointercancel', releasePointer);
 canvas.addEventListener('lostpointercapture', releasePointer);
 
 function updateMobileSteering(clientX) {
-  if (!steeringZone || mobileSteering.pointerId === null || mobileInput.gyroEnabled) return;
+  if (!steeringZone || mobileSteering.pointerId === null || mobileInput.gyroEnabled || isPaused) return;
   const rect = steeringZone.getBoundingClientRect();
   const offset = clientX - mobileSteering.startX;
   const range = Math.max(72, rect.width * 0.36);
@@ -1176,7 +1205,7 @@ function updateMobileSteering(clientX) {
   if (steeringIndicator) steeringIndicator.style.transform = `translateX(calc(-50% + ${value * range}px))`;
 }
 steeringZone?.addEventListener('pointerdown', (event) => {
-  if (race.state !== 'racing' || mobileSteering.pointerId !== null) return;
+  if (race.state !== 'racing' || isPaused || mobileInput.gyroEnabled || mobileSteering.pointerId !== null) return;
   event.preventDefault(); mobileSteering.pointerId = event.pointerId; mobileSteering.startX = event.clientX;
   steeringZone.setPointerCapture(event.pointerId); updateMobileSteering(event.clientX);
 });
@@ -1190,39 +1219,68 @@ steeringZone?.addEventListener('pointerup', releaseMobileSteering);
 steeringZone?.addEventListener('pointercancel', releaseMobileSteering);
 steeringZone?.addEventListener('lostpointercapture', releaseMobileSteering);
 
-function setMobileThrottle(value, button) { mobileInput.throttle = value; button?.classList.toggle('active', value !== 0); }
-function bindPedal(button, value) {
-  if (!button) return;
-  button.addEventListener('pointerdown', (event) => { if (race.state === 'racing') { event.preventDefault(); button.setPointerCapture(event.pointerId); setMobileThrottle(value, button); } });
-  const release = () => setMobileThrottle(0, button);
-  button.addEventListener('pointerup', release); button.addEventListener('pointercancel', release); button.addEventListener('lostpointercapture', release);
+const mobilePedals = new Map();
+function updateMobileThrottle() {
+  mobileInput.throttle = mobilePedals.has(brakeButton) ? -1 : mobilePedals.has(thrustButton) ? 1 : 0;
+  for (const button of [thrustButton, brakeButton]) button?.classList.toggle('active', mobilePedals.has(button));
 }
-bindPedal(thrustButton, 1); bindPedal(brakeButton, -1);
+function clearMobilePedals() { mobilePedals.clear(); updateMobileThrottle(); }
+function bindPedal(button) {
+  if (!button) return;
+  button.addEventListener('pointerdown', (event) => {
+    if (race.state !== 'racing' || isPaused || mobilePedals.has(button)) return;
+    event.preventDefault(); event.stopPropagation();
+    mobilePedals.set(button, event.pointerId);
+    button.setPointerCapture(event.pointerId);
+    updateMobileThrottle();
+  });
+  const release = (event) => {
+    if (mobilePedals.get(button) !== event.pointerId) return;
+    mobilePedals.delete(button); updateMobileThrottle();
+  };
+  for (const type of ['pointerup', 'pointercancel', 'lostpointercapture']) button.addEventListener(type, release);
+}
+bindPedal(thrustButton); bindPedal(brakeButton);
 
 function orientationSteering(event) {
   const angle = screen.orientation?.angle ?? window.orientation ?? 0;
-  let tilt = Number.isFinite(event.beta) ? event.beta : event.gamma;
-  if (angle === 90) tilt = event.beta;
-  else if (angle === 270 || angle === -90) tilt = -event.beta;
-  else if (window.matchMedia('(orientation: portrait)').matches) tilt = event.gamma;
-  if (typeof tilt !== 'number' || !Number.isFinite(tilt)) return;
-  const deadzone = 3;
-  const maxTilt = 15;
-  const magnitude = Math.abs(tilt);
-  mobileInput.gyroSteering = magnitude <= deadzone
-    ? 0
-    : THREE.MathUtils.clamp((magnitude - deadzone) / (maxTilt - deadzone), 0, 1) * Math.sign(tilt);
+  const landscape = Math.abs(angle) === 90 || window.matchMedia('(orientation: landscape)').matches;
+  const tilt = landscape
+    ? (Number.isFinite(event.beta) ? event.beta * (angle === -90 || angle === 270 ? -1 : 1) : null)
+    : (Number.isFinite(event.gamma) ? event.gamma : null);
+  if (tilt === null || !Number.isFinite(tilt)) return;
+  mobileInput.gyroLastEvent = performance.now();
+  // Use the player's current grip as neutral rather than the device's absolute angle.
+  if (mobileInput.gyroNeutral === null) {
+    mobileInput.gyroNeutral = tilt;
+    mobileInput.gyroSamples = 1;
+    mobileInput.gyroSteering = 0;
+    return;
+  }
+  if (mobileInput.gyroSamples < 8) {
+    mobileInput.gyroNeutral += (tilt - mobileInput.gyroNeutral) / ++mobileInput.gyroSamples;
+    mobileInput.gyroSteering = 0;
+    return;
+  }
+  const relative = THREE.MathUtils.clamp(tilt - mobileInput.gyroNeutral, -30, 30);
+  const deadzone = 2.5;
+  const magnitude = Math.abs(relative);
+  mobileInput.gyroSteering = magnitude <= deadzone ? 0
+    : THREE.MathUtils.clamp((magnitude - deadzone) / 17.5, 0, 1) * Math.sign(relative);
+  if (gyroToggle?.textContent === 'GYRO: CAL') gyroToggle.textContent = 'GYRO: ON';
 }
 async function toggleGyro() {
   if (mobileInput.gyroEnabled) {
-    window.removeEventListener('deviceorientation', orientationSteering); mobileInput.gyroEnabled = false; mobileInput.gyroSteering = 0;
+    window.removeEventListener('deviceorientation', orientationSteering); mobileInput.gyroEnabled = false; mobileInput.gyroSteering = 0; mobileInput.gyroNeutral = null;
+    race.targetSteering = 0;
     gyroToggle.textContent = 'GYRO: OFF'; gyroToggle.setAttribute('aria-pressed', 'false'); return;
   }
   try {
     if (typeof DeviceOrientationEvent === 'undefined') throw new Error('Orientation sensors unavailable');
     if (typeof DeviceOrientationEvent.requestPermission === 'function' && await DeviceOrientationEvent.requestPermission() !== 'granted') throw new Error('Orientation permission denied');
+    mobileInput.gyroNeutral = null; mobileInput.gyroSamples = 0; mobileInput.gyroSteering = 0; mobileInput.gyroLastEvent = 0;
     window.addEventListener('deviceorientation', orientationSteering); mobileInput.gyroEnabled = true;
-    gyroToggle.textContent = 'GYRO: ON'; gyroToggle.setAttribute('aria-pressed', 'true');
+    gyroToggle.textContent = 'GYRO: CAL'; gyroToggle.setAttribute('aria-pressed', 'true');
   } catch (error) { console.warn('Gyro steering could not be enabled.', error); gyroToggle.textContent = 'GYRO: N/A'; window.setTimeout(() => { if (!mobileInput.gyroEnabled) gyroToggle.textContent = 'GYRO: OFF'; }, 1400); }
 }
 gyroToggle?.addEventListener('click', toggleGyro);
@@ -1269,7 +1327,7 @@ function clearClassicInput() {
   race.gamepadThrottle = 0;
   heldKeys.clear();
   race.targetSteering = race.keyboardThrottle = 0;
-  mobileInput.throttle = 0;
+  clearMobilePedals();
   drag.active = false; drag.throttle = 0;
   for (const [element, pointerId] of [[canvas, drag.pointerId], [steeringZone, mobileSteering.pointerId]]) {
     if (pointerId !== null && element?.hasPointerCapture(pointerId)) element.releasePointerCapture(pointerId);
@@ -1285,6 +1343,9 @@ window.addEventListener('blur', () => {
   heldKeys.clear();
   drag.active = false;
   drag.throttle = 0;
+  clearMobilePedals();
+  mobileSteering.pointerId = null;
+  if (steeringIndicator) steeringIndicator.style.transform = 'translateX(-50%)';
   race.keyboardThrottle = 0;
   race.targetSteering = 0;
 });
@@ -1321,6 +1382,8 @@ function togglePause() {
   if (pauseToggleButton) pauseToggleButton.textContent = isPaused ? 'RESUME ▶' : 'PAUSE ⏸';
   
   if (isPaused) {
+    clearMobilePedals();
+    drag.active = false; drag.throttle = 0; race.targetSteering = 0;
     firing=touchFiring=flareRequested=false;
     if (activeDrivingSettings.handling === 'wipeout') clearClassicInput();
     raceAudio.audio.pause();
@@ -1335,6 +1398,10 @@ function togglePause() {
 // Byt låt direkt när man ändrar i pausmenyn
 musicSelect.addEventListener('change', async (event) => {
   const newAudioUrl = event.target.value;
+  if(newAudioUrl===REWARD_MUSIC.url&&!unlocked(REWARD_MUSIC,frontEnd.profile))return;
+  frontEnd.profile.soundtrack=selectedSoundtrack({...frontEnd.profile,soundtrack:newAudioUrl},'');
+  saveProfile(localStorage,frontEnd.profile);
+  document.querySelector('#menu-soundtrack').value=frontEnd.profile.soundtrack;
   raceAudio.dispose();
   raceAudio = new RaceAudio(newAudioUrl);
   raceAudio.setVoiceVolume(selectedVoiceVolume);
@@ -1384,13 +1451,21 @@ resize();
 
 
 const craftTemplates = {racer:craft.clone(true),kestrel:opponents.find(o=>o.name==='Kestrel').group.clone(true),orca:opponents.find(o=>o.name==='Orca').group.clone(true)};
+const crimsonCraft=await createCraft({accentColor:0xc41426,modelUrl:'/models/necron-crimson-citadel.glb'});
+// Scale child transforms: garage and race clone these children, not the root.
+for(const child of crimsonCraft.group.children){if(!child.isLight){child.scale.multiplyScalar(CRIMSON_VISUAL_SCALE);child.position.multiplyScalar(CRIMSON_VISUAL_SCALE);}}
+craftTemplates['necron-crimson-citadel']=crimsonCraft.group;
+const sacrificeCraft=await createCraft({accentColor:0xb50920,modelUrl:'/models/the-sacrifice.glb'});
+craftTemplates['the-sacrifice']=sacrificeCraft.group;
 const garage = createGarage(craftTemplates);
 let playerMaterials=[];
 function applyPlayerLoadout(spec){
+  const accent=spec.ship==='kestrel'?opponents.find(o=>o.name==='Kestrel').craft.color:spec.ship==='orca'?opponents.find(o=>o.name==='Orca').craft.color:playerCraft.color;
+  thrusters.configureCraft(playerThrusters,spec.ship,accent);
   playerMaterials.forEach(m=>m.dispose());playerMaterials=[];
   craft.clear();
   for(const child of craftTemplates[spec.ship].children){const copy=child.clone(true);copy.traverse(o=>{if(o.isMesh){const materials=(Array.isArray(o.material)?o.material:[o.material]).map(m=>{const c=m.clone();if(spec.paint&&c.color)c.color.multiply(new THREE.Color(spec.paint));playerMaterials.push(c);return c;});o.material=Array.isArray(o.material)?materials:materials[0];}});craft.add(copy);}
-  for(const ghost of ghostPool){scene.remove(ghost.group);ghost.material.dispose();}ghostPool.length=0;createGhostPool();
+  for(const ghost of ghostPool){scene.remove(ghost.group);ghost.material.dispose();}ghostPool.length=0;createGhostPool(spec);
 }
 let previewStart=0;
 frontEnd=createFrontEnd({garage,tracks:TRACK_CONFIG,
@@ -1431,6 +1506,7 @@ function render() {
 
       panoramaBackdrop.position.copy(camera.position);
       updateTrackPresentation(track,t);
+      updateVitrumSpores(track,t,0);
       updateRailGlow(track,frontEnd.profile.settings);
       updateScenery(scene,t-previewStart);
       graphics.render();
@@ -1457,6 +1533,7 @@ function render() {
   const racingOpponents=practice.active?[]:opponents;
   let crossedFinish = false;
   sceneryTime+=delta;updateScenery(scene, sceneryTime);
+  updateVitrumSpores(track,sceneryTime,shipPhysics.speed);
 
   if(practice.active){shipPhysics.catchUpBonus=shipPhysics.catchUpGap=0;}
   else updateCatchUp([
@@ -1517,7 +1594,7 @@ if (countVal !== prevCount) {
         ? drag.throttle 
         : (race.gamepadThrottle || race.keyboardThrottle);
 
-    if (mobileInput.gyroEnabled) race.targetSteering = mobileInput.gyroSteering;
+    if (mobileInput.gyroEnabled) race.targetSteering = performance.now() - mobileInput.gyroLastEvent < 650 ? mobileInput.gyroSteering : 0;
     race.steering = THREE.MathUtils.damp(
       race.steering,
       race.targetSteering,
@@ -1546,7 +1623,7 @@ if (countVal !== prevCount) {
     race.targetSteering = 0; // Släpp ratten
     race.throttleTarget = 0; // Släpp gasen
     race.steering = THREE.MathUtils.damp(race.steering, race.targetSteering, 4.8, delta);
-    
+        
     // Tvinga farten och assistansen varje frame ifall fysiken försöker ändra den
     shipPhysics.speed = 65;
     shipPhysics.assistLevel = 1.0;

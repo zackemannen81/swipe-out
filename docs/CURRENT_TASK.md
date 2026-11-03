@@ -1,20 +1,23 @@
 # Current Task
-Task ID: GIT-001
+Task ID: BANK-001
 Status: Complete
-
 ## Scope
-Remove the two oversized Crimson Citadel and Urban Spire GLBs from the four
-unpublished commits, keep local files, ignore them and push main to origin.
-Preserve all other changes and commit metadata; retain a local backup branch.
-
+Decouple craft roll from lateral drift in both handling modes. Steering/yaw
+response controls local banking; existing road-frame banking remains. Preserve
+lateral forces, steering assistance, adhesion and track data.
 ## Acceptance
-Outgoing history contains neither asset and no blobs over GitHub limit.
-Local assets remain intact; other existing tracked content unchanged.
-Normal push succeeds and remote main matches local HEAD.
+Opposite sideslip cannot reverse roll under unchanged steering. Unsteered drift
+must not introduce bank. Verify both modes, mirrored controls and driving tests.
 
-## Verification
-Four unpublished commits rewritten; original messages/authors preserved.
-Only the two model paths differ from the original committed tree.
-Both local files remain (80,329,224 and 113,808,552 bytes) and are ignored.
-Largest outgoing blob is 13,945,932 bytes. Normal main push succeeded.
-Local recovery branch: backup/before-large-model-removal-6d42d701 (not pushed).
+## 2026-11-03 - BANK-001 steering bank independent of drift
+Removed lateralVelocity from both standard and classic roll targets. Previously
+outward drift could overpower steering bank and tip the craft to the opposite
+side. Standard local bank now follows -yawVelocity * 0.3 (same 0.38 cap and
+damping); classic retains its yaw term, spring and damping. Road-frame roll is
+still composed into the craft orientation. Side forces, grip, assistance and
+magnetic adhesion are unchanged. No reduction of road banking in this pass.
+24 tests pass, including new mirrored steering/opposing-drift/neutral-input
+checks in both modes, existing handling, magnetic drift and loop/camera tests.
+Production build passes with existing chunk warning. No browser visual playtest
+this pass; the behavioral regression is verified through production physics.
+Evidence: tmp/banking-tests.txt, tmp/banking-build.txt. No user saves modified.

@@ -313,3 +313,98 @@ See FINISHING_PASS.md for behavior, validation and real-device limitations.
 New modules: src/rail-glow.js, src/race-records.js, src/world-ambience.js.
 New regression tests: tests/finish-features.test.js. Prior task archived in
  docs/archive/SCENERY-001.md.
+
+## GARAGE-002
+- public/images/garage.jpg: supplied 5504x3072 garage backdrop, original JPEG.
+- docs/archive/MOBILE-001.md: previous task record.
+
+## REWARD-001
+- public/models/necron-crimson-citadel.glb: supplied craft, 14,239,868 bytes.
+- public/audio/tracks/vi-lever-inte.mp3: supplied soundtrack, 5,262,083 bytes.
+- tools/verify-rewards.mjs: isolated dev reward/model/music browser checks.
+- docs/archive/GARAGE-002.md: prior task record.
+
+## REWARD-002
+- public/models/the-sacrifice.glb: supplied Crimson Wraith craft, 13,833,784 bytes.
+- tools/verify-sacrifice.mjs: actual finish-path unlock and model browser check.
+- docs/archive/REWARD-001.md: previous task record.
+
+## THRUST-002
+- tools/verify-thruster-loadouts.mjs: live 4/5 blood-red wake browser check.
+- docs/archive/REWARD-002.md: prior task record.
+
+- docs/archive/THRUST-002.md: previous thruster task.
+
+## 2026-11-03 — VITRUM-001
+- src/track-vitrum.js: editable track18 route, sectors, pads and scenery generation.
+- src/vitrum-deck.js: generated organic road texture.
+- public/models/stage2/: nine supplied external GLBs (unchanged).
+- public/images/stage2/: four supplied concept PNGs (unchanged).
+- tests/vitrum.test.js: format, physics, CPU and asset/road clearance verification.
+- tools/verify-vitrum.mjs: isolated browser race/editor checks and sector screenshots.
+- docs/VITRUM.md: course/art details, verification and known limits.
+- docs/archive/THRUST-003.md: previous active task preserved.
+
+## 2026-11-03 — VITRUM-002
+- tools/build-vitrum-organics.mjs: reproducible seven-sector textured GLB exporter.
+- tools/build-vitrum-surface.py: deterministic tileable organic surface texture.
+- public/models/stage2/organic/: seven generated, self-contained architecture GLBs.
+- public/images/stage2/organic-surface.png: generated source texture embedded in GLBs.
+- public/images/stage2/vitrum-placeholder.svg: temporary neutral panorama gradient.
+- docs/archive/VITRUM-001.md: archived prior implementation task.
+
+## 2026-11-03 — VITRUM-003
+- public/images/backdrop_track-017.jpg: supplied Vitrum 4096x2048 panorama.
+- public/audio/tracks/track15.m4a, track16.m4a: supplied stereo soundtracks.
+- tools/verify-vitrum-media.mjs: browser sky/audio decode, playback and persistence.
+- docs/archive/VITRUM-002.md: completed environment revision.
+
+## 2026-11-03 — VITRUM-004
+- Existing tools/build-vitrum-organics.mjs adds city/settlement generation.
+- Existing public/models/stage2/organic/ modules now include the forest city.
+- tools/verify-vitrum.mjs includes a dedicated inhabited-terrace camera view.
+- docs/archive/VITRUM-003.md preserves the previous media task.
+
+## 2026-11-03 — VITRUM-005
+- public/images/theforest/: six supplied PBR texture families and README (unchanged).
+- src/vitrum-materials.js: shared source texture paths for runtime and exporter.
+- src/vitrum-deck.js: supplied forest PBR maps and sky-reflecting road material.
+- src/vitrum-terrain.js: shared periodic bank-height authoring function.
+- src/track-vitrum.js: measured foot bounds, slope alignment and support manifest.
+- tools/build-vitrum-organics.mjs: grounded soil/root bases, banks, dense undergrowth,
+  proper UVs, weathering and embedded PBR material exporter.
+- tests/vitrum.test.js: delivered image-byte checks, actual foot contact and
+  spatially partitioned triangle raycasts for corridor checks.
+- docs/archive/VITRUM-004.md: previous completed forest-city task.
+
+## 2026-11-03 — VITRUM-006
+- src/vitrum-forest-screen.js: route-aware, world-fixed instanced scenery layers.
+- public/images/stage2/parallax/: final megaforest-v1.png, root-curtain-v2.png,
+  undergrowth-v1.png, retained unused curtain v1 draft and exact PROMPTS.md.
+- tests/vitrum-forest-screen.test.js: card clearance, parallax, assets, disposal.
+- tools/verify-vitrum.mjs: also checks cutout loading/alpha and saved overrides.
+- docs/archive/VITRUM-005.md: previous completed material/grounding task.
+
+## 2026-11-03 — TEXTURE-001
+- Existing src/track.js: default cutout and optional blended image alpha.
+- Existing src/track-format.js: v8 optional textureAlpha with v1–7 compatibility.
+- Existing src/editor.js / editor.css: alpha mode and checkerboard preview.
+- tools/verify-texture-alpha.mjs: WebGL pixel checks plus upload/save/race flow.
+- docs/archive/VITRUM-006.md: previous completed forest screen task.
+
+## VITRUM-007
+- src/vitrum-lighting.js: route-relative point-light pools.
+- docs/archive/TEXTURE-001.md: previous task.
+
+## VITRUM-008
+- src/vitrum-spores.js: three particle batches and animation uniforms.
+- tests/vitrum-spores.test.js: lifecycle and deterministic particle checks.
+- docs/archive/VITRUM-007.md: previous lighting task.
+
+## VITRUM-009
+- tests/magnetic-drift.test.js: unassisted lateral drift versus adhesion.
+- docs/archive/VITRUM-008.md: previous particle task.
+
+## BANK-001
+- tests/banking.test.js: steering bank independent of sideslip in both modes.
+- docs/archive/VITRUM-009.md: previous feedback task.

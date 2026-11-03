@@ -487,3 +487,106 @@ See FINISHING_PASS.md for behavior, validation and real-device limitations.
 New modules: src/rail-glow.js, src/race-records.js, src/world-ambience.js.
 New regression tests: tests/finish-features.test.js. Prior task archived in
  docs/archive/SCENERY-001.md.
+
+## 2026-11-03 — Vitrum Lithofyter
+World 02 uses the supplied living-planet brief: seven connected areas, monumental
+forest, ivory biological structures, amber/turquoise light, neural chamber and
+ravine descent. No physics changes; line-choice boosts reward course learning.
+Neural Ascent is available independently of the existing Necros campaign.
+See VITRUM.md for the implemented layout and human-playtest boundaries.
+
+## 2026-11-03 — VITRUM-002 layout and media ownership
+Vitrum now prioritizes connected traversable structures and clustered colonies.
+Seven route-conforming GLB modules supplement all nine supplied models. The
+road enters an enclosed mycelium vault and passes under the neural heart inside
+Bloom. Existing route physics remain. User owns final panorama, trailer/flyby
+script and music; built-in media remain temporary until supplied. See VITRUM.md.
+
+## 2026-11-03 — VITRUM-004 design
+User requested an Avatar-like city feeling. Interpreted as a luminous organic
+forest settlement: tiered tree habitats, warm pod openings, root ramps,
+canopy promenades, hanging seed lanterns and violet/turquoise undergrowth.
+Original Vitrum assets/forms retained. Racing route and supplied media unchanged.
+
+## 2026-11-03 — VITRUM-005 art direction
+Use the user's forest textures and reference imagery for moss/ivory/amber
+contrast, restrained cyan mycelium and lavender growth. Glossy road has darker
+weathered edges. Following live user feedback, every planted asset receives a
+physical soil/root footing and smaller plants follow the bank slope. Dense
+broad-leaf understory, small mushrooms and flower sprays connect the large
+landmarks. Warm sunlight and green ambient fill replace the cooler forest light.
+The Bloom orb remains deliberately suspended. No driving/route/media change.
+
+## 2026-11-03 — VITRUM-006 scenic enclosure
+User's shield means forest scenery masking the finite world: dense megaforest
+silhouettes behind real geometry, porous hanging roots and clustered understory.
+Three fixed physical depths produce parallax rather than following the camera.
+Dark olive foreground gives way to paler green/teal distance through fog. Small
+plants use three planes at 60-degree intervals, rooted into the banks. Preserve
+an open racing corridor and the supplied panoramic sky. Generated art matches
+the moss, ivory wood, amber gills and restrained cyan/lavender world palette.
+
+## 2026-11-03 — TEXTURE-001 authoring
+Users can upload transparent vegetation and silhouette textures onto scenery
+objects. Cutout is the default for crisp foliage and overlapping layers; Soft
+is available for mist and glass. Whole-object opacity remains independent of
+image holes. A checkerboard thumbnail makes imported transparency visible.
+
+## 2026-11-03 - VITRUM-007 lighting
+Vitrum sun intensity is 0.65 (formerly 3.4), hemisphere fill 0.48 (formerly
+1.95). Game and editor share the darker treatment. Thirteen world-fixed point
+lights follow route stations, alternating banks, 24 units above the road:
+amber with two mint accents, intensity 850, range 240, decay 2, no shadows.
+Automatic lighting also applies to saved Vitrum variants without rewriting
+objects. Forest image cards are tinted to 65% to match. Lighting adds fragment
+shading cost; target-device FPS is not measured. Generated lights are tuned in
+src/vitrum-lighting.js, separate from user-authored editable lights.
+## 2026-11-03 - VITRUM-008 biological atmosphere
+Vitrum now has three GPU-animated Points batches: 5,200 pollen, 650 larger spores
+and 350 speed streaks. Deterministic world positions follow the current route,
+biased toward banks and height; three denser zones align with canopy, mycelium
+and Bloom. Cyan, amber, yellow-green and rare violet, slow bounded drift/pulse,
+near-camera and 260-520 unit distance fade. Streaks fade in at speed 100-280
+world units/sec and use short screen-space elongated sprites (not motion blur).
+No new lights, textures or collision. Three extra draws; all 6,200 vertices are
+submitted in fixed batches, with distance fading in the shader. Target-device
+FPS is unmeasured. Existing scenery clock freezes animation on race pause;
+editor motion preview enables animation. Saved Vitrum routes receive it without
+rewriting objects. Shared track disposal releases geometry/materials.
+Five targeted tests pass, including determinism, bounded counts, unchanged base
+positions, time/speed uniforms and disposal. Production build passes (existing
+chunk warning). Browser sectors, editor and saved override checks pass with no
+page/HTTP errors; Rootwake capture inspected, rendered spores visible. Evidence:
+tmp/vitrum-spores-{browser,tests,build}.txt and tmp/vitrum/*.png.
+## 2026-11-03 - VITRUM-009 feedback pass
+Magnetic mode constrains vertical offset and follows the road's moving frame;
+it is not free-world inertial physics. Standard handling previously retained
+4.5 lateral grip and only 0.1 centrifugal scale even with assistance off.
+Magnetic standard handling now uses grip 1.6 at assist zero, interpolating to
+4.5 at full assistance, with centrifugal scale 0.3 (still multiplied by 1-assist).
+Classic handling and nonmagnetic coefficients are unchanged. A circular-track
+regression confirms no-input outward drift with assist off while adhesion holds.
+Spore sprites are larger/brighter, 42% placed over the road at height >=9;
+remaining spores cluster nearer the banks. Vitrum sun/fill are 0.28/0.25;
+fog is dark green 0x263e38, density 0.0024. Craft point lights replaced with
+soft additive 3.8x5.2 chassis glow planes, colored per craft. This is a visual
+halo attached to the craft, not projected area lighting; steep roll/jumps can
+separate it from the road. No extra dynamic light or shadow passes.
+Eight targeted tests pass, including both handling modes/player three-lap runs,
+CPU fields and magnetic drift. Production build passes (existing chunk warning).
+Browser sectors, editor save/reload and 232-object override pass. Final Rootwake
+image inspected: airborne spores and wide underglow visible. Hardware FPS and
+subjective steering balance remain playtest items. User saves untouched.
+Evidence: tmp/vitrum-009-{tests,browser,build}.txt and tmp/vitrum/Rootwake.png.
+## 2026-11-03 - BANK-001 steering bank independent of drift
+Removed lateralVelocity from both standard and classic roll targets. Previously
+outward drift could overpower steering bank and tip the craft to the opposite
+side. Standard local bank now follows -yawVelocity * 0.3 (same 0.38 cap and
+damping); classic retains its yaw term, spring and damping. Road-frame roll is
+still composed into the craft orientation. Side forces, grip, assistance and
+magnetic adhesion are unchanged. No reduction of road banking in this pass.
+24 tests pass, including new mirrored steering/opposing-drift/neutral-input
+checks in both modes, existing handling, magnetic drift and loop/camera tests.
+Production build passes with existing chunk warning. No browser visual playtest
+this pass; the behavioral regression is verified through production physics.
+Evidence: tmp/banking-tests.txt, tmp/banking-build.txt. No user saves modified.

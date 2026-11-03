@@ -45,7 +45,8 @@ export function stepClassicMomentum(ship, frame, dt) {
 
 export function stepClassicRoll(ship, dt) {
   const t = CLASSIC_HANDLING;
-  const target = clamp(-ship.yawVelocity * 0.2 - ship.lateralVelocity * 0.01, -0.28, 0.28);
+  // Sliding outward changes position, not the pilot's commanded bank.
+  const target = clamp(-ship.yawVelocity * 0.2, -0.28, 0.28);
   ship.classicRollVelocity += ((target - ship.roll) * t.rollSpring - ship.classicRollVelocity * t.rollDamping) * dt;
   ship.roll += ship.classicRollVelocity * dt;
 }

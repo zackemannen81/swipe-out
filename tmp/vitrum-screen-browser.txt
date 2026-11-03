@@ -1,0 +1,27 @@
+Loaded {
+  state: 'racing',
+  objects: 229,
+  loaded: 227,
+  errors: [],
+  draws: 1,
+  triangles: 1
+}
+PASS all three cutout maps decoded, five instanced layers / 1360 cards, clear curtain alpha
+PASS decoded forest maps, data/color spaces, anisotropy and 1024px sky reflections
+Rootwake { frame: 7269, calls: 219, triangles: 3342192, points: 127, lines: 7 }
+The Great Canopy { frame: 8085, calls: 136, triangles: 2180655, points: 127, lines: 0 }
+Glassroot Ascent { frame: 8901, calls: 83, triangles: 1144869, points: 127, lines: 0 }
+The Mycelium Veins { frame: 9669, calls: 100, triangles: 1390506, points: 127, lines: 0 }
+The Singing Ravine { frame: 10405, calls: 117, triangles: 1643933, points: 127, lines: 0 }
+Neural Bloom { frame: 11141, calls: 136, triangles: 2180521, points: 127, lines: 0 }
+The Canopy Return { frame: 11893, calls: 83, triangles: 1240549, points: 127, lines: 0 }
+Mycelium interior { frame: 12629, calls: 111, triangles: 1476778, points: 127, lines: 0 }
+Bloom approach { frame: 13349, calls: 138, triangles: 2230238, points: 127, lines: 0 }
+Bloom heart { frame: 14053, calls: 173, triangles: 2424754, points: 127, lines: 0 }
+Ravine bottom { frame: 14757, calls: 84, triangles: 1133475, points: 127, lines: 0 }
+Grounding canopy { frame: 15461, calls: 87, triangles: 1198907, points: 127, lines: 0 }
+Grounding ascent { frame: 16213, calls: 69, triangles: 868064, points: 127, lines: 0 }
+Grounding return { frame: 16949, calls: 84, triangles: 1255075, points: 127, lines: 0 }
+PASS editor loaded all GLBs
+PASS saved 232-object Vitrum override retains all manual objects and gets the scenery layers
+PASS sectors, all GLBs, editor export/save/reload; no page or HTTP errors

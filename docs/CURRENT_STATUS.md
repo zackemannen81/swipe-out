@@ -1,5 +1,137 @@
 # Current Status
 
+## 2026-11-03 — TEXTURE-001
+
+Editor image textures now respect transparent PNG/WebP backgrounds at opacity 1.
+Default Cutout mode clips transparent pixels while keeping correct object depth;
+Soft mode preserves fractional alpha for mist/glass. The preview uses a checkerboard.
+Shared race/editor materials retain front-face behavior and scrolling support.
+Track format v8 saves optional textureAlpha; versions 1–7 remain readable.
+31 relevant tests and production build pass. Isolated Chrome verifies actual
+pixel blending/depth, upload, undo/redo, exact file bytes, save/reload, export/import
+and Save & Test race with no page/HTTP errors. Source alpha is used directly;
+this does not remove a background painted into an opaque image. Soft intersecting
+surfaces retain the normal transparency-sorting limitations. No user saves changed.
+
+## 2026-11-03 — VITRUM-006
+
+Vitrum has a world-fixed image enclosure: three forest depth rings, hanging
+root curtains and crossed-plane undergrowth. Built-in image generation supplied
+three RGBA textures (8.86 MiB); final root-curtain-v2 removes the first draft's
+background matte. Five InstancedMesh draws, 1,360 cards / 2,720 triangles.
+The layer rebuilds from the current route in game/editor and also applies to
+saved Vitrum overrides; user object arrays and supplied media are untouched.
+Ten targeted tests and production build pass. Isolated Chrome verifies loaded
+textures and clear alpha gaps, seven sectors, export/save/reload, and exact
+preservation of a synthetic saved 232-object variant; no page/HTTP errors.
+Whole-frame captures 69–219 draws / 0.87–3.34M triangles, not device FPS evidence.
+Automatic scenery is tuned in src/vitrum-forest-screen.js, not editor objects.
+See VITRUM.md and public/images/stage2/parallax/PROMPTS.md.
+
+## 2026-11-03 — VITRUM-005
+
+All six supplied forest PBR families now texture the road and generated world.
+219 planted source-model instances have aligned bases, rooted soil supports and
+horizontal clearance against neighbouring road bends. Continuous banks close
+road-edge gaps. Added 2,244 understory clumps, 754 small mushrooms and 1,126
+violet flower sprays, merged into seven modules with eight material batches.
+Warm sunlight, green ambient fill, weathering and sky-reflecting road material.
+Six Vitrum tests pass, including actual foot support and 1,200-station/five-lane
+triangle clearance. Browser race/editor export-save-reload and build pass;
+all 227 GLBs and PBR maps decoded without page/HTTP errors. Views corresponding
+to the user's 22%, 26% and 79% screenshots inspected. Modules total 95.8 MiB;
+captures ~64–215 draws / 0.87–3.36M triangles, not target-device FPS testing.
+Old saved overrides are preserved and require restoring the built-in to adopt
+new placements (export user work first). Full suite not rerun; prior unrelated
+thruster expectation and unrelated working edits remain. See VITRUM.md.
+
+## 2026-11-03 — VITRUM-004
+
+Vitrum includes 23 layered tree settlements (345 pod dwellings), connecting
+footbridges, hanging lanterns and luminous ground plants. Same seven editable
+modules, now six material batches each; supplied models/panorama/music retained.
+Six Vitrum tests, actual mesh clearance, browser race/editor checks and build
+pass. Human visual preference and target-device frame time remain unverified.
+See VITRUM.md for content, download cost and verification boundaries.
+
+
+## 2026-11-03 — VITRUM-003
+
+Supplied backdrop_track-017.jpg is now the Vitrum panorama; track15.m4a is
+default and both track15/16 are selectable/persisted in Settings and pause.
+Build, 12 career/library tests and browser decode/playback/persistence checks
+pass. Original assets and existing music preferences preserved.
+
+
+## 2026-11-03 — VITRUM-002 (supersedes first environment pass)
+
+Vitrum now has seven connected organic architecture modules and 220 placements
+of the nine supplied models. Enclosed mycelium chamber, root bridges, ravine
+walls and drive-through Bloom; 229 editable objects total. Neutral temporary
+sky, separate concept preview; user owns final panorama/trailer/music.
+Six Vitrum tests, real mesh clearance and browser race/editor checks pass.
+Build passes; full suite 142/143 (existing thruster width mismatch untouched).
+Human/device playtests remain. See VITRUM.md for art pipeline and media handoff.
+
+
+## 2026-11-03 — VITRUM-001
+
+Track18, Vitrum Lithofyter · Neural Ascent, is selectable in Quick Race, Time
+Attack and the editor. Seven sectors, ~560-unit elevation range, organic deck,
+383 editable objects and all nine supplied GLBs. Three-lap player/CPU simulations
+and browser model/sector/editor checks pass. Production build passes. Full suite
+141/142: pre-existing Sacrifice thruster width mismatch remains untouched.
+Human handling/Elite balance and physical-device performance await playtesting.
+Music uses an existing temporary track; see VITRUM.md for details.
+
+
+## 2026-11-01 — THRUST-003
+
+Crimson hull and nozzle offsets enlarged 10%; reward exhaust 50% thicker.
+Blood-red exhaust now restricted to Sacrifice/Crimson; original accents restored
+for all other hulls/CPU. Six tests, build and browser bounds/colour/wake checks
+pass. Physics unchanged. This supersedes THRUST-002 global red exhaust.
+
+
+## 2026-11-01 — THRUST-002
+
+Player/CPU exhaust now blood red (#a80010, matching Necros rails), including
+sparks and warm cores. The sacrifice has four craft-local outlets; Crimson
+Citadel has five. Other hulls retain two. Loadout switches dispose old wakes
+and reset history. Five thruster tests, build and isolated live browser checks
+pass; racing screenshots inspected.
+
+
+## 2026-11-01 — REWARD-002
+
+The sacrifice is a bonus craft for completed 5/5 Race results with starting
+Swipeout handling, High (Auto) assist and Rookie CPU. Quick Race/Campaign only;
+no abandoned/DNF/TA/Cup award. Separate bonus trophy does not change five-goal
+Necros mastery or existing test grants. Build, 135 tests and controlled actual
+finish-path browser checks pass; garage/grid screenshots inspected.
+
+
+## 2026-11-01 — REWARD-001
+
+Necron Crimson Citadel and Vi lever inte reward all five Necros challenges.
+Local Vite development auto-grants only these rewards for author testing; no
+trophies are fabricated. Production fresh profiles remain locked. Music choice
+persists from Settings/pause and applies to races. 134 tests, build and isolated
+Chrome checks pass, including fresh production locks and model/audio loading.
+
+
+## 2026-11-01 — GARAGE-002
+
+User-supplied high-resolution garage.jpg now backs the menu and garage. Live
+craft remains customizable, gently hovering over the pictured platform. Fixed
+camera and aspect-preserving cover crop replace procedural hangar geometry.
+Build and isolated menu browser checks pass; desktop/landscape inspected.
+
+
+## 2026-11-01 — MOBILE-001
+
+Mobile touch controls retained and hardened: independently captured thrust/brake pointers with pause/blur cleanup; steering ignores paused/gyro touches. Gyro explicitly requests device permission, calibrates relative neutral grip over initial samples, handles missing readings and stale input. Production build and all 132 Node tests pass. Physical landscape-phone sensor response and steering direction remain unverified; existing desktop controls and unrelated working files untouched.
+
 ## 2026-11-01 — GIT-001
 
 Removed oversized Crimson Citadel and Urban Spire GLBs from unpublished Git
@@ -771,3 +903,62 @@ and race updater restores authored transforms and freezes on race pause.
 Version 7 track documents preserve settings and read versions 1–6. Necros-named
 tracks use blood-red edge/rail lights; saved track geometry is unchanged.
 See SCENERY_ANIMATION.md for controls, limitations and verification.
+
+## 2026-11-03 - VITRUM-007 lighting
+Vitrum sun intensity is 0.65 (formerly 3.4), hemisphere fill 0.48 (formerly
+1.95). Game and editor share the darker treatment. Thirteen world-fixed point
+lights follow route stations, alternating banks, 24 units above the road:
+amber with two mint accents, intensity 850, range 240, decay 2, no shadows.
+Automatic lighting also applies to saved Vitrum variants without rewriting
+objects. Forest image cards are tinted to 65% to match. Lighting adds fragment
+shading cost; target-device FPS is not measured. Generated lights are tuned in
+src/vitrum-lighting.js, separate from user-authored editable lights.
+## 2026-11-03 - VITRUM-008 biological atmosphere
+Vitrum now has three GPU-animated Points batches: 5,200 pollen, 650 larger spores
+and 350 speed streaks. Deterministic world positions follow the current route,
+biased toward banks and height; three denser zones align with canopy, mycelium
+and Bloom. Cyan, amber, yellow-green and rare violet, slow bounded drift/pulse,
+near-camera and 260-520 unit distance fade. Streaks fade in at speed 100-280
+world units/sec and use short screen-space elongated sprites (not motion blur).
+No new lights, textures or collision. Three extra draws; all 6,200 vertices are
+submitted in fixed batches, with distance fading in the shader. Target-device
+FPS is unmeasured. Existing scenery clock freezes animation on race pause;
+editor motion preview enables animation. Saved Vitrum routes receive it without
+rewriting objects. Shared track disposal releases geometry/materials.
+Five targeted tests pass, including determinism, bounded counts, unchanged base
+positions, time/speed uniforms and disposal. Production build passes (existing
+chunk warning). Browser sectors, editor and saved override checks pass with no
+page/HTTP errors; Rootwake capture inspected, rendered spores visible. Evidence:
+tmp/vitrum-spores-{browser,tests,build}.txt and tmp/vitrum/*.png.
+## 2026-11-03 - VITRUM-009 feedback pass
+Magnetic mode constrains vertical offset and follows the road's moving frame;
+it is not free-world inertial physics. Standard handling previously retained
+4.5 lateral grip and only 0.1 centrifugal scale even with assistance off.
+Magnetic standard handling now uses grip 1.6 at assist zero, interpolating to
+4.5 at full assistance, with centrifugal scale 0.3 (still multiplied by 1-assist).
+Classic handling and nonmagnetic coefficients are unchanged. A circular-track
+regression confirms no-input outward drift with assist off while adhesion holds.
+Spore sprites are larger/brighter, 42% placed over the road at height >=9;
+remaining spores cluster nearer the banks. Vitrum sun/fill are 0.28/0.25;
+fog is dark green 0x263e38, density 0.0024. Craft point lights replaced with
+soft additive 3.8x5.2 chassis glow planes, colored per craft. This is a visual
+halo attached to the craft, not projected area lighting; steep roll/jumps can
+separate it from the road. No extra dynamic light or shadow passes.
+Eight targeted tests pass, including both handling modes/player three-lap runs,
+CPU fields and magnetic drift. Production build passes (existing chunk warning).
+Browser sectors, editor save/reload and 232-object override pass. Final Rootwake
+image inspected: airborne spores and wide underglow visible. Hardware FPS and
+subjective steering balance remain playtest items. User saves untouched.
+Evidence: tmp/vitrum-009-{tests,browser,build}.txt and tmp/vitrum/Rootwake.png.
+## 2026-11-03 - BANK-001 steering bank independent of drift
+Removed lateralVelocity from both standard and classic roll targets. Previously
+outward drift could overpower steering bank and tip the craft to the opposite
+side. Standard local bank now follows -yawVelocity * 0.3 (same 0.38 cap and
+damping); classic retains its yaw term, spring and damping. Road-frame roll is
+still composed into the craft orientation. Side forces, grip, assistance and
+magnetic adhesion are unchanged. No reduction of road banking in this pass.
+24 tests pass, including new mirrored steering/opposing-drift/neutral-input
+checks in both modes, existing handling, magnetic drift and loop/camera tests.
+Production build passes with existing chunk warning. No browser visual playtest
+this pass; the behavioral regression is verified through production physics.
+Evidence: tmp/banking-tests.txt, tmp/banking-build.txt. No user saves modified.

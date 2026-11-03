@@ -1,0 +1,14 @@
+✔ Vitrum round-trips editor data, ships self-contained models and safe off-centre pads (172.2659ms)
+✔ Vitrum has seven ordered sectors, an upright smooth road, descent and no road overlap (27.0212ms)
+✔ Vitrum CPU field finishes three laps on Rookie, Pilot and Elite without recovery (4065.9366ms)
+✔ Vitrum player completes ordered three laps with both handling modes and assistance off (1179.9385ms)
+✔ all supplied GLB bounds leave the full racing corridor clear (1200.9846ms)
+✔ organic passages leave real ship space open inside their enclosing bounds (115275.0121ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 122353.3611

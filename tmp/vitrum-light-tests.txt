@@ -1,0 +1,17 @@
+✔ lights and motion roundtrip, legacy reading and malformed limits (12.1052ms)
+✔ light illumination, world-space motion, reset and transform reuse (9.3108ms)
+✔ spin and orbit retain authored pose at zero and loop without drift (3.3532ms)
+✔ Necros rail materials use blood red while other tracks retain cyan (132.6348ms)
+✔ embedded GLB clip loops independently and mixer is released on disposal (91.4975ms)
+✔ forest cutouts ship as real RGBA PNGs and use five instanced depth layers (94.7633ms)
+✔ full forest/curtain rectangles leave racing and camera space clear around the lap (390.4939ms)
+✔ world-fixed forest layers produce different parallax and adapt to edited routes (119.4278ms)
+✔ screen is Vitrum-only and its shared resources are released once on track disposal (233.16ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 9
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1277.8453

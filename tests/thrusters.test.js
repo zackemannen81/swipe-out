@@ -110,3 +110,24 @@ test('turns, teleports, camera along exhaust, and long runs keep geometry finite
   assert.equal(emitter.nozzles[0].samples.length, 128);
   env.system.dispose();
 });
+import {BLOOD_RED} from '../src/thrusters.js';
+test('reward hulls switch between four/five red outlets and factory twin outlets without leaked wakes',()=>{
+ const env=setup();const e=env.emitters[0];
+ for(const [ship,count] of [['the-sacrifice',4],['necron-crimson-citadel',5],['racer',2]]){
+  const old=e.nozzles;let disposed=0;old.forEach(n=>n.geometry.addEventListener('dispose',()=>disposed++));
+  env.system.configureCraft(e,ship);assert.equal(disposed,old.length);assert.equal(e.nozzles.length,count);assert.equal(e.color.getHex(),ship==='racer'?0xffffff:BLOOD_RED);assert.equal(env.scene.children.length,count+1);
+  e.craft.position.set(4,2,8);e.craft.rotation.y=Math.PI/2;step(env,1/60);
+  e.nozzles.forEach((n,i)=>{assert.ok(n.head.distanceTo(e.offsets[i].clone().applyQuaternion(e.craft.quaternion).add(e.craft.position))<1e-8);assert.ok(n.geometry.drawRange.count>0);assert.ok(n.geometry.attributes.position.array.every(Number.isFinite));});
+  env.system.reset();assert.ok(e.nozzles.every(n=>n.count===0&&n.geometry.drawRange.count===0));
+ }
+ env.system.dispose();assert.equal(env.scene.children.length,0);
+});
+
+test('only reward hulls use red; wider jets and enlarged Crimson outlets retain original CPU accents',()=>{
+ const scene=new THREE.Scene(),system=new ThrusterSystem(scene);
+ const cyan=new THREE.Color(0x43f6ea),blue=new THREE.Color(0x2345ff);
+ const player=system.addCraft(new THREE.Group(),cyan),cpu=system.addCraft(new THREE.Group(),blue);
+ system.configureCraft(player,'the-sacrifice');assert.equal(player.widthScale,.675);assert.equal(player.color.getHex(),BLOOD_RED);
+ system.configureCraft(player,'necron-crimson-citadel');assert.equal(player.widthScale,.54);assert.ok(Math.abs(player.offsets[2].z-(-1.5*1.1))<1e-9);
+ system.configureCraft(player,'racer');assert.equal(player.color.getHex(),cyan.getHex());assert.equal(cpu.color.getHex(),blue.getHex());assert.equal(player.nozzles.length,2);system.dispose();
+});

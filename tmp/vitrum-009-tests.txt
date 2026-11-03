@@ -1,0 +1,15 @@
+✔ spores have bounded deterministic batches, immutable bases and pauseable uniforms (105.2877ms)
+✔ Vitrum round-trips editor data, ships self-contained models and safe off-centre pads (452.0324ms)
+✔ Vitrum has seven ordered sectors, an upright smooth road, descent and no road overlap (28.9024ms)
+✔ Vitrum CPU field finishes three laps on Rookie, Pilot and Elite without recovery (4530.9294ms)
+✔ Vitrum player completes ordered three laps with both handling modes and assistance off (1246.6757ms)
+✔ all supplied GLB bounds leave the full racing corridor clear (1506.0571ms)
+✔ organic passages leave real ship space open inside their enclosing bounds (27200.0402ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 35552.3887

@@ -1,7 +1,7 @@
 import { validatePads } from './track-pads.js';
-// Version 7 adds light sources and object motion; previous versions remain readable.
+// Version 8 adds texture alpha modes; previous versions remain readable.
 export const TRACK_FORMAT = 'swipe-out-track';
-export const TRACK_VERSION = 7;
+export const TRACK_VERSION = 8;
 // Cap portable JSON exports/imports, not the size of GLBs referenced via /models/.
 // Prefer external GLB paths for large models; the limit is only for embedded data.
 export const MAX_TRACK_BYTES = 64 * 1024 * 1024;
@@ -74,7 +74,7 @@ export function normalizeTrack(input) {
   const objects = sourceObjects.map((object, i) => {
     const path = `track.objects[${i}]`;
     record(object, path);
-    knownFields(object, ['id', 'type', 'position', 'rotation', 'scale', 'texture', 'animType', 'opacity', 'color', 'emissive', 'model', 'lightIntensity', 'lightRange', 'motion', 'playClip', 'clipSpeed'], path);
+    knownFields(object, ['id', 'type', 'position', 'rotation', 'scale', 'texture', 'textureAlpha', 'animType', 'opacity', 'color', 'emissive', 'model', 'lightIntensity', 'lightRange', 'motion', 'playClip', 'clipSpeed'], path);
     if (!['box', 'sphere', 'cylinder', 'cone', 'glb', 'light'].includes(object.type)) fail(`${path}.type`, 'expected box, sphere, cylinder, cone or glb.');
     const animType = object.animType ?? 'none';
     if (!['none', 'scroll-x', 'scroll-y', 'pulse'].includes(animType)) fail(`${path}.animType`, 'unknown animation.');
@@ -88,6 +88,10 @@ export function normalizeTrack(input) {
       // Older editor builds sometimes serialized opacity with a decimal comma.
       opacity: number(typeof object.opacity === 'string' ? Number(object.opacity.replace(',', '.')) : (object.opacity ?? 1), `${path}.opacity`, 0, 1),
     };
+    if (object.textureAlpha !== undefined) {
+      if (!['cutout', 'blend'].includes(object.textureAlpha)) fail(`${path}.textureAlpha`, 'expected cutout or blend.');
+      result.textureAlpha = object.textureAlpha;
+    }
     if (object.type === 'glb') {
       if (typeof object.model !== 'string' || !(/^(?:\/[a-z0-9_./ -]+\.glb|data:model\/gltf-binary;base64,[a-z0-9+/=]+)$/i.test(object.model)) || object.model.includes('..'))
         fail(`${path}.model`, 'use /models/name.glb or an embedded GLB.');
@@ -199,11 +203,12 @@ export function decodeTrack(value) {
   record(value, 'file');
   if ('format' in value || 'version' in value || 'track' in value) {
     if (value.format !== TRACK_FORMAT) fail('file.format', `expected ${TRACK_FORMAT}.`);
-    if (![1, 2, 3, 4, 5, 6, TRACK_VERSION].includes(value.version)) fail('file.version', `unsupported version ${String(value.version)}; this editor supports versions 1–${TRACK_VERSION}.`);
+    if (![1, 2, 3, 4, 5, 6, 7, TRACK_VERSION].includes(value.version)) fail('file.version', `unsupported version ${String(value.version)}; this editor supports versions 1–${TRACK_VERSION}.`);
     knownFields(value, ['format', 'version', 'track'], 'file');
     if (value.version === 1 && (value.track?.magnetic !== undefined || value.track?.gaps !== undefined)) fail('file.version', 'magnetic road and gaps require version 2.');
     if (value.version < 3 && value.track?.branches !== undefined) fail('file.version', 'branches require version 3.');
     if (value.version < 4 && ['pointWidths','pads','roadStyle'].some(k=>value.track?.[k] !== undefined)) fail('file.version','widths, pads and road styles require version 4.');
+    if(value.version<8 && value.track?.objects?.some(o=>o.textureAlpha!==undefined))fail('file.version','texture alpha modes require version 8.');
     if(value.version<7 && value.track?.objects?.some(o=>o.type==='light'||o.motion!==undefined||o.playClip!==undefined||o.clipSpeed!==undefined))fail('file.version','lights and motion require version 7.');
     if(value.version<6 && value.track?.objects?.some(o=>o.type==='glb'))fail('file.version','GLB scenery requires version 6.');
     if(value.version<5 && value.track?.pads?.some(p=>p.type==='weapon'))fail('file.version','weapon pads require version 5.');

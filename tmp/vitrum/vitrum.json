@@ -1,0 +1,5665 @@
+{
+  "format": "swipe-out-track",
+  "version": 8,
+  "track": {
+    "id": "vitrum-neural-ascent",
+    "name": "Vitrum Lithofyter · Neural Ascent",
+    "width": 26,
+    "horizontalScale": 1,
+    "centerline": [
+      [
+        0,
+        40,
+        -900,
+        21.32117456661925
+      ],
+      [
+        0,
+        40,
+        -640,
+        0.17299962646359246
+      ],
+      [
+        0,
+        48,
+        -360,
+        -15.740463309111682
+      ],
+      [
+        70,
+        70,
+        -110,
+        -21.53071412666079
+      ],
+      [
+        260,
+        110,
+        70,
+        -13.119273705416111
+      ],
+      [
+        490,
+        160,
+        160,
+        -13.167676308153439
+      ],
+      [
+        730,
+        225,
+        100,
+        -4.62406756581932
+      ],
+      [
+        890,
+        290,
+        -100,
+        2.0801472929274247
+      ],
+      [
+        960,
+        355,
+        -350,
+        45.59809077901933
+      ],
+      [
+        1110,
+        420,
+        -550,
+        36.497733378006
+      ],
+      [
+        1360,
+        485,
+        -590,
+        25.161004830091457
+      ],
+      [
+        1580,
+        540,
+        -450,
+        16.72916487016167
+      ],
+      [
+        1690,
+        580,
+        -210,
+        11.207076739527585
+      ],
+      [
+        1660,
+        600,
+        70,
+        3.6919005899848916
+      ],
+      [
+        1530,
+        590,
+        330,
+        2.198623837041273
+      ],
+      [
+        1320,
+        560,
+        550,
+        -8.406497116200729
+      ],
+      [
+        1080,
+        485,
+        740,
+        -8.26739355292138
+      ],
+      [
+        820,
+        340,
+        900,
+        -6.151843950107084
+      ],
+      [
+        530,
+        175,
+        1030,
+        -1.8428582075611564
+      ],
+      [
+        250,
+        75,
+        1100,
+        10.965012286646559
+      ],
+      [
+        -50,
+        55,
+        1080,
+        17.066278915595763
+      ],
+      [
+        -300,
+        70,
+        950,
+        16.074061958989653
+      ],
+      [
+        -460,
+        100,
+        700,
+        12.496870295588458
+      ],
+      [
+        -490,
+        145,
+        410,
+        -32.19277929141224
+      ],
+      [
+        -650,
+        180,
+        160,
+        -21.279077393923117
+      ],
+      [
+        -860,
+        185,
+        -60,
+        13.218359243125644
+      ],
+      [
+        -970,
+        160,
+        -330,
+        14.654683258706122
+      ],
+      [
+        -940,
+        110,
+        -600,
+        19.441197936152236
+      ],
+      [
+        -760,
+        65,
+        -830,
+        19.519152901972255
+      ],
+      [
+        -500,
+        40,
+        -980,
+        15.165078389308844
+      ],
+      [
+        -220,
+        40,
+        -1050,
+        19.639048091363353
+      ],
+      [
+        -50,
+        40,
+        -1030,
+        22.381393456038666
+      ]
+    ],
+    "objects": [
+      {
+        "type": "sphere",
+        "position": [
+          400,
+          -230,
+          50
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          5000,
+          260,
+          4300
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "id": "vitrum-0",
+        "color": 2113067
+      },
+      {
+        "type": "glb",
+        "position": [
+          -34.745763756125896,
+          39.52991416608099,
+          -813.2449555738667
+        ],
+        "rotation": [
+          0.018927169293005943,
+          0.0021034429319439067,
+          12.682919835584011
+        ],
+        "scale": [
+          15,
+          15,
+          15
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/mushroom_lamp_lowpoly.glb",
+        "id": "vitrum-1"
+      },
+      {
+        "type": "glb",
+        "position": [
+          -48.44518308982711,
+          40.35929130171958,
+          -800.4293685909532
+        ],
+        "rotation": [
+          -27.33286227449318,
+          63.904081629107125,
+          29.942529554533763
+        ],
+        "scale": [
+          22,
+          22,
+          22
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/bio_flora_plant_lowpo.glb",
+        "id": "vitrum-2"
+      },
+      {
+        "type": "glb",
+        "position": [
+          -36.56931719352451,
+          45.953461337906816,
+          -787.2453665519306
+        ],
+        "rotation": [
+          -167.17271552029035,
+          44.56857588474155,
+          162.0500324064718
+        ],
+        "scale": [
+          29,
+          29,
+          29
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/lantern_flower_lowpol.glb",
+        "id": "vitrum-3"
+      },
+      {
+        "type": "glb",
+        "position": [
+          -48.069380347522745,
+          37.00994279793853,
+          -774.4330887041706
+        ],
+        "rotation": [
+          175.20139112656514,
+          -20.466401878171105,
+          166.44680473583117
+        ],
+        "scale": [
+          15,
+          15,
+          15
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/mushroom_lamp_lowpoly.glb",
+        "id": "vitrum-4"
+      },
+      {
+        "type": "glb",
+        "position": [
+          -94.9667265755014,
+          104.21060367766243,
+          -794.6426525245336
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          180,
+          180,
+          180
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/canopy_spire_lowpoly.glb",
+        "id": "vitrum-5"
+      },
+      {
+        "type": "glb",
+        "position": [
+          36.50330142519353,
+          46.9583080286382,
+          -597.9592508468602
+        ],
+        "rotation": [
+          -0.347792781944358,
+          31.003671545881684,
+          -1.4112387691808281
+        ],
+        "scale": [
+          15,
+          15,
+          15
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/mushroom_lamp_lowpoly.glb",
+        "id": "vitrum-6"
+      },
+      {
+        "type": "glb",
+        "position": [
+          49.16744838894542,
+          50.72061130699878,
+          -584.6273861896808
+        ],
+        "rotation": [
+          170.39508320146567,
+          81.8984430685351,
+          -171.38519704708804
+        ],
+        "scale": [
+          22,
+          22,
+          22
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/bio_flora_plant_lowpo.glb",
+        "id": "vitrum-7"
+      },
+      {
+        "type": "glb",
+        "position": [
+          35.83151075513159,
+          54.13604613189733,
+          -572.1020524732169
+        ],
+        "rotation": [
+          178.60135589730046,
+          14.985235508552769,
+          -178.7478213921886
+        ],
+        "scale": [
+          29,
+          29,
+          29
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/lantern_flower_lowpol.glb",
+        "id": "vitrum-8"
+      },
+      {
+        "type": "glb",
+        "position": [
+          48.284194760286546,
+          47.88502532796051,
+          -558.5823243499425
+        ],
+        "rotation": [
+          -179.52647704338668,
+          -51.99500080858035,
+          -178.03528257558654
+        ],
+        "scale": [
+          15,
+          15,
+          15
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/mushroom_lamp_lowpoly.glb",
+        "id": "vitrum-9"
+      },
+      {
+        "type": "glb",
+        "position": [
+          -36.73370128475697,
+          63.205346403352905,
+          -382.3888759268514
+        ],
+        "rotation": [
+          20.57111359063768,
+          59.39104299599485,
+          -28.751789219679416
+        ],
+        "scale": [
+          15,
+          15,
+          15
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/mushroom_lamp_lowpoly.glb",
+        "id": "vitrum-10"
+      },
+      {
+        "type": "glb",
+        "position": [
+          -47.04000098251499,
+          70.0984828094184,
+          -368.48038299942687
+        ],
+        "rotation": [
+          158.79402755913816,
+          48.34853912497236,
+          -158.37522495647286
+        ],
+        "scale": [
+          22,
+          22,
+          22
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/bio_flora_plant_lowpo.glb",
+        "id": "vitrum-11"
+      },
+      {
+        "type": "glb",
+        "position": [
+          -41.17253996185787,
+          71.03455364861162,
+          -349.2011108052875
+        ],
+        "rotation": [
+          179.46610928071615,
+          -16.06649011522128,
+          -165.23369950412126
+        ],
+        "scale": [
+          29,
+          29,
+          29
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/lantern_flower_lowpol.glb",
+        "id": "vitrum-12"
+      },
+      {
+        "type": "glb",
+        "position": [
+          -44.91911511710223,
+          68.24821357684198,
+          -342.41806771536733
+        ],
+        "rotation": [
+          -119.36201695310126,
+          -74.46633245287812,
+          -113.85746642818398
+        ],
+        "scale": [
+          15,
+          15,
+          15
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/mushroom_lamp_lowpoly.glb",
+        "id": "vitrum-13"
+      },
+      {
+        "type": "glb",
+        "position": [
+          -96.65405235279682,
+          159.61554589082857,
+          -356.5034067669797
+        ],
+        "rotation": [
+          -180,
+          82.00000000000003,
+          -180
+        ],
+        "scale": [
+          180,
+          180,
+          180
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/canopy_spire_lowpoly.glb",
+        "id": "vitrum-14"
+      },
+      {
+        "type": "glb",
+        "position": [
+          84.28240219405271,
+          57.86078352988714,
+          -198.32885567174884
+        ],
+        "rotation": [
+          93.74702955513082,
+          72.46770500868897,
+          -105.69970830679945
+        ],
+        "scale": [
+          15,
+          15,
+          15
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/mushroom_lamp_lowpoly.glb",
+        "id": "vitrum-15"
+      },
+      {
+        "type": "glb",
+        "position": [
+          92.76656238055754,
+          57.613794536775124,
+          -182.4256306342343
+        ],
+        "rotation": [
+          161.9036322020023,
+          17.310243831884833,
+          -162.31624017404525
+        ],
+        "scale": [
+          22,
+          22,
+          22
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/bio_flora_plant_lowpo.glb",
+        "id": "vitrum-16"
+      },
+      {
+        "type": "glb",
+        "position": [
+          97.9185866766612,
+          66.67946718867658,
+          -171.73645339232684
+        ],
+        "rotation": [
+          -174.2967427370759,
+          -46.13930962406205,
+          -155.25796874363368
+        ],
+        "scale": [
+          29,
+          29,
+          29
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/lantern_flower_lowpol.glb",
+        "id": "vitrum-17"
+      },
+      {
+        "type": "glb",
+        "position": [
+          100.98745842975838,
+          57.07935916333504,
+          -157.53994844481664
+        ],
+        "rotation": [
+          -43.540124071163184,
+          -59.42912786115998,
+          -34.764036701961615
+        ],
+        "scale": [
+          15,
+          15,
+          15
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/mushroom_lamp_lowpoly.glb",
+        "id": "vitrum-18"
+      },
+      {
+        "type": "glb",
+        "position": [
+          131.62347216439144,
+          107.52896100071256,
+          26.52350237027434
+        ],
+        "rotation": [
+          152.03562932199685,
+          54.58342141018437,
+          -170.03399833750314
+        ],
+        "scale": [
+          15,
+          15,
+          15
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/mushroom_lamp_lowpoly.glb",
+        "id": "vitrum-19"
+      },
+      {
+        "type": "glb",
+        "position": [
+          131.08786209704556,
+          116.77404250193649,
+          41.087403799241066
+        ],
+        "rotation": [
+          161.4069286054341,
+          -11.944758438747948,
+          -174.11609808741764
+        ],
+        "scale": [
+          22,
+          22,
+          22
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/bio_flora_plant_lowpo.glb",
+        "id": "vitrum-20"
+      },
+      {
+        "type": "glb",
+        "position": [
+          150.123055626939,
+          117.76809708789484,
+          53.08263751790766
+        ],
+        "rotation": [
+          -172.5093532418209,
+          -77.6069262788052,
+          -152.1399912776613
+        ],
+        "scale": [
+          29,
+          29,
+          29
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/lantern_flower_lowpol.glb",
+        "id": "vitrum-21"
+      },
+      {
+        "type": "glb",
+        "position": [
+          158.60265871716393,
+          117.63648086506609,
+          50.53685512709215
+        ],
+        "rotation": [
+          -23.684160230844537,
+          -33.79921890445593,
+          -6.931993626261721
+        ],
+        "scale": [
+          15,
+          15,
+          15
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/mushroom_lamp_lowpoly.glb",
+        "id": "vitrum-22"
+      },
+      {
+        "type": "glb",
+        "position": [
+          89.17938830631819,
+          208.06581326971735,
+          103.69356414880035
+        ],
+        "rotation": [
+          -180,
+          -15.999999999999991,
+          -180
+        ],
+        "scale": [
+          180,
+          180,
+          180
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/canopy_spire_lowpoly.glb",
+        "id": "vitrum-23"
+      },
+      {
+        "type": "glb",
+        "position": [
+          -46.15343511164431,
+          60.27985804090991,
+          -819.641007586982
+        ],
+        "rotation": [
+          90.09076224475272,
+          -74.54733893240753,
+          89.9092377552474
+        ],
+        "scale": [
+          65,
+          65,
+          65
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/spire_orb_holder_lowp.glb",
+        "id": "vitrum-24"
+      },
+      {
+        "type": "glb",
+        "position": [
+          -93.03489321765508,
+          54.06886935898658,
+          -613.7103140799445
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          130,
+          80,
+          90
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/bridge_segment_lowpol.glb",
+        "id": "vitrum-25"
+      },
+      {
+        "type": "glb",
+        "position": [
+          51.099085812126646,
+          81.15329689162775,
+          -801.3544949729585
+        ],
+        "rotation": [
+          -89.9092377552474,
+          74.54733893240753,
+          90.09076224475272
+        ],
+        "scale": [
+          65,
+          65,
+          65
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/spire_orb_holder_lowp.glb",
+        "id": "vitrum-26"
+      },
+      {
+        "type": "glb",
+        "position": [
+          91.60676558323274,
+          56.29655282825949,
+          -610.3786242430523
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          130,
+          80,
+          90
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/bridge_segment_lowpol.glb",
+        "id": "vitrum-27"
+      },
+      {
+        "type": "glb",
+        "position": [
+          311.067156228639,
+          141.87607145724607,
+          150.3128613050795
+        ],
+        "rotation": [
+          -20.820596753529948,
+          -0.3975030084566204,
+          2.1633848247878174
+        ],
+        "scale": [
+          15,
+          15,
+          15
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/mushroom_lamp_lowpoly.glb",
+        "id": "vitrum-28"
+      },
+      {
+        "type": "glb",
+        "position": [
+          315.2789842203154,
+          150.98264822823583,
+          164.45646637215052
+        ],
+        "rotation": [
+          -25.82149837350857,
+          66.50801612614279,
+          5.433897646842632
+        ],
+        "scale": [
+          22,
+          22,
+          22
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/bio_flora_plant_lowpo.glb",
+        "id": "vitrum-29"
+      },
+      {
+        "type": "glb",
+        "position": [
+          336.9378078563139,
+          153.02450974363362,
+          170.48734051651036
+        ],
+        "rotation": [
+          161.43420681738314,
+          46.354924723028745,
+          176.86477422262382
+        ],
+        "scale": [
+          29,
+          29,
+          29
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/lantern_flower_lowpol.glb",
+        "id": "vitrum-30"
+      },
+      {
+        "type": "glb",
+        "position": [
+          345.9716994957198,
+          152.77552553977222,
+          166.53025847484625
+        ],
+        "rotation": [
+          158.35139631599424,
+          -20.58686323239493,
+          177.6890156550941
+        ],
+        "scale": [
+          15,
+          15,
+          15
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/mushroom_lamp_lowpoly.glb",
+        "id": "vitrum-31"
+      },
+      {
+        "type": "glb",
+        "position": [
+          298.2920242406379,
+          243.8552687283812,
+          211.7030072566837
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          180,
+          180,
+          180
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/canopy_spire_lowpoly.glb",
+        "id": "vitrum-32"
+      },
+      {
+        "type": "glb",
+        "position": [
+          519.0520636241728,
+          161.53579642155424,
+          114.24899613123905
+        ],
+        "rotation": [
+          -30.260863184921504,
+          26.750976194201545,
+          17.79694346504835
+        ],
+        "scale": [
+          15,
+          15,
+          15
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/mushroom_lamp_lowpoly.glb",
+        "id": "vitrum-33"
+      },
+      {
+        "type": "glb",
+        "position": [
+          538.5299673692466,
+          162.51496712372025,
+          108.4984733464297
+        ],
+        "rotation": [
+          -129.46567723820223,
+          73.44010682145482,
+          106.74497889106618
+        ],
+        "scale": [
+          22,
+          22,
+          22
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/bio_flora_plant_lowpo.glb",
+        "id": "vitrum-34"
+      },
+      {
+        "type": "glb",
+        "position": [
+          545.4892033524704,
+          173.89097945019043,
+          106.65704943270872
+        ],
+        "rotation": [
+          163.05961617963357,
+          17.393669634107248,
+          163.38076660092906
+        ],
+        "scale": [
+          29,
+          29,
+          29
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/lantern_flower_lowpol.glb",
+        "id": "vitrum-35"
+      },
+      {
+        "type": "glb",
+        "position": [
+          564.4508495611414,
+          165.93735248279236,
+          106.61139202842105
+        ],
+        "rotation": [
+          140.58960487021685,
+          -46.4618287731589,
+          156.6578701950417
+        ],
+        "scale": [
+          15,
+          15,
+          15
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/mushroom_lamp_lowpoly.glb",
+        "id": "vitrum-36"
+      },
+      {
+        "type": "glb",
+        "position": [
+          747.9369798038229,
+          243.74404862685537,
+          139.44343803503602
+        ],
+        "rotation": [
+          -46.58497707026789,
+          51.39227572163207,
+          42.71560956509415
+        ],
+        "scale": [
+          15,
+          15,
+          15
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/mushroom_lamp_lowpoly.glb",
+        "id": "vitrum-37"
+      },
+      {
+        "type": "glb",
+        "position": [
+          762.336500383572,
+          254.97419601890192,
+          142.3562441619984
+        ],
+        "rotation": [
+          -161.09422834973853,
+          46.66439916618656,
+          141.91772871747014
+        ],
+        "scale": [
+          22,
+          22,
+          22
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/bio_flora_plant_lowpo.glb",
+        "id": "vitrum-38"
+      },
+      {
+        "type": "glb",
+        "position": [
+          785.8082344566386,
+          256.4232233757623,
+          135.03797933441436
+        ],
+        "rotation": [
+          163.37777273148868,
+          -12.300712339362285,
+          154.32714789875007
+        ],
+        "scale": [
+          29,
+          29,
+          29
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/lantern_flower_lowpol.glb",
+        "id": "vitrum-39"
+      },
+      {
+        "type": "glb",
+        "position": [
+          773.8858450909828,
+          258.7377393541358,
+          121.3509502257368
+        ],
+        "rotation": [
+          100.58484262018196,
+          -63.35869123648548,
+          109.26805273894216
+        ],
+        "scale": [
+          15,
+          15,
+          15
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/mushroom_lamp_lowpoly.glb",
+        "id": "vitrum-40"
+      },
+      {
+        "type": "glb",
+        "position": [
+          812.8696845724706,
+          350.40540248241007,
+          197.43354384676667
+        ],
+        "rotation": [
+          -180,
+          82.00000000000003,
+          -180
+        ],
+        "scale": [
+          180,
+          180,
+          180
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/canopy_spire_lowpoly.glb",
+        "id": "vitrum-41"
+      },
+      {
+        "type": "glb",
+        "position": [
+          818.6223923849346,
+          266.32514916542425,
+          -73.45274066802659
+        ],
+        "rotation": [
+          -96.99832710787953,
+          64.29282398547645,
+          96.18099776087267
+        ],
+        "scale": [
+          15,
+          15,
+          15
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/mushroom_lamp_lowpoly.glb",
+        "id": "vitrum-42"
+      },
+      {
+        "type": "glb",
+        "position": [
+          814.4417793971361,
+          267.6169577590793,
+          -91.8412530696526
+        ],
+        "rotation": [
+          -171.20838221462677,
+          18.00297016278826,
+          153.0346843563273
+        ],
+        "scale": [
+          22,
+          22,
+          22
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/bio_flora_plant_lowpo.glb",
+        "id": "vitrum-43"
+      },
+      {
+        "type": "glb",
+        "position": [
+          829.7458712572862,
+          278.6007646484386,
+          -95.89698970423045
+        ],
+        "rotation": [
+          155.0618980122013,
+          -41.261679096733964,
+          144.99164357208085
+        ],
+        "scale": [
+          29,
+          29,
+          29
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/lantern_flower_lowpol.glb",
+        "id": "vitrum-44"
+      },
+      {
+        "type": "glb",
+        "position": [
+          838.2026938611334,
+          270.8546534399071,
+          -105.55373859276254
+        ],
+        "rotation": [
+          43.98589485612247,
+          -55.53174844663099,
+          49.64033049122223
+        ],
+        "scale": [
+          15,
+          15,
+          15
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/mushroom_lamp_lowpoly.glb",
+        "id": "vitrum-45"
+      },
+      {
+        "type": "glb",
+        "position": [
+          963.6187923231442,
+          330.60612043243157,
+          -225.16491146728544
+        ],
+        "rotation": [
+          -165.92879811085817,
+          56.003475916671825,
+          -179.94963160661257
+        ],
+        "scale": [
+          15,
+          15,
+          15
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/mushroom_lamp_lowpoly.glb",
+        "id": "vitrum-46"
+      },
+      {
+        "type": "glb",
+        "position": [
+          978.9757122136199,
+          336.72529639693835,
+          -234.05155948085383
+        ],
+        "rotation": [
+          -165.88156653235419,
+          -10.99651247524516,
+          -179.97131010663006
+        ],
+        "scale": [
+          22,
+          22,
+          22
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/bio_flora_plant_lowpo.glb",
+        "id": "vitrum-47"
+      },
+      {
+        "type": "glb",
+        "position": [
+          977.5758051834589,
+          343.28727398974075,
+          -239.97933943830122
+        ],
+        "rotation": [
+          -165.75458195343984,
+          -77.99648126629113,
+          -179.8645819164493
+        ],
+        "scale": [
+          29,
+          29,
+          29
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/lantern_flower_lowpol.glb",
+        "id": "vitrum-48"
+      },
+      {
+        "type": "glb",
+        "position": [
+          984.2186483145273,
+          339.69148660363294,
+          -259.56389508056634
+        ],
+        "rotation": [
+          14.093238315869982,
+          -35.00348133255435,
+          -0.03438227542592334
+        ],
+        "scale": [
+          15,
+          15,
+          15
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/mushroom_lamp_lowpoly.glb",
+        "id": "vitrum-49"
+      },
+      {
+        "type": "glb",
+        "position": [
+          1038.9261254840417,
+          411.6062027255933,
+          -225.7232049327109
+        ],
+        "rotation": [
+          -180,
+          -15.999999999999991,
+          -180
+        ],
+        "scale": [
+          180,
+          180,
+          180
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/canopy_spire_lowpoly.glb",
+        "id": "vitrum-50"
+      },
+      {
+        "type": "glb",
+        "position": [
+          310.4448468979681,
+          164.37737140376697,
+          176.77423740496775
+        ],
+        "rotation": [
+          79.71632484948154,
+          -88.4598380244678,
+          100.28367515051751
+        ],
+        "scale": [
+          65,
+          65,
+          65
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/spire_orb_holder_lowp.glb",
+        "id": "vitrum-51"
+      },
+      {
+        "type": "glb",
+        "position": [
+          488.8778635535562,
+          177.61565658065336,
+          210.73374518367655
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          130,
+          80,
+          90
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/bridge_segment_lowpol.glb",
+        "id": "vitrum-52"
+      },
+      {
+        "type": "glb",
+        "position": [
+          362.0986350828921,
+          139.9658558626482,
+          43.47129579333257
+        ],
+        "rotation": [
+          -100.28367515051751,
+          88.4598380244678,
+          79.71632484948132
+        ],
+        "scale": [
+          65,
+          65,
+          65
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/spire_orb_holder_lowp.glb",
+        "id": "vitrum-53"
+      },
+      {
+        "type": "glb",
+        "position": [
+          564.7232617738441,
+          161.07150690479128,
+          82.58411899037782
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          130,
+          80,
+          90
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/bridge_segment_lowpol.glb",
+        "id": "vitrum-54"
+      },
+      {
+        "type": "glb",
+        "position": [
+          1042.4392423801078,
+          371.1518833646531,
+          -397.0611195588094
+        ],
+        "rotation": [
+          22.577049480003346,
+          -1.9850011898909317,
+          -9.920461751388286
+        ],
+        "scale": [
+          15,
+          15,
+          15
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/mushroom_lamp_lowpoly.glb",
+        "id": "vitrum-55"
+      },
+      {
+        "type": "glb",
+        "position": [
+          1051.1909359920612,
+          372.88930499265166,
+          -407.9520271245642
+        ],
+        "rotation": [
+          43.17728949346958,
+          63.209826499526734,
+          -22.457729028033096
+        ],
+        "scale": [
+          22,
+          22,
+          22
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/bio_flora_plant_lowpo.glb",
+        "id": "vitrum-56"
+      },
+      {
+        "type": "glb",
+        "position": [
+          1058.1447623594754,
+          383.5279160258372,
+          -416.76673093266334
+        ],
+        "rotation": [
+          -167.90701726285764,
+          47.07286435966731,
+          -165.35642370083923
+        ],
+        "scale": [
+          29,
+          29,
+          29
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/lantern_flower_lowpol.glb",
+        "id": "vitrum-57"
+      },
+      {
+        "type": "glb",
+        "position": [
+          1064.3928503522234,
+          376.17695765021955,
+          -430.3588726920013
+        ],
+        "rotation": [
+          -153.68591845503326,
+          -18.690776774002618,
+          -169.52751171803052
+        ],
+        "scale": [
+          15,
+          15,
+          15
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/mushroom_lamp_lowpoly.glb",
+        "id": "vitrum-58"
+      },
+      {
+        "type": "glb",
+        "position": [
+          1103.8047574141951,
+          432.10213495797325,
+          -388.56317035805023
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          180,
+          180,
+          180
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/canopy_spire_lowpoly.glb",
+        "id": "vitrum-59"
+      },
+      {
+        "type": "glb",
+        "position": [
+          1127.6427202244183,
+          451.6982039842712,
+          -605.8434614431702
+        ],
+        "rotation": [
+          23.761232951928136,
+          32.1819449804376,
+          6.588162233540802
+        ],
+        "scale": [
+          15,
+          15,
+          15
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/mushroom_lamp_lowpoly.glb",
+        "id": "vitrum-60"
+      },
+      {
+        "type": "glb",
+        "position": [
+          1131.8592798296206,
+          462.89820603304673,
+          -618.2336582952487
+        ],
+        "rotation": [
+          -122.1975768143268,
+          79.12524665316542,
+          149.02262800873612
+        ],
+        "scale": [
+          22,
+          22,
+          22
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/bio_flora_plant_lowpo.glb",
+        "id": "vitrum-61"
+      },
+      {
+        "type": "glb",
+        "position": [
+          1161.737492671974,
+          464.0929308260035,
+          -620.2866276023068
+        ],
+        "rotation": [
+          -151.36819022780506,
+          13.580960356846235,
+          174.2667115208228
+        ],
+        "scale": [
+          29,
+          29,
+          29
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/lantern_flower_lowpol.glb",
+        "id": "vitrum-62"
+      },
+      {
+        "type": "glb",
+        "position": [
+          1161.0751816739987,
+          466.43194334588213,
+          -616.2455214137645
+        ],
+        "rotation": [
+          -160.15545997693502,
+          -52.99087610725555,
+          170.71654507628537
+        ],
+        "scale": [
+          15,
+          15,
+          15
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/mushroom_lamp_lowpoly.glb",
+        "id": "vitrum-63"
+      },
+      {
+        "type": "glb",
+        "position": [
+          1334.230087765823,
+          472.80410970008813,
+          -547.7723253322232
+        ],
+        "rotation": [
+          -14.133728496043995,
+          59.64227588480528,
+          37.59697327192811
+        ],
+        "scale": [
+          15,
+          15,
+          15
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/mushroom_lamp_lowpoly.glb",
+        "id": "vitrum-64"
+      },
+      {
+        "type": "glb",
+        "position": [
+          1350.271772484269,
+          474.3448069058728,
+          -541.446075064753
+        ],
+        "rotation": [
+          -141.69320197305206,
+          44.89107224064232,
+          154.19953986823168
+        ],
+        "scale": [
+          22,
+          22,
+          22
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/bio_flora_plant_lowpo.glb",
+        "id": "vitrum-65"
+      },
+      {
+        "type": "glb",
+        "position": [
+          1360.7209576197522,
+          484.97983618186043,
+          -537.5803838206149
+        ],
+        "rotation": [
+          -166.62858096382683,
+          -18.14127471154724,
+          161.06631675939866
+        ],
+        "scale": [
+          29,
+          29,
+          29
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/lantern_flower_lowpol.glb",
+        "id": "vitrum-66"
+      },
+      {
+        "type": "glb",
+        "position": [
+          1375.76114014222,
+          477.5361132033268,
+          -536.2236588072641
+        ],
+        "rotation": [
+          121.91789368063533,
+          -71.6367220311619,
+          101.83433998612638
+        ],
+        "scale": [
+          15,
+          15,
+          15
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/mushroom_lamp_lowpoly.glb",
+        "id": "vitrum-67"
+      },
+      {
+        "type": "glb",
+        "position": [
+          1339.4919948593185,
+          534.1535548009178,
+          -476.8770087705834
+        ],
+        "rotation": [
+          -180,
+          82.00000000000003,
+          -180
+        ],
+        "scale": [
+          180,
+          180,
+          180
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/canopy_spire_lowpoly.glb",
+        "id": "vitrum-68"
+      },
+      {
+        "type": "glb",
+        "position": [
+          1557.5723997776524,
+          546.1289422545683,
+          -531.4927546785825
+        ],
+        "rotation": [
+          -93.18576605219047,
+          67.69502722831639,
+          102.0343933674848
+        ],
+        "scale": [
+          15,
+          15,
+          15
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/mushroom_lamp_lowpoly.glb",
+        "id": "vitrum-69"
+      },
+      {
+        "type": "glb",
+        "position": [
+          1573.088498351237,
+          556.6730833806319,
+          -532.2969480911818
+        ],
+        "rotation": [
+          -163.2876989201928,
+          16.77733914811567,
+          157.18865587899535
+        ],
+        "scale": [
+          22,
+          22,
+          22
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/bio_flora_plant_lowpo.glb",
+        "id": "vitrum-70"
+      },
+      {
+        "type": "glb",
+        "position": [
+          1587.5351398704618,
+          557.1936866094369,
+          -514.86945775957
+        ],
+        "rotation": [
+          166.74810925288904,
+          -44.39534098025132,
+          148.70155094082986
+        ],
+        "scale": [
+          29,
+          29,
+          29
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/lantern_flower_lowpol.glb",
+        "id": "vitrum-71"
+      },
+      {
+        "type": "glb",
+        "position": [
+          1584.661476553866,
+          558.5716560572578,
+          -508.1820266737992
+        ],
+        "rotation": [
+          47.19990683488371,
+          -56.654201209272955,
+          42.47590897671145
+        ],
+        "scale": [
+          15,
+          15,
+          15
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/mushroom_lamp_lowpoly.glb",
+        "id": "vitrum-72"
+      },
+      {
+        "type": "glb",
+        "position": [
+          1609.9124572706417,
+          555.5934627787419,
+          -305.60735502067564
+        ],
+        "rotation": [
+          -148.62584600056667,
+          49.386128970006574,
+          142.55760527903138
+        ],
+        "scale": [
+          15,
+          15,
+          15
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/mushroom_lamp_lowpoly.glb",
+        "id": "vitrum-73"
+      },
+      {
+        "type": "glb",
+        "position": [
+          1611.5936599596284,
+          555.2636813550264,
+          -296.5686608139453
+        ],
+        "rotation": [
+          176.70510664193904,
+          -10.319811226403719,
+          156.2800801624898
+        ],
+        "scale": [
+          22,
+          22,
+          22
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/bio_flora_plant_lowpo.glb",
+        "id": "vitrum-74"
+      },
+      {
+        "type": "glb",
+        "position": [
+          1617.7872383820347,
+          565.434199694128,
+          -280.9340161323153
+        ],
+        "rotation": [
+          118.93352354994535,
+          -64.04090245440226,
+          115.29534786175742
+        ],
+        "scale": [
+          29,
+          29,
+          29
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/lantern_flower_lowpol.glb",
+        "id": "vitrum-75"
+      },
+      {
+        "type": "glb",
+        "position": [
+          1622.6887891144477,
+          555.9070053131237,
+          -272.82734294033816
+        ],
+        "rotation": [
+          16.558542121104153,
+          -31.56567774671227,
+          27.676790284815663
+        ],
+        "scale": [
+          15,
+          15,
+          15
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/mushroom_lamp_lowpoly.glb",
+        "id": "vitrum-76"
+      },
+      {
+        "type": "glb",
+        "position": [
+          1553.0467958806266,
+          613.729692245513,
+          -243.18827892573555
+        ],
+        "rotation": [
+          -180,
+          -15.999999999999991,
+          -180
+        ],
+        "scale": [
+          180,
+          180,
+          180
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/canopy_spire_lowpoly.glb",
+        "id": "vitrum-77"
+      },
+      {
+        "type": "glb",
+        "position": [
+          1055.9093532702561,
+          387.7388122740242,
+          -372.72674748425464
+        ],
+        "rotation": [
+          -78.63300519021097,
+          -78.60965443821712,
+          -101.36699480978885
+        ],
+        "scale": [
+          65,
+          65,
+          65
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/spire_orb_holder_lowp.glb",
+        "id": "vitrum-78"
+      },
+      {
+        "type": "glb",
+        "position": [
+          1289.9762463187928,
+          418.48270640223507,
+          -531.6170707834087
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          130,
+          80,
+          90
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/bridge_segment_lowpol.glb",
+        "id": "vitrum-79"
+      },
+      {
+        "type": "glb",
+        "position": [
+          953.3485019845763,
+          418.0324693444467,
+          -468.26473613535813
+        ],
+        "rotation": [
+          101.36699480978884,
+          78.60965443821712,
+          -78.63300519021097
+        ],
+        "scale": [
+          65,
+          65,
+          65
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/spire_orb_holder_lowp.glb",
+        "id": "vitrum-80"
+      },
+      {
+        "type": "glb",
+        "position": [
+          1036.322487898612,
+          433.2520275252997,
+          -603.7591426101231
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          130,
+          80,
+          90
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/bridge_segment_lowpol.glb",
+        "id": "vitrum-81"
+      },
+      {
+        "type": "glb",
+        "position": [
+          1654.9437675119864,
+          582.3620257111968,
+          -113.37302922609916
+        ],
+        "rotation": [
+          -6.0863893411383385,
+          -1.0825493858004176,
+          20.152775258805313
+        ],
+        "scale": [
+          15,
+          15,
+          15
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/mushroom_lamp_lowpoly.glb",
+        "id": "vitrum-82"
+      },
+      {
+        "type": "glb",
+        "position": [
+          1640.4622765421761,
+          581.7443437060797,
+          -101.62842906081575
+        ],
+        "rotation": [
+          -44.013136631818654,
+          58.93836645522511,
+          41.88333411415659
+        ],
+        "scale": [
+          22,
+          22,
+          22
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/bio_flora_plant_lowpo.glb",
+        "id": "vitrum-83"
+      },
+      {
+        "type": "glb",
+        "position": [
+          1638.166442563466,
+          590.5979327072112,
+          -87.53781923231554
+        ],
+        "rotation": [
+          -166.10983865937052,
+          43.495964100807555,
+          151.65077377537432
+        ],
+        "scale": [
+          29,
+          29,
+          29
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/lantern_flower_lowpol.glb",
+        "id": "vitrum-84"
+      },
+      {
+        "type": "glb",
+        "position": [
+          1639.112615341516,
+          580.6361418903871,
+          -75.47281332667606
+        ],
+        "rotation": [
+          166.42898288867656,
+          -18.586112908099484,
+          158.68981708115362
+        ],
+        "scale": [
+          15,
+          15,
+          15
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/mushroom_lamp_lowpoly.glb",
+        "id": "vitrum-85"
+      },
+      {
+        "type": "glb",
+        "position": [
+          1596.1870022087364,
+          641.6666360356762,
+          -97.3968050288877
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          180,
+          180,
+          180
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/canopy_spire_lowpoly.glb",
+        "id": "vitrum-86"
+      },
+      {
+        "type": "glb",
+        "position": [
+          1681.1744858237776,
+          616.6672416798039,
+          144.16854144055682
+        ],
+        "rotation": [
+          -15.046504066097574,
+          28.86506764762284,
+          18.49064900527078
+        ],
+        "scale": [
+          15,
+          15,
+          15
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/mushroom_lamp_lowpoly.glb",
+        "id": "vitrum-87"
+      },
+      {
+        "type": "glb",
+        "position": [
+          1686.7137597589142,
+          622.9580549732841,
+          160.71066766542134
+        ],
+        "rotation": [
+          -120.23329442900648,
+          72.39203970914896,
+          113.34080838268547
+        ],
+        "scale": [
+          22,
+          22,
+          22
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/bio_flora_plant_lowpo.glb",
+        "id": "vitrum-88"
+      },
+      {
+        "type": "glb",
+        "position": [
+          1676.4943532740945,
+          622.5191699843505,
+          176.77092945687792
+        ],
+        "rotation": [
+          178.6278403751225,
+          15.1947740581746,
+          163.27319830359622
+        ],
+        "scale": [
+          29,
+          29,
+          29
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/lantern_flower_lowpol.glb",
+        "id": "vitrum-89"
+      },
+      {
+        "type": "glb",
+        "position": [
+          1668.3073274559392,
+          619.2373641762916,
+          177.05515439121058
+        ],
+        "rotation": [
+          155.0876442729049,
+          -48.445620195897924,
+          155.24647540849915
+        ],
+        "scale": [
+          15,
+          15,
+          15
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/mushroom_lamp_lowpoly.glb",
+        "id": "vitrum-90"
+      },
+      {
+        "type": "glb",
+        "position": [
+          1489.2715675030026,
+          585.9258169531855,
+          302.84090131068024
+        ],
+        "rotation": [
+          -31.272560401910088,
+          57.940597019378345,
+          28.38042035008404
+        ],
+        "scale": [
+          15,
+          15,
+          15
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/mushroom_lamp_lowpoly.glb",
+        "id": "vitrum-91"
+      },
+      {
+        "type": "glb",
+        "position": [
+          1471.7493401607155,
+          585.1238387316971,
+          303.3802256250571
+        ],
+        "rotation": [
+          -168.86061496662066,
+          49.55434961280044,
+          157.1128555919626
+        ],
+        "scale": [
+          22,
+          22,
+          22
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/bio_flora_plant_lowpo.glb",
+        "id": "vitrum-92"
+      },
+      {
+        "type": "glb",
+        "position": [
+          1470.6138841665766,
+          590.537303708876,
+          324.19018201540007
+        ],
+        "rotation": [
+          169.4226687495966,
+          -14.642583703889125,
+          164.88422478031927
+        ],
+        "scale": [
+          29,
+          29,
+          29
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/lantern_flower_lowpol.glb",
+        "id": "vitrum-93"
+      },
+      {
+        "type": "glb",
+        "position": [
+          1465.264069009584,
+          580.1077086280787,
+          332.505816310771
+        ],
+        "rotation": [
+          112.00343814052658,
+          -73.44896222782165,
+          117.66561551822502
+        ],
+        "scale": [
+          15,
+          15,
+          15
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/mushroom_lamp_lowpoly.glb",
+        "id": "vitrum-94"
+      },
+      {
+        "type": "glb",
+        "position": [
+          1422.4782225025842,
+          647.444780161127,
+          272.8992830794851
+        ],
+        "rotation": [
+          -180,
+          82.00000000000003,
+          -180
+        ],
+        "scale": [
+          180,
+          180,
+          180
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/canopy_spire_lowpoly.glb",
+        "id": "vitrum-95"
+      },
+      {
+        "type": "glb",
+        "position": [
+          1396.7551971951584,
+          578.9989091040134,
+          544.4165613755897
+        ],
+        "rotation": [
+          -107.16226807912518,
+          80.05457203889743,
+          107.86724765602973
+        ],
+        "scale": [
+          15,
+          15,
+          15
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/mushroom_lamp_lowpoly.glb",
+        "id": "vitrum-96"
+      },
+      {
+        "type": "glb",
+        "position": [
+          1396.9469582373965,
+          581.8073626776812,
+          561.6012378698596
+        ],
+        "rotation": [
+          -175.6309561281144,
+          19.638364028776092,
+          169.94855340896638
+        ],
+        "scale": [
+          22,
+          22,
+          22
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/bio_flora_plant_lowpo.glb",
+        "id": "vitrum-97"
+      },
+      {
+        "type": "glb",
+        "position": [
+          1384.0136725683878,
+          582.1527449414128,
+          571.143938277134
+        ],
+        "rotation": [
+          170.93542498778862,
+          -46.247773176150616,
+          166.2490857321676
+        ],
+        "scale": [
+          29,
+          29,
+          29
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/lantern_flower_lowpol.glb",
+        "id": "vitrum-98"
+      },
+      {
+        "type": "glb",
+        "position": [
+          1370.1157428335016,
+          575.0815318524541,
+          570.76638798776
+        ],
+        "rotation": [
+          21.154954367170298,
+          -64.23196512022909,
+          22.2173729729371
+        ],
+        "scale": [
+          15,
+          15,
+          15
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/mushroom_lamp_lowpoly.glb",
+        "id": "vitrum-99"
+      },
+      {
+        "type": "glb",
+        "position": [
+          1155.1382176480301,
+          527.9096992560665,
+          622.6795510355137
+        ],
+        "rotation": [
+          -155.41895531052597,
+          52.91434639208299,
+          155.99585158188074
+        ],
+        "scale": [
+          15,
+          15,
+          15
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/mushroom_lamp_lowpoly.glb",
+        "id": "vitrum-100"
+      },
+      {
+        "type": "glb",
+        "position": [
+          1144.9913276626191,
+          527.2877801830087,
+          628.7793076778142
+        ],
+        "rotation": [
+          -177.86551693062808,
+          -11.2661816176851,
+          165.5150719416981
+        ],
+        "scale": [
+          22,
+          22,
+          22
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/bio_flora_plant_lowpo.glb",
+        "id": "vitrum-101"
+      },
+      {
+        "type": "glb",
+        "position": [
+          1123.645412557375,
+          527.9350006488214,
+          631.8251990743956
+        ],
+        "rotation": [
+          134.37696933995926,
+          -71.87998047555973,
+          127.93190984769828
+        ],
+        "scale": [
+          29,
+          29,
+          29
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/lantern_flower_lowpol.glb",
+        "id": "vitrum-102"
+      },
+      {
+        "type": "glb",
+        "position": [
+          1125.8505931308116,
+          517.6391402792044,
+          643.8691042517391
+        ],
+        "rotation": [
+          14.549265275405444,
+          -33.18471544607953,
+          17.044142303313233
+        ],
+        "scale": [
+          15,
+          15,
+          15
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/mushroom_lamp_lowpoly.glb",
+        "id": "vitrum-103"
+      },
+      {
+        "type": "glb",
+        "position": [
+          1085.6436737994666,
+          596.2416632653253,
+          568.4402064908668
+        ],
+        "rotation": [
+          -180,
+          -15.999999999999991,
+          -180
+        ],
+        "scale": [
+          180,
+          180,
+          180
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/canopy_spire_lowpoly.glb",
+        "id": "vitrum-104"
+      },
+      {
+        "type": "glb",
+        "position": [
+          1632.0173775378098,
+          601.8885725769891,
+          -140.39936893829574
+        ],
+        "rotation": [
+          87.09283763408042,
+          -68.53847575611368,
+          92.9071623659196
+        ],
+        "scale": [
+          65,
+          65,
+          65
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/spire_orb_holder_lowp.glb",
+        "id": "vitrum-105"
+      },
+      {
+        "type": "glb",
+        "position": [
+          1554.3858492898025,
+          606.0503421025811,
+          63.77813773102557
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          130,
+          80,
+          90
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/bridge_segment_lowpol.glb",
+        "id": "vitrum-106"
+      },
+      {
+        "type": "glb",
+        "position": [
+          1744.7466432774333,
+          631.8475809890675,
+          -106.20575321807121
+        ],
+        "rotation": [
+          -92.9071623659196,
+          68.53847575611368,
+          87.09283763408042
+        ],
+        "scale": [
+          65,
+          65,
+          65
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/spire_orb_holder_lowp.glb",
+        "id": "vitrum-107"
+      },
+      {
+        "type": "glb",
+        "position": [
+          1764.8242713728516,
+          621.6086941286824,
+          80.25698029547578
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          130,
+          80,
+          90
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/bridge_segment_lowpol.glb",
+        "id": "vitrum-108"
+      },
+      {
+        "type": "glb",
+        "position": [
+          943.2841933066298,
+          431.27148089218605,
+          771.816304721516
+        ],
+        "rotation": [
+          9.488902686529316,
+          2.0620543177671546,
+          24.46907250459332
+        ],
+        "scale": [
+          15,
+          15,
+          15
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/mushroom_lamp_lowpoly.glb",
+        "id": "vitrum-109"
+      },
+      {
+        "type": "glb",
+        "position": [
+          934.8595922490354,
+          427.9451463707045,
+          774.6931165800497
+        ],
+        "rotation": [
+          -37.12874303667494,
+          58.35841342190321,
+          52.09593467972036
+        ],
+        "scale": [
+          22,
+          22,
+          22
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/bio_flora_plant_lowpo.glb",
+        "id": "vitrum-110"
+      },
+      {
+        "type": "glb",
+        "position": [
+          911.2209539623557,
+          425.80977877838166,
+          778.3441247016625
+        ],
+        "rotation": [
+          -147.96729066585468,
+          38.99946999501616,
+          147.8167240292052
+        ],
+        "scale": [
+          29,
+          29,
+          29
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/lantern_flower_lowpol.glb",
+        "id": "vitrum-111"
+      },
+      {
+        "type": "glb",
+        "position": [
+          916.4032431464939,
+          413.5151951057852,
+          786.4534573638032
+        ],
+        "rotation": [
+          -179.6643358225871,
+          -21.073291628219774,
+          153.66611633146624
+        ],
+        "scale": [
+          15,
+          15,
+          15
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/mushroom_lamp_lowpoly.glb",
+        "id": "vitrum-112"
+      },
+      {
+        "type": "glb",
+        "position": [
+          900.2220931287958,
+          498.42254900696827,
+          724.7451895464358
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          180,
+          180,
+          180
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/canopy_spire_lowpoly.glb",
+        "id": "vitrum-113"
+      },
+      {
+        "type": "glb",
+        "position": [
+          743.5891146665583,
+          294.0149283596187,
+          991.3039962581881
+        ],
+        "rotation": [
+          -8.736261800367759,
+          28.824293333532324,
+          31.999664174403588
+        ],
+        "scale": [
+          15,
+          15,
+          15
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/mushroom_lamp_lowpoly.glb",
+        "id": "vitrum-114"
+      },
+      {
+        "type": "glb",
+        "position": [
+          728.9864931385322,
+          292.0938502126646,
+          999.1882068420543
+        ],
+        "rotation": [
+          -102.72854117114888,
+          60.72675290260953,
+          108.29491182478239
+        ],
+        "scale": [
+          22,
+          22,
+          22
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/bio_flora_plant_lowpo.glb",
+        "id": "vitrum-115"
+      },
+      {
+        "type": "glb",
+        "position": [
+          714.666247210863,
+          287.5264145539362,
+          1004.1779022720657
+        ],
+        "rotation": [
+          -165.8432375119554,
+          11.510208852749324,
+          151.71957214852387
+        ],
+        "scale": [
+          29,
+          29,
+          29
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/lantern_flower_lowpol.glb",
+        "id": "vitrum-116"
+      },
+      {
+        "type": "glb",
+        "position": [
+          709.7963208235478,
+          276.8199800972197,
+          1008.4408880356639
+        ],
+        "rotation": [
+          155.46999109415742,
+          -45.754991029160244,
+          138.28798136667814
+        ],
+        "scale": [
+          15,
+          15,
+          15
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/mushroom_lamp_lowpoly.glb",
+        "id": "vitrum-117"
+      },
+      {
+        "type": "glb",
+        "position": [
+          440.22410160357504,
+          146.94444659898784,
+          1008.9552292863085
+        ],
+        "rotation": [
+          -37.172014239815454,
+          54.43555139043871,
+          40.855893909158866
+        ],
+        "scale": [
+          15,
+          15,
+          15
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/mushroom_lamp_lowpoly.glb",
+        "id": "vitrum-118"
+      },
+      {
+        "type": "glb",
+        "position": [
+          433.1293929997592,
+          143.88748269955317,
+          1007.7768730596217
+        ],
+        "rotation": [
+          -156.55777797398622,
+          46.28492082491592,
+          146.59517876716012
+        ],
+        "scale": [
+          22,
+          22,
+          22
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/bio_flora_plant_lowpo.glb",
+        "id": "vitrum-119"
+      },
+      {
+        "type": "glb",
+        "position": [
+          414.716707235425,
+          143.78534598711354,
+          1015.3401970210682
+        ],
+        "rotation": [
+          171.8940739880641,
+          -14.396598143735208,
+          156.8708120178831
+        ],
+        "scale": [
+          29,
+          29,
+          29
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/lantern_flower_lowpol.glb",
+        "id": "vitrum-120"
+      },
+      {
+        "type": "glb",
+        "position": [
+          411.13990755068437,
+          131.47032979542192,
+          1014.8084286836068
+        ],
+        "rotation": [
+          106.81368362661594,
+          -66.50316693347662,
+          107.39199101142415
+        ],
+        "scale": [
+          15,
+          15,
+          15
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/mushroom_lamp_lowpoly.glb",
+        "id": "vitrum-121"
+      },
+      {
+        "type": "glb",
+        "position": [
+          410.5076239169482,
+          211.86638705805254,
+          953.2292449296569
+        ],
+        "rotation": [
+          -180,
+          82.00000000000003,
+          -180
+        ],
+        "scale": [
+          180,
+          180,
+          180
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/canopy_spire_lowpoly.glb",
+        "id": "vitrum-122"
+      },
+      {
+        "type": "glb",
+        "position": [
+          158.3331031385875,
+          78.48703879354333,
+          1136.7939152073216
+        ],
+        "rotation": [
+          -141.56844666991108,
+          85.67076220748105,
+          124.9898442944151
+        ],
+        "scale": [
+          15,
+          15,
+          15
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/mushroom_lamp_lowpoly.glb",
+        "id": "vitrum-123"
+      },
+      {
+        "type": "glb",
+        "position": [
+          144.53601833361716,
+          84.84673395427215,
+          1147.8267123268802
+        ],
+        "rotation": [
+          164.8239290243298,
+          20.47327479337062,
+          176.21497159844333
+        ],
+        "scale": [
+          22,
+          22,
+          22
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/bio_flora_plant_lowpo.glb",
+        "id": "vitrum-124"
+      },
+      {
+        "type": "glb",
+        "position": [
+          123.42220855158992,
+          82.99395932422091,
+          1142.5985388186875
+        ],
+        "rotation": [
+          159.77154360290223,
+          -46.37030452769216,
+          174.85774138828867
+        ],
+        "scale": [
+          29,
+          29,
+          29
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/lantern_flower_lowpol.glb",
+        "id": "vitrum-125"
+      },
+      {
+        "type": "glb",
+        "position": [
+          118.82021163650263,
+          79.7673188336685,
+          1148.0772297954707
+        ],
+        "rotation": [
+          -8.401298167352737,
+          -66.26317014591014,
+          8.837612545149653
+        ],
+        "scale": [
+          15,
+          15,
+          15
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/mushroom_lamp_lowpoly.glb",
+        "id": "vitrum-126"
+      },
+      {
+        "type": "glb",
+        "position": [
+          -126.73022560003938,
+          49.825835583806644,
+          1000.3599805598042
+        ],
+        "rotation": [
+          146.61470638066953,
+          52.57601580897898,
+          -160.62843240083777
+        ],
+        "scale": [
+          15,
+          15,
+          15
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/mushroom_lamp_lowpoly.glb",
+        "id": "vitrum-127"
+      },
+      {
+        "type": "glb",
+        "position": [
+          -139.53402838242988,
+          49.1210757287281,
+          992.4909380707928
+        ],
+        "rotation": [
+          164.84326820303636,
+          -12.557912068714083,
+          -168.0819122208268
+        ],
+        "scale": [
+          22,
+          22,
+          22
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/bio_flora_plant_lowpo.glb",
+        "id": "vitrum-128"
+      },
+      {
+        "type": "glb",
+        "position": [
+          -150.38706226317828,
+          57.486648567938865,
+          986.1322094135205
+        ],
+        "rotation": [
+          -149.46424784797966,
+          -74.59468135356954,
+          -130.6412371252198
+        ],
+        "scale": [
+          29,
+          29,
+          29
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/lantern_flower_lowpol.glb",
+        "id": "vitrum-129"
+      },
+      {
+        "type": "glb",
+        "position": [
+          -163.5885596551622,
+          47.43905661747489,
+          982.2090964064133
+        ],
+        "rotation": [
+          -25.291251052008153,
+          -32.40894488149296,
+          -13.813425916015259
+        ],
+        "scale": [
+          15,
+          15,
+          15
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/mushroom_lamp_lowpoly.glb",
+        "id": "vitrum-130"
+      },
+      {
+        "type": "glb",
+        "position": [
+          -116.5743072175344,
+          108.61580522889959,
+          928.7288311261248
+        ],
+        "rotation": [
+          -180,
+          -15.999999999999991,
+          -180
+        ],
+        "scale": [
+          180,
+          180,
+          180
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/canopy_spire_lowpoly.glb",
+        "id": "vitrum-131"
+      },
+      {
+        "type": "glb",
+        "position": [
+          963.5632182428128,
+          480.60284255260905,
+          738.7112587662084
+        ],
+        "rotation": [
+          94.89631320711476,
+          -67.3007139358415,
+          85.10368679288517
+        ],
+        "scale": [
+          65,
+          65,
+          65
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/spire_orb_holder_lowp.glb",
+        "id": "vitrum-132"
+      },
+      {
+        "type": "glb",
+        "position": [
+          781.4612431385912,
+          405.93399502552563,
+          826.2867421535692
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          130,
+          80,
+          90
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/bridge_segment_lowpol.glb",
+        "id": "vitrum-133"
+      },
+      {
+        "type": "glb",
+        "position": [
+          1044.4353183783421,
+          483.9740719130609,
+          853.2665654107022
+        ],
+        "rotation": [
+          -85.10368679288517,
+          67.3007139358415,
+          94.89631320711476
+        ],
+        "scale": [
+          65,
+          65,
+          65
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/spire_orb_holder_lowp.glb",
+        "id": "vitrum-134"
+      },
+      {
+        "type": "glb",
+        "position": [
+          935.651105685305,
+          409.59366100204136,
+          930.0886274643004
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          130,
+          80,
+          90
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/bridge_segment_lowpol.glb",
+        "id": "vitrum-135"
+      },
+      {
+        "type": "glb",
+        "position": [
+          -325.49723903422347,
+          71.86177692854683,
+          844.1798662624702
+        ],
+        "rotation": [
+          -8.007564149562787,
+          1.497767720494571,
+          -21.156296083586092
+        ],
+        "scale": [
+          15,
+          15,
+          15
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/mushroom_lamp_lowpoly.glb",
+        "id": "vitrum-136"
+      },
+      {
+        "type": "glb",
+        "position": [
+          -322.26007160792904,
+          70.89079271010604,
+          825.6761531963527
+        ],
+        "rotation": [
+          34.05515605413457,
+          60.27114423505809,
+          -46.68153023907254
+        ],
+        "scale": [
+          22,
+          22,
+          22
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/bio_flora_plant_lowpo.glb",
+        "id": "vitrum-137"
+      },
+      {
+        "type": "glb",
+        "position": [
+          -338.70751248058497,
+          80.48202545209664,
+          820.8105368046974
+        ],
+        "rotation": [
+          151.95772485041837,
+          40.728063549169875,
+          -151.56949040429816
+        ],
+        "scale": [
+          29,
+          29,
+          29
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/lantern_flower_lowpol.glb",
+        "id": "vitrum-138"
+      },
+      {
+        "type": "glb",
+        "position": [
+          -346.70911141364166,
+          70.27314929046372,
+          813.0209979282745
+        ],
+        "rotation": [
+          179.95634196520606,
+          -21.00819426341457,
+          -157.26437204266966
+        ],
+        "scale": [
+          15,
+          15,
+          15
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/mushroom_lamp_lowpoly.glb",
+        "id": "vitrum-139"
+      },
+      {
+        "type": "glb",
+        "position": [
+          -284.66074247779386,
+          129.34294771151977,
+          784.5568330845615
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          180,
+          180,
+          180
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/canopy_spire_lowpoly.glb",
+        "id": "vitrum-140"
+      },
+      {
+        "type": "glb",
+        "position": [
+          -513.0684636742571,
+          124.96488228950895,
+          670.665760429704
+        ],
+        "rotation": [
+          17.522326376813055,
+          28.021770501682663,
+          -21.931489812911288
+        ],
+        "scale": [
+          15,
+          15,
+          15
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/mushroom_lamp_lowpoly.glb",
+        "id": "vitrum-141"
+      },
+      {
+        "type": "glb",
+        "position": [
+          -514.0878318363076,
+          133.76600089329392,
+          656.449306244986
+        ],
+        "rotation": [
+          116.81213010029015,
+          69.61201149311267,
+          -108.83937862601738
+        ],
+        "scale": [
+          22,
+          22,
+          22
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/bio_flora_plant_lowpo.glb",
+        "id": "vitrum-142"
+      },
+      {
+        "type": "glb",
+        "position": [
+          -522.3642891474773,
+          135.14929140938818,
+          635.8349057253578
+        ],
+        "rotation": [
+          -178.6454915526507,
+          15.230364840966134,
+          -160.01865921543646
+        ],
+        "scale": [
+          29,
+          29,
+          29
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/lantern_flower_lowpol.glb",
+        "id": "vitrum-143"
+      },
+      {
+        "type": "glb",
+        "position": [
+          -517.6660921149664,
+          134.55998176192568,
+          630.4929663872313
+        ],
+        "rotation": [
+          -151.1464393740451,
+          -47.059745762639515,
+          -151.05357198489867
+        ],
+        "scale": [
+          15,
+          15,
+          15
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/mushroom_lamp_lowpoly.glb",
+        "id": "vitrum-144"
+      },
+      {
+        "type": "glb",
+        "position": [
+          -445.11347690667196,
+          162.92540558602568,
+          407.78395778564044
+        ],
+        "rotation": [
+          -17.508745933870795,
+          59.103556255642694,
+          36.920787279918315
+        ],
+        "scale": [
+          15,
+          15,
+          15
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/mushroom_lamp_lowpoly.glb",
+        "id": "vitrum-145"
+      },
+      {
+        "type": "glb",
+        "position": [
+          -438.83797369517487,
+          172.65574243289387,
+          393.2968135208426
+        ],
+        "rotation": [
+          -145.43349771637887,
+          45.49323060293912,
+          153.8942637088525
+        ],
+        "scale": [
+          22,
+          22,
+          22
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/bio_flora_plant_lowpo.glb",
+        "id": "vitrum-146"
+      },
+      {
+        "type": "glb",
+        "position": [
+          -449.1306573766375,
+          172.64904187400865,
+          375.5245512480173
+        ],
+        "rotation": [
+          -170.56621381540646,
+          -17.504649434553375,
+          161.12921402876893
+        ],
+        "scale": [
+          29,
+          29,
+          29
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/lantern_flower_lowpol.glb",
+        "id": "vitrum-147"
+      },
+      {
+        "type": "glb",
+        "position": [
+          -455.8667760215915,
+          173.18841456233687,
+          376.12258644554936
+        ],
+        "rotation": [
+          119.8210025464493,
+          -71.48099335347291,
+          103.7949948985513
+        ],
+        "scale": [
+          15,
+          15,
+          15
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/mushroom_lamp_lowpoly.glb",
+        "id": "vitrum-148"
+      },
+      {
+        "type": "glb",
+        "position": [
+          -394.9460335404104,
+          269.3549992148116,
+          370.41395998166826
+        ],
+        "rotation": [
+          -180,
+          82.00000000000003,
+          -180
+        ],
+        "scale": [
+          180,
+          180,
+          180
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/canopy_spire_lowpoly.glb",
+        "id": "vitrum-149"
+      },
+      {
+        "type": "glb",
+        "position": [
+          -644.2897263109633,
+          173.24488153676828,
+          249.6647681684739
+        ],
+        "rotation": [
+          -103.92061655476994,
+          81.38443877742885,
+          116.50829347375775
+        ],
+        "scale": [
+          15,
+          15,
+          15
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/mushroom_lamp_lowpoly.glb",
+        "id": "vitrum-150"
+      },
+      {
+        "type": "glb",
+        "position": [
+          -661.720444642458,
+          174.2420483547696,
+          248.48733103450027
+        ],
+        "rotation": [
+          -164.48924957050187,
+          18.95198128955957,
+          171.85154477366706
+        ],
+        "scale": [
+          22,
+          22,
+          22
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/bio_flora_plant_lowpo.glb",
+        "id": "vitrum-151"
+      },
+      {
+        "type": "glb",
+        "position": [
+          -661.705613403339,
+          182.2402673684247,
+          229.12004585640912
+        ],
+        "rotation": [
+          -175.58154878399716,
+          -47.30010567843411,
+          168.59896633569812
+        ],
+        "scale": [
+          29,
+          29,
+          29
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/lantern_flower_lowpol.glb",
+        "id": "vitrum-152"
+      },
+      {
+        "type": "glb",
+        "position": [
+          -668.4300205149483,
+          173.55907894015434,
+          218.57051506314716
+        ],
+        "rotation": [
+          28.978662442554032,
+          -64.0380031385489,
+          17.8315128191888
+        ],
+        "scale": [
+          15,
+          15,
+          15
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/mushroom_lamp_lowpoly.glb",
+        "id": "vitrum-153"
+      },
+      {
+        "type": "glb",
+        "position": [
+          -731.9508246870836,
+          186.6230127096298,
+          7.123478179656617
+        ],
+        "rotation": [
+          163.5562972143931,
+          55.00444983691514,
+          -167.8804005138842
+        ],
+        "scale": [
+          15,
+          15,
+          15
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/mushroom_lamp_lowpoly.glb",
+        "id": "vitrum-154"
+      },
+      {
+        "type": "glb",
+        "position": [
+          -740.0617774836745,
+          188.35769026386996,
+          -2.7281401202903925
+        ],
+        "rotation": [
+          174.92303632991334,
+          -11.307186237253717,
+          -172.94660992854824
+        ],
+        "scale": [
+          22,
+          22,
+          22
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/bio_flora_plant_lowpo.glb",
+        "id": "vitrum-155"
+      },
+      {
+        "type": "glb",
+        "position": [
+          -751.2958889196733,
+          193.44363190746304,
+          -12.821630273859192
+        ],
+        "rotation": [
+          -156.09054784580775,
+          -76.51161313260585,
+          -148.92000896640087
+        ],
+        "scale": [
+          29,
+          29,
+          29
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/lantern_flower_lowpol.glb",
+        "id": "vitrum-156"
+      },
+      {
+        "type": "glb",
+        "position": [
+          -759.1649623389008,
+          185.29714657821202,
+          -20.416196310501974
+        ],
+        "rotation": [
+          -11.21665093681043,
+          -34.32165394462769,
+          -8.383375364950584
+        ],
+        "scale": [
+          15,
+          15,
+          15
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/mushroom_lamp_lowpoly.glb",
+        "id": "vitrum-157"
+      },
+      {
+        "type": "glb",
+        "position": [
+          -689.3577139536629,
+          255.69065808890343,
+          -69.63000349364603
+        ],
+        "rotation": [
+          -180,
+          -15.999999999999991,
+          -180
+        ],
+        "scale": [
+          180,
+          180,
+          180
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/canopy_spire_lowpoly.glb",
+        "id": "vitrum-158"
+      },
+      {
+        "type": "glb",
+        "position": [
+          -295.82959925036033,
+          88.23950316988163,
+          842.8140740282937
+        ],
+        "rotation": [
+          -94.81000137876758,
+          -69.15698769525522,
+          -85.18999862123226
+        ],
+        "scale": [
+          65,
+          65,
+          65
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/spire_orb_holder_lowp.glb",
+        "id": "vitrum-159"
+      },
+      {
+        "type": "glb",
+        "position": [
+          -359.67663852464,
+          98.15334771908732,
+          683.0799833383929
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          130,
+          80,
+          90
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/bridge_segment_lowpol.glb",
+        "id": "vitrum-160"
+      },
+      {
+        "type": "glb",
+        "position": [
+          -425.1437946918796,
+          122.67635473699025,
+          922.2953787187362
+        ],
+        "rotation": [
+          85.18999862123226,
+          69.15698769525522,
+          -94.81000137876758
+        ],
+        "scale": [
+          65,
+          65,
+          65
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/spire_orb_holder_lowp.glb",
+        "id": "vitrum-161"
+      },
+      {
+        "type": "glb",
+        "position": [
+          -554.7741431556661,
+          115.44962078184378,
+          737.1247477822691
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          130,
+          80,
+          90
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/bridge_segment_lowpol.glb",
+        "id": "vitrum-162"
+      },
+      {
+        "type": "glb",
+        "position": [
+          -886.4039212142227,
+          168.14122044823142,
+          -220.5492154132496
+        ],
+        "rotation": [
+          -12.496632605140615,
+          2.1221805538749763,
+          -19.20316957978321
+        ],
+        "scale": [
+          15,
+          15,
+          15
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/mushroom_lamp_lowpoly.glb",
+        "id": "vitrum-163"
+      },
+      {
+        "type": "glb",
+        "position": [
+          -888.3880429756101,
+          164.6472579804799,
+          -230.0753214069649
+        ],
+        "rotation": [
+          27.70404823523276,
+          62.02581980294278,
+          -44.485487408555755
+        ],
+        "scale": [
+          22,
+          22,
+          22
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/bio_flora_plant_lowpo.glb",
+        "id": "vitrum-164"
+      },
+      {
+        "type": "glb",
+        "position": [
+          -894.4247240858697,
+          171.88086063921696,
+          -247.39849466899042
+        ],
+        "rotation": [
+          149.29629691103574,
+          40.77762295884271,
+          -154.27439759715597
+        ],
+        "scale": [
+          29,
+          29,
+          29
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/lantern_flower_lowpol.glb",
+        "id": "vitrum-165"
+      },
+      {
+        "type": "glb",
+        "position": [
+          -898.6970931873642,
+          159.17748067903645,
+          -253.5480918241312
+        ],
+        "rotation": [
+          174.80134694984773,
+          -21.886342295293023,
+          -159.2541113021895
+        ],
+        "scale": [
+          15,
+          15,
+          15
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/mushroom_lamp_lowpoly.glb",
+        "id": "vitrum-166"
+      },
+      {
+        "type": "glb",
+        "position": [
+          -841.900358932839,
+          221.60471720668755,
+          -257.7428838685419
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          180,
+          180,
+          180
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/canopy_spire_lowpoly.glb",
+        "id": "vitrum-167"
+      },
+      {
+        "type": "glb",
+        "position": [
+          -994.7710123399171,
+          141.18824085065668,
+          -566.0835259940809
+        ],
+        "rotation": [
+          10.813461878346137,
+          28.600382657787588,
+          -28.60554499850002
+        ],
+        "scale": [
+          15,
+          15,
+          15
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/mushroom_lamp_lowpoly.glb",
+        "id": "vitrum-168"
+      },
+      {
+        "type": "glb",
+        "position": [
+          -1003.1671609727663,
+          146.3096920562752,
+          -580.8018117862592
+        ],
+        "rotation": [
+          106.48948855396169,
+          63.71171678388832,
+          -108.35457084631818
+        ],
+        "scale": [
+          22,
+          22,
+          22
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/bio_flora_plant_lowpo.glb",
+        "id": "vitrum-169"
+      },
+      {
+        "type": "glb",
+        "position": [
+          -994.4846301360501,
+          142.38876565037387,
+          -598.5137486944932
+        ],
+        "rotation": [
+          170.1295293571239,
+          12.823202648972984,
+          -154.4620770133542
+        ],
+        "scale": [
+          29,
+          29,
+          29
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/lantern_flower_lowpol.glb",
+        "id": "vitrum-170"
+      },
+      {
+        "type": "glb",
+        "position": [
+          -988.0650958403266,
+          138.44107771650465,
+          -598.0094947295574
+        ],
+        "rotation": [
+          -154.80307338322677,
+          -46.31405855732522,
+          -142.5123568523457
+        ],
+        "scale": [
+          15,
+          15,
+          15
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/mushroom_lamp_lowpoly.glb",
+        "id": "vitrum-171"
+      },
+      {
+        "type": "glb",
+        "position": [
+          -729.2766131526221,
+          60.82423127329193,
+          -791.7596222047335
+        ],
+        "rotation": [
+          37.21535176178993,
+          56.633285836822076,
+          -30.485014949455625
+        ],
+        "scale": [
+          15,
+          15,
+          15
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/mushroom_lamp_lowpoly.glb",
+        "id": "vitrum-172"
+      },
+      {
+        "type": "glb",
+        "position": [
+          -710.6623924714893,
+          58.84975885588452,
+          -789.1952688316929
+        ],
+        "rotation": [
+          171.00126080449726,
+          49.69512417324441,
+          -154.44681617643622
+        ],
+        "scale": [
+          22,
+          22,
+          22
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/bio_flora_plant_lowpo.glb",
+        "id": "vitrum-173"
+      },
+      {
+        "type": "glb",
+        "position": [
+          -697.4688958399496,
+          64.20265586457631,
+          -799.3717799577076
+        ],
+        "rotation": [
+          -164.86103057056786,
+          -13.840156039843485,
+          -163.29985241156143
+        ],
+        "scale": [
+          29,
+          29,
+          29
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/lantern_flower_lowpol.glb",
+        "id": "vitrum-174"
+      },
+      {
+        "type": "glb",
+        "position": [
+          -700.1163370981346,
+          52.78652714784347,
+          -813.8366635770045
+        ],
+        "rotation": [
+          -107.35481433168272,
+          -71.72273882329891,
+          -117.16598432227514
+        ],
+        "scale": [
+          15,
+          15,
+          15
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/mushroom_lamp_lowpoly.glb",
+        "id": "vitrum-175"
+      },
+      {
+        "type": "glb",
+        "position": [
+          -670.5725981965417,
+          118.36062748166292,
+          -749.8420814855048
+        ],
+        "rotation": [
+          -180,
+          82.00000000000003,
+          -180
+        ],
+        "scale": [
+          180,
+          180,
+          180
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/canopy_spire_lowpoly.glb",
+        "id": "vitrum-176"
+      },
+      {
+        "type": "glb",
+        "position": [
+          -465.4453767660924,
+          54.25317876831713,
+          -1041.3383754110046
+        ],
+        "rotation": [
+          133.13404258169282,
+          84.96202368474738,
+          -119.30807335277063
+        ],
+        "scale": [
+          15,
+          15,
+          15
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/mushroom_lamp_lowpoly.glb",
+        "id": "vitrum-177"
+      },
+      {
+        "type": "glb",
+        "position": [
+          -450.9087644129515,
+          60.93046714722123,
+          -1045.5428673508686
+        ],
+        "rotation": [
+          -167.9112806174884,
+          20.466057404526914,
+          -175.3117150680362
+        ],
+        "scale": [
+          22,
+          22,
+          22
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/bio_flora_plant_lowpo.glb",
+        "id": "vitrum-178"
+      },
+      {
+        "type": "glb",
+        "position": [
+          -438.28036000601884,
+          60.56637431355911,
+          -1058.007908027821
+        ],
+        "rotation": [
+          -161.6600325352518,
+          -46.29414467229223,
+          -173.6370946362719
+        ],
+        "scale": [
+          29,
+          29,
+          29
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/lantern_flower_lowpol.glb",
+        "id": "vitrum-179"
+      },
+      {
+        "type": "glb",
+        "position": [
+          -426.2510801256894,
+          57.541211917580455,
+          -1053.7695000539197
+        ],
+        "rotation": [
+          3.729584470047655,
+          -66.14456293796778,
+          -10.914376813724708
+        ],
+        "scale": [
+          15,
+          15,
+          15
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/mushroom_lamp_lowpoly.glb",
+        "id": "vitrum-180"
+      },
+      {
+        "type": "glb",
+        "position": [
+          -118.47741556271909,
+          34.73901203108218,
+          -1002.8333274679984
+        ],
+        "rotation": [
+          -151.58861968567436,
+          54.65651838147286,
+          170.69148560549766
+        ],
+        "scale": [
+          15,
+          15,
+          15
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/mushroom_lamp_lowpoly.glb",
+        "id": "vitrum-181"
+      },
+      {
+        "type": "glb",
+        "position": [
+          -101.46411786439066,
+          32.97722880111974,
+          -995.7557976127692
+        ],
+        "rotation": [
+          -160.3419276295671,
+          -11.932535474008343,
+          174.5121071527563
+        ],
+        "scale": [
+          22,
+          22,
+          22
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/bio_flora_plant_lowpo.glb",
+        "id": "vitrum-182"
+      },
+      {
+        "type": "glb",
+        "position": [
+          -89.86022246279342,
+          40.9524776512084,
+          -991.4988163958011
+        ],
+        "rotation": [
+          175.1207007566134,
+          -77.76153419376882,
+          153.80660545841044
+        ],
+        "scale": [
+          29,
+          29,
+          29
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/lantern_flower_lowpol.glb",
+        "id": "vitrum-183"
+      },
+      {
+        "type": "glb",
+        "position": [
+          -76.01710376282188,
+          29.867089360447174,
+          -990.2838293172672
+        ],
+        "rotation": [
+          24.40931363896172,
+          -33.84463385232607,
+          6.46860899003336
+        ],
+        "scale": [
+          15,
+          15,
+          15
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/mushroom_lamp_lowpoly.glb",
+        "id": "vitrum-184"
+      },
+      {
+        "type": "glb",
+        "position": [
+          -125.16131100103296,
+          89.31687717909765,
+          -923.1709979943892
+        ],
+        "rotation": [
+          -180,
+          -15.999999999999991,
+          -180
+        ],
+        "scale": [
+          180,
+          180,
+          180
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/canopy_spire_lowpoly.glb",
+        "id": "vitrum-185"
+      },
+      {
+        "type": "glb",
+        "position": [
+          -838.2403191164229,
+          192.9895816729989,
+          -170.70737159091334
+        ],
+        "rotation": [
+          -96.63913878546205,
+          -71.82824673933969,
+          -83.36086121453793
+        ],
+        "scale": [
+          65,
+          65,
+          65
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/spire_orb_holder_lowp.glb",
+        "id": "vitrum-186"
+      },
+      {
+        "type": "glb",
+        "position": [
+          -876.0079340656143,
+          175.21094248988737,
+          -340.2150615364773
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          130,
+          80,
+          90
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/bridge_segment_lowpol.glb",
+        "id": "vitrum-187"
+      },
+      {
+        "type": "glb",
+        "position": [
+          -968.9858777529024,
+          225.29714121826387,
+          -124.00886037859301
+        ],
+        "rotation": [
+          83.36086121453793,
+          71.82824673933969,
+          -96.63913878546205
+        ],
+        "scale": [
+          65,
+          65,
+          65
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/spire_orb_holder_lowp.glb",
+        "id": "vitrum-188"
+      },
+      {
+        "type": "glb",
+        "position": [
+          -1065.3050325971549,
+          192.95397549933412,
+          -310.3177573720816
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          130,
+          80,
+          90
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/bridge_segment_lowpol.glb",
+        "id": "vitrum-189"
+      },
+      {
+        "type": "glb",
+        "position": [
+          -101.30678062514144,
+          57.857630177241475,
+          -806.6792513973052
+        ],
+        "rotation": [
+          0,
+          -90,
+          0
+        ],
+        "scale": [
+          130,
+          140,
+          150
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/half_arch_segment_low.glb",
+        "id": "vitrum-190"
+      },
+      {
+        "type": "glb",
+        "position": [
+          106.74422959995891,
+          93.87507253601447,
+          -806.879932403264
+        ],
+        "rotation": [
+          0,
+          90,
+          0
+        ],
+        "scale": [
+          130,
+          140,
+          150
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/half_arch_segment_low.glb",
+        "id": "vitrum-191"
+      },
+      {
+        "type": "glb",
+        "position": [
+          198.0983729936918,
+          164.9116848705695,
+          141.01293739435278
+        ],
+        "rotation": [
+          0,
+          -90,
+          0
+        ],
+        "scale": [
+          130,
+          140,
+          150
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/half_arch_segment_low.glb",
+        "id": "vitrum-192"
+      },
+      {
+        "type": "glb",
+        "position": [
+          345.5352484582461,
+          127.44146926752938,
+          10.210180408491503
+        ],
+        "rotation": [
+          0,
+          90,
+          0
+        ],
+        "scale": [
+          130,
+          140,
+          150
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/half_arch_segment_low.glb",
+        "id": "vitrum-193"
+      },
+      {
+        "type": "glb",
+        "position": [
+          1130.0484576613871,
+          399.43459810430835,
+          -424.40266186864426
+        ],
+        "rotation": [
+          0,
+          -90,
+          0
+        ],
+        "scale": [
+          130,
+          140,
+          150
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/half_arch_segment_low.glb",
+        "id": "vitrum-194"
+      },
+      {
+        "type": "glb",
+        "position": [
+          925.4116091031615,
+          442.5693466008072,
+          -504.3331622408837
+        ],
+        "rotation": [
+          0,
+          90,
+          0
+        ],
+        "scale": [
+          130,
+          140,
+          150
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/half_arch_segment_low.glb",
+        "id": "vitrum-195"
+      },
+      {
+        "type": "glb",
+        "position": [
+          1578.7340617724178,
+          601.0228261470384,
+          -107.92706526518332
+        ],
+        "rotation": [
+          0,
+          -90,
+          0
+        ],
+        "scale": [
+          130,
+          140,
+          150
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/half_arch_segment_low.glb",
+        "id": "vitrum-196"
+      },
+      {
+        "type": "glb",
+        "position": [
+          1794.2008766875874,
+          645.8558022941021,
+          -101.01804144625655
+        ],
+        "rotation": [
+          0,
+          90,
+          0
+        ],
+        "scale": [
+          130,
+          140,
+          150
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/half_arch_segment_low.glb",
+        "id": "vitrum-197"
+      },
+      {
+        "type": "glb",
+        "position": [
+          1091.8012510739823,
+          546.7994875242316,
+          619.6879938871459
+        ],
+        "rotation": [
+          0,
+          -90,
+          0
+        ],
+        "scale": [
+          130,
+          140,
+          150
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/half_arch_segment_low.glb",
+        "id": "vitrum-198"
+      },
+      {
+        "type": "glb",
+        "position": [
+          1233.4396481136826,
+          555.6262458701639,
+          747.3594387104923
+        ],
+        "rotation": [
+          0,
+          90,
+          0
+        ],
+        "scale": [
+          130,
+          140,
+          150
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/half_arch_segment_low.glb",
+        "id": "vitrum-199"
+      },
+      {
+        "type": "glb",
+        "position": [
+          805.2166173223395,
+          400.2089152319636,
+          805.5561709266417
+        ],
+        "rotation": [
+          0,
+          -90,
+          0
+        ],
+        "scale": [
+          130,
+          140,
+          150
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/half_arch_segment_low.glb",
+        "id": "vitrum-200"
+      },
+      {
+        "type": "glb",
+        "position": [
+          918.4326048212596,
+          409.41343108139654,
+          942.8556493993575
+        ],
+        "rotation": [
+          0,
+          90,
+          0
+        ],
+        "scale": [
+          130,
+          140,
+          150
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/half_arch_segment_low.glb",
+        "id": "vitrum-201"
+      },
+      {
+        "type": "glb",
+        "position": [
+          326.7046863607417,
+          122.4886986714783,
+          1017.0491229726318
+        ],
+        "rotation": [
+          0,
+          -90,
+          0
+        ],
+        "scale": [
+          130,
+          140,
+          150
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/half_arch_segment_low.glb",
+        "id": "vitrum-202"
+      },
+      {
+        "type": "glb",
+        "position": [
+          356.50670025003865,
+          150.52437886555956,
+          1145.3859841585336
+        ],
+        "rotation": [
+          0,
+          90,
+          0
+        ],
+        "scale": [
+          130,
+          140,
+          150
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/half_arch_segment_low.glb",
+        "id": "vitrum-203"
+      },
+      {
+        "type": "glb",
+        "position": [
+          -285.8628404226226,
+          90.822638946036,
+          799.7624629098119
+        ],
+        "rotation": [
+          0,
+          -90,
+          0
+        ],
+        "scale": [
+          130,
+          140,
+          150
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/half_arch_segment_low.glb",
+        "id": "vitrum-204"
+      },
+      {
+        "type": "glb",
+        "position": [
+          -479.21746997192713,
+          139.85655965960655,
+          896.1216546009365
+        ],
+        "rotation": [
+          0,
+          90,
+          0
+        ],
+        "scale": [
+          130,
+          140,
+          150
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/half_arch_segment_low.glb",
+        "id": "vitrum-205"
+      },
+      {
+        "type": "glb",
+        "position": [
+          -368.78039154449704,
+          163.4190400871671,
+          507.03873480875865
+        ],
+        "rotation": [
+          0,
+          -90,
+          0
+        ],
+        "scale": [
+          130,
+          140,
+          150
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/half_arch_segment_low.glb",
+        "id": "vitrum-206"
+      },
+      {
+        "type": "glb",
+        "position": [
+          -582.6102382758335,
+          156.35117152638753,
+          509.86995625444246
+        ],
+        "rotation": [
+          0,
+          90,
+          0
+        ],
+        "scale": [
+          130,
+          140,
+          150
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/half_arch_segment_low.glb",
+        "id": "vitrum-207"
+      },
+      {
+        "type": "glb",
+        "position": [
+          -863.3749961952066,
+          174.82959017195225,
+          -329.98191980345706
+        ],
+        "rotation": [
+          0,
+          -90,
+          0
+        ],
+        "scale": [
+          130,
+          140,
+          150
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/half_arch_segment_low.glb",
+        "id": "vitrum-208"
+      },
+      {
+        "type": "glb",
+        "position": [
+          -1076.9047691587884,
+          222.79040731497258,
+          -296.4434822152677
+        ],
+        "rotation": [
+          0,
+          90,
+          0
+        ],
+        "scale": [
+          130,
+          140,
+          150
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/half_arch_segment_low.glb",
+        "id": "vitrum-209"
+      },
+      {
+        "type": "glb",
+        "position": [
+          -394.8234622789221,
+          56.9778276976393,
+          -934.398010499458
+        ],
+        "rotation": [
+          0,
+          -90,
+          0
+        ],
+        "scale": [
+          130,
+          140,
+          150
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/half_arch_segment_low.glb",
+        "id": "vitrum-210"
+      },
+      {
+        "type": "glb",
+        "position": [
+          -463.13133007529376,
+          89.03174949415408,
+          -1067.8285226722792
+        ],
+        "rotation": [
+          0,
+          90,
+          0
+        ],
+        "scale": [
+          130,
+          140,
+          150
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/half_arch_segment_low.glb",
+        "id": "vitrum-211"
+      },
+      {
+        "type": "glb",
+        "position": [
+          -459.7790668716664,
+          140.0338948735509,
+          647.9564590726762
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          20,
+          20,
+          20
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/bio_orb_sphere_lowpol.glb",
+        "motion": {
+          "type": "shuttle",
+          "axis": "y",
+          "period": 16,
+          "distance": 2
+        },
+        "id": "vitrum-212"
+      },
+      {
+        "type": "light",
+        "position": [
+          -462.799086599629,
+          131.61268330023537,
+          646.9752982906567
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "lightIntensity": 2200,
+        "lightRange": 110,
+        "id": "vitrum-213",
+        "color": 16760677
+      },
+      {
+        "type": "glb",
+        "position": [
+          -404.8557096477033,
+          120.26550240955847,
+          639.3162207223127
+        ],
+        "rotation": [
+          6.259825314113205,
+          -1.0828731456811866,
+          -19.610103533343864
+        ],
+        "scale": [
+          70,
+          70,
+          70
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/monolith_egg_lowpoly.glb",
+        "id": "vitrum-214"
+      },
+      {
+        "type": "glb",
+        "position": [
+          -401.0373278569621,
+          125.77212168440309,
+          661.2897345173141
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          90,
+          90,
+          90
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/lantern_flower_lowpol.glb",
+        "id": "vitrum-215"
+      },
+      {
+        "type": "glb",
+        "position": [
+          -401.7423090601466,
+          127.55298305793127,
+          633.594488151917
+        ],
+        "rotation": [
+          0,
+          45.00000000000001,
+          0
+        ],
+        "scale": [
+          90,
+          90,
+          90
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/lantern_flower_lowpol.glb",
+        "id": "vitrum-216"
+      },
+      {
+        "type": "glb",
+        "position": [
+          -393.8678522052108,
+          129.42070398123255,
+          597.4875589058671
+        ],
+        "rotation": [
+          0,
+          90,
+          0
+        ],
+        "scale": [
+          90,
+          90,
+          90
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/lantern_flower_lowpol.glb",
+        "id": "vitrum-217"
+      },
+      {
+        "type": "glb",
+        "position": [
+          -536.6435504913319,
+          158.77576956964276,
+          647.7240706598458
+        ],
+        "rotation": [
+          6.259825314113205,
+          -1.0828731456811866,
+          -19.610103533343864
+        ],
+        "scale": [
+          70,
+          70,
+          70
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/monolith_egg_lowpoly.glb",
+        "id": "vitrum-218"
+      },
+      {
+        "type": "glb",
+        "position": [
+          -525.4443409995836,
+          166.12973786980237,
+          687.7320914560388
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          90,
+          90,
+          90
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/lantern_flower_lowpol.glb",
+        "id": "vitrum-219"
+      },
+      {
+        "type": "glb",
+        "position": [
+          -540.1598818529247,
+          175.34648286577047,
+          655.059168604127
+        ],
+        "rotation": [
+          0,
+          45.00000000000001,
+          0
+        ],
+        "scale": [
+          90,
+          90,
+          90
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/lantern_flower_lowpol.glb",
+        "id": "vitrum-220"
+      },
+      {
+        "type": "glb",
+        "position": [
+          -554.794403007471,
+          184.789148248563,
+          622.4125678819324
+        ],
+        "rotation": [
+          0,
+          90,
+          0
+        ],
+        "scale": [
+          90,
+          90,
+          90
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/lantern_flower_lowpol.glb",
+        "id": "vitrum-221"
+      },
+      {
+        "type": "glb",
+        "position": [
+          0,
+          40,
+          -900
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/organic/rootwake.glb",
+        "id": "vitrum-architecture-rootwake"
+      },
+      {
+        "type": "glb",
+        "position": [
+          260.0000000000008,
+          110.00000000000017,
+          70.0000000000005
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/organic/canopy.glb",
+        "id": "vitrum-architecture-canopy"
+      },
+      {
+        "type": "glb",
+        "position": [
+          960.0000000000003,
+          355.00000000000017,
+          -350.0000000000007
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/organic/ascent.glb",
+        "id": "vitrum-architecture-ascent"
+      },
+      {
+        "type": "glb",
+        "position": [
+          1690,
+          580,
+          -210.0000000000004
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/organic/mycelium.glb",
+        "id": "vitrum-architecture-mycelium"
+      },
+      {
+        "type": "glb",
+        "position": [
+          1079.9999999999993,
+          484.99999999999966,
+          740.0000000000006
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/organic/ravine.glb",
+        "id": "vitrum-architecture-ravine"
+      },
+      {
+        "type": "glb",
+        "position": [
+          -300.0000000000006,
+          70.00000000000007,
+          949.9999999999994
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/organic/bloom.glb",
+        "id": "vitrum-architecture-bloom"
+      },
+      {
+        "type": "glb",
+        "position": [
+          -859.9999999999995,
+          185.00000000000003,
+          -59.999999999999254
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "texture": null,
+        "animType": "none",
+        "opacity": 1,
+        "model": "/models/stage2/organic/return.glb",
+        "id": "vitrum-architecture-return"
+      }
+    ],
+    "magnetic": true,
+    "gaps": [],
+    "branches": [],
+    "pointWidths": [
+      26,
+      26,
+      26,
+      26,
+      26,
+      26,
+      26,
+      26,
+      26,
+      26,
+      26,
+      26,
+      26,
+      26,
+      26,
+      30,
+      30,
+      30,
+      30,
+      30,
+      30,
+      26,
+      26,
+      26,
+      26,
+      26,
+      26,
+      26,
+      26,
+      26,
+      26,
+      26
+    ],
+    "roadStyle": "raceway",
+    "pads": [
+      {
+        "id": "vitrum-boost-0",
+        "type": "boost",
+        "progress": 0.00782270577361753,
+        "offset": -7
+      },
+      {
+        "id": "vitrum-boost-1",
+        "type": "boost",
+        "progress": 0.039113528868087645,
+        "offset": 6
+      },
+      {
+        "id": "vitrum-boost-2",
+        "type": "boost",
+        "progress": 0.07040435196255776,
+        "offset": 0
+      },
+      {
+        "id": "vitrum-boost-3",
+        "type": "boost",
+        "progress": 0.10169517505702788,
+        "offset": 8
+      },
+      {
+        "id": "vitrum-boost-4",
+        "type": "boost",
+        "progress": 0.132985998151498,
+        "offset": -6
+      },
+      {
+        "id": "vitrum-boost-5",
+        "type": "boost",
+        "progress": 0.16427682124596812,
+        "offset": -7
+      },
+      {
+        "id": "vitrum-boost-6",
+        "type": "boost",
+        "progress": 0.19556764434043825,
+        "offset": 6
+      },
+      {
+        "id": "vitrum-boost-7",
+        "type": "boost",
+        "progress": 0.22685846743490837,
+        "offset": 0
+      },
+      {
+        "id": "vitrum-boost-8",
+        "type": "boost",
+        "progress": 0.27379470207661355,
+        "offset": 8
+      },
+      {
+        "id": "vitrum-boost-9",
+        "type": "boost",
+        "progress": 0.3207309367183187,
+        "offset": -6
+      },
+      {
+        "id": "vitrum-boost-10",
+        "type": "boost",
+        "progress": 0.3520217598127888,
+        "offset": -7
+      },
+      {
+        "id": "vitrum-boost-11",
+        "type": "boost",
+        "progress": 0.38331258290725895,
+        "offset": 6
+      },
+      {
+        "id": "vitrum-boost-12",
+        "type": "boost",
+        "progress": 0.41460340600172907,
+        "offset": 0
+      },
+      {
+        "id": "vitrum-boost-13",
+        "type": "boost",
+        "progress": 0.4458942290961992,
+        "offset": 8
+      },
+      {
+        "id": "vitrum-boost-14",
+        "type": "boost",
+        "progress": 0.4771850521906693,
+        "offset": -6
+      },
+      {
+        "id": "vitrum-boost-15",
+        "type": "boost",
+        "progress": 0.6962208138519601,
+        "offset": -7
+      },
+      {
+        "id": "vitrum-boost-16",
+        "type": "boost",
+        "progress": 0.7431570484936653,
+        "offset": 6
+      },
+      {
+        "id": "vitrum-boost-17",
+        "type": "boost",
+        "progress": 0.7744478715881354,
+        "offset": 0
+      },
+      {
+        "id": "vitrum-boost-18",
+        "type": "boost",
+        "progress": 0.8057386946826055,
+        "offset": 8
+      },
+      {
+        "id": "vitrum-boost-19",
+        "type": "boost",
+        "progress": 0.8370295177770757,
+        "offset": -6
+      },
+      {
+        "id": "vitrum-boost-20",
+        "type": "boost",
+        "progress": 0.8683203408715457,
+        "offset": -7
+      },
+      {
+        "id": "vitrum-boost-21",
+        "type": "boost",
+        "progress": 0.8996111639660159,
+        "offset": 6
+      },
+      {
+        "id": "vitrum-boost-22",
+        "type": "boost",
+        "progress": 0.930901987060486,
+        "offset": 0
+      },
+      {
+        "id": "vitrum-boost-23",
+        "type": "boost",
+        "progress": 0.9621928101549562,
+        "offset": 8
+      }
+    ]
+  }
+}

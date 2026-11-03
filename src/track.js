@@ -1,3 +1,7 @@
+import {createVitrumDeckMaterial,createForestMaps} from './vitrum-deck.js';
+import {createVitrumForestScreen} from './vitrum-forest-screen.js';
+import {createVitrumLighting} from './vitrum-lighting.js';
+import {createVitrumSpores} from './vitrum-spores.js';
 import {addWorldAmbience} from './world-ambience.js';
 import {bindScenery} from './scenery-motion.js';
 import { loadGlb } from './glb-scenery.js';
@@ -25,11 +29,12 @@ function addInstances(group, geometry, material, transforms) {
 
 export function createTrack(definition = NEON_CAUSEWAY) {
   const necros=/necros/i.test(definition.name??'');
+  const vitrum=definition.id==='vitrum-neural-ascent';
   const curve = createTrackCurve(definition);
   const junctionClear = d => !curve.track.branches.some(b => [b.start,b.end].some(u => Math.abs(d-u*curve.getLength()) < 35));
   const group = new THREE.Group();
   // Node-based physics/tests have no document or image loader.
-  const trackTexture = typeof document === 'undefined'
+  const trackTexture = typeof document === 'undefined' || vitrum
     ? null : new THREE.TextureLoader().load('/images/track.png');
   if (trackTexture) {
     trackTexture.colorSpace = THREE.SRGBColorSpace;
@@ -37,20 +42,20 @@ export function createTrack(definition = NEON_CAUSEWAY) {
     trackTexture.wrapT = THREE.ClampToEdgeWrapping;
     trackTexture.anisotropy = 8;
   }
-  // The source image is 3:1: horizontal = travel, vertical = track width.
+  // Legacy source is 3:1; the supplied forest maps are square.
   // Round the count so the UV seam closes exactly where the lap closes.
   const roadTextureRepeats = Math.max(
-    1, Math.round(curve.getLength() / (Math.max(1, getTrackWidth(curve, 0)) * 3))
+    1, Math.round(curve.getLength() / (Math.max(1, getTrackWidth(curve, 0)) * (vitrum ? 1 : 3)))
   );
 
-  const roadMaterial = new THREE.MeshStandardMaterial({
+  const roadMaterial = vitrum ? createVitrumDeckMaterial() : new THREE.MeshStandardMaterial({
     map: trackTexture,
     color: 0xffffff, metalness: 0.88, roughness: 0.78,
     emissive: curve.track.magnetic ? 0x0b2138 : 0x06121c,
     emissiveIntensity: curve.track.magnetic ? 0.65 : 0.1,
     // An opaque, gently emissive magnetic deck stays legible on the dark side
     // of loops and prevents background/other road sections showing through it.
-    transparent: !curve.track.magnetic, opacity: curve.track.magnetic ? 1 : 0.75,
+    transparent: !curve.track.magnetic, opacity: curve.track.magnetic ? 1 : 0.85,
     depthWrite: curve.track.magnetic, side: curve.track.magnetic ? THREE.DoubleSide : THREE.FrontSide,
   });
   const cyanMaterial = new THREE.MeshStandardMaterial({
@@ -71,6 +76,7 @@ export function createTrack(definition = NEON_CAUSEWAY) {
     const positions = [];
     const uvs = [];
     const indices = [];
+    const weathered=vitrum && material===roadMaterial,columns=weathered?8:1,colors=[];
     const stops = [...new Set([...Array.from({ length: samples + 1 }, (_, i) => i / samples),
       ...curve.track.gaps.flatMap(gap => [gap.start, gap.end])])].sort((a, b) => a - b);
     const previousRight = new THREE.Vector3(1, 0, 0);
@@ -82,24 +88,31 @@ export function createTrack(definition = NEON_CAUSEWAY) {
       else right.copy(previousRight);
       const center = frame.center.addScaledVector(right, typeof offset === 'function' ? offset(u) : offset).addScaledVector(frame.normal, yOffset);
       const localWidth = typeof width === 'function' ? width(u) : width;
-      const leftPoint = center.clone().addScaledVector(right, -localWidth / 2);
-      const rightPoint = center.clone().addScaledVector(right, localWidth / 2);
-      positions.push(
-        leftPoint.x, leftPoint.y, leftPoint.z,
-        rightPoint.x, rightPoint.y, rightPoint.z,
-      );
       // UV x follows track distance; UV y spans the road from edge to edge.
       // Only the road material samples the texture; other ribbons ignore UVs.
       const uvAlong = u * roadTextureRepeats;
-      uvs.push(uvAlong, 0, uvAlong, 1);
+      for(let column=0;column<=columns;column++){
+        const across=column/columns;
+        positions.push(...center.clone().addScaledVector(right,(across-.5)*localWidth).toArray());
+        uvs.push(uvAlong,across);
+        if(weathered){
+          const edge=Math.abs(across*2-1)**4;
+          const stain=(.5+.5*Math.sin(u*Math.PI*114+across*4)*Math.sin(u*Math.PI*42))*edge;
+          const value=.94-edge*.28-stain*.16;
+          colors.push(value*(.96+edge*.04),value,value*(1-edge*.28));
+        }
+      }
       if (i < stops.length - 1 && hasSurface(curve, (u + stops[i + 1]) * 0.5 * curve.getLength())) {
-        const a = i * 2;
-        indices.push(a, a + 2, a + 1, a + 1, a + 2, a + 3);
+        for(let column=0;column<columns;column++){
+          const a = i*(columns+1)+column,b=a+columns+1;
+          indices.push(a,b,a+1,a+1,b,b+1);
+        }
       }
     }
     const geometry = new THREE.BufferGeometry();
     geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
     geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+    if(weathered)geometry.setAttribute('color',new THREE.Float32BufferAttribute(colors,3));
     geometry.setIndex(indices);
     geometry.computeVertexNormals();
     group.add(new THREE.Mesh(geometry, material));
@@ -125,6 +138,11 @@ export function createTrack(definition = NEON_CAUSEWAY) {
     color: (necros ? 0xa80010 : 0x58f4e8), emissive: (necros ? 0xa80010 : 0x23dace), emissiveIntensity: necros ? 12 : 8.5,
     metalness: 0.05, roughness: 0.3,
   });
+  if(vitrum){
+    for(const m of [pinkMaterial,pinkRailMaterial]){m.color.setHex(0xe6bd67);m.emissive.setHex(0xd69424);m.emissiveIntensity=2.0;}
+    for(const m of [cyanMaterial,cyanRailMaterial]){m.color.setHex(0x89dcc2);m.emissive.setHex(0x36a98e);m.emissiveIntensity=1.7;}
+    railMaterial.color.setHex(0x67754b);
+  }
   group.userData.railMaterials=[cyanMaterial,pinkMaterial,pinkRailMaterial,cyanRailMaterial];
   const railGeometry = new THREE.CylinderGeometry(0.07, 0.07, 8.5, 8);
   const railTransforms = [];
@@ -324,6 +342,9 @@ export function createTrack(definition = NEON_CAUSEWAY) {
   const authoredWeapons=definition.pads?.filter(p=>p.type==='weapon')??[];
   const weaponPads=addWeaponPads(group,curve,authoredWeapons.length?authoredWeapons:automaticWeaponPads(curve,boostPadPlacements));
   addWorldAmbience(group,curve);
+  if(vitrum)group.add(createVitrumForestScreen(curve));
+  if(vitrum)group.add(createVitrumLighting(curve));
+  if(vitrum)group.add(createVitrumSpores(curve));
 return { group, curve, length: curve.getLength(), boostPads: boostPadPlacements, weaponPads };
 }
 
@@ -478,7 +499,14 @@ export function spawnTrackObjects(scene, trackData) {
       setTransform(holder,obj);
       objectGroup.add(holder);
       if(!modelLoads.has(obj.model))modelLoads.set(obj.model,loadGlb(obj.model).then(model=>{
-        if(objectGroup.userData.disposed){disposeTrackGroup(model);return null;}return model;
+        if(objectGroup.userData.disposed){disposeTrackGroup(model);return null;}
+        if(obj.model.startsWith('/models/stage2/organic/'))model.traverse(child=>{
+          for(const material of (Array.isArray(child.material)?child.material:[child.material])){
+            if(!material)continue;
+            for(const value of Object.values(material))if(value?.isTexture)value.anisotropy=8;
+          }
+        });
+        return model;
       }));
       modelLoads.get(obj.model).then(model=>{
         if(!model || objectGroup.userData.disposed)return;
@@ -520,7 +548,8 @@ export function spawnTrackObjects(scene, trackData) {
     const opacity = !isNaN(parsedOpacity) ? parsedOpacity : 1.0;
 
     const scrolling = obj.animType === 'scroll-x' || obj.animType === 'scroll-y';
-    const materialKey = JSON.stringify([obj.texture || null, obj.type, obj.color, obj.emissive, opacity]);
+    const textureAlpha = obj.textureAlpha ?? 'cutout';
+    const materialKey = JSON.stringify([obj.texture || null, obj.type, obj.color, obj.emissive, opacity, textureAlpha]);
     let material = scrolling ? null : materials.get(materialKey);
     if (!material && obj.texture) {
       let tex = scrolling ? null : textures.get(obj.texture);
@@ -530,9 +559,8 @@ export function spawnTrackObjects(scene, trackData) {
       }
       tex.colorSpace = THREE.SRGBColorSpace;
       
-      // TILLÄGG 1: Säger åt Three.js att texturen får repeteras, vilket krävs för scroll-animationer
-      tex.wrapS = THREE.RepeatWrapping;
-      tex.wrapT = THREE.RepeatWrapping;
+      // Static cutouts must not sample the opposite edge. Scrolling still tiles.
+      tex.wrapS = tex.wrapT = scrolling ? THREE.RepeatWrapping : THREE.ClampToEdgeWrapping;
 
       material = new THREE.MeshStandardMaterial({
         color: obj.color ?? 0xffffff,
@@ -540,9 +568,12 @@ export function spawnTrackObjects(scene, trackData) {
         emissiveMap: tex,
         emissive: obj.emissive ?? 0xffffff,
         emissiveIntensity: obj.emissive !== undefined ? 4.0 : 0.2,
-        transparent: opacity < 1,
+        // Image alpha is independent of whole-object opacity. Cutouts keep
+        // correct depth between overlapping foliage; blend preserves soft alpha.
+        alphaTest: textureAlpha === 'blend' ? 0.001 : 0.1 * opacity,
+        transparent: textureAlpha === 'blend' || opacity < 1,
         opacity: opacity,
-        depthWrite: opacity >= 1,
+        depthWrite: textureAlpha !== 'blend' && opacity >= 1,
         roughness: 0.3,
         metalness: 0.7
       });
@@ -564,6 +595,13 @@ export function spawnTrackObjects(scene, trackData) {
       });
     }
 
+    if(trackData.id==='vitrum-neural-ascent'){
+      material.metalness=0.08;material.roughness=0.85;
+      if(obj.id==='vitrum-0' && obj.type==='sphere' && !obj.texture){
+        Object.assign(material,createForestMaps('moss',[120,60]));
+        material.color.setHex(0x8e9c7d);material.normalScale.set(.3,.3);
+      }
+    }
     if (!scrolling) materials.set(materialKey, material);
 
     const mesh = new THREE.Mesh(geometry, material);

@@ -1,0 +1,39 @@
+✔ v3 branch round-trip, v1/v2 compatibility and invalid topology rejection (8.3679ms)
+✔ branch endpoints/frames join main road and shorter distance gives a real time saving (45.372ms)
+✔ pads belong to a route, ordered gates reject skipped sectors and state resets (16.3241ms)
+✔ all CPUs race both routes and finish three validated laps with contacts and pads (903.2449ms)
+✔ equal section progress gets equal catch-up; recovery after a fork uses the shared merge (7.5082ms)
+✔ rockets hit swept hulls at 30/60/120 Hz; damage persists and moving aside dodges (36.2785ms)
+✔ homing requires continuous visible lock, warns its target and can lose sight (8.7808ms)
+✔ finite ammo, rate limits, shared hit protection and bounded projectile/effect resources (21.622ms)
+✔ combat off, pause, finish/retry and airborne knockback preserve lifecycle rules (4.162ms)
+✔ lights and motion roundtrip, legacy reading and malformed limits (9.3031ms)
+✔ light illumination, world-space motion, reset and transform reuse (6.852ms)
+✔ spin and orbit retain authored pose at zero and loop without drift (2.4969ms)
+✔ Necros rail materials use blood red while other tracks retain cyan (113.5287ms)
+✔ embedded GLB clip loops independently and mixer is released on disposal (78.6187ms)
+✔ texture alpha modes round-trip through export, storage and undo; versions 1–7 stay readable (66.1661ms)
+✔ every shipped track migrates and round-trips without losing geometry, scenery or textures (471.721ms)
+✔ legacy optional fields and fourth-coordinate bank metadata survive migration (0.9984ms)
+✔ reject malformed, unsupported, degenerate and excessive track data with field-specific errors (3.4997ms)
+✔ mixed legacy/versioned library isolates corrupt records and safely loads built-in fallback (45.4549ms)
+✔ save/reset affect only the chosen track; invalid writes and quota failure preserve prior data (60.5719ms)
+✔ undo/redo retain scenery and edits independently of saved snapshots, and discard redo after new edits (0.9299ms)
+✔ history bounds large snapshots while keeping the most recent undo step (0.4277ms)
+✔ empty start; pickup is a single replacing slot, no free ammo or reload (27.571ms)
+✔ swept pickups match 30/60/120 Hz; side miss, airborne and recovery rejected (34.2492ms)
+✔ shared eight-second cooldown awards first crossing independent of racer order (19.469ms)
+✔ fork and merge sweeps use correct route and physical pad length (6.1852ms)
+✔ v5 weapon metadata round-trips and old versions reject new fields; fallback validates on all tracks (657.6887ms)
+✔ weapon pads are hidden outside combat, dim on pickup and reset on retry (20.9518ms)
+✔ CPU races seek, collect and fire finite weapons through the production update path (547.2271ms)
+✔ same equipped weapon is ignored without ammo refill, cooldown or announcer event (9.2989ms)
+✔ automatic weapon stations are single pads at doubled spacing (3.0344ms)
+ℹ tests 31
+ℹ suites 0
+ℹ pass 31
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1863.0571

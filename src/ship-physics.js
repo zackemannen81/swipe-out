@@ -223,12 +223,14 @@ ship.boostTimer = Math.max(0, ship.boostTimer - dt);
   const driftFactor = 1.0 - (ship.assistLevel ?? 1.0);
   
   // Omvandla svängen till en acceleration (skalad med hastighet). 0.06 är en justerbar styrkekonstant.
-  const centrifugalAccel = (trackTurnAmount / Math.max(dt, 0.001)) * ship.speed * driftFactor * 0.1;
+  const centrifugalScale = curve.track?.magnetic ? 0.3 : 0.1;
+  const centrifugalAccel = (trackTurnAmount / Math.max(dt, 0.001)) * ship.speed * driftFactor * centrifugalScale;
   ship.previousTangent.copy(frame.tangent);
   // ------------------------------------------
 
   // Wipeout's forward-velocity correction (skid) and weaker airborne grip.
-  const grip = ship.airborne ? 1.0 : 4.5 + brake * 1.8;
+  const lateralGrip = curve.track?.magnetic ? THREE.MathUtils.lerp(1.6,4.5,ship.assistLevel??1) : 4.5;
+  const grip = ship.airborne ? 1.0 : lateralGrip + brake * 1.8;
   const speedRatio = THREE.MathUtils.clamp(ship.speed / baseSpeed, 0.35, 1.55);
   const yawLateralForce = ship.yawVelocity * ship.speed * 0.12;
   const brakeSteerForce = differentialBrake * ship.speed * 0.10;
@@ -260,11 +262,12 @@ ship.lateralOffset += (ship.lateralVelocity + effectiveCentering) * dt * 2;
   const outerLimit = trackWidth / 2 + 0.4;
   ship.lateralOffset = THREE.MathUtils.clamp(ship.lateralOffset, -outerLimit, outerLimit);
 
-  // Track-relative bank and attitude damping.
+  // Local bank follows steering attitude, never outward sideslip. The road's
+  // own bank is already composed into makePose through frame.rotation.
   if (classic) stepClassicRoll(ship, dt);
   else {
   const desiredRoll = THREE.MathUtils.clamp(
-    -(ship.lateralVelocity * 0.035 + ship.yawVelocity * 0.1),
+    -ship.yawVelocity * 0.3,
     -0.38,
     0.38,
   );

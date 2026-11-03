@@ -1,0 +1,20 @@
+✔ career unlocks earned from campaign finishing, podium and Elite win; replay is idempotent (4.3464ms)
+✔ locked choices and malformed persistence fall back; earned loadout survives reload; standards isolate upgrades (1.7818ms)
+✔ all five Necros challenges unlock craft and soundtrack; partial/old profiles normalize correctly (1.9335ms)
+✔ preview grants only the two mastery rewards, persists, and never fakes trophies (0.3758ms)
+✔ The sacrifice requires completed last place, automatic full assist and Rookie in a race (0.7886ms)
+✔ every shipped track migrates and round-trips without losing geometry, scenery or textures (419.4739ms)
+✔ legacy optional fields and fourth-coordinate bank metadata survive migration (0.6875ms)
+✔ reject malformed, unsupported, degenerate and excessive track data with field-specific errors (3.5583ms)
+✔ mixed legacy/versioned library isolates corrupt records and safely loads built-in fallback (51.4943ms)
+✔ save/reset affect only the chosen track; invalid writes and quota failure preserve prior data (68.0663ms)
+✔ undo/redo retain scenery and edits independently of saved snapshots, and discard redo after new edits (1.1694ms)
+✔ history bounds large snapshots while keeping the most recent undo step (0.4928ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1005.7825

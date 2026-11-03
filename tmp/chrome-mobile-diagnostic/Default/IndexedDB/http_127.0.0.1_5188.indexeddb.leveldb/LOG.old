@@ -1,0 +1,7 @@
+2026/11/01-13:49:50.695 b104 Reusing MANIFEST C:\code\swipe-out\tmp\chrome-mobile-diagnostic\Default\IndexedDB\http_127.0.0.1_5188.indexeddb.leveldb/MANIFEST-000001
+2026/11/01-13:49:50.695 b104 Recovering log #3
+2026/11/01-13:49:50.696 b104 Reusing old log C:\code\swipe-out\tmp\chrome-mobile-diagnostic\Default\IndexedDB\http_127.0.0.1_5188.indexeddb.leveldb/000003.log 
+2026/11/01-13:49:52.776 b104 Level-0 table #5: started
+2026/11/01-13:49:52.783 b104 Level-0 table #5: 872 bytes OK
+2026/11/01-13:49:52.788 b104 Delete type=0 #3
+2026/11/01-13:49:52.789 b104 Manual compaction at level-0 from (begin) .. (end); will stop at (end)

@@ -1,0 +1,86 @@
+Loaded {
+  state: 'racing',
+  objects: 229,
+  loaded: 227,
+  errors: [],
+  draws: 1,
+  triangles: 1
+}
+Rootwake {
+  frame: 7616,
+  calls: 193,
+  triangles: 2120041,
+  points: 146,
+  lines: 29299
+}
+The Great Canopy {
+  frame: 8432,
+  calls: 113,
+  triangles: 1209132,
+  points: 146,
+  lines: 29292
+}
+Glassroot Ascent {
+  frame: 9136,
+  calls: 72,
+  triangles: 737935,
+  points: 146,
+  lines: 29292
+}
+The Mycelium Veins {
+  frame: 9776,
+  calls: 84,
+  triangles: 841190,
+  points: 146,
+  lines: 29292
+}
+The Singing Ravine {
+  frame: 10384,
+  calls: 102,
+  triangles: 1069985,
+  points: 146,
+  lines: 29292
+}
+Neural Bloom {
+  frame: 11024,
+  calls: 120,
+  triangles: 1361283,
+  points: 146,
+  lines: 29292
+}
+The Canopy Return {
+  frame: 11680,
+  calls: 71,
+  triangles: 745737,
+  points: 146,
+  lines: 29292
+}
+Mycelium interior {
+  frame: 12288,
+  calls: 99,
+  triangles: 1028438,
+  points: 146,
+  lines: 29292
+}
+Bloom approach {
+  frame: 12928,
+  calls: 121,
+  triangles: 1371540,
+  points: 146,
+  lines: 29292
+}
+Bloom heart {
+  frame: 13568,
+  calls: 153,
+  triangles: 1521796,
+  points: 146,
+  lines: 29292
+}
+Ravine bottom {
+  frame: 14208,
+  calls: 72,
+  triangles: 701911,
+  points: 146,
+  lines: 29292
+}
+PASS sectors, all GLBs, editor export/save/reload; no page or HTTP errors

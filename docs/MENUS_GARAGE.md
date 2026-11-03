@@ -63,3 +63,45 @@ No physical-phone performance claim is made.
 Updated by FINISH-001: records/time medals, audio/glow controls, generated Necros
 patrols and amber signs are implemented. See FINISHING_PASS.md. Remaining content
 work: human balancing, additional worlds, bespoke camera paths and phone testing.
+
+## Garage backdrop update (GARAGE-002)
+The procedural hangar/facade has been replaced by public/images/garage.jpg.
+The original 5504x3072 JPEG is retained; cover cropping does not stretch it.
+src/garage.js controls image anchors (.67, .61), camera and craft hover/yaw.
+Lighting affects the live craft; baked lighting in the image is static.
+Glow preference scales live craft emissive materials, not the photograph.
+
+## Necros mastery rewards
+All five existing trophies (finish, podium, win, Elite win, Gold time medal)
+unlock Necron Crimson Citadel and Vi lever inte. Existing complete profiles
+qualify automatically. Craft uses factory performance plus normal paint/modules;
+TA/cup still use factory Racer. Settings > Race soundtrack selects the song
+for races; pause selector can change it. Selection persists across reloads.
+Local Vite DEV on localhost/127.0.0.1 auto-grants previewRewards:necros_mastery
+for author testing, without granting trophies. Production fresh profiles do not
+receive this override. Remove the development grant in src/front-end.js to end
+local testing and clear only previewRewards in the career profile if desired.
+
+## The sacrifice — consolation reward
+Finish last (5/5) with Swipeout handling, High (Auto) lane assist and Rookie CPU
+in Quick Race or Campaign. Settings are snapshotted at race start; victory-lap
+autopilot cannot qualify. Completed distance is checked by the race integration.
+DNF, abandoned runs, TA and Cup do not qualify. The bonus trophy appears in
+Trophies, separately from the five Necros mastery goals. The craft keeps normal
+factory stats, paint and module support, and remains locked until earned.
+
+## Exhaust profiles
+src/thrusters.js defines thrusterLayout(ship): four outlets for The sacrifice,
+five for Necron Crimson Citadel, two otherwise. Positions are craft-local metres
+(+Z forward); widthScale keeps adjacent jets separate. BLOOD_RED matches Necros
+rail #a80010. Player and CPU exhaust use this colour. applyPlayerLoadout rebuilds
+the player emitter and disposes old wake geometry. Garage remains a hover display.
+
+## THRUST-003 tuning
+Crimson visual scale is 1.10 (3.465 game-unit longest dimension), applied to model
+child transforms so garage/race clones agree. Its nozzle offsets use the same
+CRIMSON_VISUAL_SCALE exported from src/thrusters.js. No physics size changes.
+Reward jet widths increased 50%: Sacrifice .675, Crimson .54. Only these two
+hulls force #a80010; stock/CPU exhaust uses original craft accents again.
+Export size is normalized by loadCraftModel: changing Meshy centimetres does
+not set game size; leave resize off and tune the code multiplier instead.

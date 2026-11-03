@@ -1,4 +1,5 @@
 import {updateScenery} from './scenery-motion.js';
+import {updateVitrumSpores} from './vitrum-spores.js';
 import { updateWeaponPads } from './weapon-pads.js';
 import { updateTrackPresentation, padPlacement } from './track-pads.js';
 import * as THREE from 'three';
@@ -13,7 +14,8 @@ export function createEditorView(canvas, { onSelect, onMove, onCommit, onError }
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   const scene = new THREE.Scene();
   scene.background = new THREE.Color('#080f1a');
-  scene.add(new THREE.HemisphereLight(0xc5edff, 0x182238, 2.4));
+  const fillLight=new THREE.HemisphereLight(0xc5edff, 0x182238, 2.4);
+  scene.add(fillLight);
   const light = new THREE.DirectionalLight(0xffffff, 3);
   light.position.set(200, 500, 100);
   scene.add(light);
@@ -44,6 +46,12 @@ export function createEditorView(canvas, { onSelect, onMove, onCommit, onError }
   let wasDragging = false;
 
   function build() {
+    const vitrum=track.id==='vitrum-neural-ascent';
+    light.intensity=vitrum?0.28:3;
+    light.color.setHex(vitrum?0xffdfa0:0xffffff);
+    fillLight.intensity=vitrum?0.25:2.4;
+    fillLight.color.setHex(vitrum?0xc8d8ac:0xc5edff);
+    fillLight.groundColor.setHex(vitrum?0x29351c:0x182238);
     if (road) { scene.remove(road); disposeTrackGroup(road); }
     const assets = createTrack(track);
     road = assets.group;
@@ -155,6 +163,7 @@ export function createEditorView(canvas, { onSelect, onMove, onCommit, onError }
       marker.scale.setScalar(camera.position.distanceTo(marker.position) * 0.006);
     }
     updateTrackPresentation(road, performance.now()/1000);
+    updateVitrumSpores(road,document.getElementById('scenery-preview')?.checked?performance.now()/1000:0);
     updateWeaponPads(road, performance.now()/1000, null, true);
     const errors=scene.getObjectByName('customTrackObjects')?.userData.loadErrors;
     if(errors?.length)onError?.('GLB: '+errors.splice(0).join('; '));

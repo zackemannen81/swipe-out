@@ -4,7 +4,15 @@ import * as THREE from 'three';
 const SAMPLE_STEP = 1 / 240;
 const HISTORY_SIZE = 128;
 const SPARK_CAPACITY = 2048;
+export const CRIMSON_VISUAL_SCALE = 1.50;
+export const BLOOD_RED = 0xa80010;
 const NOZZLES = [-0.34, 0.34].map(x => new THREE.Vector3(x, 0, -1.42));
+// Craft-local exhaust outlets; the hull faces +Z. Coordinates are in game metres.
+export function thrusterLayout(ship) {
+  if(ship==='the-sacrifice')return {widthScale:.775,positions:[[-.48,0,-1.12],[-.17,0,-1.48],[.17,0,-1.48],[.48,0,-1.12]]};
+  if(ship==='necron-crimson-citadel')return {widthScale:.74,positions:[[-.34,-.06,-1.30],[-.19,-0.068,-1.48],[0,-0.020,-1.53],[.19,-0.068,-1.48],[.34,-0.06,-1.30]].map(p=>p.map(v=>v*CRIMSON_VISUAL_SCALE))};
+  return {widthScale:1,positions:NOZZLES.map(p=>p.toArray())};
+}
 const clamp = THREE.MathUtils.clamp;
 
 function makeTrailMaterial() {
@@ -14,7 +22,7 @@ function makeTrailMaterial() {
     vertexShader: `
       attribute float age;
       attribute float power;
-      attribute vec3 color; // NYTT: Ta emot färg
+      attribute vec3 color; // NYTT: Ta emot fÃ¤rg
       
       varying vec2 vUv;
       varying float vAge;
@@ -37,8 +45,8 @@ function makeTrailMaterial() {
         float core = exp(-radius * radius * 32.0);
         float fade = pow(max(0.0, 1.0 - vAge), 2.0);
         
-        // NYTT: Mixa accentfärgen till en glödande vit/blå-kärna
-        vec3 hot = mix(vColor, vec3(1.5, 1.8, 2.0), exp(-vAge * 9.0));
+        // NYTT: Mixa accentfÃ¤rgen till en glÃ¶dande vit/blÃ¥-kÃ¤rna
+        vec3 hot = mix(vColor, vColor * 5.0 + vec3(0.12), exp(-vAge * 9.0));
         vec3 finalColor = mix(vColor * 0.2, hot, core); 
         
         float filament = 0.92 + 0.08 * sin(vUv.y * 100.0 + radius * 9.0);
@@ -126,8 +134,8 @@ export class ThrusterSystem {
           float r = length(gl_PointCoord * 2.0 - 1.0);
           float glow = pow(max(0.0, 1.0 - r), 2.0);
           
-          // NYTT: Mixa accentfärgen till glödande vit
-          vec3 sparkColor = mix(vColor, vec3(1.6, 2.0, 2.4), vLife);
+          // NYTT: Mixa accentfÃ¤rgen till glÃ¶dande vit
+          vec3 sparkColor = mix(vColor, vColor * 5.0 + vec3(0.12), vLife);
           gl_FragColor = vec4(sparkColor, glow * vLife * vLife);
           #include <tonemapping_fragment>
           #include <colorspace_fragment>
@@ -147,15 +155,25 @@ export class ThrusterSystem {
     this._next = new THREE.Vector3();
   }
 
-  // NYTT: Tar emot färg från skeppet
-  addCraft(craft, color = new THREE.Color(0xffffff)) {
+  // NYTT: Tar emot fÃ¤rg frÃ¥n skeppet
+  addCraft(craft, color = new THREE.Color(0xffffff), layout = thrusterLayout()) {
     const emitter = {
-      craft, color, previousPosition: new THREE.Vector3(), previousRotation: new THREE.Quaternion(),
+      craft, baseColor: new THREE.Color(color), color: new THREE.Color(color), offsets: layout.positions.map(p=>new THREE.Vector3(...p)), widthScale:layout.widthScale, previousPosition: new THREE.Vector3(), previousRotation: new THREE.Quaternion(),
       initialized: false, active: false, power: 0, remainder: 0,
-      nozzles: NOZZLES.map(() => createNozzle(this.scene, this.material)),
+      nozzles: layout.positions.map(() => createNozzle(this.scene, this.material)),
     };
     this.emitters.push(emitter);
     return emitter;
+  }
+
+  configureCraft(emitter, ship, color = emitter.baseColor) {
+    const layout=thrusterLayout(ship);
+    for(const nozzle of emitter.nozzles){this.scene.remove(nozzle.mesh);nozzle.geometry.dispose();}
+    emitter.offsets=layout.positions.map(p=>new THREE.Vector3(...p));
+    emitter.widthScale=layout.widthScale;
+    emitter.nozzles=emitter.offsets.map(()=>createNozzle(this.scene,this.material));
+    emitter.color.set(['the-sacrifice','necron-crimson-citadel'].includes(ship)?BLOOD_RED:color);
+    this.resetEmitter(emitter);
   }
 
   resetEmitter(emitter) {
@@ -193,9 +211,9 @@ export class ThrusterSystem {
       emitter.power = target;
     }
     emitter.active = active;
-    for (let n = 0; n < NOZZLES.length; n++) {
+    for (let n = 0; n < emitter.offsets.length; n++) {
       const nozzle = emitter.nozzles[n];
-      nozzle.head.copy(NOZZLES[n]).applyQuaternion(craft.quaternion).add(craft.position);
+      nozzle.head.copy(emitter.offsets[n]).applyQuaternion(craft.quaternion).add(craft.position);
       for (const sample of nozzle.samples) sample.age += delta;
     }
     if (active) {
@@ -206,14 +224,14 @@ export class ThrusterSystem {
         this._rotation.slerpQuaternions(emitter.previousRotation, craft.quaternion, fraction);
         this._direction.set(0, 0, -1).applyQuaternion(this._rotation);
         const power = THREE.MathUtils.lerp(previousPower, emitter.power, fraction);
-        for (let n = 0; n < NOZZLES.length; n++) {
+        for (let n = 0; n < emitter.offsets.length; n++) {
           const nozzle = emitter.nozzles[n];
           const sample = nozzle.samples[nozzle.cursor];
-          sample.position.copy(NOZZLES[n]).applyQuaternion(this._rotation).add(this._position);
+          sample.position.copy(emitter.offsets[n]).applyQuaternion(this._rotation).add(this._position);
           sample.velocity.copy(this._direction).multiplyScalar(7 + power * 8);
           sample.age = Math.max(0, delta - birth);
           sample.lifetime = 0.06 + power * 0.05;
-          sample.width = 0.19 + power * 0.23;
+          sample.width = (0.19 + power * 0.23) * emitter.widthScale;
           sample.power = power;
           nozzle.cursor = (nozzle.cursor + 1) % HISTORY_SIZE;
           nozzle.count = Math.min(nozzle.count + 1, HISTORY_SIZE);
@@ -260,7 +278,7 @@ export class ThrusterSystem {
       attributes.uv.setXY(vertex, side, age);
       attributes.age.setX(vertex, age);
       attributes.power.setX(vertex, power);
-      attributes.color.setXYZ(vertex, color.r, color.g, color.b); // NYTT: Skriver färgen
+      attributes.color.setXYZ(vertex, color.r, color.g, color.b); // NYTT: Skriver fÃ¤rgen
     }
   }
 
@@ -271,7 +289,7 @@ export class ThrusterSystem {
         this._tangent.set(0, 0, -1).applyQuaternion(emitter.craft.quaternion);
         if (emitter.active) {
           // NYTT: Skickar med emitter.color
-          this.writeSection(nozzle, sections++, nozzle.head, this._tangent, camera, 0, emitter.power, 0.19 + emitter.power * 0.23, emitter.color);
+          this.writeSection(nozzle, sections++, nozzle.head, this._tangent, camera, 0, emitter.power, (0.19 + emitter.power * 0.23) * emitter.widthScale, emitter.color);
         }
         for (let i = 0; i < nozzle.count; i++) {
           const sample = nozzle.samples[(nozzle.cursor - 1 - i + HISTORY_SIZE) % HISTORY_SIZE];
@@ -298,7 +316,7 @@ export class ThrusterSystem {
       attributes.position.setXYZ(count, this._center.x, this._center.y, this._center.z);
       attributes.size.setX(count, spark.size);
       attributes.life.setX(count, 1 - spark.age / spark.lifetime);
-      attributes.color.setXYZ(count, spark.color.r, spark.color.g, spark.color.b); // NYTT: Skriver färgen till Array-buffern
+      attributes.color.setXYZ(count, spark.color.r, spark.color.g, spark.color.b); // NYTT: Skriver fÃ¤rgen till Array-buffern
       count++;
     }
     this.sparkGeometry.setDrawRange(0, count);

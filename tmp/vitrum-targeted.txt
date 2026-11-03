@@ -1,0 +1,19 @@
+✔ every shipped track migrates and round-trips without losing geometry, scenery or textures (564.1352ms)
+✔ legacy optional fields and fourth-coordinate bank metadata survive migration (0.8047ms)
+✔ reject malformed, unsupported, degenerate and excessive track data with field-specific errors (4.2306ms)
+✔ mixed legacy/versioned library isolates corrupt records and safely loads built-in fallback (51.6972ms)
+✔ save/reset affect only the chosen track; invalid writes and quota failure preserve prior data (67.4498ms)
+✔ undo/redo retain scenery and edits independently of saved snapshots, and discard redo after new edits (1.1804ms)
+✔ history bounds large snapshots while keeping the most recent undo step (0.4134ms)
+✔ Vitrum round-trips editor data, ships self-contained models and safe off-centre pads (176.5898ms)
+✔ Vitrum has seven ordered sectors, an upright smooth road, descent and no road overlap (32.1378ms)
+✔ Vitrum CPU field finishes three laps on Rookie, Pilot and Elite without recovery (3815.7024ms)
+✔ Vitrum player completes ordered three laps with both handling modes and assistance off (1086.7788ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 11
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 5566.2939

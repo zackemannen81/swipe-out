@@ -1,0 +1,13 @@
+✔ forest cutouts ship as real RGBA PNGs and use five instanced depth layers (90.2014ms)
+✔ full forest/curtain rectangles leave racing and camera space clear around the lap (348.7603ms)
+✔ world-fixed forest layers produce different parallax and adapt to edited routes (81.6485ms)
+✔ screen is Vitrum-only and its shared resources are released once on track disposal (214.2605ms)
+✔ spores have bounded deterministic batches, immutable bases and pauseable uniforms (101.0481ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1196.2835
