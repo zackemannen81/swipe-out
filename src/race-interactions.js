@@ -212,7 +212,7 @@ export function collectBoostPad(ship, pads, trackLength, topSpeed) {
       const fraction = clamp((Math.max(start, entry) - start) / (end - start), 0, 1);
       const lane = THREE.MathUtils.lerp(ship.previousLateralOffset, ship.lateralOffset, fraction);
       const height = THREE.MathUtils.lerp(ship.previousVerticalOffset, ship.verticalOffset, fraction);
-      if (Math.abs(lane - pad.offset) > BOOST.halfWidth || height > 1.2) continue;
+      if (Math.abs(lane - pad.offset) > (pad.halfWidth ?? BOOST.halfWidth) || height > 1.2) continue;
       ship.padPassages[i] = lap;
       if (pad.type === 'brake') {
         ship.lastBrakeKey = key;

@@ -1158,3 +1158,11 @@ balance regression, not proof of a leader-transition code defect. Suggested next
 controlled experiment: restore shared 8% Elite ceiling before changing thresholds
 or AI braking; verify with user driving and repeated race benchmarks.
 Evidence: tmp/probe-elite.mjs, tests/catch-up.test.js, tests/cpu-difficulty.test.js.
+
+## 2026-11-04 — CPU-ELITE-BALANCE-001
+User requested quick balance pass. Raised Elite shared catch-up ceiling 2% -> 8%
+and updated menu description. Player handling and AI braking unchanged.
+Catch-up suite 7/7; difficulty suite 5/6: Elite now beats Pilot, but existing
+Pilot-faster-than-Rookie assertion fails. Latest Foundry means: Rookie 111.271 s,
+Pilot 111.446 s, Elite 105.378 s. Remaining Rookie/Pilot ordering needs later tuning.
+Build passes with existing bundle-size warning. Player feel still needs playtest.

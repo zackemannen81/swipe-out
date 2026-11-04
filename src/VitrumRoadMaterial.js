@@ -84,9 +84,10 @@ function generateVeinTexture(width, height, seed, rootCount) {
   }
 
   for (let n = 0; n < rootCount; n++) {
-    // Main roots enter from bottom; a few start later to avoid one huge tuft.
+    // Stagger roots along the full V axis instead of clustering at one end.
+    // This prevents visible empty bands when the vein texture repeats on the road.
     const x = width * (0.12 + 0.76 * rand());
-    const y = n < rootCount * 0.7 ? 2 : rand() * height * 0.25;
+    const y = height * ((n + rand() * 0.8) / rootCount);
     spawn(x, y, (rand() - 0.5) * 0.65, 0.9 + rand() * 0.1, 0);
   }
 
@@ -110,13 +111,17 @@ function generateVeinTexture(width, height, seed, rootCount) {
       const radius = Math.max(0.5, (2.7 - tip.generation * 0.5) * Math.sqrt(Math.max(0.1, tip.energy)));
       drawStroke(old, tip, radius, clamp(tip.energy, 0, 1), tip.distance - travel, tip.generation);
 
+      // Continue growing across the V seam, rather than cutting off the veins
+      // when they reach the end of a texture tile.
+      if (tip.y >= height) tip.y -= height;
+
       if (rand() < 0.012 && tip.generation < 3 && tip.energy > 0.4 && spawned < 150) {
         const side = rand() < 0.5 ? -1 : 1;
         spawn(tip.x, tip.y, tip.dx + side * (0.5 + 0.35 * rand()),
           tip.energy * (0.68 + 0.12 * rand()), tip.generation + 1, tip.distance);
       }
 
-      if (tip.energy <= 0.12 || tip.y >= height - 2 || tip.x < 2 || tip.x >= width - 2) {
+      if (tip.energy <= 0.12 || tip.x < 2 || tip.x >= width - 2) {
         tips.splice(i, 1);
       }
     }
@@ -189,14 +194,23 @@ function generatePaletteTexture() {
  * createVitrumRoad(options)
  * Returns { material, textures, uniforms, update(timeSeconds), regenerate(seed), dispose() }.
  * Use material on an EXISTING mesh with valid UVs; don't change racing physics.
+ * const vitrum = createVitrumRoad({
+  width: 1024,
+  height: 2048,
+  seed: 1981,
+  roots: 10,
+  glow: 1.15,
+  flowSpeed: 0.07,
+  roadUvRepeats,
+});
  */
 export function createVitrumRoad({
-  width = 512,
-  height = 1024,
+  width = 1024,
+  height = 2048,
   seed = 1981,
-  roots = 7,
-  glow = 2.4,
-  flowSpeed = 0.11,
+  roots = 32,
+  glow = 1.15,
+  flowSpeed = 0.07,
   plasmaSpeed = 1.0,
   roughness = 0.19,
   clearcoat = 1.0,
@@ -277,22 +291,34 @@ export function createVitrumRoad({
       float cloudB = texture2D(uVitrumPlasma, plasmaUv * vec2(3.5, 2.0) + vec2(-t * 0.003, t * 0.005)).r;
       float cloud = mix(cloudA, cloudB, 0.38);
 
-      vec3 deepPetrol = vec3(0.045, 0.09, 0.14);
-      vec3 turquoise = vec3(0.055, 0.27, 0.255);
-      vec3 softViolet = vec3(0.15, 0.08, 0.23);
-      vec3 stone = mix(deepPetrol, turquoise, smoothstep(0.12, 0.84, cloud));
-      stone = mix(stone, softViolet, smoothstep(0.67, 0.95, cloud) * 0.36);
-      diffuseColor.rgb *= stone;
+vec3 deepPetrol = vec3(0.018, 0.040, 0.060);
+vec3 turquoise  = vec3(0.035, 0.120, 0.125);
+vec3 softViolet = vec3(0.070, 0.045, 0.120);
 
-      // 2. Static biological network with moving rainbow energy within it.
+vec3 stone = mix(deepPetrol, turquoise, smoothstep(0.18, 0.82, cloud));
+stone = mix(stone, softViolet, smoothstep(0.70, 0.96, cloud) * 0.22);
+
+// mörka ner hela basen lite
+stone *= 0.92;
+
+diffuseColor.rgb *= stone;
+
+      
+      // 2. Always-visible network with a slow, continuous color flow.
       vec4 network = texture2D(uVitrumVeins, veinUv);
       float mask = network.r;
-      float flow = fract(network.g * 5.0 - uVitrumTime * uVitrumFlowSpeed);
-      vec3 rainbow = texture2D(uVitrumPalette, vec2(flow, 0.5)).rgb;
+      float phaseOffset = network.b * 0.37 + network.a * 0.21;
+      float flow = fract(network.g * 1.35 - uVitrumTime * uVitrumFlowSpeed + phaseOffset);
+      vec3 movingColor = texture2D(uVitrumPalette, vec2(flow, 0.5)).rgb;
+      vec3 baseVeinColor = texture2D(
+        uVitrumPalette, vec2(fract(network.g * 0.22 + phaseOffset), 0.5)
+      ).rgb;
       float depthAttenuation = mix(1.0, 0.46, network.b);
       float cloudyAttenuation = mix(0.60, 1.0, cloud);
-      vec3 vitrumEmission = rainbow * mask * depthAttenuation * cloudyAttenuation * uVitrumGlow;
-      diffuseColor.rgb = mix(diffuseColor.rgb, rainbow * 0.14, mask * 0.24);
+      // A persistent base + smoothly changing hue (no on/off pulse packets).
+      vec3 vitrumEmission = mix(baseVeinColor * 0.70, movingColor, 0.55)
+        * mask * depthAttenuation * cloudyAttenuation * uVitrumGlow;
+      diffuseColor.rgb = mix(diffuseColor.rgb, baseVeinColor * 0.14, mask * 0.16);
     `);
 
     shader.fragmentShader = shader.fragmentShader.replace(

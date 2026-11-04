@@ -8,7 +8,8 @@ export function padPlacement(curve, pad) {
   const frameAt = d => branch ? branch.frame((d / length - branch.start) / (branch.end - branch.start)) : getTrackFrame(curve,d/length);
   const widthAt = d => branch ? branch.widthAt((d/length-branch.start)/(branch.end-branch.start)) : getTrackWidth(curve,d/length);
   const d = pad.progress * length;
-  return { ...pad, d, metric, frameAt, widthAt };
+  const widthScale=pad.type==='boost'&&/vitrum|neural ascent/i.test(curve.track.name)?1.4:1;
+  return { ...pad, d, metric, frameAt, widthAt, widthScale };
 }
 
 export function validatePads(definition) {
@@ -17,12 +18,12 @@ export function validatePads(definition) {
   const checked=[];
   for(const pad of definition.pads) {
     const p = padPlacement(curve,pad), branch = curve.track.branches.find(b=>b.id===pad.routeId);
-    if(checked.some(other=>(other.routeId??null)===(p.routeId??null) && Math.abs(other.d-p.d)<6*p.metric && Math.abs(other.offset-p.offset)<2.8)) throw new Error('Pad '+pad.id+': pads must not overlap.');
+    if(checked.some(other=>(other.routeId??null)===(p.routeId??null) && Math.abs(other.d-p.d)<6*p.metric && Math.abs(other.offset-p.offset)<1.4*(p.widthScale+other.widthScale))) throw new Error('Pad '+pad.id+': pads must not overlap.');
     checked.push(p);
     for(const step of [-5,-2,1]) {
       const d = p.d + step*p.metric;
       if(branch ? d <= branch.start*length || d >= branch.end*length : !hasSurface(curve,d,0.5)) throw new Error('Pad '+pad.id+': leave the whole pad on continuous road.');
-      if(Math.abs(p.offset)+1.4 > p.widthAt(d)/2) throw new Error('Pad '+pad.id+': move the pad inside the road edges.');
+      if(Math.abs(p.offset)+1.4*p.widthScale > p.widthAt(d)/2) throw new Error('Pad '+pad.id+': move the pad inside the road edges.');
     }
   }
 }
@@ -58,16 +59,16 @@ export function addAuthoredPads(group, curve, pads, placements) {
   const arrowGeometry = new THREE.BoxGeometry(0.22,0.05,1.35);
   for(const pad of pads) {
     const p=padPlacement(curve,pad), material=materials[pad.type==='brake'?1:0];
-    placements.push({id:pad.id,type:pad.type,d:p.d,offset:p.offset,routeId:pad.routeId,metric:p.metric});
+    placements.push({id:pad.id,type:pad.type,d:p.d,offset:p.offset,routeId:pad.routeId,metric:p.metric,halfWidth:1.2*p.widthScale});
     const frame=p.frameAt(p.d-2*p.metric);
     const base=new THREE.Mesh(baseGeometry,baseMaterial);
     base.position.copy(frame.center).addScaledVector(frame.right,p.offset).addScaledVector(frame.normal,0.075);
-    base.quaternion.copy(frame.rotation); base.updateMatrix(); bases.push(base.matrix.clone());
+    base.quaternion.copy(frame.rotation);base.scale.x=p.widthScale; base.updateMatrix(); bases.push(base.matrix.clone());
     for(let i=0;i<3;i++) {
       const f=p.frameAt(p.d-i*2*p.metric);
       for(const side of pad.type==='brake'?[0]:[-1,1]) {
         const mark=new THREE.Mesh(pad.type==='brake'?barGeometry:arrowGeometry,material);
-        mark.position.copy(f.center).addScaledVector(f.right,p.offset+side*0.46).addScaledVector(f.normal,0.13);
+        mark.position.copy(f.center).addScaledVector(f.right,p.offset+side*0.46*p.widthScale).addScaledVector(f.normal,0.13);
         mark.quaternion.copy(f.rotation);
         if(side) mark.rotateY(-side*0.7);
         mark.updateMatrix(); (pad.type==='brake'?brakes:boosts).push(mark.matrix.clone());

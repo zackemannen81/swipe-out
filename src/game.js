@@ -26,6 +26,7 @@ import { loadTrackLibrary } from './track-storage.js';
 import { createShipPhysics, stepShipPhysics } from './ship-physics.js';
 import { createOpponents, getPlayerPosition, resetOpponents, updateOpponents, syncOpponentPose } from './opponents.js';
 import { createCraft } from './craft.js';
+import { createCraftGrounding } from './craft-grounding.js';
 import { configureImpactParticles, collectBoostPad, createCollisionState, resolveRacerCollisions, resolveWallImpact } from './race-interactions.js';
 import { updateCatchUp } from './catch-up.js';
 import { ThrusterSystem, CRIMSON_VISUAL_SCALE } from './thrusters.js';
@@ -34,7 +35,7 @@ import { createRaceIntro } from './race-intro.js';
 import { createTrackCamera } from './track-camera.js';
 import { createClassicCamera } from './classic-camera.js';
 import { loadDrivingSettings, saveDrivingSettings, cameraProfile, readClassicGamepad } from './driving-settings.js';
-import { getRacerWidth, nextBranch, canFinishRace } from './track-path.js';
+import { getRacerWidth, nextBranch, canFinishRace, getRacerFrame, hasSurface } from './track-path.js';
 import { createCombat, createCombatView, WEAPONS, COMBAT } from './combat.js';
 import { CPU_DIFFICULTIES, cpuDifficulty, loadCpuDifficulty, saveCpuDifficulty } from './cpu-difficulty.js';
 import { createPracticeUI, lapTime } from './time-attack-ui.js';
@@ -325,6 +326,13 @@ for (const opponent of opponents) {
   scene.add(opponent.group);
   opponent.thrusters = thrusters.addCraft(opponent.group, opponent.craft.color);
 }
+
+// Reusable one-time hull silhouettes + two tiny road-following decals per racer.
+// No shadow maps, no extra scene render, no per-frame texture uploads.
+const playerGrounding = createCraftGrounding(scene, craft, playerCraft.color);
+const opponentGroundings = opponents.map(opponent =>
+  createCraftGrounding(scene, opponent.group, opponent.craft.color)
+);
 
 // 3. Nu är 'craft' Garanterat inladdad och full av mesh-data!
 // Klona på för glatta livet!
@@ -860,10 +868,10 @@ function beginRace() {
   const trackData = cupRound ? BUILTIN_TRACKS[currentTrackId].data : getActiveTrackData(currentTrackId);
   const vitrumWorld=trackData.id==='vitrum-neural-ascent';
   camera.far=vitrumWorld?2200:512;camera.updateProjectionMatrix();
-  scene.fog.color.setHex(vitrumWorld?0x263e38:0x282832);
-  scene.fog.density=vitrumWorld?0.0024:0.0039;
+  scene.fog.color.setHex(vitrumWorld?0x263e38:0x202032);
+  scene.fog.density=vitrumWorld?0.0048:0.0039;
   keyLight.color.setHex(vitrumWorld?0xffdfa0:0xd8e8ff);
-  keyLight.intensity=vitrumWorld?0.28:2.8;
+  keyLight.intensity=vitrumWorld?1.28:2.8;
   hemisphereLight.color.setHex(vitrumWorld?0xc8d8ac:0x98c8ff);
   hemisphereLight.groundColor.setHex(vitrumWorld?0x29351c:0x111421);
   hemisphereLight.intensity=vitrumWorld?0.25:1.8;
@@ -1466,6 +1474,7 @@ function applyPlayerLoadout(spec){
   playerMaterials.forEach(m=>m.dispose());playerMaterials=[];
   craft.clear();
   for(const child of craftTemplates[spec.ship].children){const copy=child.clone(true);copy.traverse(o=>{if(o.isMesh){const materials=(Array.isArray(o.material)?o.material:[o.material]).map(m=>{const c=m.clone();if(spec.paint&&c.color)c.color.multiply(new THREE.Color(spec.paint));playerMaterials.push(c);return c;});o.material=Array.isArray(o.material)?materials:materials[0];}});craft.add(copy);}
+  playerGrounding.setCraft(craft); // Refresh silhouette if the player changes ship.
   for(const ghost of ghostPool){scene.remove(ghost.group);ghost.material.dispose();}ghostPool.length=0;createGhostPool(spec);
 }
 let previewStart=0;
@@ -1905,6 +1914,18 @@ if (thrustFill) {
   updateWeaponPads(track, combat.time, combat);
   particleSystem.updateSystem(delta);
 
+  // Anchor projected hull shadows/reflections to the local magnetic road frame.
+  const contactEnabled = ['intro', 'countdown', 'racing', 'finished'].includes(race.state);
+  playerGrounding.update(race.poseFrame, shipPhysics, craft,
+    contactEnabled && (shipPhysics.route || hasSurface(curve, shipPhysics.distance)));
+  for (let i = 0; i < opponents.length; i++) {
+    const opponent = opponents[i];
+    opponentGroundings[i].update(getRacerFrame(curve, opponent.physics),
+      opponent.physics, opponent.group,
+      contactEnabled && !practice.active &&
+      (opponent.physics.route || hasSurface(curve, opponent.physics.distance)));
+  }
+
   // Phase 5: camera and world transforms are final; draw once, at frame end.
   graphics.render();
   requestAnimationFrame(render);
@@ -1919,6 +1940,8 @@ window.addEventListener('pagehide', () => {
   frontEnd?.dispose();
   tourBus.dispose();
   practice.dispose();
+  playerGrounding.dispose();
+  opponentGroundings.forEach(contact => contact.dispose());
   thrusters.dispose();
   window.removeEventListener('resize', resize);
   graphics.dispose();

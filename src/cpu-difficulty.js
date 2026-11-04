@@ -10,8 +10,8 @@ export const CPU_DIFFICULTIES = Object.freeze({
     description: 'Balanced pace, calculated overtakes and occasional mistakes. Shared catch-up: up to 8%.' }),
   elite: Object.freeze({ label: 'Elite', pace: 1, reaction: 0.6, error: 0.35,
     anticipation: 1.1, cornerPenalty: 0.65, passingSpace: 2.4, shortcut: 0.75,
-    mistakeInterval: 32, mistakeSize: 0.25, catchUp: 0.02,
-    description: 'Precise lines, later braking and committed overtakes. Shared catch-up: up to 2%.' }),
+    mistakeInterval: 32, mistakeSize: 0.25, catchUp: 0.08,
+    description: 'Precise lines, later braking and committed overtakes. Shared catch-up: up to 8%.' }),
 });
 
 export function cpuDifficulty(value) {

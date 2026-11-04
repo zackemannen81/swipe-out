@@ -1041,3 +1041,11 @@ correct accumulated-distance accounting and engine-only allowance. Exact symptom
 not reproduced by input-only Vitrum simulation. Tests 15/16; existing Foundry
 Elite-faster-than-Pilot assertion fails (116.122 vs 113.439 s means). No runtime
 changes; documented weak catch-up and AI balancing concern, not proven sign bug.
+
+## 2026-11-04 — CPU-ELITE-BALANCE-001
+User requested quick balance pass. Raised Elite shared catch-up ceiling 2% -> 8%
+and updated menu description. Player handling and AI braking unchanged.
+Catch-up suite 7/7; difficulty suite 5/6: Elite now beats Pilot, but existing
+Pilot-faster-than-Rookie assertion fails. Latest Foundry means: Rookie 111.271 s,
+Pilot 111.446 s, Elite 105.378 s. Remaining Rookie/Pilot ordering needs later tuning.
+Build passes with existing bundle-size warning. Player feel still needs playtest.

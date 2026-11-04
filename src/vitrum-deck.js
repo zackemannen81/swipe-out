@@ -26,12 +26,12 @@ export function createForestMaps(surface, repeat = [1, 1]) {
 export function createVitrumDeckMaterial(roadUvRepeats = 1) {
   // Each track build owns its material and generated data textures.
   const vitrum = createVitrumRoad({
-    width: 512,
-    height: 1024,
+    width: 2048,
+    height: 2048,
     seed: 1981,
-    roots: 7,
-    glow: 2.4,
-    flowSpeed: 0.11,
+    roots: 64,
+    glow: 0.1,
+    flowSpeed: 0.015,
     roadUvRepeats,
   });
 
@@ -40,8 +40,17 @@ export function createVitrumDeckMaterial(roadUvRepeats = 1) {
   material.side = THREE.DoubleSide;    // Magnetic loops and inverted surfaces.
   material.vertexColors = true;       // Preserve the road's weathered vertex colors.
   material.envMap = createDeckEnvironment();
-  material.envMapIntensity = 0.55;
+  material.envMapIntensity = 0.35;
   material.userData.vitrumRoad = vitrum; // Track owns update + disposal.
+  material.roughness = 0.16;
+material.metalness = 0.05;
+material.clearcoat = 1.0;
+material.clearcoatRoughness = 0.05;
+material.envMapIntensity = 0.9;
+material.ior = 1.42;
+material.specularIntensity = 0.95;
+material.specularColor = new THREE.Color(0xdffcff);
+
   return material;
 }
 

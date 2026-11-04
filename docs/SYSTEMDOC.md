@@ -557,3 +557,5 @@ cargo-shuttle.glb; TB-PORT-01 uses hangar-port.glb. These are generic transport
 props. Opponent racing craft selection remains owned by existing racer definitions.
 Load each source once, clone scene nodes, share immutable GPU resources and retain
 fallback primitives on failure. Imported group descriptions track provisional art.
+
+2026-11-04: Elite catch-up ceiling is now 8%, shared equally by player and CPU; this supersedes the earlier 2% cap. Thresholds and smoothing remain unchanged.

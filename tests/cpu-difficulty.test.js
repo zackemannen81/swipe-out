@@ -44,7 +44,7 @@ test('shortcut decisions reflect level and personality, are repeatable and vary 
   for(const level of Object.keys(CPU_DIFFICULTIES))assert.ok(rate(level,0.15)<rate(level,0.85));
 });
 
-test('Elite catch-up is capped at 2% equally for player and CPU',()=>{
+test('Difficulty catch-up caps apply equally to player and CPU',()=>{
   for(const level of Object.keys(CPU_DIFFICULTIES)) {
     const racers=[1000,0,0].map(distance=>({physics:{distance,catchUpBonus:0},topSpeed:100,finished:false}));
     for(let i=0;i<600;i++)updateCatchUp(racers,1/60,10000,true,CPU_DIFFICULTIES[level].catchUp);

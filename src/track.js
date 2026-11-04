@@ -126,8 +126,13 @@ export function createTrack(definition = NEON_CAUSEWAY) {
   const trackWidth = getTrackWidth(curve, 0);
   const widthAt = u => getTrackWidth(curve,u);
   ribbon(0, widthAt, roadMaterial, 0, 900);
-  ribbon(u => -(widthAt(u)/2-0.18), 0.19, pinkMaterial, 0.075);
-  ribbon(u => widthAt(u)/2-0.18, 0.19, cyanMaterial, 0.075);
+  if(vitrum){
+    const edgeMaterial=new THREE.MeshStandardMaterial({color:0xffbd55,emissive:0xffa326,emissiveIntensity:1.7,roughness:.5,side:THREE.DoubleSide});
+    for(const side of [-1,1])ribbon(u=>side*(widthAt(u)/2-.46),.32,edgeMaterial,.035,900);
+  }else{
+    ribbon(u => -(widthAt(u)/2-0.18), 0.19, pinkMaterial, 0.075);
+    ribbon(u => widthAt(u)/2-0.18, 0.19, cyanMaterial, 0.075);
+  }
   //ribbon(-trackWidth / 2 - 0.15, 0.1, transparentDarkMaterial, 0.14);
   //ribbon(trackWidth / 2 + 0.15, 0.1, transparentDarkMaterial, 0.14);
 
