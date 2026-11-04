@@ -59,6 +59,7 @@ export function createTourBus({container,templates,frontEnd,tracks}){
  }
  draw();
  return {hub,render(renderer,time,motion,drawScene){
+  hub.loadAssets();
   syncCraft();const dt=lastTime===null?0:Math.min(.05,Math.max(0,time-lastTime));lastTime=time;
   hub.camera.aspect=window.innerWidth/window.innerHeight;hub.camera.updateProjectionMatrix();hub.update(dt,motion);
   drawScene(hub.scene,hub.camera);

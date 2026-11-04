@@ -1087,3 +1087,74 @@ and abandon/menu return, missing Necros handling, seeded exact Necros setup,
 initial camera/pillar obstruction corrected. Hardware/mobile FPS not measured.
 Evidence: tmp/tour-tests.txt, tmp/tour-browser.txt, tmp/tour-build.txt,
 tmp/tour-hangar.png, tmp/tour-workshop.png and other station screenshots.
+## 2026-11-03 — VITRUM-STUNTS-001
+Built-in Neural Ascent now has a 20 m physical road gap around 321 m after
+start, with raised launch/landing ribbon and a 44 m landing apron. A continuous
+360-degree magnetic roll spans about 1,051 m from Great Canopy toward Glassroot
+Ascent. The roll is lifted above the rooted shelf. No handling changes.
+VITRUM_SCENERY preserves pre-stunt coordinates/banks for organic regeneration;
+VITRUM_STUNTS exposes roll boundaries. Existing scenery and browser saves remain.
+Verified: six Vitrum tests (including three real landings per player/CPU race,
+all difficulties, both handling modes, 30/120 Hz, delivered mesh clearance and
+219 supported props), original-rise camera regression, feature suite and build.
+
+## 2026-11-03 — TOUR-PLANET-001
+Necros in the Tour Bus uses the user's supplied JPG surface, cloud and space
+textures under public/images/tour-bus. Surface sphere radius 27, cloud shell
+27.55, opacity 0.25, depthWrite false. Surface has faint emission; slow separate
+rotations respect reduced motion. Vitrum retains its original tinted planet/ring.
+Textures are loaded only in-browser and disposed with the hub. Object manifest updated.
+Verified scene inventory/navigation test, build, isolated Chrome image decoding,
+Necros/Vitrum/return switching and inspected tmp/tour-necros-textured.png; no JS errors.
+
+## 2026-11-03 — TOUR-MOON-PAD-001
+Added Necros moon with supplied images.jpg at (-29,16,-103), radius 5.2.
+Moon hides with Necros when selecting Vitrum. Added user's self-contained repair
+platform GLB (~18 MB, 30,216 triangles), loaded on first Tour Bus render. Uniform
+fit to 8.6 m footprint, base on deck; central downward ray sets craft support
+height (~3.105). Old primitive platform remains during load/on error. Imported
+geometry/materials/textures are owned and disposed, including a late load result.
+Workshop camera reframed upward. Object inventory now has 45 named groups and
+records normalized imported platform bounds. Desktop originals unchanged.
+Validation: scene test/build passed; isolated Chrome loaded embedded textures,
+rendered workshop and moon, and switched destinations without JS errors.
+Evidence: tmp/tour-repair-platform.png and tmp/tour-necros-moon.png.
+
+## 2026-11-03 — TOUR-SKY-002
+Tour Bus sky now uses the supplied warm Gemini image, copied as
+public/images/tour-bus/space-skybox-warm.jpg. Original cool sky retained unused.
+Browser image decode/world switching passed with no JS errors; observation
+screenshot visually inspected. Planet, clouds, moon and platform unchanged.
+
+## 2026-11-03 — TOUR-DOCKS-001
+Left docking row now trials three outside-hangar GLB modules (8.8 m fit), three
+shared generic cargo-shuttle instances (4.8 m fit) and a 6 m hangar-port at left
+wall. Source Space Shuttle visibly contains an open cockpit/interior; retained
+as provisional transport art, not an opponent assignment. CPU craft unchanged.
+Heavy source 80.54 MB / 2,073,209 triangles simplified to 17.61 MB / 232,156
+triangles using gltf-transform simplify --ratio 0.04 --error 0.01. Originals intact.
+All sources load once on first hub display, instances share geometry/materials;
+fallbacks and late-load disposal retained. Object guide now covers 46 groups.
+Validation: scene test and build pass (existing chunk warning). Isolated Chrome
+loads all eight imported instances without page errors; overview and close-up
+inspected at tmp/tour-docks.png and tmp/tour-docks-close.png.
+
+## 2026-11-03 — CPU-ELITE-AUDIT-001
+User reports runaway lead on Neural Ascent, Swipeout, Elite, steer assist off.
+Audit only: no handling, AI or rubberbanding tuning changed.
+Catch-up uses accumulated lap distance, shared 2 s start / 8 s full thresholds,
+1.5 s smoothing and Elite 2% ceiling (Pilot/Rookie 8%). Leader change does not
+reverse/disable follower help. Help raises nominal engine limit, not actual speed
+or leader-relative pace; downhill/boost overspeed can greatly exceed this limit.
+AI still brakes for corners, traffic and gap approach. Vanta 184 -> 187.68 and
+Nexus 211 -> 215.22 at full Elite bonus. Default player reference 163 gives
+326 m activation / 1,304 m full-help gaps. These are estimated seconds, not timing gates.
+Validation: catch-up 7/7, longitudinal 3/3, difficulty 5/6. Existing Foundry
+ordering test fails: Pilot mean 113.439 s, Elite 116.122 s; all finish, Elite has
+189 wall hits and 4 recoveries versus Pilot 163 hits / 2 recoveries in this run.
+Matched Vitrum input-only simulation did not reproduce user's exact runaway
+lead; CPU retained lead in that run. Strong evidence of weak catch-up and AI
+balance regression, not proof of a leader-transition code defect. Suggested next
+controlled experiment: restore shared 8% Elite ceiling before changing thresholds
+or AI braking; verify with user driving and repeated race benchmarks.
+Evidence: tmp/probe-elite.mjs, tests/catch-up.test.js, tests/cpu-difficulty.test.js.

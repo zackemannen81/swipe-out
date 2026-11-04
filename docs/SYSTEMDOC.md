@@ -530,3 +530,30 @@ Reuse existing loadout and race setup; preserve exact Necros saved-track identit
 Vitrum is an open race destination until multi-world career progression is designed.
 Planet geometry, furnishings and background shuttles remain blockout art.
 Public civilisation transmissions only; do not expose finale material in this hub.
+### Vitrum stunt authoring
+`src/track-vitrum.js` authors scenery on the original upright curve, then adds
+launch control points and a continuous unwrapped 360-degree bank to the racing
+ribbon. `VITRUM_SCENERY` is the stable curve for organic mesh generation;
+`VITRUM_STUNTS` identifies the roll span. Do not regenerate grounded scenery
+against the rolled racing frame. Existing gap-flight and magnetic physics own
+traversal; the track does not override handling.
+
+### Tour Bus planet textures
+TOUR_PLANET in src/tour-bus.js owns local surface/cloud/sky paths, sphere radii
+and cloud opacity. Necros has a textured surface plus separate transparent shell;
+Vitrum retains its prototype planet. Shared space sphere is unlit and fog-free.
+All hub textures are owned and disposed by the scene.
+
+### Tour Bus imported service platform and moon
+TB-PAD-01 loads public/models/tour-bus/repair-platform.glb once, on first hub
+render. Primitive pad is a loading/error fallback. Uniform XZ fit and grounded
+minimum Y preserve proportions; a central ray sets racer height above the deck.
+Hub owns imported GPU resources and handles disposal during pending loads.
+TB-MOON-01 is a textured satellite visible only for Necros.
+
+### Tour Bus left dock trials
+TB-DOCK-01..03 share outside-hangar.glb; TB-SHUTTLE-01..03 share the simplified
+cargo-shuttle.glb; TB-PORT-01 uses hangar-port.glb. These are generic transport
+props. Opponent racing craft selection remains owned by existing racer definitions.
+Load each source once, clone scene nodes, share immutable GPU resources and retain
+fallback primitives on failure. Imported group descriptions track provisional art.

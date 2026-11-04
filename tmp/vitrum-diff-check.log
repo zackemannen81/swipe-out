@@ -1,0 +1,48 @@
+warning: in the working copy of 'docs/CURRENT_STATUS.md', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'docs/CURRENT_TASK.md', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'docs/FILESTRUCTURE.md', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'docs/JOURNAL.md', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'docs/SYSTEMDOC.md', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'src/game.js', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'src/opponents.js', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'src/shaders.js', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'src/tour-bus-ui.js', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'src/tour-bus.js', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'src/track-vitrum.js', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'src/track.js', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'tests/camera-hop.test.js', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'tests/vitrum.test.js', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'tools/build-vitrum-organics.mjs', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'tools/document-tour-bus.mjs', CRLF will be replaced by LF the next time Git touches it
+src/shaders.js:260: trailing whitespace.
++    uFrostedColor: { value: new THREE.Color('#1a2230') }, 
+src/shaders.js:264: trailing whitespace.
++    uVeinGlow: { value: 1.5 },   
+src/shaders.js:265: trailing whitespace.
++    uRoughness: { value: 0.6 },   
+src/shaders.js:266: trailing whitespace.
++    uClearcoat: { value: 1.0 }, 
+src/shaders.js:277: trailing whitespace.
++        
+src/shaders.js:279: trailing whitespace.
++        
+src/shaders.js:282: trailing whitespace.
++        
+src/shaders.js:356: trailing whitespace.
++        // LAYER 1: SMOKY FROSTED GLASS BASE 
+src/shaders.js:361: trailing whitespace.
++        // LAYER 2: EMISSIVE RAINBOW VEIN SYSTEM 
+src/shaders.js:368: trailing whitespace.
++        
+src/shaders.js:371: trailing whitespace.
++        
+src/shaders.js:373: trailing whitespace.
++        
+src/shaders.js:379: trailing whitespace.
++        // LAYER 3: REFLECTIVE CLEARCOAT 
+src/shaders.js:381: trailing whitespace.
++        vec3 reflectionColor = vec3(1.0); 
+src/shaders.js:382: trailing whitespace.
++        
+src/shaders.js:399: trailing whitespace.
++    

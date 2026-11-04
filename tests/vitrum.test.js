@@ -2,9 +2,9 @@ import * as THREE from 'three';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {VITRUM as track,VITRUM_SECTORS as sectors,VITRUM_SUPPORTS} from '../src/track-vitrum.js';
+import {VITRUM as track,VITRUM_SECTORS as sectors,VITRUM_SUPPORTS,VITRUM_STUNTS} from '../src/track-vitrum.js';
 import {normalizeTrack,parseTrack,serializeTrack} from '../src/track-format.js';
-import {createTrackCurve,getTrackFrame,canFinishRace} from '../src/track-path.js';
+import {createTrackCurve,getTrackFrame,getTrackWidth,canFinishRace} from '../src/track-path.js';
 import {createTrack,disposeTrackGroup} from '../src/track.js';
 import {createShipPhysics,stepShipPhysics} from '../src/ship-physics.js';
 import {createOpponentState,RACER_DEFINITIONS,updateOpponents,resetOpponents} from '../src/opponents.js';
@@ -39,11 +39,11 @@ test('Vitrum round-trips editor data, ships self-contained models and safe off-c
  }
  assert.ok(track.pads.some(p=>p.offset<0)&&track.pads.some(p=>p.offset>0));
 });
-test('Vitrum has seven ordered sectors, an upright smooth road, descent and no road overlap',()=>{
+test('Vitrum has seven ordered sectors, a smooth full magnetic roll, descent and no road overlap',()=>{
  const c=createTrackCurve(track),l=c.getLength(),frames=[];let minSlope=0,minY=Infinity,maxY=-Infinity;
  assert.equal(Object.keys(sectors).length,7);assert.ok(l>8000&&l<10000);
- for(let d=0;d<l;d+=12){const f=getTrackFrame(c,d/l);frames.push(f);minSlope=Math.min(minSlope,f.tangent.y);minY=Math.min(minY,f.center.y);maxY=Math.max(maxY,f.center.y);assert.ok(f.normal.y>.7);}
- assert.ok(maxY-minY>550);assert.ok(minSlope<-.45);
+ for(let d=0;d<l;d+=12){const f=getTrackFrame(c,d/l);frames.push(f);minSlope=Math.min(minSlope,f.tangent.y);minY=Math.min(minY,f.center.y);maxY=Math.max(maxY,f.center.y);if(d/l<VITRUM_STUNTS.rollStart||d/l>VITRUM_STUNTS.rollEnd)assert.ok(f.normal.y>.7);if(frames.length>1)assert.ok(f.normal.dot(frames.at(-2).normal)>.97);}
+ assert.ok(frames.some(f=>f.normal.y<-.9));assert.equal(track.gaps.length,1);assert.ok(maxY-minY>550);assert.ok(minSlope<-.45);
  for(let i=0;i<frames.length;i++)for(let j=i+1;j<frames.length;j++)if(Math.min(j-i,frames.length-j+i)*12>80)assert.ok(frames[i].center.distanceTo(frames[j].center)>40,`overlap ${i},${j}`);
  assert.ok(getTrackFrame(c,.99999).tangent.dot(getTrackFrame(c,0).tangent)>.999);
 });
@@ -51,7 +51,7 @@ test('Vitrum CPU field finishes three laps on Rookie, Pilot and Elite without re
  const {curve,group,boostPads}=createTrack(track);try{for(const difficulty of ['rookie','pilot','elite']){
  const racers=RACER_DEFINITIONS.map(d=>createOpponentState(d));resetOpponents(racers,difficulty);
  for(let i=0;i<60*420&&racers.some(o=>o.finishTime===null);i++)updateOpponents(racers,curve,1/60,(i+1)/60,true,{boostPads,trackWidth:track.width});
- assert.ok(racers.every(o=>o.finishTime!==null),difficulty);assert.ok(racers.every(o=>o.physics.recoveries===0),difficulty);
+ assert.ok(racers.every(o=>o.finishTime!==null),difficulty);assert.ok(racers.every(o=>o.physics.recoveries===0),difficulty);assert.ok(racers.every(o=>o.physics.landings===3),difficulty);
  }}finally{disposeTrackGroup(group);}
 });
 test('Vitrum player completes ordered three laps with both handling modes and assistance off',()=>{
@@ -63,7 +63,7 @@ test('Vitrum player completes ordered three laps with both handling modes and as
  const steer=handlingMode==='wipeout'?Math.max(-1,Math.min(1,s.yaw*3+s.lateralOffset*.012+s.lateralVelocity*.045)):Math.max(-1,Math.min(1,s.lateralOffset*.06+s.lateralVelocity*.15));
  const pose=stepShipPhysics(s,{steer,thrust:1},1/hz,c,210,track.width);assert.ok(pose.position.toArray().every(Number.isFinite));
  }
- assert.ok(canFinishRace(c,s),handlingMode+' '+hz);assert.equal(s.recoveries,0);
+ assert.ok(canFinishRace(c,s),handlingMode+' '+hz);assert.equal(s.recoveries,0,handlingMode+' '+hz);assert.equal(s.landings,3);
  }
 });
 
@@ -150,7 +150,7 @@ test('organic passages leave real ship space open inside their enclosing bounds'
  assert.deepEqual(floating,[],'planted model feet need physical soil/root support');
  for(let i=0;i<1200;i++){
   const f=getTrackFrame(c,i/1200);
-  for(const lane of [-12,-6,0,6,12]){
+  for(const lane of [-1,-.5,0,.5,1].map(v=>v*(getTrackWidth(c,i/1200,track.width)/2-1))){
    const origin=f.center.clone().addScaledVector(f.right,lane).addScaledVector(f.normal,.15);
    ray.set(origin,f.normal);ray.near=0;ray.far=9;
    if(ray.intersectObjects(meshes,false).length)failures.push({u:i/1200,lane});

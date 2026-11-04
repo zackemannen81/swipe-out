@@ -1,0 +1,3 @@
+import {VITRUM} from '../src/track-vitrum.js';import {createTrackCurve,canFinishRace} from '../src/track-path.js';import {createShipPhysics,stepShipPhysics} from '../src/ship-physics.js';
+const c=createTrackCurve(VITRUM),s=createShipPhysics(140,{handlingMode:'wipeout'});s.assistLevel=0;
+for(let i=0;i<30*420&&!canFinishRace(c,s);i++) {let prior=s.flight?{p:s.distance,l:s.lateralOffset,h:s.verticalOffset,v:s.speed,t:s.flight.time}:null;let n=s.launches,r=s.recoveries;stepShipPhysics(s,{steer:Math.max(-1,Math.min(1,s.yaw*3+s.lateralOffset*.012+s.lateralVelocity*.045)),thrust:1},1/30,c,210,26);if(n!==s.launches)console.log('launch',s.speed,s.lateralOffset,s.flight.velocity.toArray());if(r!==s.recoveries)console.log('FAIL',prior);}

@@ -1,6 +1,6 @@
 # Turnébussen – objektlista för modellbyte
 
-Första byggversionen, 3 november 2026. Detta dokument beskriver vad varje namngiven grupp i 3D-prototypen ska föreställa. Alla objekt är enkla platshållare utom spelarens befintliga racerskepp. JSON-filen bredvid innehåller exakta koordinater, rotationer och utbredning för modellmatchning.
+Första byggversionen, 3 november 2026. Detta dokument beskriver vad varje namngiven grupp i 3D-prototypen ska föreställa. Geometrin är enkla platshållare utom spelarens befintliga racerskepp och importerade serviceplattformen, hangarmodulerna, sidoporten och generiska fraktskyttlarna. Plattformens mått i listan avser den importerade modellen efter skalning. Necros använder nu dina yt-, moln- och rymdtexturer under public/images/tour-bus. JSON-filen bredvid innehåller exakta koordinater, rotationer och utbredning för modellmatchning.
 
 ## Så hittar du prototypen
 
@@ -44,14 +44,15 @@ Position och mått anges som X / Y / Z. Varje rad motsvarar en utbytbar grupp; d
 | TB-WALL-L | Hangarvägg | P2 | -23 / 0 / 0 | 1 / 18 / 66 | Paneler, serviceöppningar och ventilationsfält. |
 | TB-GALLERY-R | Servicebalkong | P2 | 20 / 0 / 0 | 4.07 / 1.85 / 63 | Gångbrygga med räcke och tekniska skåp längs hangaren. |
 | TB-WALL-R | Hangarvägg | P2 | 23 / 0 / 0 | 1 / 18 / 66 | Paneler, serviceöppningar och ventilationsfält. |
-| TB-PAD-01 | Spelarens serviceplattform | P1 | 4 / 0 / 4 | 8.6 / 0.58 / 8.6 | Låg rund lyftplattform med belysta kanter, anslutningar och åtkomstpaneler. |
+| TB-PAD-01 | Spelarens serviceplattform | P1 | 4 / 0 / 4 | 8.48 / 2.98 / 8.6 | Importerad repair-platform.glb, proportionellt skalad till 8,6 m bredd och grundad på däcket. Enkel ljusplattform används medan modellen laddas eller om laddningen misslyckas. |
 | TB-RACER-01 | Utrustat racerskepp | P1 | 4 / 1.15 / 4 | 0 / 0 / 0 | Visar spelarens befintliga valda skepp och finish. Återanvänd spelets racer; ingen ny modell behövs. |
-| TB-DOCK-01 | Bakgrundsdocka | P2 | -12 / 0 / -4 | 8 / 0.34 / 7 | Rektangulär parkeringsplats med laststöd. Generiska serviceskyttlar, inte nya upplåsta racers. |
-| TB-SHUTTLE-01 | Serviceskyttel | P2 | -12 / 1 / -4 | 5 / 1.38 / 5.1 | Enkel transportfarkost som skapar skala och aktivitet. Byt mot optimerad bakgrundsmodell. |
-| TB-DOCK-02 | Bakgrundsdocka | P2 | -12 / 0 / -14 | 8 / 0.34 / 7 | Rektangulär parkeringsplats med laststöd. Generiska serviceskyttlar, inte nya upplåsta racers. |
-| TB-SHUTTLE-02 | Serviceskyttel | P2 | -12 / 1 / -14 | 5 / 1.38 / 5.1 | Enkel transportfarkost som skapar skala och aktivitet. Byt mot optimerad bakgrundsmodell. |
-| TB-DOCK-03 | Bakgrundsdocka | P2 | -12 / 0 / -24 | 8 / 0.34 / 7 | Rektangulär parkeringsplats med laststöd. Generiska serviceskyttlar, inte nya upplåsta racers. |
-| TB-SHUTTLE-03 | Serviceskyttel | P2 | -12 / 1 / -24 | 5 / 1.38 / 5.1 | Enkel transportfarkost som skapar skala och aktivitet. Byt mot optimerad bakgrundsmodell. |
+| TB-DOCK-01 | Bakgrundsdocka | P2 | -12 / 0 / -4 | 8.8 / 6.11 / 8.79 | Importerad öppen hangarmodul med tre valvbågar och golv. Upprepas runt generiska fraktskyttlar; inga motståndarskepp tilldelas här. |
+| TB-SHUTTLE-01 | Serviceskyttel | P2 | -12 / 0.35 / -4 | 4.8 / 3.6 / 4.3 | Tillfällig generisk Meshy Space Shuttle med synlig cockpit/interiör, optimerad spelkopia. Dekoration i fraktdockan; påverkar inte CPU-racers eller deras slutliga skepp. |
+| TB-DOCK-02 | Bakgrundsdocka | P2 | -12 / 0 / -14 | 8.8 / 6.11 / 8.79 | Importerad öppen hangarmodul med tre valvbågar och golv. Upprepas runt generiska fraktskyttlar; inga motståndarskepp tilldelas här. |
+| TB-SHUTTLE-02 | Serviceskyttel | P2 | -12 / 0.35 / -14 | 4.8 / 3.6 / 4.3 | Tillfällig generisk Meshy Space Shuttle med synlig cockpit/interiör, optimerad spelkopia. Dekoration i fraktdockan; påverkar inte CPU-racers eller deras slutliga skepp. |
+| TB-DOCK-03 | Bakgrundsdocka | P2 | -12 / 0 / -24 | 8.8 / 6.11 / 8.79 | Importerad öppen hangarmodul med tre valvbågar och golv. Upprepas runt generiska fraktskyttlar; inga motståndarskepp tilldelas här. |
+| TB-SHUTTLE-03 | Serviceskyttel | P2 | -12 / 0.35 / -24 | 4.8 / 3.6 / 4.3 | Tillfällig generisk Meshy Space Shuttle med synlig cockpit/interiör, optimerad spelkopia. Dekoration i fraktdockan; påverkar inte CPU-racers eller deras slutliga skepp. |
+| TB-PORT-01 | Fraktdockans sidoport | P1 | -19.5 / 0 / -14 | 6 / 4.05 / 6 | Importerad hangar_port.glb vid vänster sidovägg, med portpanel och servicegångar. |
 | TB-CRANE-01 | Traverskran | P1 | 4 / 13 / 4 | 30 / 6.5 / 2 | Takbalk med löpvagn, dubbla vajrar och serviceok. |
 | TB-CONSOLE-01 | Utrustningsterminal | P1 | 9 / 0 / 6 | 1.5 / 1.4 / 0.98 | Lutande skärm på stativ intill spelarens plattform. Öppnar garage. |
 | TB-NEXUS-01 | Briefingbord | P1 | 12 / 0 / -15 | 5.2 / 3.18 / 5.2 | Runt hologrambord med planetprojektion. Välj Necros eller Vitrum. |
@@ -74,8 +75,9 @@ Position och mått anges som X / Y / Z. Varje rad motsvarar en utbytbar grupp; d
 | TB-CARGO-07 | Reservdelscontainer | P2 | 17 / 0 / 2 | 1.5 / 1.4 / 2.1 | Stapelbar låda med lås, hörnskydd och märkning. En modell kan återanvändas. |
 | TB-WINDOW-01 | Orbitalfönstrets ram | P1 | 0 / 0 / -32 | 46 / 19.5 / 1 | Stor öppen fönsterram. Ingen tung genomskinlig glasruta behövs i prototypen. |
 | TB-RAIL-01 | Observationsräcke | P2 | 0 / 0 / -27 | 40.09 / 1.26 / 0.11 | Lågt skyddsräcke längs planetvyn. |
-| TB-PLANET-01 | Planetkuliss | P1 | 8 / 7 / -88 | 72.85 / 54 / 69.2 | Procedural sfär som representerar aktuell destination, inte en färdig planetdesign. |
-| TB-STARS-01 | Stjärnfält | P2 | 0 / 0 / 0 | 259.43 / 159.1 / 69.47 | Billig punktkuliss bakom orbitalfönstret. Behåll procedural eller ersätt med bakgrund. |
+| TB-PLANET-01 | Planetkuliss | P1 | 8 / 7 / -88 | 77.91 / 55.1 / 77.91 | Necros: brinnande yttextur på sfär och separat molnskal med opacitet 0,25. Vitrum använder tills vidare en färgad sfär. |
+| TB-MOON-01 | Necros måne | P2 | -29 / 16 / -103 | 10.4 / 10.4 / 10.4 | Liten stenig måne med användarens grå yttextur. Syns tillsammans med Necros utanför orbitalfönstret. |
+| TB-STARS-01 | Stjärnfält | P2 | 0 / 0 / 0 | 560 / 560 / 560 | Användarens varma rymdbild (space-skybox-warm.jpg) på en inåtvänd sfär, kompletterad med ett glest punktstjärnfält bakom fönstret. |
 
 ## Övriga scenkomponenter
 

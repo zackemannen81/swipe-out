@@ -147,10 +147,10 @@ if (menuButton) {
   });
 }
 
-export const SPEEDCALIBRATION = 86; // Justera detta värde för att kalibrera spelets hastighe
+export const SPEEDCALIBRATION = 98; // Justera detta värde för att kalibrera spelets hastighe
 // Phase 1: renderer / projection. No scene draw or postprocessing yet.
 export const scene = new THREE.Scene();
-scene.fog = new THREE.FogExp2(0x181822, 0.0039);
+scene.fog = new THREE.FogExp2(0x181822, 0.009);
 const initialWidth = Math.max(1, window.innerWidth);
 const initialHeight = Math.max(1, window.innerHeight);
 const camera = new THREE.PerspectiveCamera(

@@ -4,7 +4,7 @@ const hub=createTourBusScene(),rows=hub.manifest();
 writeFileSync('docs/TOUR_BUS_OBJECTS.json',JSON.stringify(rows,null,2)+'\n');
 let doc=`# Turnébussen – objektlista för modellbyte
 
-Första byggversionen, 3 november 2026. Detta dokument beskriver vad varje namngiven grupp i 3D-prototypen ska föreställa. Alla objekt är enkla platshållare utom spelarens befintliga racerskepp. JSON-filen bredvid innehåller exakta koordinater, rotationer och utbredning för modellmatchning.
+Första byggversionen, 3 november 2026. Detta dokument beskriver vad varje namngiven grupp i 3D-prototypen ska föreställa. Geometrin är enkla platshållare utom spelarens befintliga racerskepp och importerade serviceplattformen, hangarmodulerna, sidoporten och generiska fraktskyttlarna. Plattformens mått i listan avser den importerade modellen efter skalning. Necros använder nu dina yt-, moln- och rymdtexturer under public/images/tour-bus. JSON-filen bredvid innehåller exakta koordinater, rotationer och utbredning för modellmatchning.
 
 ## Så hittar du prototypen
 

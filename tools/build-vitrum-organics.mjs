@@ -4,7 +4,7 @@ import * as T from 'three';
 import {mergeGeometries,mergeVertices} from 'three/addons/utils/BufferGeometryUtils.js';
 import {GLTFExporter} from 'three/addons/exporters/GLTFExporter.js';
 import {mkdir,writeFile,readFile} from 'node:fs/promises';
-import {VITRUM,VITRUM_SECTORS,VITRUM_SUPPORTS} from '../src/track-vitrum.js';
+import {VITRUM_SCENERY as VITRUM,VITRUM_SECTORS,VITRUM_SUPPORTS} from '../src/track-vitrum.js';
 import {createTrackCurve,getTrackFrame} from '../src/track-path.js';
 import {forestMap} from '../src/vitrum-materials.js';
 import {forestBankHeight} from '../src/vitrum-terrain.js';

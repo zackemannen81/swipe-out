@@ -3,9 +3,9 @@ import assert from 'node:assert/strict';
 import * as THREE from 'three';
 import {createTrackCamera} from '../src/track-camera.js';
 import {createTrackCurve,getTrackFrame} from '../src/track-path.js';
-import {VITRUM} from '../src/track-vitrum.js';
+import {VITRUM_SCENERY as VITRUM} from '../src/track-vitrum.js';
 
-test('Swipeout chase does not kick a surface-bound hull vertically on Vitrum rises',()=>{
+test('Swipeout chase does not kick a surface-bound hull vertically on original Vitrum rises (before intentional stunts)',()=>{
   const curve=createTrackCurve(VITRUM), speed=240;
   for(const hz of [30,60,120]){
     const camera=new THREE.PerspectiveCamera(65,2,.1,10000),follow=createTrackCamera();

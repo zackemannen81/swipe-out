@@ -272,7 +272,7 @@
       0,
       4
     ],
-    "description": "Låg rund lyftplattform med belysta kanter, anslutningar och åtkomstpaneler.",
+    "description": "Importerad repair-platform.glb, proportionellt skalad till 8,6 m bredd och grundad på däcket. Enkel ljusplattform används medan modellen laddas eller om laddningen misslyckas.",
     "priority": "P1",
     "rotation": [
       0,
@@ -280,8 +280,8 @@
       0
     ],
     "size": [
-      8.6,
-      0.58,
+      8.48,
+      2.98,
       8.6
     ]
   },
@@ -316,7 +316,7 @@
       0,
       -4
     ],
-    "description": "Rektangulär parkeringsplats med laststöd. Generiska serviceskyttlar, inte nya upplåsta racers.",
+    "description": "Importerad öppen hangarmodul med tre valvbågar och golv. Upprepas runt generiska fraktskyttlar; inga motståndarskepp tilldelas här.",
     "priority": "P2",
     "rotation": [
       0,
@@ -324,9 +324,9 @@
       0
     ],
     "size": [
-      8,
-      0.34,
-      7
+      8.8,
+      6.11,
+      8.79
     ]
   },
   {
@@ -335,10 +335,10 @@
     "label": "Serviceskyttel",
     "position": [
       -12,
-      1,
+      0.35,
       -4
     ],
-    "description": "Enkel transportfarkost som skapar skala och aktivitet. Byt mot optimerad bakgrundsmodell.",
+    "description": "Tillfällig generisk Meshy Space Shuttle med synlig cockpit/interiör, optimerad spelkopia. Dekoration i fraktdockan; påverkar inte CPU-racers eller deras slutliga skepp.",
     "priority": "P2",
     "rotation": [
       0,
@@ -346,9 +346,9 @@
       0
     ],
     "size": [
-      5,
-      1.38,
-      5.1
+      4.8,
+      3.6,
+      4.3
     ]
   },
   {
@@ -360,7 +360,7 @@
       0,
       -14
     ],
-    "description": "Rektangulär parkeringsplats med laststöd. Generiska serviceskyttlar, inte nya upplåsta racers.",
+    "description": "Importerad öppen hangarmodul med tre valvbågar och golv. Upprepas runt generiska fraktskyttlar; inga motståndarskepp tilldelas här.",
     "priority": "P2",
     "rotation": [
       0,
@@ -368,9 +368,9 @@
       0
     ],
     "size": [
-      8,
-      0.34,
-      7
+      8.8,
+      6.11,
+      8.79
     ]
   },
   {
@@ -379,10 +379,10 @@
     "label": "Serviceskyttel",
     "position": [
       -12,
-      1,
+      0.35,
       -14
     ],
-    "description": "Enkel transportfarkost som skapar skala och aktivitet. Byt mot optimerad bakgrundsmodell.",
+    "description": "Tillfällig generisk Meshy Space Shuttle med synlig cockpit/interiör, optimerad spelkopia. Dekoration i fraktdockan; påverkar inte CPU-racers eller deras slutliga skepp.",
     "priority": "P2",
     "rotation": [
       0,
@@ -390,9 +390,9 @@
       0
     ],
     "size": [
-      5,
-      1.38,
-      5.1
+      4.8,
+      3.6,
+      4.3
     ]
   },
   {
@@ -404,7 +404,7 @@
       0,
       -24
     ],
-    "description": "Rektangulär parkeringsplats med laststöd. Generiska serviceskyttlar, inte nya upplåsta racers.",
+    "description": "Importerad öppen hangarmodul med tre valvbågar och golv. Upprepas runt generiska fraktskyttlar; inga motståndarskepp tilldelas här.",
     "priority": "P2",
     "rotation": [
       0,
@@ -412,9 +412,9 @@
       0
     ],
     "size": [
-      8,
-      0.34,
-      7
+      8.8,
+      6.11,
+      8.79
     ]
   },
   {
@@ -423,10 +423,10 @@
     "label": "Serviceskyttel",
     "position": [
       -12,
-      1,
+      0.35,
       -24
     ],
-    "description": "Enkel transportfarkost som skapar skala och aktivitet. Byt mot optimerad bakgrundsmodell.",
+    "description": "Tillfällig generisk Meshy Space Shuttle med synlig cockpit/interiör, optimerad spelkopia. Dekoration i fraktdockan; påverkar inte CPU-racers eller deras slutliga skepp.",
     "priority": "P2",
     "rotation": [
       0,
@@ -434,9 +434,31 @@
       0
     ],
     "size": [
-      5,
-      1.38,
-      5.1
+      4.8,
+      3.6,
+      4.3
+    ]
+  },
+  {
+    "id": "TB-PORT-01",
+    "kind": "port",
+    "label": "Fraktdockans sidoport",
+    "position": [
+      -19.5,
+      0,
+      -14
+    ],
+    "description": "Importerad hangar_port.glb vid vänster sidovägg, med portpanel och servicegångar.",
+    "priority": "P1",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      6,
+      4.05,
+      6
     ]
   },
   {
@@ -932,7 +954,7 @@
       7,
       -88
     ],
-    "description": "Procedural sfär som representerar aktuell destination, inte en färdig planetdesign.",
+    "description": "Necros: brinnande yttextur på sfär och separat molnskal med opacitet 0,25. Vitrum använder tills vidare en färgad sfär.",
     "priority": "P1",
     "rotation": [
       0,
@@ -940,9 +962,31 @@
       0
     ],
     "size": [
-      72.85,
-      54,
-      69.2
+      77.91,
+      55.1,
+      77.91
+    ]
+  },
+  {
+    "id": "TB-MOON-01",
+    "kind": "moon",
+    "label": "Necros måne",
+    "position": [
+      -29,
+      16,
+      -103
+    ],
+    "description": "Liten stenig måne med användarens grå yttextur. Syns tillsammans med Necros utanför orbitalfönstret.",
+    "priority": "P2",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      10.4,
+      10.4,
+      10.4
     ]
   },
   {
@@ -954,7 +998,7 @@
       0,
       0
     ],
-    "description": "Billig punktkuliss bakom orbitalfönstret. Behåll procedural eller ersätt med bakgrund.",
+    "description": "Användarens varma rymdbild (space-skybox-warm.jpg) på en inåtvänd sfär, kompletterad med ett glest punktstjärnfält bakom fönstret.",
     "priority": "P2",
     "rotation": [
       0,
@@ -962,9 +1006,9 @@
       0
     ],
     "size": [
-      259.43,
-      159.1,
-      69.47
+      560,
+      560,
+      560
     ]
   }
 ]

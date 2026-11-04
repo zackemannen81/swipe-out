@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import {forestMap} from './vitrum-materials.js';
+import { createVitrumRoad } from './VitrumRoadMaterial.js';
 
 // Per-track ownership: disposeTrackGroup releases every map when rebuilding.
 export function createForestMaps(surface, repeat = [1, 1]) {
@@ -22,19 +23,25 @@ export function createForestMaps(surface, repeat = [1, 1]) {
   };
 }
 
-export function createVitrumDeckMaterial() {
-  const material = new THREE.MeshPhysicalMaterial({
-    ...createForestMaps('mycelium'),
-    // A sealed, dark biological surface: keep map detail under the clear coat.
-    color: 0x8baba3, metalness: 0.22, roughness: 0.42,
-    normalScale: new THREE.Vector2(0.18, 0.18),
-    clearcoat: 0.85, clearcoatRoughness: 0.2,
-    envMap: createDeckEnvironment(), envMapIntensity: 0.28,
-    emissive: 0x69cbb9, emissiveIntensity: 0.32,
-    side: THREE.DoubleSide,
-    vertexColors: true,
+export function createVitrumDeckMaterial(roadUvRepeats = 1) {
+  // Each track build owns its material and generated data textures.
+  const vitrum = createVitrumRoad({
+    width: 512,
+    height: 1024,
+    seed: 1981,
+    roots: 7,
+    glow: 2.4,
+    flowSpeed: 0.11,
+    roadUvRepeats,
   });
+
+  const material = vitrum.material;
   material.name = 'Vitrum/mycelium-deck';
+  material.side = THREE.DoubleSide;    // Magnetic loops and inverted surfaces.
+  material.vertexColors = true;       // Preserve the road's weathered vertex colors.
+  material.envMap = createDeckEnvironment();
+  material.envMapIntensity = 0.55;
+  material.userData.vitrumRoad = vitrum; // Track owns update + disposal.
   return material;
 }
 

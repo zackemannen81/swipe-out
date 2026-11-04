@@ -48,7 +48,7 @@ export function createTrack(definition = NEON_CAUSEWAY) {
     1, Math.round(curve.getLength() / (Math.max(1, getTrackWidth(curve, 0)) * (vitrum ? 1 : 3)))
   );
 
-  const roadMaterial = vitrum ? createVitrumDeckMaterial() : new THREE.MeshStandardMaterial({
+  const roadMaterial = vitrum ? createVitrumDeckMaterial(roadTextureRepeats) : new THREE.MeshStandardMaterial({
     map: trackTexture,
     color: 0xffffff, metalness: 0.88, roughness: 0.78,
     emissive: curve.track.magnetic ? 0x0b2138 : 0x06121c,
@@ -115,7 +115,12 @@ export function createTrack(definition = NEON_CAUSEWAY) {
     if(weathered)geometry.setAttribute('color',new THREE.Float32BufferAttribute(colors,3));
     geometry.setIndex(indices);
     geometry.computeVertexNormals();
-    group.add(new THREE.Mesh(geometry, material));
+    const mesh = new THREE.Mesh(geometry, material);
+    if (weathered) {
+      // Keep Vitrum's plasma/energy moving without uploading textures every frame.
+      mesh.onBeforeRender = () => material.userData.vitrumRoad?.update(performance.now() * 0.001);
+    }
+    group.add(mesh);
   }
 
   const trackWidth = getTrackWidth(curve, 0);
@@ -366,7 +371,13 @@ export function disposeTrackGroup(group) {
     if (object.isInstancedMesh) object.dispose();
   });
   textures.forEach(texture => texture.dispose());
-  materials.forEach(material => material.dispose());
+  materials.forEach(material => {
+    const controller = material.userData?.vitrumRoad;
+    if (controller) {
+      controller.dispose(); // Includes the three generated DataTextures.
+      delete material.userData.vitrumRoad;
+    } else material.dispose();
+  });
   geometries.forEach(geometry => geometry.dispose());
 }
 // Läs av opacity och säkra variabeln

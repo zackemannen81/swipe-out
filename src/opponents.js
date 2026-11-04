@@ -13,16 +13,16 @@ const clamp = THREE.MathUtils.clamp;
 
 // User-tuned physical performance; difficulty changes driving decisions, not these caps.
 export const RACER_DEFINITIONS = [
-  { name: 'Vanta', personality: 'Balanced', risk: 0.5, topSpeed: 165, acceleration: 24, mass: 1.05, reaction: 0.34,
+  { name: 'Vanta', personality: 'Balanced', risk: 0.5, topSpeed: 194, acceleration: 30, mass: 1.05, reaction: 0.34,
     cornering: 0.76, precision: 0.3, lane: -2.4, gridDistance: 6, phase: 0.4,
     modelUrl: '/models/racer_optimized-team2.glb', accentColor: 0xe811ff },
-  { name: 'Kestrel', personality: 'Precise', risk: 0.35, topSpeed: 168, acceleration: 31, mass: 0.9, reaction: 0.23,
+  { name: 'Kestrel', personality: 'Precise', risk: 0.35, topSpeed: 204, acceleration: 28, mass: 0.9, reaction: 0.23,
     cornering: 0.9, precision: 0.18, lane: 2.4, gridDistance: 6, phase: 2.2,
     modelUrl: '/models/racer_optimized-team3.glb', accentColor: 0x00f4e8 },
-  { name: 'Orca', personality: 'Cautious', risk: 0.15, topSpeed: 178, acceleration: 21, mass: 1.3, reaction: 0.4,
+  { name: 'Orca', personality: 'Cautious', risk: 0.15, topSpeed: 212, acceleration: 16, mass: 1.3, reaction: 0.4,
     cornering: 0.72, precision: 0.38, lane: -2.4, gridDistance: 12, phase: 4.1,
     modelUrl: '/models/racer_optimized-team4.glb', accentColor: 0xff4b11 },
-  { name: 'Nexus-9', personality: 'Aggressive', risk: 0.85, topSpeed: 184, acceleration: 17, mass: 1.0, reaction: 0.3,
+  { name: 'Nexus-9', personality: 'Aggressive', risk: 0.85, topSpeed: 221, acceleration: 11, mass: 1.0, reaction: 0.3,
     cornering: 0.82, precision: 0.28, lane: 2.4, gridDistance: 12, phase: 5.8,
     modelUrl: '/models/racer_optimized-team5.glb', accentColor: 0x00f4e8 },
 ];

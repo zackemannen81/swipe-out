@@ -999,3 +999,45 @@ and abandon/menu return, missing Necros handling, seeded exact Necros setup,
 initial camera/pillar obstruction corrected. Hardware/mobile FPS not measured.
 Evidence: tmp/tour-tests.txt, tmp/tour-browser.txt, tmp/tour-build.txt,
 tmp/tour-hangar.png, tmp/tour-workshop.png and other station screenshots.
+## 2026-11-03 — VITRUM-STUNTS-001
+Added a 20 m gap after 321 m and a full 1,051 m magnetic roll in Neural Ascent.
+Raised/widened landing and raised roll maintain clearance against actual scenery.
+Kept scenery authoring snapshot for generator and left handling/custom saves alone.
+Tests: Vitrum 6/6, original camera regression 1/1, track features 10/10; build OK
+(existing chunk warning). CPU all difficulties and both player modes land all three
+laps without recovery. Original camera regression explicitly uses original rises.
+
+## 2026-11-03 — TOUR-PLANET-001
+Added supplied Necros surface, 0.25-opacity cloud shell and space sky to Tour Bus.
+Independent slow rotation and faint surface emission; Vitrum switching preserved.
+Scene test, build and isolated browser texture/switching check passed; screenshot
+inspected at tmp/tour-necros-textured.png. Updated object inventory.
+
+
+## 2026-11-03 — TOUR-MOON-PAD-001
+Added small textured Necros moon and user's repair platform GLB to hub.
+Lazy model load with fallback, uniform fit, grounded base, central-deck craft
+height and owned resource cleanup. Workshop camera raised; 45-group inventory updated.
+Scene test/build and browser rendering/world-switch checks passed. Screenshots
+inspected: tmp/tour-repair-platform.png, tmp/tour-necros-moon.png.
+
+
+## 2026-11-03 — TOUR-SKY-002
+Replaced Tour Bus sky map with supplied warm Gemini JPG; retained prior asset.
+Browser decode/switching check passed; inspected observation screenshot.
+
+
+## 2026-11-03 — TOUR-DOCKS-001
+Trial left dock modules, side port and shared generic Space Shuttle copies added.
+Shuttle simplified 2,073,209 to 232,156 triangles, 80.54 to 17.61 MB. Its open
+cockpit/interior appearance is provisional. Opponent assignments unchanged.
+Scene test/build pass; browser loaded eight instances, no page errors; screenshots inspected.
+
+
+## 2026-11-03 — CPU-ELITE-AUDIT-001
+Investigated Neural Ascent / Swipeout / Elite / assist off runaway-lead report.
+Confirmed intentional shared 2% cap vs 8% other levels, delayed 2–8 s activation,
+correct accumulated-distance accounting and engine-only allowance. Exact symptom
+not reproduced by input-only Vitrum simulation. Tests 15/16; existing Foundry
+Elite-faster-than-Pilot assertion fails (116.122 vs 113.439 s means). No runtime
+changes; documented weak catch-up and AI balancing concern, not proven sign bug.

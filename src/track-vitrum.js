@@ -166,3 +166,25 @@ Object.values(VITRUM_SECTORS).forEach((u,i)=>objects.push({
   model:'/models/stage2/organic/'+VITRUM_MODULES[i]+'.glb',
   position:getTrackFrame(curve,u).center.toArray(),rotation:[0,0,0],scale:[1,1,1],
 }));
+
+// Scenery retains its authored, grounded frame while the racing ribbon performs
+// the stunts. Keep this snapshot for regenerating the organic modules.
+export const VITRUM_SCENERY = {...VITRUM, centerline:points.map(p=>[...p]), pointWidths:[...VITRUM.pointWidths], gaps:[]};
+points.splice(2,0,[0,44,-610],[0,46,-580],[0,46,-560],[0,44,-530],[0,44,-500]);
+VITRUM.pointWidths.splice(2,0,34,38,44,44,38);
+points.splice(1,0,[0,40,-760],[0,40,-700]);
+VITRUM.pointWidths.splice(1,0,26,26);
+// Lift the roll above the rooted roadside shelf, leaving room beneath the hull.
+for(const i of [12,13,14])points[i][1]+=38;
+const stuntBase=createTrackCurve({...VITRUM,centerline:points.map(p=>p.slice(0,3))});
+for(let i=0;i<points.length;i++){
+ const u=progressAtControlPoint(stuntBase,i),f=getTrackFrame(stuntBase,u);
+ const up=new THREE.Vector3(0,1,0).addScaledVector(f.tangent,-f.tangent.y).normalize();
+ const turn=getTrackFrame(stuntBase,(u-.006+1)%1).tangent.cross(getTrackFrame(stuntBase,(u+.006)%1).tangent).y;
+ const bank=THREE.MathUtils.clamp(-turn*100,-22,22);
+ points[i][3]=bank+THREE.MathUtils.radToDeg(Math.atan2(f.tangent.dot(f.normal.clone().cross(up)),f.normal.dot(up)))+Math.max(0,Math.min(4,i-11))*90;
+}
+const stuntCurve=createTrackCurve(VITRUM);
+VITRUM.gaps=[{start:progressAtControlPoint(stuntCurve,5),end:progressAtControlPoint(stuntCurve,6)}];
+export const VITRUM_STUNTS={rollStart:progressAtControlPoint(stuntCurve,11),rollEnd:progressAtControlPoint(stuntCurve,15)};
+VITRUM.pads=VITRUM.pads.filter(p=>p.progress<VITRUM.gaps[0].start-.015 || p.progress>VITRUM.gaps[0].end+.015);

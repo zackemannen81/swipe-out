@@ -444,3 +444,18 @@ New regression tests: tests/finish-features.test.js. Prior task archived in
 - tests/tour-bus.test.js: object identity and camera navigation checks.
 - tools/verify-tour-bus.mjs: isolated browser flow; requires PLAYWRIGHT_MODULE.
 - docs/archive/GLOW-002.md: prior single-light restoration task.
+- `tools/verify-vitrum-stunts.mjs`: isolated browser renders of the Neural Ascent gap and inverted roll; screenshots under ignored `tmp/vitrum`.
+
+- public/images/tour-bus/: user-supplied necros-surface.jpg, necros-clouds.jpg and space-skybox.jpg, copied from Desktop originals.
+- docs/archive/VITRUM-STUNTS-001.md: completed gap/roll task.
+
+- public/models/tour-bus/repair-platform.glb: supplied embedded-texture service platform; original preserved on Desktop.
+- public/images/tour-bus/necros-moon.jpg: supplied moon surface image.
+- docs/archive/TOUR-PLANET-001.md: prior planet texture integration.
+
+- public/images/tour-bus/space-skybox-warm.jpg: active Tour Bus sky, user-supplied warm Gemini image.
+- docs/archive/TOUR-MOON-PAD-001.md: completed moon/platform task.
+
+- public/models/tour-bus/outside-hangar.glb / hangar-port.glb: supplied dock architecture.
+- public/models/tour-bus/cargo-shuttle.glb: simplified copy of supplied Meshy Space Shuttle, shared by background transports.
+- docs/archive/TOUR-SKY-002.md: completed warm sky replacement.
