@@ -391,6 +391,9 @@ select option { color: #eaf3f5; background: #080d14; }
 .driving-settings label { color: #a4b7c6; font: 9px/1.5 'DM Mono', monospace; letter-spacing: .06em; }
 .driving-settings select { display: block; width: 100%; min-width: 0; margin-top: 4px; padding: 9px 7px; border: 1px solid rgba(92, 245, 236, .3); border-radius: 2px; color: var(--cyan); background: #06101b; font: 10px/1.4 'DM Mono', monospace; }
 .driving-settings select:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
+#race-laps-field { grid-column: 1 / -1; max-width: 50%; }
+#race-laps-select:disabled { opacity: .6; cursor: not-allowed; }
+@media (max-width: 600px) { #race-laps-field { max-width: 100%; } }
 .driving-description { margin: 0 0 12px; color: #a4b7c6; font-size: 11px; line-height: 1.5; }
 #assist-select:disabled { opacity: .45; }
 .action-button {

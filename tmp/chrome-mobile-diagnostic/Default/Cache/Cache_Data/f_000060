@@ -1433,7 +1433,7 @@ window.addEventListener('resize', resize, { passive: true });
 resize();
 
 
-const craftTemplates = {racer:craft.clone(true),kestrel:opponents.find(o=>o.name==='Kestrel').group.clone(true),orca:opponents.find(o=>o.name==='Orca').group.clone(true)};
+const craftTemplates = {racer:craft.clone(true),singularity:opponents.find(o=>o.name==='Singularity').group.clone(true),mycelium:opponents.find(o=>o.name==='Mycelium').group.clone(true)};
 const crimsonCraft=await createCraft({accentColor:0xc41426,modelUrl:'/models/necron-crimson-citadel.glb'});
 craftTemplates['necron-crimson-citadel']=crimsonCraft.group;
 const garage = createGarage(craftTemplates);

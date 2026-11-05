@@ -15,8 +15,8 @@ Ingen nivå teleporterar skepp eller höjer deras normala toppfart. Rookie välj
 ett lägre fartmål; nära gap prioriterar alla nivåer rak ansats och tillräcklig
 hoppfart. Boost-plattor, verkliga kontakter och fartförluster gäller fortfarande.
 
-Svårighet och personlighet är separata. Vanta är balanserad, Kestrel precis,
-Orca försiktig och Nexus-9 aggressiv. Riskvilja påverkar omkörningsavstånd,
+Svårighet och personlighet är separata. Vanta är balanserad, Singularity precis,
+Mycelium försiktig och Nexus-9 aggressiv. Riskvilja påverkar omkörningsavstånd,
 kurvmarginal, genvägsval och misstag. Blockerade omkörningslinjer ger följkörning
 och ett farttak bakom framförvarande i stället för en blind sidoförflyttning.
 

@@ -1,3 +1,18 @@
+## 2026-11-04 — RACE-LAPS-001: configurable lap counts
+
+- Added saved 3/5/7/10-lap choice to Race Setup for Quick Race/Campaign.
+- CPU and player finish at the same selected lap count; HUD, checkpoint counts, final-lap announcer, race/campaign records and medal limits scale correctly.
+- Kept legacy 3-lap record identifiers; Cup fixed to 3/round and Time Attack one out plus 3 timed laps to preserve their progression and ghost rules.
+- 22 targeted tests and production build pass. Full suite 155/161; six failures in unrelated catch-up, Foundry CPU, Necros player and thruster-visual tests. Manual browser race/visual validation remains pending.
+- Preserved ongoing VITRUM-EDGES-001 task and unrelated working changes.
+
+## 2026-11-04 — AUDIO-017: GOA by ME pause menu hotfix
+
+- Corrected pause-menu asset path from track_017.m4a to track017.m4a.
+- Registered GOA by ME for persisted soundtrack choice without changing other audio or the active VITRUM-EDGES task.
+- FFmpeg AAC decode, 6 career tests, Vite build and git diff --check passed; browser playback not manually checked.
+- track017.m4a is present locally but still untracked in Git.
+
 ## 2026-10-13 — minimap: live player position
 
 - Changed the minimap player marker to use the craft's current Three.js world position instead of only the route progress centerline.
@@ -20,7 +35,7 @@
 
 ## 2026-10-11 — tighten CPU race difficulty
 
-- Following the user's feedback that the game feels too easy despite the graphics, music, track, and speed feeling right, raised Vanta's cruise speed from 60 to 72.5 and Kestrel's from 70.5 to 78.5 world units/second.
+- Following the user's feedback that the game feels too easy despite the graphics, music, track, and speed feeling right, raised Vanta's cruise speed from 60 to 72.5 and Singularity's from 70.5 to 78.5 world units/second.
 - Kept player speed/controls, rival movement logic, models, and race flow unchanged; the faster deterministic rivals make player throttle and clean steering more important without introducing catch-up behavior.
 - Updated README, current status, and system documentation. Production build, syntax, and whitespace verification remain pending; the new balance has not yet been interactively playtested.
 
@@ -65,7 +80,7 @@
 
 ## 2026-10-10 — IMPLEMENT-004: add the first CPU competition field
 
-- Added two visually distinct procedural rivals, Vanta and Kestrel, to the existing Neon Causeway race. They use fixed lane neighborhoods, subtle deterministic lateral motion, and distinct cruising speeds of 60 and 70.5 world units/second.
+- Added two visually distinct procedural rivals, Vanta and Singularity, to the existing Neon Causeway race. They use fixed lane neighborhoods, subtle deterministic lateral motion, and distinct cruising speeds of 60 and 70.5 world units/second.
 - Added live player placement in the three-racer HUD, rival finish-time recording, final placement on the results screen, and complete rival/player reset on Race Again. Moved finish evaluation after the same-frame rival update to keep placement timing consistent.
 - Documented the prototype boundary: no collisions, rubber-banding, advanced track-aware strategy, audio, or interactive/device verification claims.
 - `npm run build`, `node --check` for game/opponent/craft modules, a deterministic distance/position/reset simulation, and `git diff --check` passed. Browser automation did not start, so interactive race/finish/retry, visual rival readability, and physical-device behavior remain pending.
@@ -191,7 +206,7 @@
 - Validation: checked documentation consistency and ran `git diff --check`.
   No code tests apply because the repository has no game implementation.
 
-## 2026-10-17 � Nebula ion thrusters for every craft
+## 2026-10-17 � Nebula ion thrusters for every craft
 
 - Connected the existing Three-nebula particle configuration to the player and all four CPU racers.
 - Added two independently rendered exhaust emitters per craft, positioned at its paired rear nozzles and transformed with the craft pose.

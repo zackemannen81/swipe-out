@@ -4274,7 +4274,7 @@
         },
         {
             "from": "*",
-            "to": "[*.]liquorcave.com"
+            "to": "[*.]liqumyceliumve.com"
         },
         {
             "from": "*",
@@ -7990,7 +7990,7 @@
         },
         {
             "from": "*",
-            "to": "[*.]vaporcafeonline.net"
+            "to": "[*.]vapmyceliumfeonline.net"
         },
         {
             "from": "*",
@@ -22560,7 +22560,7 @@
         },
         {
             "from": "https://providenceaccounts.b2clogin.com",
-            "to": "https://orca.myonlinechart.org"
+            "to": "https://mycelium.myonlinechart.org"
         },
         {
             "from": "https://www.google.com",
@@ -47847,8 +47847,8 @@
             "to": "https://www.sunarp.gob.pe"
         },
         {
-            "from": "https://vendorcafeportal.yardione.com",
-            "to": "https://prod.vendorcafe.com"
+            "from": "https://vendmyceliumfeportal.yardione.com",
+            "to": "https://prod.vendmyceliumfe.com"
         },
         {
             "from": "https://id.dubai.gov.ae",

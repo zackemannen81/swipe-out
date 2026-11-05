@@ -46,8 +46,8 @@ try{
  assert.match(await page.locator('#result-best-lap').textContent(),/00:39.00/);assert.match(await page.locator('#race-record-result').textContent(),/NEW PERSONAL BEST/);
  await page.locator('#menu-button').click();await page.locator('[data-go=records]').click();assert.match(await page.locator('#race-record-list').textContent(),/Necros/);await page.locator('#menu-back').click();
  await page.locator('[data-go=garage]').click();assert.equal(await page.locator('#garage-ships button:disabled').count(),1);
- await page.locator('#garage-ships button').filter({hasText:'Orca'}).click();await page.locator('#garage-modules button').filter({hasText:'Overdrive'}).click();
- await page.reload();await page.waitForFunction(()=>window.__menuTest);await page.locator('[data-go=garage]').click();assert.equal(await page.locator('#garage-ships button').filter({hasText:'Orca'}).getAttribute('aria-pressed'),'true');assert.equal(await page.locator('#garage-modules button').filter({hasText:'Overdrive'}).getAttribute('aria-pressed'),'true');
+ await page.locator('#garage-ships button').filter({hasText:'Mycelium'}).click();await page.locator('#garage-modules button').filter({hasText:'Overdrive'}).click();
+ await page.reload();await page.waitForFunction(()=>window.__menuTest);await page.locator('[data-go=garage]').click();assert.equal(await page.locator('#garage-ships button').filter({hasText:'Mycelium'}).getAttribute('aria-pressed'),'true');assert.equal(await page.locator('#garage-modules button').filter({hasText:'Overdrive'}).getAttribute('aria-pressed'),'true');
  await page.locator('#menu-back').click();await page.locator('[data-event=race]').click();await page.locator('#start-button').click();assert.ok((await page.evaluate(()=>window.__menuTest.activeTopSpeed))>151);assert.equal(await page.evaluate(()=>window.__menuTest.audio.preferences.sfx),.35);
  await page.evaluate(()=>{window.__menuTest.race.state='ready';window.__menuTest.frontEnd.open();});
  await page.locator('[data-event=time-attack]').click();await page.locator('#start-button').click();assert.equal(await page.evaluate(()=>window.__menuTest.activeTopSpeed),151);

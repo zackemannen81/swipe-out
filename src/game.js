@@ -314,7 +314,7 @@ setupMinimap();
 const thrusters = new ThrusterSystem(scene);
 
 // 1. Invänta spelarens skepp
-const playerCraft = await createCraft({ accentColor: 0x43f6ea, modelUrl: '/models/racer_optimized.glb' });
+const playerCraft = await createCraft({ accentColor: 0xff4b11, modelUrl: '/models/racer_optimized.glb' });
 const craft = playerCraft.group; 
 scene.add(craft);
 const playerThrusters = thrusters.addCraft(craft, playerCraft.color);
@@ -877,7 +877,7 @@ function beginRace() {
   hemisphereLight.intensity=vitrumWorld?0.25:1.8;
   //const trackData = TRACK_CONFIG[currentTrackId].data;
 // Hämta banans namn och gör det till stora bokstäver
-  const loadout = frontEnd.begin(currentTrackId, recordKey({track:trackData}), {difficulty:cupRound?.settings.difficulty ?? selectedCpuDifficulty,handling:activeDrivingSettings.handling,assist:activeDrivingSettings.assist,combat:document.querySelector('#combat-enabled').checked});
+  const loadout = frontEnd.begin(currentTrackId, recordKey({track:trackData}), {difficulty:cupRound?.settings.difficulty ?? selectedCpuDifficulty,handling:activeDrivingSettings.handling,assist:activeDrivingSettings.assist,combat:document.querySelector('#combat-enabled').checked,laps:cupRound?3:frontEnd.profile.laps});
   activeTopSpeed = (baseSpeed + SPEEDCALIBRATION) * loadout.speed;
   applyPlayerLoadout(loadout);
   document.querySelector('#career-result')?.remove();document.querySelector('#race-record-result')?.remove();document.querySelector('#result-best-lap')?.remove();
@@ -909,7 +909,7 @@ const trackAssets = createTrack(trackData);
   race.boostPads = trackAssets.boostPads; // Hämta de slumpade positionerna från banan!
   practice.begin(trackData,curve,race.boostPads,{handling:activeDrivingSettings.handling,
     assist:activeDrivingSettings.assist,topSpeed:baseSpeed+SPEEDCALIBRATION});
-  totalLaps=practice.active?4:3;
+  totalLaps=practice.active?4:cupRound?3:frontEnd.profile.laps;
   for(const opponent of opponents)opponent.group.visible=!practice.active;
   track.traverse((child) => {
     if (child.isMesh) {
@@ -1459,7 +1459,7 @@ window.addEventListener('resize', resize, { passive: true });
 resize();
 
 
-const craftTemplates = {racer:craft.clone(true),kestrel:opponents.find(o=>o.name==='Kestrel').group.clone(true),orca:opponents.find(o=>o.name==='Orca').group.clone(true)};
+const craftTemplates = {racer:craft.clone(true),singularity:opponents.find(o=>o.name==='Singularity').group.clone(true),mycelium:opponents.find(o=>o.name==='Mycelium').group.clone(true)};
 const crimsonCraft=await createCraft({accentColor:0xc41426,modelUrl:'/models/necron-crimson-citadel.glb'});
 // Scale child transforms: garage and race clone these children, not the root.
 for(const child of crimsonCraft.group.children){if(!child.isLight){child.scale.multiplyScalar(CRIMSON_VISUAL_SCALE);child.position.multiplyScalar(CRIMSON_VISUAL_SCALE);}}
@@ -1469,7 +1469,7 @@ craftTemplates['the-sacrifice']=sacrificeCraft.group;
 const garage = createGarage(craftTemplates);
 let playerMaterials=[];
 function applyPlayerLoadout(spec){
-  const accent=spec.ship==='kestrel'?opponents.find(o=>o.name==='Kestrel').craft.color:spec.ship==='orca'?opponents.find(o=>o.name==='Orca').craft.color:playerCraft.color;
+  const accent=spec.ship==='singularity'?opponents.find(o=>o.name==='Singularity').craft.color:spec.ship==='mycelium'?opponents.find(o=>o.name==='Mycelium').craft.color:playerCraft.color;
   thrusters.configureCraft(playerThrusters,spec.ship,accent);
   playerMaterials.forEach(m=>m.dispose());playerMaterials=[];
   craft.clear();
@@ -1688,7 +1688,7 @@ for (const ghost of ghostPool) {
     }
     updateCraftPose(0); // Publish a newly collected boost to the collision velocity.
     updateOpponents(racingOpponents, curve, delta, race.elapsed, true, {
-      player: playerRacer, boostPads: drivingPads, trackWidth,
+      player: playerRacer, boostPads: drivingPads, trackWidth, totalLaps,
     });
     playerRacer.finished = crossedFinish;
     const racers = [playerRacer, ...racingOpponents.map(opponent => ({
@@ -1763,7 +1763,7 @@ for (const ghost of ghostPool) {
 
   } else {
     updateOpponents(racingOpponents, curve, delta, race.elapsed + race.finishElapsed, race.state === 'finished', {
-      boostPads: race.boostPads, trackWidth,
+      boostPads: race.boostPads, trackWidth, totalLaps,
     });
   }
   if(race.state==='racing'&&practice.active){
@@ -1776,12 +1776,12 @@ for (const ghost of ghostPool) {
   }
   if(race.state==='racing'){
     const lap=practice.active?practice.session.completed.length+1:Math.floor(race.distance/curve.getLength())+1;
-    if(lap>spokenLap){spokenLap=lap;if(lap===3)raceAudio.announce('final_lap');}
+    if(lap>spokenLap){spokenLap=lap;if(lap===(practice.active?3:totalLaps))raceAudio.announce('final_lap');}
   }
   if (crossedFinish) finishRace();
   if(race.state==='finished')cup.update([
-    {id:'player',time:race.playerFinishTime,distance:Math.min(race.distance,curve.getLength()*3)},
-    ...opponents.map(o=>({id:o.name,time:o.finishTime,distance:Math.min(o.distance,curve.getLength()*3)})),
+    {id:'player',time:race.playerFinishTime,distance:Math.min(race.distance,curve.getLength()*totalLaps)},
+    ...opponents.map(o=>({id:o.name,time:o.finishTime,distance:Math.min(o.distance,curve.getLength()*totalLaps)})),
   ],race.finishElapsed);
   
 //  combatSightCache.clear();

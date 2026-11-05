@@ -8,25 +8,24 @@ import { getRacerTopSpeed } from './catch-up.js';
 
 import { CPU_DIFFICULTIES, cpuDifficulty, shortcutChoice } from './cpu-difficulty.js';
 
-const TOTAL_LAPS = 3;
 const clamp = THREE.MathUtils.clamp;
 
 // User-tuned physical performance; difficulty changes driving decisions, not these caps.
 export const RACER_DEFINITIONS = [
-  { name: 'Vanta', personality: 'Balanced', risk: 0.5, topSpeed: 194, acceleration: 30, mass: 1.05, reaction: 0.34,
+  { name: 'Vanta', personality: 'Balanced', risk: 0.5, topSpeed: 204, acceleration: 30, mass: 1.05, reaction: 0.34,
     cornering: 0.76, precision: 0.3, lane: -2.4, gridDistance: 6, phase: 0.4,
-    modelUrl: '/models/racer_optimized-team2.glb', accentColor: 0xe811ff },
-  { name: 'Kestrel', personality: 'Precise', risk: 0.35, topSpeed: 204, acceleration: 28, mass: 0.9, reaction: 0.23,
+    modelUrl: '/models/racer_optimized-team2.glb', accentColor: 0x00F4E8 },
+  { name: 'Singularity', personality: 'Precise', risk: 0.35, topSpeed: 214, acceleration: 28, mass: 0.9, reaction: 0.23,
     cornering: 0.9, precision: 0.18, lane: 2.4, gridDistance: 6, phase: 2.2,
-    modelUrl: '/models/racer_optimized-team3.glb', accentColor: 0x00f4e8 },
-  { name: 'Orca', personality: 'Cautious', risk: 0.15, topSpeed: 212, acceleration: 16, mass: 1.3, reaction: 0.4,
+    modelUrl: '/models/racer_optimized-team3.glb', accentColor: 0xa34dff },
+  { name: 'Mycelium', personality: 'Cautious', risk: 0.15, topSpeed: 222, acceleration: 16, mass: 1.3, reaction: 0.4,
     cornering: 0.72, precision: 0.38, lane: -2.4, gridDistance: 12, phase: 4.1,
-    modelUrl: '/models/racer_optimized-team4.glb', accentColor: 0xff4b11 },
-  { name: 'Nexus-9', personality: 'Aggressive', risk: 0.85, topSpeed: 221, acceleration: 11, mass: 1.0, reaction: 0.3,
+    modelUrl: '/models/racer_optimized-team4.glb', accentColor:  0xffc45c },
+  { name: 'Nexus-9', personality: 'Aggressive', risk: 0.85, topSpeed: 231, acceleration: 11, mass: 1.0, reaction: 0.3,
     cornering: 0.82, precision: 0.28, lane: 2.4, gridDistance: 12, phase: 5.8,
-    modelUrl: '/models/racer_optimized-team5.glb', accentColor: 0x00f4e8 },
+    modelUrl: '/models/crimson_deathknight.glb', accentColor: 0xff1838 },
 ];
-
+//0xff4b11
 export function createOpponentState(definition, craft = { group: new THREE.Group() }) {
   const opponent = { ...definition, craft, group: craft.group };
   // Keep existing HUD/checkpoint callers connected to the authoritative physics.
@@ -211,10 +210,10 @@ export function syncOpponentPose(opponent, curve, trackWidth = 10) {
 }
 
 export function updateOpponents(opponents, curve, delta, elapsed, racing, {
-  player = null, boostPads = [], trackWidth = 10,
+  player = null, boostPads = [], trackWidth = 10, totalLaps = 3,
 } = {}) {
   const length = curve.getLength();
-  const totalDistance = length * TOTAL_LAPS;
+  const totalDistance = length * totalLaps;
   for (const opponent of opponents) {
     if (!racing || delta <= 0 || opponent.finishTime !== null) {
       syncOpponentPose(opponent, curve, trackWidth);
@@ -236,7 +235,7 @@ export function updateOpponents(opponents, curve, delta, elapsed, racing, {
       drive(opponent, curve, dt);
       stepShipPhysics(ship, opponent.input, dt, curve, opponent.topSpeed, trackWidth);
       collectBoostPad(ship, boostPads, length, opponent.topSpeed);
-      if (canFinishRace(curve, ship, TOTAL_LAPS)) {
+      if (canFinishRace(curve, ship, totalLaps)) {
         opponent.finishTime = now - (ship.distance - totalDistance) / Math.max(1, ship.speed);
         ship.distance = totalDistance;
         ship.boostTimer = 0;

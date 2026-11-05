@@ -195,3 +195,17 @@ test('on the real Neon Causeway all CPU racers collect pads, recover from walls 
     assert.ok(rival.group.position.toArray().every(Number.isFinite));
   }
 });
+
+test('CPU finish distance follows selected race laps instead of always three',()=>{
+ const length=straight.getLength();
+ for(const totalLaps of [3,5,7,10]){
+  const rival=createOpponentState(RACER_DEFINITIONS[0]);
+  rival.distance=length*totalLaps-length/2;
+  updateOpponents([rival],straight,1/30,1/30,true,{totalLaps});
+  assert.equal(rival.finishTime,null,`${totalLaps} laps: premature finish`);
+  rival.distance=length*totalLaps-1;
+  updateOpponents([rival],straight,1/30,2/30,true,{totalLaps});
+  assert.ok(Number.isFinite(rival.finishTime),`${totalLaps} laps: CPU should finish`);
+  assert.equal(rival.distance,length*totalLaps);
+ }
+});

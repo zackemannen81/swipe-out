@@ -22,13 +22,13 @@ platform and drifting particles. Menu movement respects reduced-motion preferenc
 ## Rewards and customization
 | Campaign result | Reward |
 | --- | --- |
-| Finish | Kestrel chassis and Launch capacitor |
-| Podium | Orca chassis and Overdrive |
+| Finish | Singularity chassis and Launch capacitor |
+| Podium | Mycelium chassis and Overdrive |
 | Win | Dominion Gold finish |
 | Elite win | To death and beyond trophy |
 
-Kestrel: 97% engine limit, 118% thrust force, 90% mass.
-Orca: 105% engine limit, 92% thrust force, 120% mass.
+Singularity: 97% engine limit, 118% thrust force, 90% mass.
+Mycelium: 105% engine limit, 92% thrust force, 120% mass.
 Racer retains the accepted factory baseline. One module can be fitted: Launch
 adds 10% thrust force; Overdrive adds 4% engine limit. Downhill momentum remains
 uncapped. Percentages are relative to factory; mass affects existing interactions.

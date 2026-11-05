@@ -115,7 +115,7 @@ archetypes to prototype:
 | Working archetype | Strength | Trade-off | Intended feel |
 | --- | --- | --- | --- |
 | Vector | High top speed | Less forgiving steering | Precise and demanding |
-| Kestrel | Responsive steering | Lower top speed | Nimble and accessible |
+| Singularity | Responsive steering | Lower top speed | Nimble and accessible |
 | Bastion | Stable handling | Slower acceleration / recovery | Composed through turns |
 
 These names and stat profiles are placeholders for original designs. Final

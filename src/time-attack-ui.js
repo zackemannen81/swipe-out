@@ -23,7 +23,7 @@ export function createPracticeUI(scene,craft,storage,selection) {
     const solo=preferences.mode==='time-attack';
     document.body.classList.toggle('time-attack-selected',solo);
     $('start-copy').textContent=solo?'Learn the circuit. Chase your best flying lap. One out lap, then three timed attempts.':
-      'A three-lap anti-gravity race against four CPU rivals. Drag left or right to steer; hold higher to accelerate or lower to brake.';
+      `A ${Number($('race-laps-select').value)||3}-lap anti-gravity race against four CPU rivals. Drag left or right to steer; hold higher to accelerate or lower to brake.`;
     $('combat-enabled').disabled=solo;
     $('practice-options').hidden=!solo;
     $('practice-preview').hidden=!solo;
@@ -37,7 +37,7 @@ export function createPracticeUI(scene,craft,storage,selection) {
   }
   $('race-mode-select').addEventListener('change',()=>{preferences.mode=$('race-mode-select').value;save();});
   for(const name of ['line','warnings','ghost'])$(`practice-${name}`).addEventListener('change',()=>{preferences[name]=$(`practice-${name}`).checked;save();});
-  for(const id of ['track-select','handling-select','assist-select'])$(id).addEventListener('change',preview);
+  for(const id of ['track-select','handling-select','assist-select','race-laps-select'])$(id).addEventListener('change',preview);
   function save(){try{storage.setItem(PREF_KEY,JSON.stringify(preferences));}catch{/* Gameplay stays available. */}preview();}
   preview();
   function hide(){lapGhost.group.visible=guideView.mesh.visible=false;$('time-attack-hud').hidden=true;$('corner-warning').hidden=true;}

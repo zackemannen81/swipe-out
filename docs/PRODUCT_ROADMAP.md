@@ -116,7 +116,7 @@ mänsklig provbalansering. Tidigare öppna rutor för garage/progression var ina
 - [x] Tidsmedaljer i trevarvslopp, synliga måltider före start och efter loppet.
   Gold/Silver/Bronze baseras initialt på banlängd / 110, 95 respektive 80 world
   units/s. Necros Gold-tid låser upp Spire Silver; se FINISHING_PASS.md.
-- [x] Kestrel/Orca och två moduler låses upp i kampanjen; originalskeppet finns kvar.
+- [x] Singularity/Mycelium och två moduler låses upp i kampanjen; originalskeppet finns kvar.
 - [x] Dominion Gold-lackering, troféer och nästa kampanjmål på resultatskärmen.
 - [x] Versionssparad progression; Race-rekord separeras efter bana/revision,
   svårighet, kontrolläge, assist, combat och loadout. TA/cup använder fabriksskepp.

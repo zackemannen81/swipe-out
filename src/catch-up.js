@@ -2,10 +2,10 @@ import { MathUtils } from 'three';
 
 // Catch-up för ALLA skepp. Sekunderna uppskattas från ledarens normala toppfart.
 export const CATCH_UP = {
-  startGapSeconds: 2,  // Ingen hjälp närmare ledaren än så här.
-  fullGapSeconds: 8,   // Full målbonus vid detta avstånd eller längre bakom.
-  maxBonus: 0.08,      // 0.08 = högst 8 % extra toppfart.
-  smoothingSeconds: 1.5, // Tidskonstant: ca 95 % av förändringen efter 4.5 s.
+  startGapSeconds: 1,  // Ingen hjälp närmare ledaren än så här.
+  fullGapSeconds: 4,   // Full målbonus vid detta avstånd eller längre bakom.
+  maxBonus: 0.12,      // 0.12 = högst 12 % extra toppfart.
+  smoothingSeconds: 1.0, // Tidskonstant: ca 95 % av förändringen efter 4.5 s.
 };
 
 export function catchUpTarget(gapSeconds, maxBonus = CATCH_UP.maxBonus) {

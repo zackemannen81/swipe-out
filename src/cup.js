@@ -1,5 +1,5 @@
 export const CUP = Object.freeze({id:'foundry-v1',name:'Foundry Cup',tracks:['track1','track13','track15'],points:[10,7,5,3,1]});
-export const CUP_RACERS=['player','Vanta','Kestrel','Orca','Nexus-9'];
+export const CUP_RACERS=['player','Vanta','Singularity','Mycelium','Nexus-9'];
 export const CUP_KEY='swipeout.cup.v1';
 const defaults=()=>({version:1,active:null,bests:{}});
 export function cupSettings(value){

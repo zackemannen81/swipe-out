@@ -28,3 +28,14 @@ test('Necros gets distant animated patrols and raised amber warning signs',async
  const {group,curve}=createTrack(NECROS);assert.equal(group.userData.patrols.length,3);assert.ok(group.children.some(o=>o.userData.cornerSign));
  const maxY=Math.max(...curve.getPoints(100).map(p=>p.y));const patrol=group.userData.patrols[0];updateWorldAmbience(group,0);const x=patrol.drone.position.x;updateWorldAmbience(group,10);assert.notEqual(patrol.drone.position.x,x);assert.ok(patrol.drone.position.y>maxY+60);disposeTrackGroup(group);
 });
+
+test('race time medals scale with selected lap count',()=>{
+ for(const laps of [3,5,7,10]){
+  const length=1100;
+  assert.equal(timeMedal(length*laps/110,length,laps),'GOLD');
+  assert.equal(timeMedal(length*laps/95,length,laps),'SILVER');
+  assert.equal(timeMedal(length*laps/80,length,laps),'BRONZE');
+  assert.equal(timeMedal(length*laps/79,length,laps),null);
+ }
+ assert.equal(timeMedal(30,1100),timeMedal(30,1100,3));
+});

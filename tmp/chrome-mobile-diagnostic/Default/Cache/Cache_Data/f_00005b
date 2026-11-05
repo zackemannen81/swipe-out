@@ -1427,7 +1427,7 @@ window.addEventListener('resize', resize, { passive: true });
 resize();
 
 
-const craftTemplates = {racer:craft.clone(true),kestrel:opponents.find(o=>o.name==='Kestrel').group.clone(true),orca:opponents.find(o=>o.name==='Orca').group.clone(true)};
+const craftTemplates = {racer:craft.clone(true),singularity:opponents.find(o=>o.name==='Singularity').group.clone(true),mycelium:opponents.find(o=>o.name==='Mycelium').group.clone(true)};
 const garage = createGarage(craftTemplates);
 let playerMaterials=[];
 function applyPlayerLoadout(spec){

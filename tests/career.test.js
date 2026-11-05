@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import {loadProfile,normalizeProfile,saveProfile,awardCampaign,loadout,SHIPS,unlocked} from '../src/career.js';
+import {loadProfile,normalizeProfile,saveProfile,awardCampaign,loadout,SHIPS,unlocked,VITRUM_MUSIC,RACE_LAP_OPTIONS,normalizeRaceLaps} from '../src/career.js';
 test('career unlocks earned from campaign finishing, podium and Elite win; replay is idempotent',()=>{
  const p=normalizeProfile(null);assert.equal(unlocked(SHIPS[1],p),false);
  assert.deepEqual(awardCampaign(p,{position:4,time:100,difficulty:'rookie',key:'course|rookie'}),['finish']);
@@ -12,10 +12,10 @@ test('career unlocks earned from campaign finishing, podium and Elite win; repla
  assert.deepEqual(awardCampaign(p,{position:0,time:NaN}),[]);
 });
 test('locked choices and malformed persistence fall back; earned loadout survives reload; standards isolate upgrades',()=>{
- const p=normalizeProfile({version:1,ship:'orca',module:'engine',paint:'gold'});assert.equal(p.ship,'racer');assert.equal(p.module,'stock');
- awardCampaign(p,{position:1,time:100,difficulty:'pilot',key:'x'});p.ship='orca';p.module='engine';p.paint='gold';
+ const p=normalizeProfile({version:1,ship:'mycelium',module:'engine',paint:'gold'});assert.equal(p.ship,'racer');assert.equal(p.module,'stock');
+ awardCampaign(p,{position:1,time:100,difficulty:'pilot',key:'x'});p.ship='mycelium';p.module='engine';p.paint='gold';
  let value;const storage={setItem(k,v){value=v;},getItem(){return value;}};
- assert.equal(saveProfile(storage,p),'');const loaded=loadProfile(storage);assert.equal(loaded.ship,'orca');assert.equal(loadout(loaded).speed,1.05*1.04);assert.deepEqual(loadout(loaded,true),{ship:'racer',speed:1,force:1,mass:1});
+ assert.equal(saveProfile(storage,p),'');const loaded=loadProfile(storage);assert.equal(loaded.ship,'mycelium');assert.equal(loadout(loaded).speed,1.05*1.04);assert.deepEqual(loadout(loaded,true),{ship:'racer',speed:1,force:1,mass:1});
  assert.equal(loadProfile({getItem(){return '{broken';}}).ship,'racer');assert.match(saveProfile({setItem(){throw Error();}},p),/Could not save/);
 });
 import {NECROS_REWARD,REWARD_MUSIC,TROPHIES,grantNecrosPreview,selectedSoundtrack,necrosMastered} from '../src/career.js';
@@ -41,4 +41,26 @@ test('The sacrifice requires completed last place, automatic full assist and Roo
  p.ship=ship.id;const loaded=normalizeProfile(p);assert.equal(loaded.ship,ship.id);assert.equal(unlocked(ship,loaded),true);assert.equal(loadout(loaded,true).ship,'racer');
  assert.equal(necrosMastered(loaded),false);
  const master=normalizeProfile({version:1,trophies:TROPHIES.map(t=>t.id)});assert.equal(necrosMastered(master),true);assert.equal(unlocked(ship,master),false);
+});
+
+test('GOA by ME is selectable and persists as an allowed soundtrack',()=>{
+ const song=VITRUM_MUSIC.find(item=>item.name==='GOA by ME');
+ assert.equal(song?.url,'/audio/tracks/track017.m4a');
+ const profile=normalizeProfile({version:1,soundtrack:song.url});
+ assert.equal(profile.soundtrack,song.url);
+ assert.equal(selectedSoundtrack(profile,'fallback'),song.url);
+});
+
+test('race lap options persist and invalid values fall back to three laps',()=>{
+ assert.deepEqual(RACE_LAP_OPTIONS,[3,5,7,10]);
+ assert.equal(normalizeProfile(null).laps,3);
+ for(const laps of RACE_LAP_OPTIONS){
+  const saved=normalizeProfile({version:1,laps});
+  assert.equal(saved.laps,laps);
+  let content='';const storage={setItem:(k,v)=>{content=v;},getItem:()=>content};
+  assert.equal(saveProfile(storage,saved),'');
+  assert.equal(loadProfile(storage).laps,laps);
+ }
+ for(const value of [0,4,11,'5',null,-3,Infinity])assert.equal(normalizeRaceLaps(value),3);
+ assert.equal(normalizeProfile({version:1,laps:99}).laps,3);
 });

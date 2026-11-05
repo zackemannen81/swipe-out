@@ -220,8 +220,8 @@ Mobila och desktop-orienterade styrmetoder har arbetats med.
 Racingfilosofi: Banorna ska kunna köras snabbt utan styrhjälp, men mastering kräver träning. Auto ska vara bekvämt, inte automatiskt optimalt: boosters kan ligga i alternativa racinglinjer så att en skicklig pilot kan slå automatiken.
 6.3 Necros-kampanjens etablerade utmaningar [BYGGT/VISAT]
 Against the Clock: Ta guldmedalj på en Necros-tid och lås upp Spire Silver.
-Survival Approved: Fullfölj Necros och lås upp Kestrel + Launch Capacitor.
-Recognised by the Dominion: Nå podiet och lås upp Orca + Overdrive.
+Survival Approved: Fullfölj Necros och lås upp Singularity + Launch Capacitor.
+Recognised by the Dominion: Nå podiet och lås upp Mycelium + Overdrive.
 Your World Expects Victory: Vinn på Necros och lås upp Dominion Gold.
 To Death and Beyond: Vinn på Elite.
 NECROS MASTERY: Slutför samtliga fem för att låsa upp Necron Crimson Citadel och musikbelöningen “Vi lever inte”.

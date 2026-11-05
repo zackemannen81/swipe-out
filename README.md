@@ -140,7 +140,7 @@ precisely. The choice persists locally and is disabled in Time Attack. Driver
 personalities separately affect overtaking, shortcuts and mistakes. See the
 [CPU difficulty guide and measurements](docs/CPU_DIFFICULTY.md).
 
-Vanta, Kestrel, Orca and Nexus-9 have different speed caps, acceleration, mass and
+Vanta, Singularity, Mycelium and Nexus-9 have different speed caps, acceleration, mass and
 driving profiles. They brake, steer, seek boost pads, react to traffic, choose
 routes and can make mistakes or hit walls. Boost pads and craft collisions affect
 actual motion. Wipeout has its own tuned rail response; Swipeout and CPU craft
