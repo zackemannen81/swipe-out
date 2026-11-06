@@ -45,7 +45,7 @@ test('fork and merge sweeps use correct route and physical pad length',()=>{
 });
 test('v5 weapon metadata round-trips and old versions reject new fields; fallback validates on all tracks',()=>{
  const data={...COMBAT_LAB,pads:[{id:'weapon',type:'weapon',weapon:'homing',progress:.1,offset:0}]};
- assert.equal(JSON.parse(serializeTrack(data)).version,8);assert.deepEqual(parseTrack(serializeTrack(data)).pads,data.pads);
+ assert.equal(JSON.parse(serializeTrack(data)).version,9);assert.deepEqual(parseTrack(serializeTrack(data)).pads,data.pads);
  assert.throws(()=>parseTrack(JSON.stringify({format:'swipe-out-track',version:4,track:data})),/version 5/);
  assert.throws(()=>normalizeTrack({...data,pads:[{...data.pads[0],weapon:'laser'}]}),/choose rocket/);
  for(const {data} of Object.values(BUILTIN_TRACKS)){const assets=createTrack(data);try{const pads=automaticWeaponPads(assets.curve,assets.boostPads);normalizeTrack({...data,pads});assert.ok(pads.length>0,data.name);}finally{disposeTrackGroup(assets.group);}}

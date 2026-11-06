@@ -34,8 +34,11 @@ export function createTrack(definition = NEON_CAUSEWAY) {
   const junctionClear = d => !curve.track.branches.some(b => [b.start,b.end].some(u => Math.abs(d-u*curve.getLength()) < 35));
   const group = new THREE.Group();
   // Node-based physics/tests have no document or image loader.
-  const trackTexture = typeof document === 'undefined' || vitrum
-    ? null : new THREE.TextureLoader().load('/images/track.png');
+  const surface=definition.roadMaterial??'default';
+  const useVitrumDeck=vitrum && surface==='default' && !definition.roadTexture;
+  const texturePath=definition.roadTexture ?? (surface==='default'&&!vitrum?'/images/track.png':null);
+  const trackTexture=typeof document==='undefined'||!texturePath
+    ? null : new THREE.TextureLoader().load(texturePath);
   if (trackTexture) {
     trackTexture.colorSpace = THREE.SRGBColorSpace;
     trackTexture.wrapS = THREE.RepeatWrapping;
@@ -45,12 +48,21 @@ export function createTrack(definition = NEON_CAUSEWAY) {
   // Legacy source is 3:1; the supplied forest maps are square.
   // Round the count so the UV seam closes exactly where the lap closes.
   const roadTextureRepeats = Math.max(
-    1, Math.round(curve.getLength() / (Math.max(1, getTrackWidth(curve, 0)) * (vitrum ? 1 : 3)))
+    1, Math.round(curve.getLength() / (Math.max(1, getTrackWidth(curve, 0)) * (useVitrumDeck || definition.roadTexture ? 1 : 3)))
   );
-
-  const roadMaterial = vitrum ? createVitrumDeckMaterial(roadTextureRepeats) : new THREE.MeshStandardMaterial({
+  const surfaceStyles={
+    default:{color:0xffffff,metalness:0.88,roughness:0.78},
+    asphalt:{color:0x3b4148,metalness:0.02,roughness:0.98},
+    matte:{color:0x6c7781,metalness:0,roughness:1},
+    metal:{color:0xadb9bf,metalness:0.92,roughness:0.3},
+    stone:{color:0x8f8c84,metalness:0.02,roughness:0.95},
+    organic:{color:0x59735a,metalness:0,roughness:0.9},
+  };
+  const surfaceStyle=surfaceStyles[surface]??surfaceStyles.default;
+  const roadMaterial = useVitrumDeck ? createVitrumDeckMaterial(roadTextureRepeats) : new THREE.MeshStandardMaterial({
     map: trackTexture,
-    color: 0xffffff, metalness: 0.88, roughness: 0.78,
+    color: definition.roadTexture ? 0xffffff : surfaceStyle.color,
+    metalness:surfaceStyle.metalness,roughness:surfaceStyle.roughness,
     emissive: curve.track.magnetic ? 0x0b2138 : 0x06121c,
     emissiveIntensity: curve.track.magnetic ? 0.65 : 0.1,
     // An opaque, gently emissive magnetic deck stays legible on the dark side
@@ -76,7 +88,7 @@ export function createTrack(definition = NEON_CAUSEWAY) {
     const positions = [];
     const uvs = [];
     const indices = [];
-    const weathered=vitrum && material===roadMaterial,columns=weathered?8:1,colors=[];
+    const weathered=useVitrumDeck && material===roadMaterial,columns=weathered?8:1,colors=[];
     const stops = [...new Set([...Array.from({ length: samples + 1 }, (_, i) => i / samples),
       ...curve.track.gaps.flatMap(gap => [gap.start, gap.end])])].sort((a, b) => a - b);
     const previousRight = new THREE.Vector3(1, 0, 0);
@@ -128,7 +140,7 @@ export function createTrack(definition = NEON_CAUSEWAY) {
   ribbon(0, widthAt, roadMaterial, 0, 900);
   if(vitrum){
     const edgeMaterial=new THREE.MeshStandardMaterial({color:0xffbd55,emissive:0xffa326,emissiveIntensity:1.7,roughness:.5,side:THREE.DoubleSide});
-    for(const side of [-1,1])ribbon(u=>side*(widthAt(u)/2-.46),.32,edgeMaterial,.035,900);
+    for(const side of [-1,1])ribbon(u=>side*(widthAt(u)/2-.46),2.32,edgeMaterial,.035,900);
   }else{
     ribbon(u => -(widthAt(u)/2-0.18), 0.19, pinkMaterial, 0.075);
     ribbon(u => widthAt(u)/2-0.18, 0.19, cyanMaterial, 0.075);
@@ -152,6 +164,19 @@ export function createTrack(definition = NEON_CAUSEWAY) {
     for(const m of [pinkMaterial,pinkRailMaterial]){m.color.setHex(0xe6bd67);m.emissive.setHex(0xd69424);m.emissiveIntensity=2.0;}
     for(const m of [cyanMaterial,cyanRailMaterial]){m.color.setHex(0x89dcc2);m.emissive.setHex(0x36a98e);m.emissiveIntensity=1.7;}
     railMaterial.color.setHex(0x67754b);
+  }
+  // Negative road-right is the LEFT rail; positive is RIGHT.
+  for(const [side,materials] of [
+    ['left',[pinkMaterial,pinkRailMaterial]],
+    ['right',[cyanMaterial,cyanRailMaterial]]
+  ]) {
+    const color=definition.railColors?.[side];
+    if(!color)continue;
+    for(const material of materials) {
+      material.color.set(color);
+      material.emissive.set(color);
+      material.emissiveIntensity=necros?12:7;
+    }
   }
   group.userData.railMaterials=[cyanMaterial,pinkMaterial,pinkRailMaterial,cyanRailMaterial];
   const railGeometry = new THREE.CylinderGeometry(0.07, 0.07, 8.5, 8);

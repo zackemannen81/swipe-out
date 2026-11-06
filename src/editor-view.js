@@ -14,6 +14,25 @@ export function createEditorView(canvas, { onSelect, onMove, onCommit, onError }
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   const scene = new THREE.Scene();
   scene.background = new THREE.Color('#080f1a');
+  let skyPath='', skyTexture=null, skyRequest=0;
+  const skyLoader=new THREE.TextureLoader();
+  function setSky(path) {
+    if(path===skyPath)return;
+    skyPath=path??'';
+    const request=++skyRequest;
+    if(skyTexture){skyTexture.dispose();skyTexture=null;}
+    scene.background=new THREE.Color('#080f1a');
+    if(!skyPath)return;
+    skyLoader.load(skyPath,texture=>{
+      if(request!==skyRequest){texture.dispose();return;}
+      texture.colorSpace=THREE.SRGBColorSpace;
+      texture.mapping=THREE.EquirectangularReflectionMapping;
+      skyTexture=texture;
+      scene.background=texture;
+    },undefined,error=>{
+      if(request===skyRequest)onError?.('Sky preview failed: '+(error?.message??skyPath));
+    });
+  }
   const fillLight=new THREE.HemisphereLight(0xc5edff, 0x182238, 2.4);
   scene.add(fillLight);
   const light = new THREE.DirectionalLight(0xffffff, 3);
@@ -171,7 +190,7 @@ export function createEditorView(canvas, { onSelect, onMove, onCommit, onError }
     renderer.render(scene, camera);
   });
   return {
-    setTrack, fit,
+    setTrack, setSky, fit,
     focusPad(pad) {
       const assets = createTrackCurve(track), p = padPlacement(assets,pad), f = p.frameAt(p.d);
       orbit.target.copy(f.center).addScaledVector(f.right,p.offset);
@@ -190,6 +209,7 @@ export function createEditorView(canvas, { onSelect, onMove, onCommit, onError }
       renderer.setAnimationLoop(null);
       observer.disconnect();
       transform.dispose(); orbit.dispose();
+      skyRequest++;skyTexture?.dispose();
       disposeTrackGroup(scene); renderer.dispose();
     },
   };

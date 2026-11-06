@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import * as definitions from '../src/track-data.js';
-import { normalizeTrack, parseTrack, serializeTrack, trackDocument } from '../src/track-format.js';
+import { normalizeTrack, parseTrack, serializeTrack, trackDocument, TRACK_VERSION } from '../src/track-format.js';
 import { BUILTIN_TRACKS, readTrackLibrary, saveTrack, resetTrack, STORAGE_KEY, LEGACY_STORAGE_KEY } from '../src/track-library.js';
 import { createHistory } from '../src/editor-history.js';
 import { createTrack, disposeTrackGroup } from '../src/track.js';
@@ -21,7 +21,7 @@ test('texture alpha modes round-trip through export, storage and undo; versions 
   const storage=memoryStorage(),history=createHistory(normalizeTrack(legacy));
   for(const mode of ['cutout','blend']) {
     const changed=structuredClone(legacy);changed.objects[0].textureAlpha=mode;
-    const exported=serializeTrack(changed);assert.equal(JSON.parse(exported).version,8);
+    const exported=serializeTrack(changed);assert.equal(JSON.parse(exported).version,TRACK_VERSION);
     assert.deepEqual(parseTrack(exported),normalizeTrack(changed));
     saveTrack(storage,'custom-alpha',changed);
     assert.equal(readTrackLibrary(storage).entries['custom-alpha'].data.objects[0].textureAlpha,mode);
@@ -145,4 +145,43 @@ test('history bounds large snapshots while keeping the most recent undo step', (
   assert.equal(history.undo().n, 19);
   assert.equal(history.canUndo, false);
   assert.equal(history.redo().n, 20);
+});
+
+test('v9 editor settings survive JSON and storage; older circuit files remain valid',()=>{
+ const base={...definitions.NEON_CAUSEWAY};
+ const values={...base,music:'/audio/tracks/track017.m4a',alternateMusic:'/audio/tracks/track16.m4a',
+  sky:'/images/backdrop_track-017.jpg',railColors:{left:'#ff8800',right:'#0077aa'},
+  cpuMultiplier:1.35,roadMaterial:'stone',roadTexture:'/images/textures/tex001.png'};
+ const normalized=normalizeTrack(values),exported=serializeTrack(values);
+ assert.equal(JSON.parse(exported).version,9);
+ assert.deepEqual(parseTrack(exported),normalized);
+ const storage=memoryStorage();
+ saveTrack(storage,'custom-test-v9',values);
+ const stored=readTrackLibrary(storage).entries['custom-test-v9'];
+ assert.deepEqual(stored.data,normalized);
+ assert.equal(stored.defaultAudio,values.music);
+ assert.equal(stored.alternateAudio,values.alternateMusic);
+ assert.equal(stored.backdrop,values.sky);
+ assert.equal(normalizeTrack(base).cpuMultiplier,undefined);
+ assert.equal(parseTrack(JSON.stringify({format:'swipe-out-track',version:8,track:base})).roadMaterial,undefined);
+ assert.throws(()=>parseTrack(JSON.stringify({format:'swipe-out-track',version:8,track:values})),/version 9/);
+ for(const [field,bad] of [['music','https://attacker.example/music.mp3'],['alternateMusic','/images/x.png'],
+   ['sky','/audio/tracks/track017.m4a'],['roadTexture','/images/../private.png'],
+   ['roadMaterial','lava'],['cpuMultiplier',5],['railColors',{middle:'#ffffff'}]]){
+  assert.throws(()=>normalizeTrack({...base,[field]:bad}),new RegExp(field));
+ }
+});
+test('road presets and independent rail tint apply to actual road meshes',()=>{
+ const base={...definitions.NEON_CAUSEWAY,roadMaterial:'matte',
+   railColors:{left:'#d02030',right:'#2080f0'}};
+ const {group}=createTrack(base);
+ const road=group.children.find(child=>child.isMesh&&!child.isInstancedMesh);
+ assert.equal(road.material.metalness,0);
+ assert.equal(road.material.roughness,1);
+ const [rightRibbon,leftRibbon,leftRail,rightRail]=group.userData.railMaterials;
+ assert.equal(leftRibbon.color.getHexString(),'d02030');
+ assert.equal(leftRail.color.getHexString(),'d02030');
+ assert.equal(rightRibbon.color.getHexString(),'2080f0');
+ assert.equal(rightRail.color.getHexString(),'2080f0');
+ disposeTrackGroup(group);
 });

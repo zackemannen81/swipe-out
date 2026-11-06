@@ -43,17 +43,20 @@ export async function createOpponents() {
     createOpponentState(definition, await createCraft(definition))));
 }
 
-export function resetOpponents(opponents, difficulty = 'pilot') {
+export function resetOpponents(opponents, difficulty = 'pilot', cpuMultiplier = 1) {
   for (const opponent of opponents) {
     opponent.difficulty = cpuDifficulty(difficulty);
+    const scale=Number.isFinite(cpuMultiplier)?THREE.MathUtils.clamp(cpuMultiplier,0.5,2):1;
+    opponent.raceTopSpeed=opponent.topSpeed*scale;
+    opponent.raceAcceleration=opponent.acceleration*scale;
     opponent.ai = CPU_DIFFICULTIES[opponent.difficulty];
     opponent.risk ??= 0.5;
     opponent.mistakeUntil = 0;
     opponent.nextMistake = 5 + opponent.phase * 2;
     opponent.mistakes = 0;
-    opponent.physics = createShipPhysics(opponent.topSpeed * 0.8, {
-      engineForce: opponent.acceleration + opponent.topSpeed * 0.045,
-      brakeForce: 32, mass: opponent.mass, centeringStrength: 0,
+    opponent.physics = createShipPhysics(opponent.raceTopSpeed * 0.8, {
+      engineForce: opponent.raceAcceleration + opponent.raceTopSpeed * 0.045,
+      brakeForce: 32 * scale, mass: opponent.mass, centeringStrength: 0,
     });
     opponent.physics.assistLevel = 0.25;
     opponent.distance = opponent.gridDistance;
@@ -81,7 +84,7 @@ function decide(opponent, opponents, player, curve, pads, trackWidth, elapsed) {
   const edge = Math.max(0.4, trackWidth / 2 - 1.2);
   const cornerSlowdown = Math.abs(turn) * (0.7 - opponent.cornering * 0.3)
     * opponent.ai.cornerPenalty * (1.08 - opponent.risk * 0.16);
-  opponent.targetSpeed = opponent.topSpeed * opponent.ai.pace * clamp(1 - cornerSlowdown, 0.6, 1);
+  opponent.targetSpeed = opponent.raceTopSpeed * opponent.ai.pace * clamp(1 - cornerSlowdown, 0.6, 1);
   opponent.targetLane = clamp(opponent.lane * 0.35 - turn * 2.4, -edge, edge);
   opponent.strategy = 'race';
   opponent.trafficSpeedLimit = Infinity;
@@ -187,8 +190,8 @@ function drive(opponent, curve, dt) {
   const desiredYawRate = clamp(((desiredLateral - ship.lateralVelocity) * 4 + ship.lateralVelocity * grip - centrifugal)
     / Math.max(4, ship.speed * 0.12), -1.7, 1.7);
   const steer = -clamp(((desiredYawRate - ship.yawVelocity) * 5 + ship.yawVelocity * 1.15) / 3.7, -1, 1);
-  const topSpeed = getRacerTopSpeed(ship, opponent.topSpeed);
-  const cornerTarget = opponent.targetSpeed * topSpeed / opponent.topSpeed;
+  const topSpeed = getRacerTopSpeed(ship, opponent.raceTopSpeed);
+  const cornerTarget = opponent.targetSpeed * topSpeed / opponent.raceTopSpeed;
   const speedTarget = Math.min(opponent.trafficSpeedLimit,
     ship.boostTimer > 0 ? Math.max(cornerTarget, topSpeed * 1.3) : cornerTarget);
   // Keep downhill momentum on clear straights. Corners and traffic still
@@ -204,7 +207,7 @@ function drive(opponent, curve, dt) {
 }
 
 export function syncOpponentPose(opponent, curve, trackWidth = 10) {
-  const pose = stepShipPhysics(opponent.physics, opponent.input, 0, curve, opponent.topSpeed, trackWidth);
+  const pose = stepShipPhysics(opponent.physics, opponent.input, 0, curve, opponent.raceTopSpeed, trackWidth);
   opponent.group.position.copy(pose.position);
   opponent.group.quaternion.copy(pose.orientation);
 }
@@ -220,7 +223,7 @@ export function updateOpponents(opponents, curve, delta, elapsed, racing, {
       continue;
     }
     const ship = opponent.physics;
-    const initialPose = stepShipPhysics(ship, opponent.input, 0, curve, opponent.topSpeed, trackWidth);
+    const initialPose = stepShipPhysics(ship, opponent.input, 0, curve, opponent.raceTopSpeed, trackWidth);
     const respawnSerial = ship.respawnSerial;
     if (!ship.previousTangent) {
       ship.previousSlope = initialPose.frame.tangent.y;
@@ -233,8 +236,8 @@ export function updateOpponents(opponents, curve, delta, elapsed, racing, {
       opponent.decisionTimer -= dt;
       if (opponent.decisionTimer <= 0) decide(opponent, opponents, player, curve, boostPads, trackWidth, now);
       drive(opponent, curve, dt);
-      stepShipPhysics(ship, opponent.input, dt, curve, opponent.topSpeed, trackWidth);
-      collectBoostPad(ship, boostPads, length, opponent.topSpeed);
+      stepShipPhysics(ship, opponent.input, dt, curve, opponent.raceTopSpeed, trackWidth);
+      collectBoostPad(ship, boostPads, length, opponent.raceTopSpeed);
       if (canFinishRace(curve, ship, totalLaps)) {
         opponent.finishTime = now - (ship.distance - totalDistance) / Math.max(1, ship.speed);
         ship.distance = totalDistance;

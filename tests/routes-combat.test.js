@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import * as THREE from 'three';
 import { ROUTE_LAB, COMBAT_LAB, GAP_LAB } from '../src/track-labs.js';
-import { normalizeTrack, parseTrack, serializeTrack } from '../src/track-format.js';
+import { normalizeTrack, parseTrack, serializeTrack, TRACK_VERSION } from '../src/track-format.js';
 import { createTrackCurve, getTrackFrame, getRacerFrame, advanceRouteDistance, canFinishRace } from '../src/track-path.js';
 import { createTrack, disposeTrackGroup } from '../src/track.js';
 import { createShipPhysics, stepShipPhysics } from '../src/ship-physics.js';
@@ -13,7 +13,7 @@ import { updateCatchUp } from '../src/catch-up.js';
 import { recoverBeforeGap } from '../src/gap-flight.js';
 
 test('v3 branch round-trip, v1/v2 compatibility and invalid topology rejection',()=>{
-  assert.equal(JSON.parse(serializeTrack(ROUTE_LAB)).version,8);
+  assert.equal(JSON.parse(serializeTrack(ROUTE_LAB)).version,TRACK_VERSION);
   assert.deepEqual(parseTrack(serializeTrack(ROUTE_LAB)),normalizeTrack(ROUTE_LAB));
   assert.deepEqual(parseTrack(JSON.stringify({format:'swipe-out-track',version:2,track:GAP_LAB})),normalizeTrack(GAP_LAB));
   assert.throws(()=>parseTrack(JSON.stringify({format:'swipe-out-track',version:2,track:ROUTE_LAB})),/version 3/);

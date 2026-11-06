@@ -1,7 +1,8 @@
 import { validatePads } from './track-pads.js';
-// Version 8 adds texture alpha modes; previous versions remain readable.
+// Version 9 adds circuit audio, sky, rail colors, CPU calibration and road material.
+// Previous versions remain readable.
 export const TRACK_FORMAT = 'swipe-out-track';
-export const TRACK_VERSION = 8;
+export const TRACK_VERSION = 9;
 // Cap portable JSON exports/imports, not the size of GLBs referenced via /models/.
 // Prefer external GLB paths for large models; the limit is only for embedded data.
 export const MAX_TRACK_BYTES = 64 * 1024 * 1024;
@@ -34,6 +35,15 @@ function color(value, path) {
   if (typeof value === 'string' && /^#[0-9a-f]{3}([0-9a-f]{3})?$/i.test(value)) return value;
   fail(path, 'expected a numeric RGB color or #hex color.');
 }
+function localMedia(value, path, category) {
+  if (typeof value !== 'string' || value.length > 500 || value.includes('..') ||
+      value.includes('\\') || value.includes('//') ||
+      !new RegExp(category === 'audio'
+        ? '^/audio/tracks/[^?#]+\\.(mp3|m4a|wav|ogg)$'
+        : '^/images/[^?#]+\\.(png|jpe?g|webp)$', 'i').test(value))
+    fail(path, category === 'audio' ? 'expected a public/audio/tracks audio file.' : 'expected a public/images image file.');
+  return value;
+}
 function texture(value, path) {
   if (value == null || value === '') return null;
   if (typeof value !== 'string') fail(path, 'expected an image path or embedded image.');
@@ -44,7 +54,7 @@ function texture(value, path) {
 
 export function normalizeTrack(input) {
   record(input, 'track');
-  knownFields(input, ['id', 'name', 'width', 'horizontalScale', 'centerline', 'objects', 'magnetic', 'gaps', 'branches', 'pointWidths', 'pads', 'roadStyle'], 'track');
+  knownFields(input, ['id', 'name', 'width', 'horizontalScale', 'centerline', 'objects', 'magnetic', 'gaps', 'branches', 'pointWidths', 'pads', 'roadStyle', 'music', 'alternateMusic', 'sky', 'railColors', 'cpuMultiplier', 'roadMaterial', 'roadTexture'], 'track');
   const id = text(input.id, 'track.id');
   const name = text(input.name, 'track.name');
   const width = number(input.width, 'track.width', 4, 100);
@@ -121,6 +131,23 @@ export function normalizeTrack(input) {
   });
   if(objects.filter(o=>o.type==='light').length>16) fail('track.objects','maximum 16 point lights.');
   const result = { id, name, width, horizontalScale, centerline, objects };
+  for (const key of ['music', 'alternateMusic', 'sky', 'roadTexture']) {
+    if (input[key] !== undefined) result[key] = localMedia(input[key], 'track.' + key, ['music', 'alternateMusic'].includes(key) ? 'audio' : 'image');
+  }
+  if (input.railColors !== undefined) {
+    record(input.railColors, 'track.railColors');
+    knownFields(input.railColors, ['left', 'right'], 'track.railColors');
+    result.railColors = {};
+    for (const side of ['left', 'right']) if (input.railColors[side] !== undefined)
+      result.railColors[side] = color(input.railColors[side], 'track.railColors.' + side);
+  }
+  if (input.cpuMultiplier !== undefined)
+    result.cpuMultiplier = number(input.cpuMultiplier, 'track.cpuMultiplier', 0.5, 2);
+  if (input.roadMaterial !== undefined) {
+    if (!['default', 'asphalt', 'matte', 'metal', 'stone', 'organic'].includes(input.roadMaterial))
+      fail('track.roadMaterial', 'unknown road material.');
+    result.roadMaterial = input.roadMaterial;
+  }
   if (input.magnetic !== undefined) {
     if (typeof input.magnetic !== 'boolean') fail('track.magnetic', 'expected true or false.');
     result.magnetic = input.magnetic;
@@ -203,11 +230,12 @@ export function decodeTrack(value) {
   record(value, 'file');
   if ('format' in value || 'version' in value || 'track' in value) {
     if (value.format !== TRACK_FORMAT) fail('file.format', `expected ${TRACK_FORMAT}.`);
-    if (![1, 2, 3, 4, 5, 6, 7, TRACK_VERSION].includes(value.version)) fail('file.version', `unsupported version ${String(value.version)}; this editor supports versions 1–${TRACK_VERSION}.`);
+    if (![1, 2, 3, 4, 5, 6, 7, 8, TRACK_VERSION].includes(value.version)) fail('file.version', `unsupported version ${String(value.version)}; this editor supports versions 1–${TRACK_VERSION}.`);
     knownFields(value, ['format', 'version', 'track'], 'file');
     if (value.version === 1 && (value.track?.magnetic !== undefined || value.track?.gaps !== undefined)) fail('file.version', 'magnetic road and gaps require version 2.');
     if (value.version < 3 && value.track?.branches !== undefined) fail('file.version', 'branches require version 3.');
     if (value.version < 4 && ['pointWidths','pads','roadStyle'].some(k=>value.track?.[k] !== undefined)) fail('file.version','widths, pads and road styles require version 4.');
+    if(value.version<9 && ['music','alternateMusic','sky','railColors','cpuMultiplier','roadMaterial','roadTexture'].some(k=>value.track?.[k]!==undefined))fail('file.version','circuit media and tuning require version 9.');
     if(value.version<8 && value.track?.objects?.some(o=>o.textureAlpha!==undefined))fail('file.version','texture alpha modes require version 8.');
     if(value.version<7 && value.track?.objects?.some(o=>o.type==='light'||o.motion!==undefined||o.playClip!==undefined||o.clipSpeed!==undefined))fail('file.version','lights and motion require version 7.');
     if(value.version<6 && value.track?.objects?.some(o=>o.type==='glb'))fail('file.version','GLB scenery requires version 6.');

@@ -1,5 +1,14 @@
 # File Structure
 
+## 2026-11-05 — EDITOR-TRACK-MEDIA-001
+
+- `src/editor-media-plugin.js` — scans public audio/images into virtual editor-select module via Vite
+- `vite.config.js` — registers editor-media plugin
+- `editor.html`, `src/editor.js`, `src/editor.css`, `src/editor-view.js` — media, sky preview, rails, CPU and road material editing
+- `src/track-format.js`, `src/track-library.js`, `src/track-storage.js` — versioned v9 metadata, runtime media resolution and existing storage
+- `src/track.js`, `src/opponents.js`, `src/game.js` — render/apply road/rails and circuit media/CPU settings
+- `tests/track-format.test.js`, `tests/cpu-difficulty.test.js` — validation, persistence, material/rail and CPU calibration tests
+
 ## 2026-10-29 — CUP-001
 
 - `src/cup.js` — cup configuration, validated persistence and scoring

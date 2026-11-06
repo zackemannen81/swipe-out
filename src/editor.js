@@ -1,3 +1,4 @@
+import editorMedia from 'virtual:track-editor-media';
 import { loadGlb, validateGlb } from './glb-scenery.js';
 import { CATHEDRAL_KIT, createCathedralObjects } from './cathedral-kit.js';
 import { suggestBoostPads } from './track-pads.js';
@@ -23,6 +24,27 @@ const current = () => drafts.get(currentKey);
 const track = () => current().track;
 const isDirty = draft => draft.saved !== JSON.stringify(draft.track);
 const status = $('#status');
+const catalogOptions=[
+  ['#track-music',editorMedia.audio,'Use circuit default'],
+  ['#track-alt-music',editorMedia.audio,'No alternate'],
+  ['#track-sky',editorMedia.images,'Use circuit default'],
+  ['#road-texture',editorMedia.images,'No custom texture']
+];
+for(const [selector,files,label] of catalogOptions) {
+  $(selector).replaceChildren(new Option(label,''),...files.map(path=>new Option(decodeURIComponent(path.split('/').slice(2).join('/')),path)));
+}
+function syncMediaChoice(selector,value,inherited='') {
+  const input=$(selector);
+  input.options[0].textContent=inherited ? 'Use default · '+decodeURIComponent(inherited.split('/').at(-1)) : input.options[0].textContent;
+  if(value&&!Array.from(input.options).some(option=>option.value===value))
+    input.add(new Option('Not found · '+value,value));
+  setValue(selector,value??'');
+}
+function themeRailColors(definition) {
+  if(definition.id==='vitrum-neural-ascent')return {left:'#e6bd67',right:'#89dcc2'};
+  if(/necros/i.test(definition.name))return {left:'#a80010',right:'#a80010'};
+  return {left:'#ff4b91',right:'#58f4e8'};
+}
 function message(text, error = false) { status.textContent = text; status.classList.toggle('error', error); }
 const view = createEditorView($('#editor-canvas'), {
   onError(error) { message(error, true); },
@@ -80,6 +102,18 @@ function render() {
   $('#width-value').textContent = value.width.toFixed(2);
   $('#scale-value').textContent = value.horizontalScale.toFixed(2);
   $('#magnetic-input').checked = value.magnetic === true;
+  const defaults=library.entries[currentKey]??BUILTIN_TRACKS[currentKey]??BUILTIN_TRACKS.track1;
+  syncMediaChoice('#track-music',value.music,defaults.defaultAudio);
+  syncMediaChoice('#track-alt-music',value.alternateMusic);
+  syncMediaChoice('#track-sky',value.sky,defaults.backdrop);
+  syncMediaChoice('#road-texture',value.roadTexture);
+  setValue('#road-material',value.roadMaterial??'default');
+  const rails=themeRailColors(value);
+  setValue('#rail-left',value.railColors?.left??rails.left);
+  setValue('#rail-right',value.railColors?.right??rails.right);
+  setValue('#cpu-multiplier',value.cpuMultiplier??1);
+  $('#cpu-multiplier-value').textContent=(value.cpuMultiplier??1).toFixed(2);
+  view.setSky(value.sky??defaults.backdrop);
   $('#undo-button').disabled = !current().history.canUndo;
   $('#redo-button').disabled = !current().history.canRedo;
   $('#reset-button').textContent = BUILTIN_TRACKS[currentKey] ? 'RESTORE BUILT-IN' : 'REMOVE CUSTOM';
@@ -471,6 +505,31 @@ $('#point-width').addEventListener('change',event=>{
   edit(next=>{next.pointWidths??=next.centerline.map(()=>null);next.pointWidths[selection.index]=value;});
 });
 $('#road-style').addEventListener('change',event=>{const value=event.target.value;edit(next=>{next.roadStyle=value;});});
+for(const [selector,key] of [['#track-music','music'],['#track-alt-music','alternateMusic'],
+  ['#track-sky','sky'],['#road-texture','roadTexture']]){
+  $(selector).addEventListener('change',event=>{
+    const value=event.target.value;
+    edit(next=>{if(value)next[key]=value;else delete next[key];});
+  });
+}
+$('#road-material').addEventListener('change',event=>{
+  const value=event.target.value;
+  edit(next=>{if(value==='default')delete next.roadMaterial;else next.roadMaterial=value;});
+});
+for(const side of ['left','right']) {
+  $('#rail-'+side).addEventListener('change',event=>{
+    const color=event.target.value;
+    edit(next=>{next.railColors??={};next.railColors[side]=color;});
+  });
+}
+$('#reset-rail-colors').addEventListener('click',()=>edit(next=>{delete next.railColors;}));
+$('#cpu-multiplier').addEventListener('input',event=>{
+  $('#cpu-multiplier-value').textContent=Number(event.target.value).toFixed(2);
+});
+$('#cpu-multiplier').addEventListener('change',event=>{
+  const scale=Number(event.target.value);
+  edit(next=>{if(scale===1)delete next.cpuMultiplier;else next.cpuMultiplier=scale;});
+});
 for(const type of ['boost','brake','weapon']) $('#add-'+type).addEventListener('click',()=>{
   const curve=createTrackCurve(track());
   const branch=selection.kind==='branch'?curve.track.branches[selection.branch]:null;

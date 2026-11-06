@@ -1,5 +1,22 @@
 # Current Status
 
+## 2026-11-05 — EDITOR-TRACK-MEDIA-001
+
+Track editor supports track-specific primary/alternate music from public/audio/tracks,
+equirectangular sky selection from public/images, independent left/right glowing
+rail colors, CPU top-speed/acceleration/braking multiplier (0.50–2.00), and road
+material presets with optional texture from public/images. Asset lists are generated
+by a Vite virtual module from actual public folders (and reload on file additions).
+Metadata uses versioned track JSON v9; previous v1–8 formats remain readable.
+The game uses saved primary audio/sky, cycles to alternate audio on track completion,
+and applies CPU tuning and road/rail materials for actual races. A global soundtrack
+override still takes priority. No stored browser tracks were altered.
+Production build and 17 focused tests passed. Full suite: 158/164 passed;
+the six remaining failures reproduce known catch-up (3), Foundry CPU,
+Necros player and thruster-color issues. Isolated Edge browser tested controls,
+IndexedDB save/reload and encountered no page errors. Original in-progress
+Vitrum road-edge modification in src/track.js was preserved.
+
 ## 2026-11-04 — RACE-LAPS-001
 
 Race Setup allows 3, 5, 7 or 10 laps for Quick Race and Campaign, persisted in

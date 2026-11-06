@@ -45,6 +45,39 @@
           <label>ROAD WIDTH <output id="width-value">10.00</output><input id="width-input" type="range" min="4" max="100" step="0.25" /></label>
           <label>HORIZONTAL SCALE <output id="scale-value">3.25</output><input id="scale-input" type="range" min="0.1" max="10" step="0.05" /></label>
           <label><input id="magnetic-input" type="checkbox" /> MAGNETIC ROAD · LOOPS &amp; GAPS</label>
+          <div class="gap-editor">
+            <div class="subheading">WORLD / AUDIO</div>
+            <label>PRIMARY MUSIC <select id="track-music"></select></label>
+            <label>ALTERNATE MUSIC <select id="track-alt-music"></select></label>
+            <p class="field-help">Primary plays at race start, then alternate plays when it ends (and they keep rotating). Both are selectable in Pause. A global soundtrack override takes precedence.</p>
+            <label>SKYSPHERE <select id="track-sky"></select></label>
+            <p class="field-help">Images come from public/images. For the correct wrap, use a 2:1 equirectangular panorama.</p>
+          </div>
+          <div class="gap-editor">
+            <div class="subheading">ROAD / RAILS</div>
+            <div class="button-row compact">
+              <label>LEFT RAIL <input id="rail-left" type="color" value="#ff4b91"></label>
+              <label>RIGHT RAIL <input id="rail-right" type="color" value="#58f4e8"></label>
+            </div>
+            <button id="reset-rail-colors" type="button">USE THEME RAIL COLORS</button>
+            <label>ROAD MATERIAL <select id="road-material">
+              <option value="default">Default / world style</option>
+              <option value="asphalt">Asphalt</option>
+              <option value="matte">Matte composite</option>
+              <option value="metal">Brushed metal</option>
+              <option value="stone">Stone / concrete</option>
+              <option value="organic">Organic</option>
+            </select></label>
+            <label>ROAD TEXTURE <select id="road-texture"></select></label>
+            <p class="field-help">Optional image from public/images, repeated over the road. Leave blank to use the material's built-in look.</p>
+          </div>
+          <div class="gap-editor">
+            <div class="subheading">CPU DIFFICULTY CALIBRATION</div>
+            <label>OPPONENT PERFORMANCE × <output id="cpu-multiplier-value">1.00</output>
+              <input id="cpu-multiplier" type="range" min="0.50" max="2.00" step="0.05" value="1">
+            </label>
+            <p class="field-help">Per-track multiplier for CPU top speed, acceleration and braking. 1.00 keeps the existing balance; Rookie/Pilot/Elite still apply.</p>
+          </div>
 <div class="point-editor">
   <div class="subheading">SELECTED POINT <b id="selected-point">—</b></div>
   <label>X <input id="point-x" type="number" step="1" /></label>

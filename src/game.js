@@ -927,10 +927,35 @@ scene.traverse(obj => {
   // Uppdatera minimappen för den nya banan
   setupMinimap();
 
+  // Show each circuit's own primary and alternate music in the pause menu.
+  musicSelect.querySelectorAll('option[data-circuit-music]').forEach(option=>option.remove());
+  const circuitMedia=TRACK_CONFIG[currentTrackId];
+  for(const [label,url] of [['CIRCUIT · PRIMARY',circuitMedia.defaultAudio],['CIRCUIT · ALTERNATE',circuitMedia.alternateAudio]]) {
+    if(url && ![...musicSelect.options].some(option=>option.value===url)) {
+      const option=new Option(label+' · '+url.split('/').at(-1),url);
+      option.dataset.circuitMusic='true';
+      musicSelect.add(option);
+    }
+  }
   // Byt musik
   raceAudio.dispose();
-  raceAudio = new RaceAudio(selectedSoundtrack(frontEnd?.profile??{},TRACK_CONFIG[currentTrackId].defaultAudio));
-  musicSelect.value=selectedSoundtrack(frontEnd.profile,TRACK_CONFIG[currentTrackId].defaultAudio);
+  const initialMusic=selectedSoundtrack(frontEnd?.profile??{},circuitMedia.defaultAudio);
+  raceAudio = new RaceAudio(initialMusic);
+  // Custom circuit music cycles primary -> alternate -> primary in longer races.
+  // An explicit global soundtrack override or manual pause selection stays a single loop.
+  if(circuitMedia.alternateAudio && circuitMedia.alternateAudio!==circuitMedia.defaultAudio &&
+      initialMusic===circuitMedia.defaultAudio){
+    const playlist=[circuitMedia.defaultAudio,circuitMedia.alternateAudio];
+    let playing=0;
+    raceAudio.audio.loop=false;
+    raceAudio.audio.addEventListener('ended',()=>{
+      playing=(playing+1)%playlist.length;
+      raceAudio.audio.src=playlist[playing];
+      musicSelect.value=playlist[playing];
+      raceAudio.audio.play().catch(error=>console.warn('Could not switch circuit music.',error));
+    });
+  }
+  musicSelect.value=initialMusic;
   raceAudio.setPreferences(frontEnd.profile.settings);
   raceAudio.setVoiceVolume(selectedVoiceVolume);spokenLap=1;voiceCombatPrevious={};
   // Läs av sökvägen till den nya bakgrundsbilden
@@ -986,7 +1011,7 @@ Object.assign(shipPhysics, createShipPhysics(activeTopSpeed,tuning));
   document.querySelector('#race-lap-time').textContent='00:00.00';
   race.playerFinishTime = null;
   activeCpuDifficulty = cupRound?.settings.difficulty ?? selectedCpuDifficulty;
-  resetOpponents(opponents, activeCpuDifficulty);
+  resetOpponents(opponents, activeCpuDifficulty, trackData.cpuMultiplier ?? 1);
   firing=touchFiring=false;
   combat.reset(!practice.active&&(cupRound?.settings.combat??document.querySelector('#combat-enabled').checked),combatRacers(),race.weaponPads);
   combatView.update(combat);updateCombatHud();
@@ -1550,7 +1575,7 @@ function render() {
   else updateCatchUp([
     { physics: shipPhysics, topSpeed: activeTopSpeed, finished: race.playerFinishTime !== null },
     ...opponents.map(opponent => ({
-      physics: opponent.physics, topSpeed: opponent.topSpeed, finished: opponent.finishTime !== null,
+      physics: opponent.physics, topSpeed: opponent.raceTopSpeed, finished: opponent.finishTime !== null,
     })),
   ], delta, curve.getLength() * totalLaps, race.state === 'racing', CPU_DIFFICULTIES[activeCpuDifficulty].catchUp);
 

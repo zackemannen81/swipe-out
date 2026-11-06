@@ -1,3 +1,12 @@
+## 2026-11-05 — EDITOR-TRACK-MEDIA-001: world and track authoring
+
+- New editor UI chooses primary and alternate track audio, panorama/sky, rail side colors, CPU performance multiplier and road material/texture.
+- Track JSON v9 preserves these fields for IndexedDB save, JSON import/export, Undo/Redo and Save & Test; v1–8 migrate without losing prior data.
+- Vite catalog scans public/audio/tracks and public/images for select options; no manual asset manifest.
+- The race loads track-specific sky/audio, rotates alternate soundtrack on playback end unless global preference overrides, and applies speed/acceleration/braking to all CPU opponents. Physical road/rails match editor.
+- Left existing Vitrum edge-strip width edit and docs/CURRENT_TASK.md unchanged.
+- Verified 17 focused tests and production build, plus isolated Edge editor interactions with IndexedDB save/reload and no JS errors. Full suite 158/164; six previously known failures in catch-up (3), Foundry CPU, Necros player and thruster color. No user saves modified.
+
 ## 2026-11-04 — RACE-LAPS-001: configurable lap counts
 
 - Added saved 3/5/7/10-lap choice to Race Setup for Quick Race/Campaign.

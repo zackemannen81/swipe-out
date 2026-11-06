@@ -24,15 +24,10 @@ BUILTIN_TRACKS.track18.defaultAudio = '/audio/tracks/track15.m4a';
 // id such as "synthetic-dreams". Match its displayed name, not its id.
 // Preserve the original soundtrack/sky for all unrelated custom tracks.
 export function trackMedia(data, fallback) {
-  if (data.id === VITRUM.id) return {...fallback, backdrop: BUILTIN_TRACKS.track18.backdrop, defaultAudio: BUILTIN_TRACKS.track18.defaultAudio};
-  if (/^necros\s*[-–—·:]\s*prime$/i.test(data.name)) {
-    return {
-      ...fallback,
-      defaultAudio: '/audio/tracks/track_014.mp3',
-      backdrop: '/images/backdrop_track-015.jpg'
-    };
-  }
-  return fallback;
+  let media = {...fallback};
+  if (data.id === VITRUM.id) media = {...media, backdrop: BUILTIN_TRACKS.track18.backdrop, defaultAudio: BUILTIN_TRACKS.track18.defaultAudio};
+  else if (/^necros\s*[-–—·:]\s*prime$/i.test(data.name)) media = {...media, defaultAudio: '/audio/tracks/track_014.mp3', backdrop: '/images/backdrop_track-015.jpg'};
+  return {...media, defaultAudio:data.music??media.defaultAudio, alternateAudio:data.alternateMusic??null, backdrop:data.sky??media.backdrop};
 }
 
 function storedRecords(storage) {
@@ -44,7 +39,7 @@ function storedRecords(storage) {
 }
 
 export function readTrackLibrary(storage) {
-  const entries = Object.fromEntries(Object.entries(BUILTIN_TRACKS).map(([key, entry]) => [key, { ...entry, data: normalizeTrack(entry.data) }]));
+  const entries = Object.fromEntries(Object.entries(BUILTIN_TRACKS).map(([key, entry]) => [key, { ...trackMedia(entry.data,entry), data: normalizeTrack(entry.data) }]));
   const issues = [];
   try {
     const records = storedRecords(storage);

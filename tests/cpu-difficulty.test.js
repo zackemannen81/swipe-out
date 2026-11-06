@@ -78,3 +78,18 @@ test('all difficulties complete Foundry with jumps and boosts; Elite beats Rooki
   assert.ok(mean('elite')<mean('pilot'));
   assert.ok(mean('pilot')<mean('rookie'));
 });
+
+test('circuit CPU calibration scales speed, acceleration and braking without changing factory definitions',()=>{
+ const source=RACER_DEFINITIONS[0];
+ const normal=createOpponentState(source),fast=createOpponentState(source),slow=createOpponentState(source);
+ resetOpponents([normal],'pilot');
+ resetOpponents([fast],'pilot',1.5);
+ resetOpponents([slow],'pilot',0.6);
+ assert.equal(fast.raceTopSpeed,normal.raceTopSpeed*1.5);
+ assert.equal(fast.raceAcceleration,normal.raceAcceleration*1.5);
+ assert.equal(fast.physics.tuning.brakeForce,normal.physics.tuning.brakeForce*1.5);
+ assert.equal(slow.raceTopSpeed,normal.raceTopSpeed*0.6);
+ assert.equal(source.topSpeed,RACER_DEFINITIONS[0].topSpeed);
+ resetOpponents([fast],'elite');
+ assert.equal(fast.raceTopSpeed,source.topSpeed);
+});

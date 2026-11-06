@@ -1,5 +1,6 @@
 import { resolve } from 'node:path';
 import { defineConfig } from 'vite';
+import { trackEditorMediaPlugin } from './src/editor-media-plugin.js';
 const WS_PROXY_TARGET = process.env.VITE_WS_PROXY_TARGET ?? 'http://127.0.0.1:8787';
 
 const wsProxy = {
@@ -11,6 +12,7 @@ const wsProxy = {
 };
 
 export default defineConfig({
+  plugins: [trackEditorMediaPlugin()],
     base: './',
   server: {
     port: 5173,
