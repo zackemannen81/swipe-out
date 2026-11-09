@@ -1,5 +1,20 @@
 # Current Status
 
+## 2026-11-06 — EDITOR-SKY-FLY-001
+
+Game and editor use matching equirectangular panorama mapping. The game no longer
+draws the sky on a fog-affected moving sphere, while the race camera's FOV remains
+unchanged. Editor now offers Fly Mode (WASD/arrows, Q/E, Shift and mouse-look),
+multi-object Shift/Ctrl/Cmd-click selection and outlines, group movement via gizmo,
+Delete, Ctrl+C/Ctrl+P copy/paste in place and toolbar controls. Paste refreshes IDs
+and retains object transforms; undo/redo works without altering saved tracks.
+Three focused tests, Vite production build and isolated Chrome interaction
+(add, copy, paste, delete, undo, keyboard copy/paste, fly toggle) passed without
+page exceptions. Full suite: 161/167 passed; same six known failures in
+catch-up (3), Foundry CPU, Necros player and thruster color. Live visual
+comparison and multi-pointer selection remain for author verification.
+VITRUM-EDGES-001 active task record retained. See EDITOR-SKY-FLY-001.md.
+
 ## 2026-11-05 — EDITOR-TRACK-MEDIA-001
 
 Track editor supports track-specific primary/alternate music from public/audio/tracks,

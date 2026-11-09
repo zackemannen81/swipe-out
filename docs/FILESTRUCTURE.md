@@ -1,5 +1,13 @@
 # File Structure
 
+## 2026-11-06 — EDITOR-SKY-FLY-001
+
+- `src/editor-object-actions.js` — pure selection/copy/paste/delete helpers and scene capacity guardrails
+- `tests/editor-object-actions.test.js` — multi-selection and transform-preserving paste tests
+- `src/editor-view.js`, `src/editor.js`, `src/editor.css`, `editor.html` — Fly Mode, multi-pick highlights, shortcut and toolbar authoring controls
+- `src/game.js` — editor-parity equirectangular scene background
+- `docs/EDITOR-SKY-FLY-001.md` — scope, verification, outstanding visual checks
+
 ## 2026-11-05 — EDITOR-TRACK-MEDIA-001
 
 - `src/editor-media-plugin.js` — scans public audio/images into virtual editor-select module via Vite

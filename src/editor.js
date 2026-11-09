@@ -7,6 +7,7 @@ import { BUILTIN_TRACKS } from './track-library.js';
 import { loadTrackLibrary, persistTrack, removePersistedTrack } from './track-storage.js';
 import { normalizeTrack, parseTrack, serializeTrack, MAX_TRACK_BYTES } from './track-format.js';
 import { createHistory } from './editor-history.js';
+import { selectedObjectIndexes, copySceneObjects, createPastedObjects, withoutSceneObjects } from './editor-object-actions.js';
 import { createEditorView } from './editor-view.js';
 import { createTrackCurve, getTrackFrame, progressAtControlPoint } from './track-path.js';
 import './editor.css';
@@ -20,7 +21,34 @@ for (const [key, entry] of Object.entries(library.entries)) {
 const requestedKey = new URLSearchParams(location.search).get('track');
 let currentKey = drafts.has(requestedKey) ? requestedKey : 'track1';
 let selection = { kind: 'point', index: 0 };
+let selectedObjects = new Set();
+let objectClipboard = [];
+let flyEnabled = false;
 const current = () => drafts.get(currentKey);
+const selectedIndexes = () => selection.kind === 'object'
+  ? selectedObjectIndexes(selection, selectedObjects, track().objects.length) : [];
+function chooseSelection(value, { additive = false, focus = false } = {}) {
+  if (value.kind === 'object') {
+    if (additive) {
+      if (selectedObjects.has(value.index)) selectedObjects.delete(value.index);
+      else selectedObjects.add(value.index);
+      const remaining = [...selectedObjects];
+      selection = remaining.length
+        ? {kind:'object', index:selectedObjects.has(value.index) ? value.index : remaining.at(-1)}
+        : {kind:'point', index:0};
+    } else {
+      selection = value;
+      selectedObjects = new Set([value.index]);
+    }
+  } else {
+    selection = value;
+    selectedObjects.clear();
+  }
+  render();
+  view.select(selection, selectedIndexes());
+  if (focus) { if (flyEnabled) toggleFly(false); view.focus(); }
+}
+
 const track = () => current().track;
 const isDirty = draft => draft.saved !== JSON.stringify(draft.track);
 const status = $('#status');
@@ -48,15 +76,22 @@ function themeRailColors(definition) {
 function message(text, error = false) { status.textContent = text; status.classList.toggle('error', error); }
 const view = createEditorView($('#editor-canvas'), {
   onError(error) { message(error, true); },
-  onSelect(value) { selection = value; render(); view.select(selection); },
+  onSelect(value, options) { chooseSelection(value, options); },
   onMove(value, position) {
+    const previous = value.kind === 'object' ? track().objects[value.index].position : null;
+    const delta = previous?.map((v, i) => position[i] - v);
+    const indexes = selectedIndexes();
     edit(next => {
       if (value.kind === 'point') next.centerline[value.index].splice(0, 3, ...position);
       else if (value.kind === 'branch') next.branches[value.branch].points[value.index] = position;
-      else next.objects[value.index].position = position;
+      else if (indexes.length > 1) {
+        for (const index of indexes) {
+          next.objects[index].position = next.objects[index].position.map((v, i) => Math.round((v + delta[i]) * 100) / 100);
+        }
+      } else next.objects[value.index].position = position;
     }, false);
   },
-  onCommit() { current().history.push(track()); render(); view.setTrack(track(), selection); },
+  onCommit() { current().history.push(track()); render(); view.setTrack(track(), selection, selectedIndexes()); },
 });
 
 function edit(change, commit = true) {
@@ -66,11 +101,13 @@ function edit(change, commit = true) {
     current().track = normalizeTrack(next);
     if (commit) current().history.push(track());
     render();
-    view.setTrack(track(), selection);
+    view.setTrack(track(), selection, selectedIndexes());
     message('Unsaved changes. Save to Game or Save & Test when ready.');
+    return true;
   } catch (error) {
     render();
     message(error.message, true);
+    return false;
   }
 }
 
@@ -79,9 +116,10 @@ function setValue(selector, value) {
   if (document.activeElement !== input) input.value = value;
 }
 function clampSelection() {
+  selectedObjects = new Set([...selectedObjects].filter(i => i >= 0 && i < track().objects.length));
   if (selection.kind === 'branch' && !track().branches?.[selection.branch]) selection = {kind:'point',index:0};
   const count = selection.kind === 'point' ? track().centerline.length : selection.kind === 'branch' ? track().branches[selection.branch].points.length : track().objects.length;
-  if (!count) selection = { kind: 'point', index: 0 };
+  if (!count) { selection = { kind: 'point', index: 0 }; selectedObjects.clear(); }
   else selection.index = Math.max(0, Math.min(selection.index, count - 1));
 }
 function render() {
@@ -125,7 +163,11 @@ function render() {
   renderPads();
   setValue('#point-bank', point[3] ?? 0);
   $('#point-bank').disabled = selection.kind !== 'point' || !value.magnetic;
-  $('#selected-point').textContent = selection.kind === 'point' ? String(pointIndex + 1).padStart(2, '0') : selection.kind === 'branch' ? `ROUTE POINT ${selection.index+1}` : 'OBJECT SELECTED';
+  $('#selected-point').textContent = selection.kind === 'point' ? String(pointIndex + 1).padStart(2, '0') : selection.kind === 'branch' ? `ROUTE POINT ${selection.index+1}` : `${selectedIndexes().length} OBJECT(S)`;
+  const count = selectedIndexes().length;
+  $('#object-selection-count').textContent = count ? `${count} scenery object(s) selected. Shift/Ctrl-click to add or remove.` : 'Shift/Ctrl-click objects in the 3D view to select multiple.';
+  $('#delete-objects-button').disabled = $('#copy-objects-button').disabled = !count;
+  $('#paste-objects-button').disabled = !objectClipboard.length;
   for (const [axis, name] of ['x', 'y', 'z'].entries()) {
     setValue(`#point-${name}`, point[axis]);
     $(`#point-${name}`).disabled = selection.kind === 'object';
@@ -160,12 +202,14 @@ function renderBranches() {
   side.add(new Option('Approach LEFT','1'));side.add(new Option('Approach RIGHT','-1')); side.value=String(branch.side);
   side.addEventListener('change',()=>{const value=Number(side.value);side.blur();edit(next=>{next.branches[selection.branch].side=value;});});panel.append(side);
   const remove=document.createElement('button'); remove.textContent='REMOVE ROUTE'; remove.id='remove-branch-button';
-  remove.addEventListener('click',()=>{const index=selection.branch;selection={kind:'point',index:0};edit(next=>{ const id=next.branches[index].id; next.branches.splice(index,1); if(next.pads) next.pads=next.pads.filter(p=>p.routeId!==id); });});panel.append(remove);
+  remove.addEventListener('click',()=>{const index=selection.branch;selectedObjects.clear();selection={kind:'point',index:0};edit(next=>{ const id=next.branches[index].id; next.branches.splice(index,1); if(next.pads) next.pads=next.pads.filter(p=>p.routeId!==id); });});panel.append(remove);
 }
 
 $('#branch-select').addEventListener('change',event=>{
+  selectedObjects.clear();
   selection=event.target.value===''?{kind:'point',index:0}:{kind:'branch',branch:Number(event.target.value),index:0};
-  render();view.select(selection);view.focus();
+  if (flyEnabled) toggleFly(false);
+  render();view.select(selection, []);view.focus();
 });
 $('#add-branch-button').addEventListener('click',()=>{
   const curve=createTrackCurve(track()), start=Math.max(0.08,Math.min(0.72,progressAtControlPoint(curve,selection.index))), end=start+0.16;
@@ -175,7 +219,7 @@ $('#add-branch-button').addEventListener('click',()=>{
   });
   const id=crypto.randomUUID();edit(next=>{next.branches??=[];next.branches.push({id,name:'Alternative route',start,end,side:1,width:Math.max(4,next.width*0.5),points});});
   const index=track().branches?.findIndex(b=>b.id===id)??-1;
-  if(index>=0){selection={kind:'branch',branch:index,index:0};render();view.select(selection);view.fit();}
+  if(index>=0){selectedObjects.clear();selection={kind:'branch',branch:index,index:0};render();view.select(selection, []);view.fit();}
 });
 
 function renderGaps() {
@@ -209,6 +253,12 @@ function renderObjectInspector() {
   if (panel.contains(document.activeElement)) return;
   panel.replaceChildren();
   if (selection.kind !== 'object') return;
+  if (selectedIndexes().length > 1) {
+    const note = document.createElement('p'); note.className = 'field-help';
+    note.textContent = `${selectedIndexes().length} objects selected. Drag the gizmo to move the group, or use Copy / Paste / Delete above. Paste keeps their exact original positions.`;
+    panel.append(note);
+    return;
+  }
   const object = track().objects[selection.index];
   const row = document.createElement('div');
   row.className = 'primitive-row active-row';
@@ -328,11 +378,7 @@ function renderObjectInspector() {
   }
   const motionHelp=document.createElement('p');motionHelp.className='field-help';motionHelp.textContent='Shuttle moves back and forth along a world axis. Orbit circles around the chosen axis, starting at the saved position. Rotation uses the saved orientation. GLB playback needs an animation clip in the file.';row.append(motionHelp);
   const remove = document.createElement('button'); remove.textContent = 'REMOVE OBJECT';
-  remove.addEventListener('click', () => {
-    const index = selection.index;
-    selection = { kind: 'point', index: 0 };
-    edit(next => { next.objects.splice(index, 1); });
-  });
+  remove.addEventListener('click', deleteSelectedObjects);
   row.append(remove); panel.append(row);
   const clone = document.createElement('button'); clone.textContent = 'CLONE OBJECT';
   clone.id = 'clone-object-button'; clone.disabled = track().objects.length >= 1024;
@@ -346,21 +392,54 @@ function cloneSelectedObject() {
   const offset=Math.min(100,Math.max(2,copy.scale[0]+1));
   copy.position[0] += copy.position[0]+offset<=10000?offset:-offset;
   edit(next => { next.objects.push(copy); });
-  selection = { kind: 'object', index: track().objects.length - 1 };
-  render(); view.select(selection); view.focus();
+  chooseSelection({kind:'object',index:track().objects.length - 1}, {focus:true});
+}
+
+function copySelectedObjects() {
+  const indexes = selectedIndexes();
+  if (!indexes.length) return;
+  objectClipboard = copySceneObjects(track().objects, indexes);
+  render();
+  message(`Copied ${objectClipboard.length} object(s). Paste will keep their original coordinates.`);
+}
+
+function pasteSelectedObjects() {
+  if (!objectClipboard.length) return;
+  let additions;
+  try {
+    additions = createPastedObjects(track().objects, objectClipboard, () => crypto.randomUUID());
+    serializeTrack({...track(), objects:[...track().objects, ...additions]});
+  } catch (error) { message(error.message, true); return; }
+  const start = track().objects.length;
+  if (!edit(next => { next.objects.push(...additions); })) return;
+  selectedObjects = new Set(additions.map((_, i) => start + i));
+  selection = {kind:'object',index:start};
+  render(); view.select(selection, selectedIndexes());
+  message(`Pasted ${additions.length} object(s) at their exact copied positions. Save when ready.`);
+}
+
+function deleteSelectedObjects() {
+  const indexes = selectedIndexes();
+  if (!indexes.length) return;
+  if (!edit(next => { next.objects = withoutSceneObjects(next.objects, indexes); })) return;
+  selectedObjects.clear();
+  selection = {kind:'point',index:0};
+  render(); view.select(selection, []);
+  message(`Deleted ${indexes.length} object(s). Ctrl+Z to undo.`);
 }
 
 function activate(key) {
+  if (flyEnabled) toggleFly(false);
   currentKey = key;
+  selectedObjects.clear();
   selection = { kind: 'point', index: 0 };
-  render(); view.setTrack(track(), selection); view.fit();
+  render(); view.setTrack(track(), selection, []); view.fit();
   message('Drafts are kept while switching tracks. Save or download before closing the editor.');
 }
 $('#track-select').addEventListener('change', event => activate(event.target.value));
 $('#object-select').addEventListener('change', event => {
   if (event.target.value === '') return;
-  selection = { kind: 'object', index: Number(event.target.value) };
-  render(); view.select(selection); view.focus();
+  chooseSelection({kind:'object', index:Number(event.target.value)}, {focus:true});
 });
 $('#track-name').addEventListener('change', event => { const value = event.target.value; event.target.blur(); edit(next => { next.name = value; }); });
 $('#magnetic-input').addEventListener('change', event => edit(next => { next.magnetic = event.target.checked; }));
@@ -395,7 +474,7 @@ $('#add-point-btn').addEventListener('click', () => {
     points.splice(index + 1, 0, point);
     if(selection.kind === 'point' && next.pointWidths) next.pointWidths.splice(index+1,0,next.pointWidths[index]);
   });
-  selection.index = index + 1; render(); view.select(selection);
+  selectedObjects.clear(); selection.index = index + 1; render(); view.select(selection, []);
 });
 $('#del-point-btn').addEventListener('click', () => edit(next => { pointCollection(next).splice(selection.index, 1); if(selection.kind==='point') next.pointWidths?.splice(selection.index,1); }));
 for (const button of document.querySelectorAll('[data-primitive]')) {
@@ -403,28 +482,48 @@ for (const button of document.querySelectorAll('[data-primitive]')) {
     const position = track().centerline[selection.kind === 'point' ? selection.index : 0].slice(0, 3);
     position[1] += 2;
     edit(next => next.objects.push({ id: crypto.randomUUID(), type: button.dataset.primitive, position, scale: button.dataset.primitive==='light'?[1,1,1]:[5,5,5] }));
-    selection = { kind: 'object', index: track().objects.length - 1 };
-    render(); view.select(selection);
+    chooseSelection({kind:'object', index:track().objects.length - 1});
   });
 }
 function historyAction(action) {
   current().track = current().history[action]();
-  render(); view.setTrack(track(), selection);
+  selectedObjects.clear();
+  selection = {kind:'point',index:0};
+  render(); view.setTrack(track(), selection, []);
   message(action === 'undo' ? 'Edit undone.' : 'Edit restored.');
 }
 $('#undo-button').addEventListener('click', () => historyAction('undo'));
 $('#redo-button').addEventListener('click', () => historyAction('redo'));
 window.addEventListener('keydown', event => {
-  if (event.target.matches('input, textarea, select') || !(event.ctrlKey || event.metaKey)) return;
+  if (event.target instanceof Element && event.target.closest('input, textarea, select, [contenteditable="true"]')) return;
+  const modifier = event.ctrlKey || event.metaKey;
+  if ((event.code === 'Delete' || event.code === 'Backspace') && !modifier && selectedIndexes().length) {
+    event.preventDefault(); deleteSelectedObjects(); return;
+  }
+  if (!modifier) return;
+  if (event.code === 'KeyC' && selectedIndexes().length) { event.preventDefault(); copySelectedObjects(); return; }
+  if (event.code === 'KeyP' && objectClipboard.length) { event.preventDefault(); pasteSelectedObjects(); return; }
   if (event.code === 'KeyD' && selection.kind === 'object') { event.preventDefault(); cloneSelectedObject(); return; }
   if (event.code === 'KeyZ' || event.code === 'KeyY') {
     event.preventDefault(); historyAction(event.shiftKey || event.code === 'KeyY' ? 'redo' : 'undo');
   }
 });
-$('#fit-button').addEventListener('click', () => view.fit());
-$('#top-button').addEventListener('click', () => view.fit(true));
-$('#side-button').addEventListener('click', () => view.fit('side'));
-$('#focus-button').addEventListener('click', () => view.focus());
+$('#fit-button').addEventListener('click', () => { if (flyEnabled) toggleFly(false); view.fit(); });
+$('#top-button').addEventListener('click', () => { if (flyEnabled) toggleFly(false); view.fit(true); });
+$('#side-button').addEventListener('click', () => { if (flyEnabled) toggleFly(false); view.fit('side'); });
+$('#focus-button').addEventListener('click', () => { if (flyEnabled) toggleFly(false); view.focus(); });
+$('#copy-objects-button').addEventListener('click', copySelectedObjects);
+$('#paste-objects-button').addEventListener('click', pasteSelectedObjects);
+$('#delete-objects-button').addEventListener('click', deleteSelectedObjects);
+function toggleFly(enabled = !flyEnabled) {
+  flyEnabled = view.setFlyMode(enabled);
+  const button = $('#fly-mode-button');
+  button.textContent = `FLY MODE: ${flyEnabled ? 'ON' : 'OFF'}`;
+  button.setAttribute('aria-pressed', String(flyEnabled));
+  button.classList.toggle('active', flyEnabled);
+  $('#editor-canvas').classList.toggle('flying', flyEnabled);
+}
+$('#fly-mode-button').addEventListener('click', () => toggleFly());
 let saveInProgress = false;
 async function save() {
   if (saveInProgress) return false;
@@ -565,7 +664,7 @@ function renderPads() {
     const route=document.createElement('select');route.setAttribute('aria-label','Pad '+(index+1)+' route');route.add(new Option('Main road',''));
     for(const b of track().branches??[])route.add(new Option(b.name,b.id));route.value=pad.routeId??'';
     route.onchange=()=>{const value=route.value;route.blur();edit(next=>{const p=next.pads[index];if(value){const b=next.branches.find(b=>b.id===value);p.routeId=value;p.progress=(b.start+b.end)/2;p.offset=0;}else delete p.routeId;});};row.append(route);
-    const focus=document.createElement('button');focus.textContent='FOCUS';focus.onclick=()=>view.focusPad(pad);row.append(focus);
+    const focus=document.createElement('button');focus.textContent='FOCUS';focus.onclick=()=>{if(flyEnabled)toggleFly(false);view.focusPad(pad);};row.append(focus);
     const remove=document.createElement('button');remove.textContent='REMOVE';remove.onclick=()=>edit(next=>{next.pads.splice(index,1);});row.append(remove);
     list.append(row);
   });
@@ -581,7 +680,7 @@ async function addGlb(source) {
   // Verify portable export budget before changing the draft.
   serializeTrack({...track(),objects:[...track().objects,object]});
   edit(next=>next.objects.push(object));
-  selection={kind:'object',index:track().objects.length-1};render();view.select(selection);view.focus();
+  chooseSelection({kind:'object',index:track().objects.length-1}, {focus:true});
 }
 
 // Cathedral kit: paths point to GLBs already present under public/models.
@@ -618,8 +717,7 @@ async function stageCathedral(parts) {
     serializeTrack({ ...track(), objects: [...track().objects, ...additions] });
     const firstIndex = track().objects.length;
     edit(next => { next.objects.push(...additions); });
-    selection = {kind:'object',index:firstIndex};
-    render(); view.select(selection);
+    chooseSelection({kind:'object',index:firstIndex});
     message(`Staged ${additions.length} Cathedral GLB reference(s) by the selected point. Move/scale each piece under SCENERY, then Save to Game. Models remain in public/models.`);
   } catch (error) { message(`Cathedral import failed: ${error.message}`, true); }
 }

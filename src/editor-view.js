@@ -51,6 +51,92 @@ export function createEditorView(canvas, { onSelect, onMove, onCommit, onError }
   const markers = new THREE.Group();
   let markerSelections = [];
   scene.add(markers);
+  // Selection boxes stay separate from authored scenery and never get saved.
+  const selectionHelpers = new THREE.Group();
+  scene.add(selectionHelpers);
+  let selectedObjects = new Set();
+  let helperTargets = [];
+  let flyMode = false;
+  const flyKeys = new Set();
+  let flyPointer = null;
+  let flyYaw = 0, flyPitch = 0;
+  let previousFrame = performance.now();
+  let lastHighlightRefresh = 0;
+  const flyForward = new THREE.Vector3();
+  const flyRight = new THREE.Vector3();
+  const flyMove = new THREE.Vector3();
+  const flyUp = new THREE.Vector3(0, 1, 0);
+  const isTyping = target => target instanceof Element && Boolean(target.closest('input, textarea, select, [contenteditable="true"]'));
+
+  function syncHighlights() {
+    const roots = scene.getObjectByName('customTrackObjects')?.children ?? [];
+    const next = [...selectedObjects].map(index => roots[index]).filter(Boolean);
+    if (helperTargets.length === next.length && next.every((root, index) => helperTargets[index] === root)) return;
+    for (const helper of [...selectionHelpers.children]) {
+      selectionHelpers.remove(helper);
+      helper.geometry.dispose();
+      helper.material.dispose();
+    }
+    helperTargets = next;
+    next.forEach(root => {
+      const helper = new THREE.BoxHelper(root, 0x5de8df);
+      helper.material.depthTest = false;
+      helper.material.transparent = true;
+      helper.renderOrder = 15;
+      selectionHelpers.add(helper);
+    });
+  }
+
+  function setFlyMode(enabled) {
+    flyMode = Boolean(enabled);
+    flyKeys.clear();
+    flyPointer = null;
+    orbit.enabled = !flyMode;
+    transform.enabled = !flyMode;
+    transform.getHelper().visible = !flyMode;
+    if (flyMode) {
+      const direction = camera.getWorldDirection(new THREE.Vector3());
+      flyYaw = Math.atan2(-direction.x, -direction.z);
+      flyPitch = Math.asin(THREE.MathUtils.clamp(direction.y, -1, 1));
+      camera.up.set(0, 1, 0);
+      camera.rotation.order = 'YXZ';
+      camera.rotation.set(flyPitch, flyYaw, 0);
+      canvas.focus({ preventScroll: true });
+    } else {
+      camera.getWorldDirection(flyForward);
+      orbit.target.copy(camera.position).addScaledVector(flyForward, 40);
+      orbit.update();
+      syncSelection();
+    }
+    return flyMode;
+  }
+  function onFlyKeyDown(event) {
+    if (!flyMode || event.ctrlKey || event.metaKey || event.altKey || isTyping(event.target)) return;
+    if (['KeyW','KeyA','KeyS','KeyD','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','KeyQ','KeyE','ShiftLeft','ShiftRight'].includes(event.code)) {
+      flyKeys.add(event.code);
+      event.preventDefault();
+    }
+  }
+  function onFlyKeyUp(event) { flyKeys.delete(event.code); }
+  function stopFlyMovement() { flyKeys.clear(); flyPointer = null; }
+  window.addEventListener('keydown', onFlyKeyDown);
+  window.addEventListener('keyup', onFlyKeyUp);
+  window.addEventListener('blur', stopFlyMovement);
+  function updateFly(delta) {
+    if (!flyMode) return;
+    camera.rotation.set(flyPitch, flyYaw, 0, 'YXZ');
+    camera.getWorldDirection(flyForward);
+    flyRight.set(1, 0, 0).applyQuaternion(camera.quaternion);
+    const forward = Number(flyKeys.has('KeyW') || flyKeys.has('ArrowUp')) - Number(flyKeys.has('KeyS') || flyKeys.has('ArrowDown'));
+    const strafe = Number(flyKeys.has('KeyD') || flyKeys.has('ArrowRight')) - Number(flyKeys.has('KeyA') || flyKeys.has('ArrowLeft'));
+    const vertical = Number(flyKeys.has('KeyE')) - Number(flyKeys.has('KeyQ'));
+    flyMove.set(0, 0, 0).addScaledVector(flyForward, forward).addScaledVector(flyRight, strafe).addScaledVector(flyUp, vertical);
+    if (flyMove.lengthSq() > 0) {
+      const speed = flyKeys.has('ShiftLeft') || flyKeys.has('ShiftRight') ? 300 : 65;
+      camera.position.addScaledVector(flyMove.normalize(), delta * speed);
+    }
+    orbit.target.copy(camera.position).addScaledVector(flyForward, 40);
+  }
   const markerGeometry = new THREE.SphereGeometry(1, 12, 8);
   const markerMaterial = new THREE.MeshBasicMaterial({ color: '#b6ffff', depthTest: false });
   const selectedMaterial = new THREE.MeshBasicMaterial({ color: '#ff5f98', depthTest: false });
@@ -94,6 +180,7 @@ export function createEditorView(canvas, { onSelect, onMove, onCommit, onError }
       spawnTrackObjects(scene, track);
       sceneryKey = nextSceneryKey;
     }
+    syncHighlights();
     dirty = false;
     lastBuild = performance.now();
   }
@@ -116,10 +203,27 @@ export function createEditorView(canvas, { onSelect, onMove, onCommit, onError }
     onMove(selection, [p.x / track.horizontalScale, p.y, p.z / track.horizontalScale].map(n => Math.round(n * 100) / 100));
   });
   canvas.addEventListener('pointerdown', event => {
+    if (flyMode) {
+      if (event.button === 0) {
+        flyPointer = { id: event.pointerId, x: event.clientX, y: event.clientY };
+        canvas.setPointerCapture(event.pointerId);
+      }
+      return;
+    }
     down = [event.clientX, event.clientY];
     wasDragging = Boolean(transform.axis);
   });
+  canvas.addEventListener('pointermove', event => {
+    if (!flyMode || !flyPointer || flyPointer.id !== event.pointerId) return;
+    const dx = event.clientX - flyPointer.x, dy = event.clientY - flyPointer.y;
+    flyPointer.x = event.clientX; flyPointer.y = event.clientY;
+    flyYaw -= dx * 0.003;
+    flyPitch = THREE.MathUtils.clamp(flyPitch - dy * 0.003, -Math.PI / 2 + 0.02, Math.PI / 2 - 0.02);
+  });
+  canvas.addEventListener('pointercancel', () => { flyPointer = null; down = null; });
+  canvas.addEventListener('contextmenu', event => { if (flyMode) event.preventDefault(); });
   canvas.addEventListener('pointerup', event => {
+    if (flyMode) { flyPointer = null; return; }
     if (!down || wasDragging || Math.hypot(event.clientX - down[0], event.clientY - down[1]) > 5) return;
     const rect = canvas.getBoundingClientRect();
     pointer.set((event.clientX - rect.left) / rect.width * 2 - 1, -(event.clientY - rect.top) / rect.height * 2 + 1);
@@ -128,12 +232,17 @@ export function createEditorView(canvas, { onSelect, onMove, onCommit, onError }
     const scenery = scene.getObjectByName('customTrackObjects');
     const objectHit = scenery && raycaster.intersectObjects(scenery.children)[0];
     if (pointHit) onSelect({ ...markerSelections[markers.children.indexOf(pointHit.object)] });
-    else if (objectHit) {let root=objectHit.object;while(root.parent!==scenery)root=root.parent;onSelect({kind:'object',index:scenery.children.indexOf(root)});}
+    else if (objectHit) {
+      let root = objectHit.object;
+      while (root.parent && root.parent !== scenery) root = root.parent;
+      if (root.parent === scenery) onSelect({kind:'object',index:scenery.children.indexOf(root)}, { additive: event.shiftKey || event.ctrlKey || event.metaKey });
+    }
   });
 
-  function setTrack(value, nextSelection = selection) {
+  function setTrack(value, nextSelection = selection, indexes = [...selectedObjects]) {
     track = value;
     selection = nextSelection;
+    selectedObjects = new Set(indexes.filter(i => i >= 0 && i < track.objects.length));
     const sources = track.centerline.map((p,index)=>({p,selection:{kind:'point',index}}));
     (track.branches??[]).forEach((b,branch)=>b.points.forEach((p,index)=>sources.push({p,selection:{kind:'branch',branch,index}})));
     markerSelections = sources.map(s=>s.selection);
@@ -176,8 +285,16 @@ export function createEditorView(canvas, { onSelect, onMove, onCommit, onError }
   camera.updateProjectionMatrix();
   renderer.setSize(initialRect.width, initialRect.height, false);
   renderer.setAnimationLoop(() => {
-    if (dirty && (!transform.dragging || performance.now() - lastBuild > 120)) build();
-    orbit.update();
+    const now = performance.now();
+    const delta = Math.min(0.05, Math.max(0, (now - previousFrame) / 1000));
+    previousFrame = now;
+    if (dirty && (!transform.dragging || now - lastBuild > 120)) build();
+    if (flyMode) updateFly(delta);
+    else orbit.update();
+    if (selectionHelpers.children.length && (transform.dragging || now - lastHighlightRefresh > 120)) {
+      for (const helper of selectionHelpers.children) helper.update();
+      lastHighlightRefresh = now;
+    }
     for (const marker of markers.children) {
       marker.scale.setScalar(camera.position.distanceTo(marker.position) * 0.006);
     }
@@ -190,7 +307,7 @@ export function createEditorView(canvas, { onSelect, onMove, onCommit, onError }
     renderer.render(scene, camera);
   });
   return {
-    setTrack, setSky, fit,
+    setTrack, setSky, fit, setFlyMode,
     focusPad(pad) {
       const assets = createTrackCurve(track), p = padPlacement(assets,pad), f = p.frameAt(p.d);
       orbit.target.copy(f.center).addScaledVector(f.right,p.offset);
@@ -198,11 +315,23 @@ export function createEditorView(canvas, { onSelect, onMove, onCommit, onError }
       camera.position.copy(orbit.target).addScaledVector(f.normal,14).addScaledVector(f.tangent,-18);
       orbit.update();
     },
-    select(value) { selection = value; syncSelection(); },
+    select(value, indexes = []) {
+      selection = value;
+      selectedObjects = new Set(indexes);
+      syncSelection();
+      syncHighlights();
+    },
     focus() {
-      const offset = camera.position.clone().sub(orbit.target).normalize().multiplyScalar(Math.max(track.width * 7, 60));
-      orbit.target.copy(anchor.position);
-      camera.position.copy(anchor.position).add(offset);
+      const positions = selection.kind === 'object' && selectedObjects.size
+        ? [...selectedObjects].map(i => track.objects[i]?.position).filter(Boolean).map(([x,y,z]) => new THREE.Vector3(x * track.horizontalScale,y,z * track.horizontalScale))
+        : [anchor.position.clone()];
+      const bounds = new THREE.Box3().setFromPoints(positions);
+      const center = bounds.getCenter(new THREE.Vector3());
+      const direction = camera.position.clone().sub(orbit.target).normalize();
+      const distance = Math.max(track.width * 7, 60, bounds.getSize(new THREE.Vector3()).length() * 1.3);
+      orbit.target.copy(center);
+      camera.position.copy(center).addScaledVector(direction, distance);
+      if (flyMode) setFlyMode(false);
       orbit.update();
     },
     dispose() {
@@ -210,6 +339,10 @@ export function createEditorView(canvas, { onSelect, onMove, onCommit, onError }
       observer.disconnect();
       transform.dispose(); orbit.dispose();
       skyRequest++;skyTexture?.dispose();
+      window.removeEventListener('keydown', onFlyKeyDown);
+      window.removeEventListener('keyup', onFlyKeyUp);
+      window.removeEventListener('blur', stopFlyMovement);
+      for (const helper of selectionHelpers.children) { helper.geometry.dispose(); helper.material.dispose(); }
       disposeTrackGroup(scene); renderer.dispose();
     },
   };

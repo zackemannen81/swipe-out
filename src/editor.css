@@ -46,6 +46,9 @@ button.primary:hover { background: #a1fff7; }
 .status.error { color: #ff8eaf; }
 .view-toolbar { display: flex; flex-wrap: wrap; gap: 6px; padding: 10px; }
 .view-toolbar button { font-size: 9px; min-width: 70px; }
+#fly-mode-button.active { border-color: #5de8df; background: #17454b; color: #b6fffa; }
+#editor-canvas.flying { cursor: grab; }
+#editor-canvas.flying:active { cursor: grabbing; }
 .test-button { display: block; width: calc(100% - 32px); margin: 16px; }
 .canvas-panel { align-self: start; position: sticky; top: 12px; }
 button:disabled { opacity: .35; cursor: default; }

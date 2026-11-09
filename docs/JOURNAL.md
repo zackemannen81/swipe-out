@@ -1,3 +1,12 @@
+## 2026-11-06 — EDITOR-SKY-FLY-001: panorama parity, fly and group editing
+
+- Replaced the in-game moving UV panorama sphere with the same equirectangular scene.background used in the editor, retaining the camera FOV and real scenery fog.
+- Added fly camera (WASD/arrows, Q/E, Shift and drag-look), multi-selection in the editor 3D viewport and group transform support.
+- Added Delete and Ctrl+C/Ctrl+P for copied scenery at unchanged coordinates with new IDs, plus toolbar buttons, selection bounds and undo/redo integration.
+- Focused tests 3/3; production build; isolated headless Chrome checked add/copy/paste/delete/undo, keyboard copy/paste and fly toggles, no page exceptions.
+- Whole suite: 161 passed, six pre-existing failures as documented. Real-world sky and multi-click visuals remain author checks.
+- Preserved the ongoing VITRUM-EDGES-001 task, track JSON version, and saved user tracks. Details: EDITOR-SKY-FLY-001.md.
+
 ## 2026-11-05 — EDITOR-TRACK-MEDIA-001: world and track authoring
 
 - New editor UI chooses primary and alternate track audio, panorama/sky, rail side colors, CPU performance multiplier and road material/texture.

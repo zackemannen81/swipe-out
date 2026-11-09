@@ -239,29 +239,24 @@ document.querySelectorAll('[data-voice-volume]').forEach(el=>el.addEventListener
 }));
 let spokenLap=1, voiceCombatPrevious={};
 
-const panoramaTexture = new THREE.TextureLoader().load(
-  TRACK_CONFIG[currentTrackId].backdrop,
-  (texture) => {
+// Match the editor: an equirectangular scene background, not UVs on a mesh.
+// This stays infinitely distant, without fog or an artificial sphere radius.
+const panoramaLoader = new THREE.TextureLoader();
+let panoramaLoadId = 0;
+function setPanorama(url) {
+  const request = ++panoramaLoadId;
+  panoramaLoader.load(url, (texture) => {
+    if (request !== panoramaLoadId) { texture.dispose(); return; }
     texture.colorSpace = THREE.SRGBColorSpace;
-    }
-);
-
-const panoramaBackdrop = new THREE.Mesh(
-
-  //new THREE.CylinderGeometry(384,374, 256, 64, 8, false),
-  new THREE.SphereGeometry(392,128,64),
-  new THREE.MeshBasicMaterial({
-    map: panoramaTexture,
-    side: THREE.BackSide,
-    depthWrite: false,
-    depthTest: false,
-    toneMapped: true,
-    fog:true,
-  })
-);
-// Sky must render before opaque scenery; it does not participate in depth testing.
-panoramaBackdrop.renderOrder = -10;
-scene.add(panoramaBackdrop);
+    texture.mapping = THREE.EquirectangularReflectionMapping;
+    const previous = scene.background;
+    scene.background = texture;
+    if (previous?.isTexture) previous.dispose();
+  }, undefined, (error) => {
+    if (request === panoramaLoadId) console.warn('Unable to load panorama backdrop.', error);
+  });
+}
+setPanorama(TRACK_CONFIG[currentTrackId].backdrop);
 
 // Scene lights are ordinary objects and may be created before the camera moves.
 const hemisphereLight=new THREE.HemisphereLight(0x98c8ff, 0x111421, 0.8);
@@ -869,7 +864,11 @@ function beginRace() {
   const vitrumWorld=trackData.id==='vitrum-neural-ascent';
   camera.far=vitrumWorld?2200:512;camera.updateProjectionMatrix();
   scene.fog.color.setHex(vitrumWorld?0x263e38:0x202032);
-  scene.fog.density=vitrumWorld?0.0048:0.0039;
+  scene.fog.density=vitrumWorld?0.0048:0.00019;
+
+  //scene.fog.density = vitrumWorld ? 0.0025 : 0.0005;
+  camera.far = 3000;
+
   keyLight.color.setHex(vitrumWorld?0xffdfa0:0xd8e8ff);
   keyLight.intensity=vitrumWorld?1.28:2.8;
   hemisphereLight.color.setHex(vitrumWorld?0xc8d8ac:0x98c8ff);
@@ -958,27 +957,7 @@ scene.traverse(obj => {
   musicSelect.value=initialMusic;
   raceAudio.setPreferences(frontEnd.profile.settings);
   raceAudio.setVoiceVolume(selectedVoiceVolume);spokenLap=1;voiceCombatPrevious={};
-  // Läs av sökvägen till den nya bakgrundsbilden
-  const backdropUrl = TRACK_CONFIG[currentTrackId].backdrop;
-
-  // Ladda den nya texturen och byt ut den gamla
-  new THREE.TextureLoader().load(
-    backdropUrl,
-    (texture) => {
-      texture.colorSpace = THREE.SRGBColorSpace;
-      
-      // Frigör minne från den gamla texturen om den finns
-      if (panoramaBackdrop.material.map) {
-        panoramaBackdrop.material.map.dispose(); 
-      }
-      
-      // Applicera den nya texturen
-      panoramaBackdrop.material.map = texture;
-      panoramaBackdrop.material.needsUpdate = true;
-    },
-    undefined,
-    (error) => console.warn('Unable to load new panorama backdrop.', error)
-  );
+  setPanorama(TRACK_CONFIG[currentTrackId].backdrop);
   
   raceAudio.setPreferences(frontEnd.profile.settings);
   raceAudio.play().catch((error) => console.warn('Unable to start race music.', error));
@@ -1471,7 +1450,7 @@ cameraSystem.currentLook.copy(craft.position)
 camera.position.copy(cameraSystem.position);
 camera.up.copy(initialFrame.normal);
 camera.lookAt(cameraSystem.currentLook);
-panoramaBackdrop.position.copy(camera.position);
+// The equirectangular scene background follows the camera automatically.
 
 // Phase 4: register all postprocessing only after the initial scene and camera.
 const graphics = createRenderPipeline({ scene, camera, renderer, getTrack: () => track });
@@ -1540,7 +1519,7 @@ function render() {
       camera.updateProjectionMatrix();
      
 
-      panoramaBackdrop.position.copy(camera.position);
+      // The equirectangular scene background follows the camera automatically.
       updateTrackPresentation(track,t);
       updateVitrumSpores(track,t,0);
       updateRailGlow(track,frontEnd.profile.settings);
@@ -1913,7 +1892,7 @@ if (thrustFill) {
   updateCombatHud();
   practice.update(race.state,race.elapsed,shipPhysics,delta);
   
-  panoramaBackdrop.position.copy(camera.position);
+  // The equirectangular scene background follows the camera automatically.
 
   const kick = race.state === 'racing' ? raceAudio.channels.kick : { hitValue: 0 };
   const bass = race.state === 'racing' ? raceAudio.channels.bass : { value: 0 };

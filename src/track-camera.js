@@ -23,7 +23,7 @@ export function createTrackCamera() {
       }else if(mode==='static'){offset=frame.right.clone().multiplyScalar(10).addScaledVector(up,3);target=position.clone();}
       const desired=position.clone().add(offset);
       if(snap||internal||mode==='circle'||mode==='static')followPosition.copy(desired);
-      else followPosition.lerp(desired,1-Math.exp(-5.5*Math.max(0,dt)));
+      else followPosition.lerp(desired,1-Math.exp(-3.5*Math.max(0,dt)));
       const relative=followPosition.clone().sub(position);
       if(!internal){
         // Keep horizontal chase lag, but follow elevation in the road frame.
