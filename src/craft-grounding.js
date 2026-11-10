@@ -2,7 +2,7 @@ import * as THREE from 'three';
 
 // A one-time projected silhouette, not a second scene render or screen-space reflection.
 // Once the model changes we rasterize its top-down outline, then reuse the texture.
-function makeHullTexture(root) {
+export function makeHullTexture(root) {
   if (typeof document === 'undefined') return null;
   root.updateWorldMatrix(true, true);
   const inverse = root.matrixWorld.clone().invert();

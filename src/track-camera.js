@@ -29,8 +29,8 @@ export function createTrackCamera() {
         // Keep horizontal chase lag, but follow elevation in the road frame.
         // World-space vertical lag repeatedly hit the clearance floor on rises,
         // making a surface-bound craft appear to hop when the camera was lifted.
-        const desiredHeight=Math.max(1.6,offset.dot(frame.normal));
-        followHeight=snap?desiredHeight:THREE.MathUtils.damp(followHeight,desiredHeight,5.5,Math.max(0,dt));
+        const desiredHeight=Math.max(2.2,offset.dot(frame.normal));
+        followHeight=snap?desiredHeight:THREE.MathUtils.damp(followHeight,desiredHeight,3.6,Math.max(0,dt));
         relative.addScaledVector(frame.normal,-relative.dot(frame.normal));
         relative.clampLength(0,Math.sqrt(Math.max(0,14*14-followHeight*followHeight)));
         relative.addScaledVector(frame.normal,followHeight);

@@ -70,8 +70,10 @@ export function createTrack(definition = NEON_CAUSEWAY) {
     emissiveIntensity: curve.track.magnetic ? 0.65 : 0.1,
     // An opaque, gently emissive magnetic deck stays legible on the dark side
     // of loops and prevents background/other road sections showing through it.
-    transparent: !curve.track.magnetic, opacity: curve.track.magnetic ? 1 : 0.85,
-    depthWrite: curve.track.magnetic, side: curve.track.magnetic ? THREE.DoubleSide : THREE.FrontSide,
+    // The road is a solid surface, not a translucent overlay. Transparent sorting
+    // and disabled depth writes caused angle-dependent holes and scenery bleed-through.
+    transparent: false, opacity: 1,
+    depthWrite: true, side: curve.track.magnetic ? THREE.DoubleSide : THREE.FrontSide,
   });
   const cyanMaterial = new THREE.MeshStandardMaterial({
     color: (necros ? 0xa80010 : 0x58f4e8), emissive: (necros ? 0xa80010 : 0x23dace), emissiveIntensity: necros ? 12 : 6.1,
