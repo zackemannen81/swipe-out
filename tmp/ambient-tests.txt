@@ -1,0 +1,10 @@
+✔ authored destinations select one particle system and dispose all particle resources (1069.4993ms)
+✔ spores have bounded deterministic batches, immutable bases and pauseable uniforms (94.2963ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1572.3514

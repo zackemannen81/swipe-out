@@ -674,3 +674,8 @@ Reuse existing loadout and race setup; preserve exact Necros saved-track identit
 Vitrum is an open race destination until multi-world career progression is designed.
 Planet geometry, furnishings and background shuttles remain blockout art.
 Public civilisation transmissions only; do not expose finale material in this hub.
+## 2026-11-10 — Service Bay / garage continuity
+Accepted presentation: keep the existing garage art and customization controls as
+an interior work view of Service Bay. Retain carrier room navigation and continuous
+zone audio; fade between platform/work view, Back to platform. Do not create a
+second customization system or replace the accepted garage background.

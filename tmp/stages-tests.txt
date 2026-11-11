@@ -1,0 +1,29 @@
+✔ career unlocks earned from campaign finishing, podium and Elite win; replay is idempotent (3.2489ms)
+✔ locked choices and malformed persistence fall back; earned loadout survives reload; standards isolate upgrades (2.6076ms)
+✔ all five Necros challenges unlock craft and soundtrack; partial/old profiles normalize correctly (0.8346ms)
+✔ preview grants only the two mastery rewards, persists, and never fakes trophies (0.3571ms)
+✔ The sacrifice requires completed last place, automatic full assist and Rookie in a race (0.7711ms)
+✔ GOA by ME is selectable and persists as an allowed soundtrack (0.3046ms)
+✔ race lap options persist and invalid values fall back to three laps (0.9359ms)
+✔ carrier reload retains world and station; setup and race restore safe destinations (2.8247ms)
+✔ invalid/unavailable storage falls back safely and cannot introduce unknown destinations (0.5606ms)
+✔ three supplied stages retain authored identity and media are present and byte-verified (662.1521ms)
+✔ shipped tracks do not overwrite saved legacy tracks or overrides; Collective session persists (66.4517ms)
+✔ texture alpha modes round-trip through export, storage and undo; versions 1–7 stay readable (70.9481ms)
+✔ every shipped track migrates and round-trips without losing geometry, scenery or textures (447.421ms)
+✔ legacy optional fields and fourth-coordinate bank metadata survive migration (0.7442ms)
+✔ reject malformed, unsupported, degenerate and excessive track data with field-specific errors (2.4714ms)
+✔ mixed legacy/versioned library isolates corrupt records and safely loads built-in fallback (63.2146ms)
+✔ save/reset affect only the chosen track; invalid writes and quota failure preserve prior data (85.3743ms)
+✔ undo/redo retain scenery and edits independently of saved snapshots, and discard redo after new edits (0.9791ms)
+✔ history bounds large snapshots while keeping the most recent undo step (0.4793ms)
+✔ v9 editor settings survive JSON and storage; older circuit files remain valid (29.1382ms)
+✔ road presets and independent rail tint apply to actual road meshes (21.6961ms)
+ℹ tests 21
+ℹ suites 0
+ℹ pass 21
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1245.6405

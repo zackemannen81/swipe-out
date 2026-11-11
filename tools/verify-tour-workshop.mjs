@@ -1,0 +1,33 @@
+import assert from 'node:assert/strict';
+import {pathToFileURL} from 'node:url';
+const {chromium}=await import(pathToFileURL(process.env.PLAYWRIGHT_MODULE).href);
+const browser=await chromium.launch({channel:'chrome',headless:true,args:['--use-angle=d3d11']});
+const context=await browser.newContext({viewport:{width:1440,height:900},serviceWorkers:'block'}),errors=[];
+await context.route('**/src/game.js*',async r=>{const response=await r.fetch();await r.fulfill({response,body:(await response.text())+'\nwindow.__workshop={frontEnd,tourBus};'});});
+try{
+ const page=await context.newPage();page.on('pageerror',e=>errors.push(e.message));
+ await page.goto('http://127.0.0.1:5173');await page.waitForFunction(()=>window.__workshop,{timeout:120000});
+ await page.evaluate(()=>['00','01','02','05','06'].forEach(id=>__workshop.frontEnd.markZoneIntro(id)));
+ const settled=()=>page.waitForFunction(()=>!__workshop.frontEnd.workshopTransition&&!__workshop.tourBus.hub.navigation.pending);
+ await page.locator('[data-go=bus]:visible').click();await page.locator('[data-station=workshop]').click();await settled();
+ await page.waitForFunction(()=>__workshop.tourBus.crew.audio.voice.currentTime>0);
+ const before=await page.evaluate(()=>{const a=__workshop.tourBus.crew.audio;window.__sameVoice=a.voice;window.__sameMusic=a.music;return {voice:a.voice.currentTime,music:a.music.currentTime};});
+ await page.getByRole('button',{name:'OPEN GARAGE'}).click();await settled();
+ assert.equal(await page.evaluate(()=>__workshop.frontEnd.isBusGarage),true);
+ assert.equal(await page.locator('[data-view=garage] h2').textContent(),'SERVICE BAY');assert.equal(await page.locator('.bus-nav').isVisible(),true);
+ const continuity=await page.evaluate(()=>{const a=__workshop.tourBus.crew.audio;return a.voice===__sameVoice&&a.music===__sameMusic&&!a.voice.paused&&!a.music.paused&&a.voice.currentTime;});assert.ok(continuity>before.voice);
+ assert.equal(await page.locator('.bus-crew').isVisible(),true);await page.screenshot({path:'tmp/workshop-crew.png'});
+ await page.keyboard.press('Enter');await page.waitForFunction(()=>document.querySelector('.bus-crew').hidden);
+ await page.locator('#garage-paints').getByRole('button',{name:'Cyan',exact:true}).click();assert.equal(await page.evaluate(()=>__workshop.frontEnd.profile.paint),'cyan');await page.screenshot({path:'tmp/workshop-integrated.png'});
+ await page.locator('#menu-back').click();await settled();assert.equal(await page.evaluate(()=>__workshop.frontEnd.view),'bus');assert.equal(await page.evaluate(()=>__workshop.tourBus.hub.navigation.station),'workshop');
+ await page.getByRole('button',{name:'OPEN GARAGE'}).click();await settled();await page.locator('[data-station=briefing]').click();await settled();assert.equal(await page.evaluate(()=>__workshop.frontEnd.view),'bus');assert.equal(await page.evaluate(()=>__workshop.tourBus.hub.navigation.station),'briefing');
+ console.log('PASS: local fade, continuous voice/music, crew overlay, paint, Back and room navigation');
+ await page.locator('[data-station=workshop]').click();await settled();await page.emulateMedia({reducedMotion:'reduce'});await page.getByRole('button',{name:'OPEN GARAGE'}).click();assert.equal(await page.evaluate(()=>__workshop.frontEnd.isBusGarage&&!__workshop.frontEnd.workshopTransition),true);
+ await page.setViewportSize({width:390,height:844});await page.screenshot({path:'tmp/workshop-mobile.png'});
+ const bounds=await page.locator('.bus-nav').boundingBox();assert.ok(bounds.x>=0&&bounds.x+bounds.width<=390);
+ await page.locator('#menu-pages').evaluate(el=>el.scrollTop=el.scrollHeight);await page.screenshot({path:'tmp/workshop-mobile-controls.png'});
+ await page.keyboard.press('Escape');assert.equal(await page.evaluate(()=>__workshop.frontEnd.view),'bus');
+ await page.setViewportSize({width:1440,height:900});await page.locator('#menu-home').click();await page.locator('[data-go=garage]:visible').click();assert.equal(await page.locator('[data-view=garage] h2').textContent(),'GARAGE');assert.equal(await page.locator('.bus-nav').isVisible(),false);
+ await page.waitForFunction(()=>__workshop.tourBus.crew.audio.music.paused);await page.reload();await page.waitForFunction(()=>window.__workshop,{timeout:120000});assert.equal(await page.evaluate(()=>__workshop.frontEnd.profile.paint),'cyan');
+ assert.deepEqual(errors,[]);console.log('PASS: reduced motion, mobile layout, Escape, standalone garage isolation, persisted paint; no page errors');
+}finally{await browser.close();}

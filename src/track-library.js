@@ -1,3 +1,6 @@
+import tourNecros from './tour-stages/necros.json' with {type:'json'};
+import tourVitrum from './tour-stages/vitrum.json' with {type:'json'};
+import tourCollective from './tour-stages/collective.json' with {type:'json'};
 import { VITRUM } from './track-vitrum.js';
 import { NECROS } from './track-necros.js';
 import { RACEWAY_LAB } from './track-workshop.js';
@@ -19,6 +22,12 @@ export const BUILTIN_TRACKS = Object.fromEntries(definitions.map((data, i) => [`
 BUILTIN_TRACKS.track18.backdrop = '/images/backdrop_track-017.jpg';
 BUILTIN_TRACKS.track18.preview = '/images/stage2/concept1.png';
 BUILTIN_TRACKS.track18.defaultAudio = '/audio/tracks/track15.m4a';
+
+// Delivered authored snapshots; separate keys preserve all prior browser drafts.
+for(const [key,document,fallback] of [['track19',tourNecros,{defaultAudio:'/audio/tracks/track_014.mp3',backdrop:'/images/backdrop_track-015.jpg'}],['track20',tourVitrum,BUILTIN_TRACKS.track18],['track21',tourCollective,BUILTIN_TRACKS.track1]]){
+ const data=decodeTrack(document);BUILTIN_TRACKS[key]={...trackMedia(data,fallback),name:data.name,data,supplied:true};
+}
+
 
 // Necros Prime is frequently imported as a custom track, with an inherited
 // id such as "synthetic-dreams". Match its displayed name, not its id.

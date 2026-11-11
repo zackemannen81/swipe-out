@@ -15,7 +15,7 @@ export const MODULES=[{id:'stock',name:'Factory',description:'Original specifica
 export const TROPHIES=[{id:'time_gold',name:'Against the clock',description:'Earn a Gold time medal in Necros. Unlock Spire Silver.'},{id:'finish',name:'Survival approved',description:'Finish Necros. Unlock Singularity + Launch capacitor.'},{id:'podium',name:'Recognised by the Dominion',description:'Reach the podium. Unlock Mycelium + Overdrive.'},{id:'win',name:'Your world expects victory',description:'Win Necros. Unlock Dominion Gold finish.'},{id:'elite',name:'To death and beyond',description:'Win on Elite.'}];
 export const RACE_LAP_OPTIONS=Object.freeze([3,5,7,10]);
 export const normalizeRaceLaps=value=>RACE_LAP_OPTIONS.includes(value)?value:3;
-const defaults=()=>({version:1,laps:3,ship:'racer',paint:'original',module:'stock',trophies:[],previewRewards:[],soundtrack:'',bests:{},settings:{music:.9,sfx:.7,mix:'headphones',mute:false,glow:1,musicPulse:true,bloom:true,shake:true,motion:true,quality:'high'}});
+const defaults=()=>({version:1,laps:3,ship:'racer',paint:'original',module:'stock',trophies:[],previewRewards:[],soundtrack:'',bests:{},visitedZoneIntros:{},settings:{music:.9,sfx:.7,mix:'headphones',mute:false,glow:1,musicPulse:true,bloom:true,shake:true,motion:true,quality:'high'}});
 export const necrosMastered=profile=>TROPHIES.every(t=>profile.trophies.includes(t.id));
 export const unlocked=(item,profile)=>!item.require||(item.require===NECROS_REWARD?(necrosMastered(profile)||profile.previewRewards?.includes(NECROS_REWARD)):profile.trophies.includes(item.require));
 export function grantNecrosPreview(profile){profile.previewRewards=[NECROS_REWARD];}
@@ -23,6 +23,7 @@ export function selectedSoundtrack(profile,fallback){return VITRUM_MUSIC.some(t=
 export function normalizeProfile(raw){
  const p=defaults();if(!raw||raw.version!==1)return p;
  p.laps=normalizeRaceLaps(raw.laps);
+ for(const id of [...Array.from({length:17},(_,i)=>String(i).padStart(2,'0')),'16B'])if(raw.visitedZoneIntros?.[id]===true)p.visitedZoneIntros[id]=true;
  p.trophies=[...TROPHIES,...BONUS_TROPHIES].filter(t=>Array.isArray(raw.trophies)&&raw.trophies.includes(t.id)).map(t=>t.id);
  p.previewRewards=Array.isArray(raw.previewRewards)&&raw.previewRewards.includes(NECROS_REWARD)?[NECROS_REWARD]:[];
  p.soundtrack=selectedSoundtrack({...p,soundtrack:raw.soundtrack},'');

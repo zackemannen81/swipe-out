@@ -10,6 +10,7 @@
     ],
     "description": "Slitna modulära metallplattor, kabelrännor och gångmarkeringar.",
     "priority": "P1",
+    "zoneId": "01",
     "rotation": [
       0,
       0,
@@ -32,6 +33,7 @@
     ],
     "description": "Mörka takpaneler bakom bärverket, med plats för ventilation och kabelstegar.",
     "priority": "P2",
+    "zoneId": "01",
     "rotation": [
       0,
       0,
@@ -54,6 +56,7 @@
     ],
     "description": "Återanvändbar industribåge med pelarfot, snedsträva och takbalk.",
     "priority": "P1",
+    "zoneId": "01",
     "rotation": [
       0,
       0,
@@ -76,6 +79,7 @@
     ],
     "description": "Återanvändbar industribåge med pelarfot, snedsträva och takbalk.",
     "priority": "P1",
+    "zoneId": "01",
     "rotation": [
       0,
       0,
@@ -98,6 +102,7 @@
     ],
     "description": "Återanvändbar industribåge med pelarfot, snedsträva och takbalk.",
     "priority": "P1",
+    "zoneId": "01",
     "rotation": [
       0,
       0,
@@ -120,6 +125,7 @@
     ],
     "description": "Återanvändbar industribåge med pelarfot, snedsträva och takbalk.",
     "priority": "P1",
+    "zoneId": "01",
     "rotation": [
       0,
       0,
@@ -142,6 +148,7 @@
     ],
     "description": "Återanvändbar industribåge med pelarfot, snedsträva och takbalk.",
     "priority": "P1",
+    "zoneId": "01",
     "rotation": [
       0,
       0,
@@ -164,6 +171,7 @@
     ],
     "description": "Återanvändbar industribåge med pelarfot, snedsträva och takbalk.",
     "priority": "P1",
+    "zoneId": "01",
     "rotation": [
       0,
       0,
@@ -186,6 +194,7 @@
     ],
     "description": "Gångbrygga med räcke och tekniska skåp längs hangaren.",
     "priority": "P2",
+    "zoneId": "01",
     "rotation": [
       0,
       0,
@@ -208,6 +217,7 @@
     ],
     "description": "Paneler, serviceöppningar och ventilationsfält.",
     "priority": "P2",
+    "zoneId": "01",
     "rotation": [
       0,
       0,
@@ -230,6 +240,7 @@
     ],
     "description": "Gångbrygga med räcke och tekniska skåp längs hangaren.",
     "priority": "P2",
+    "zoneId": "01",
     "rotation": [
       0,
       0,
@@ -252,6 +263,7 @@
     ],
     "description": "Paneler, serviceöppningar och ventilationsfält.",
     "priority": "P2",
+    "zoneId": "01",
     "rotation": [
       0,
       0,
@@ -270,10 +282,11 @@
     "position": [
       4,
       0,
-      4
+      52
     ],
     "description": "Importerad repair-platform.glb, proportionellt skalad till 8,6 m bredd och grundad på däcket. Enkel ljusplattform används medan modellen laddas eller om laddningen misslyckas.",
     "priority": "P1",
+    "zoneId": "03",
     "rotation": [
       0,
       0,
@@ -292,10 +305,11 @@
     "position": [
       4,
       1.15,
-      4
+      52
     ],
     "description": "Visar spelarens befintliga valda skepp och finish. Återanvänd spelets racer; ingen ny modell behövs.",
     "priority": "P1",
+    "zoneId": "03",
     "rotation": [
       0,
       0,
@@ -318,6 +332,7 @@
     ],
     "description": "Importerad öppen hangarmodul med tre valvbågar och golv. Upprepas runt generiska fraktskyttlar; inga motståndarskepp tilldelas här.",
     "priority": "P2",
+    "zoneId": "01",
     "rotation": [
       0,
       0,
@@ -340,6 +355,7 @@
     ],
     "description": "Tillfällig generisk Meshy Space Shuttle med synlig cockpit/interiör, optimerad spelkopia. Dekoration i fraktdockan; påverkar inte CPU-racers eller deras slutliga skepp.",
     "priority": "P2",
+    "zoneId": "01",
     "rotation": [
       0,
       0,
@@ -362,6 +378,7 @@
     ],
     "description": "Importerad öppen hangarmodul med tre valvbågar och golv. Upprepas runt generiska fraktskyttlar; inga motståndarskepp tilldelas här.",
     "priority": "P2",
+    "zoneId": "01",
     "rotation": [
       0,
       0,
@@ -384,6 +401,7 @@
     ],
     "description": "Tillfällig generisk Meshy Space Shuttle med synlig cockpit/interiör, optimerad spelkopia. Dekoration i fraktdockan; påverkar inte CPU-racers eller deras slutliga skepp.",
     "priority": "P2",
+    "zoneId": "01",
     "rotation": [
       0,
       0,
@@ -406,6 +424,7 @@
     ],
     "description": "Importerad öppen hangarmodul med tre valvbågar och golv. Upprepas runt generiska fraktskyttlar; inga motståndarskepp tilldelas här.",
     "priority": "P2",
+    "zoneId": "01",
     "rotation": [
       0,
       0,
@@ -428,6 +447,7 @@
     ],
     "description": "Tillfällig generisk Meshy Space Shuttle med synlig cockpit/interiör, optimerad spelkopia. Dekoration i fraktdockan; påverkar inte CPU-racers eller deras slutliga skepp.",
     "priority": "P2",
+    "zoneId": "01",
     "rotation": [
       0,
       0,
@@ -450,6 +470,7 @@
     ],
     "description": "Importerad hangar_port.glb vid vänster sidovägg, med portpanel och servicegångar.",
     "priority": "P1",
+    "zoneId": "01",
     "rotation": [
       0,
       0,
@@ -472,6 +493,7 @@
     ],
     "description": "Takbalk med löpvagn, dubbla vajrar och serviceok.",
     "priority": "P1",
+    "zoneId": "01",
     "rotation": [
       0,
       0,
@@ -490,10 +512,11 @@
     "position": [
       9,
       0,
-      6
+      54
     ],
     "description": "Lutande skärm på stativ intill spelarens plattform. Öppnar garage.",
     "priority": "P1",
+    "zoneId": "03",
     "rotation": [
       0,
       0,
@@ -510,12 +533,13 @@
     "kind": "nexus",
     "label": "Briefingbord",
     "position": [
+      -46,
       12,
-      0,
-      -15
+      6
     ],
     "description": "Runt hologrambord med planetprojektion. Välj Necros eller Vitrum.",
     "priority": "P1",
+    "zoneId": "05",
     "rotation": [
       0,
       0,
@@ -532,21 +556,22 @@
     "kind": "banner",
     "label": "Civilisationsfana",
     "position": [
-      -19.5,
-      0,
-      -18
+      -54,
+      10,
+      -49
     ],
     "description": "Vertikal fana för en av de fyra offentliga civilisationerna. Symboler ersätts senare.",
     "priority": "P2",
+    "zoneId": "02",
     "rotation": [
       0,
-      -1.5707963267948966,
+      0,
       0
     ],
     "size": [
-      0.16,
+      2,
       4.18,
-      2
+      0.16
     ]
   },
   {
@@ -554,21 +579,22 @@
     "kind": "banner",
     "label": "Civilisationsfana",
     "position": [
-      -19.5,
-      0,
-      -6
+      -48,
+      10,
+      -49
     ],
     "description": "Vertikal fana för en av de fyra offentliga civilisationerna. Symboler ersätts senare.",
     "priority": "P2",
+    "zoneId": "02",
     "rotation": [
       0,
-      -1.5707963267948966,
+      0,
       0
     ],
     "size": [
-      0.16,
+      2,
       4.18,
-      2
+      0.16
     ]
   },
   {
@@ -576,21 +602,22 @@
     "kind": "banner",
     "label": "Civilisationsfana",
     "position": [
-      19.5,
-      0,
-      -18
+      -42,
+      10,
+      -49
     ],
     "description": "Vertikal fana för en av de fyra offentliga civilisationerna. Symboler ersätts senare.",
     "priority": "P2",
+    "zoneId": "02",
     "rotation": [
       0,
-      1.5707963267948966,
+      0,
       0
     ],
     "size": [
-      0.16,
+      2,
       4.18,
-      2
+      0.16
     ]
   },
   {
@@ -598,21 +625,22 @@
     "kind": "banner",
     "label": "Civilisationsfana",
     "position": [
-      19.5,
-      0,
-      -6
+      -36,
+      10,
+      -49
     ],
     "description": "Vertikal fana för en av de fyra offentliga civilisationerna. Symboler ersätts senare.",
     "priority": "P2",
+    "zoneId": "02",
     "rotation": [
       0,
-      1.5707963267948966,
+      0,
       0
     ],
     "size": [
-      0.16,
+      2,
       4.18,
-      2
+      0.16
     ]
   },
   {
@@ -620,12 +648,13 @@
     "kind": "lounge",
     "label": "Loungepodie",
     "position": [
-      -14,
-      0,
-      14
+      -44,
+      12,
+      -36
     ],
     "description": "Upphöjt viloområde med sittplatser och lågt bord.",
     "priority": "P2",
+    "zoneId": "02",
     "rotation": [
       0,
       0,
@@ -642,12 +671,13 @@
     "kind": "seat",
     "label": "Pilotfåtölj",
     "position": [
-      -14,
-      0,
-      17.5
+      -44,
+      12,
+      -32.5
     ],
     "description": "Modulär vilostol för lounge. Fristående säte, rygg och fot.",
     "priority": "P2",
+    "zoneId": "02",
     "rotation": [
       0,
       0,
@@ -664,12 +694,13 @@
     "kind": "seat",
     "label": "Pilotfåtölj",
     "position": [
-      -10.671302192966962,
-      0,
-      15.081559480312317
+      -40.67130219296696,
+      12,
+      -34.918440519687685
     ],
     "description": "Modulär vilostol för lounge. Fristående säte, rygg och fot.",
     "priority": "P2",
+    "zoneId": "02",
     "rotation": [
       0,
       1.2566370614359172,
@@ -686,12 +717,13 @@
     "kind": "seat",
     "label": "Pilotfåtölj",
     "position": [
-      -11.942751616976343,
-      0,
-      11.168440519687685
+      -41.942751616976345,
+      12,
+      -38.831559480312315
     ],
     "description": "Modulär vilostol för lounge. Fristående säte, rygg och fot.",
     "priority": "P2",
+    "zoneId": "02",
     "rotation": [
       0,
       2.5132741228718345,
@@ -708,12 +740,13 @@
     "kind": "seat",
     "label": "Pilotfåtölj",
     "position": [
-      -16.057248383023655,
-      0,
-      11.168440519687683
+      -46.057248383023655,
+      12,
+      -38.831559480312315
     ],
     "description": "Modulär vilostol för lounge. Fristående säte, rygg och fot.",
     "priority": "P2",
+    "zoneId": "02",
     "rotation": [
       0,
       3.7699111843077517,
@@ -730,12 +763,13 @@
     "kind": "seat",
     "label": "Pilotfåtölj",
     "position": [
-      -17.328697807033038,
-      0,
-      15.081559480312315
+      -47.32869780703304,
+      12,
+      -34.918440519687685
     ],
     "description": "Modulär vilostol för lounge. Fristående säte, rygg och fot.",
     "priority": "P2",
+    "zoneId": "02",
     "rotation": [
       0,
       5.026548245743669,
@@ -758,6 +792,7 @@
     ],
     "description": "Stapelbar låda med lås, hörnskydd och märkning. En modell kan återanvändas.",
     "priority": "P2",
+    "zoneId": "01",
     "rotation": [
       0,
       0,
@@ -780,6 +815,7 @@
     ],
     "description": "Stapelbar låda med lås, hörnskydd och märkning. En modell kan återanvändas.",
     "priority": "P2",
+    "zoneId": "01",
     "rotation": [
       0,
       0,
@@ -802,6 +838,7 @@
     ],
     "description": "Stapelbar låda med lås, hörnskydd och märkning. En modell kan återanvändas.",
     "priority": "P2",
+    "zoneId": "01",
     "rotation": [
       0,
       0,
@@ -824,6 +861,7 @@
     ],
     "description": "Stapelbar låda med lås, hörnskydd och märkning. En modell kan återanvändas.",
     "priority": "P2",
+    "zoneId": "01",
     "rotation": [
       0,
       0,
@@ -846,6 +884,7 @@
     ],
     "description": "Stapelbar låda med lås, hörnskydd och märkning. En modell kan återanvändas.",
     "priority": "P2",
+    "zoneId": "01",
     "rotation": [
       0,
       0,
@@ -868,6 +907,7 @@
     ],
     "description": "Stapelbar låda med lås, hörnskydd och märkning. En modell kan återanvändas.",
     "priority": "P2",
+    "zoneId": "01",
     "rotation": [
       0,
       0,
@@ -890,6 +930,7 @@
     ],
     "description": "Stapelbar låda med lås, hörnskydd och märkning. En modell kan återanvändas.",
     "priority": "P2",
+    "zoneId": "01",
     "rotation": [
       0,
       0,
@@ -906,21 +947,22 @@
     "kind": "window",
     "label": "Orbitalfönstrets ram",
     "position": [
-      0,
-      0,
-      -32
+      -100,
+      24,
+      0
     ],
-    "description": "Stor öppen fönsterram. Ingen tung genomskinlig glasruta behövs i prototypen.",
+    "description": "Öppen 32 m panoramaram med elliptiskt valv och tre lager metall/ljustätning; fri central planetvy.",
     "priority": "P1",
+    "zoneId": "06",
     "rotation": [
       0,
       0,
       0
     ],
     "size": [
-      46,
-      19.5,
-      1
+      2.24,
+      13.42,
+      32.84
     ]
   },
   {
@@ -928,21 +970,22 @@
     "kind": "rail",
     "label": "Observationsräcke",
     "position": [
-      0,
-      0,
-      -27
+      -84,
+      24,
+      0
     ],
-    "description": "Lågt skyddsräcke längs planetvyn.",
+    "description": "Böjt 30 m observationsräcke, 1,15 m högt, med metallstolpar och tunna horisontella stag.",
     "priority": "P2",
+    "zoneId": "06",
     "rotation": [
       0,
       0,
       0
     ],
     "size": [
-      40.09,
-      1.26,
-      0.11
+      2.04,
+      1.22,
+      30.24
     ]
   },
   {
@@ -950,12 +993,13 @@
     "kind": "planet",
     "label": "Planetkuliss",
     "position": [
-      8,
-      7,
-      -88
+      -158,
+      38,
+      0
     ],
     "description": "Necros: brinnande yttextur på sfär och separat molnskal med opacitet 0,25. Vitrum använder tills vidare en färgad sfär.",
     "priority": "P1",
+    "zoneId": "06",
     "rotation": [
       0,
       0,
@@ -972,12 +1016,13 @@
     "kind": "moon",
     "label": "Necros måne",
     "position": [
-      -29,
-      16,
-      -103
+      -174,
+      49,
+      -37
     ],
     "description": "Liten stenig måne med användarens grå yttextur. Syns tillsammans med Necros utanför orbitalfönstret.",
     "priority": "P2",
+    "zoneId": "06",
     "rotation": [
       0,
       0,
@@ -1000,6 +1045,7 @@
     ],
     "description": "Användarens varma rymdbild (space-skybox-warm.jpg) på en inåtvänd sfär, kompletterad med ett glest punktstjärnfält bakom fönstret.",
     "priority": "P2",
+    "zoneId": "01",
     "rotation": [
       0,
       0,
@@ -1009,6 +1055,2237 @@
       560,
       560,
       560
+    ]
+  },
+  {
+    "id": "TB-ROOM-03",
+    "kind": "room",
+    "label": "Workshop / Service Bay",
+    "position": [
+      0,
+      0,
+      52
+    ],
+    "description": "Separat rum med golv, tak, slutna väggar och markerad passage.",
+    "priority": "P1",
+    "zoneId": "03",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      32.5,
+      12.6,
+      30.5
+    ]
+  },
+  {
+    "id": "TB-DOOR-03",
+    "kind": "door",
+    "label": "Passage / lift",
+    "position": [
+      15.65,
+      0,
+      52
+    ],
+    "description": "Stängd markerad passage; scenövergång representerar färden mellan däck.",
+    "priority": "P2",
+    "zoneId": "03",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      0.23,
+      4.3,
+      3.28
+    ]
+  },
+  {
+    "id": "TB-ROOM-05",
+    "kind": "room",
+    "label": "Tournament Nexus",
+    "position": [
+      -46,
+      12,
+      6
+    ],
+    "description": "Separat rum med golv, tak, slutna väggar och markerad passage.",
+    "priority": "P1",
+    "zoneId": "05",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      28.5,
+      11.6,
+      28.5
+    ]
+  },
+  {
+    "id": "TB-DOOR-05",
+    "kind": "door",
+    "label": "Passage / lift",
+    "position": [
+      -32.35,
+      12,
+      6
+    ],
+    "description": "Stängd markerad passage; scenövergång representerar färden mellan däck.",
+    "priority": "P2",
+    "zoneId": "05",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      0.23,
+      4.3,
+      3.28
+    ]
+  },
+  {
+    "id": "TB-ROOM-02",
+    "kind": "room",
+    "label": "Pilots’ Lounge",
+    "position": [
+      -44,
+      12,
+      -36
+    ],
+    "description": "Separat rum med golv, tak, slutna väggar och markerad passage.",
+    "priority": "P1",
+    "zoneId": "02",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      28.5,
+      11.6,
+      28.5
+    ]
+  },
+  {
+    "id": "TB-DOOR-02",
+    "kind": "door",
+    "label": "Passage / lift",
+    "position": [
+      -30.35,
+      12,
+      -36
+    ],
+    "description": "Stängd markerad passage; scenövergång representerar färden mellan däck.",
+    "priority": "P2",
+    "zoneId": "02",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      0.23,
+      4.3,
+      3.28
+    ]
+  },
+  {
+    "id": "TB-ROOM-06",
+    "kind": "room",
+    "label": "Observation: välvt rumsskal",
+    "position": [
+      -84,
+      24,
+      0
+    ],
+    "description": "34 × 34 m golv, välvt tak och slutna sidoväggar; panoramat öppnar mot babord.",
+    "priority": "P1",
+    "zoneId": "06",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      34.25,
+      14.15,
+      34
+    ]
+  },
+  {
+    "id": "TB-OBS-RIB-01",
+    "kind": "rib",
+    "label": "Observationsvalv",
+    "position": [
+      -91,
+      24,
+      0
+    ],
+    "description": "Elliptiskt bärverk med varm integrerad ljuslist och låga pelarfötter.",
+    "priority": "P1",
+    "zoneId": "06",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      1.7,
+      13.48,
+      33.7
+    ]
+  },
+  {
+    "id": "TB-OBS-RIB-02",
+    "kind": "rib",
+    "label": "Observationsvalv",
+    "position": [
+      -79,
+      24,
+      0
+    ],
+    "description": "Elliptiskt bärverk med varm integrerad ljuslist och låga pelarfötter.",
+    "priority": "P1",
+    "zoneId": "06",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      1.7,
+      13.48,
+      33.7
+    ]
+  },
+  {
+    "id": "TB-OBS-RIB-03",
+    "kind": "rib",
+    "label": "Observationsvalv",
+    "position": [
+      -69,
+      24,
+      0
+    ],
+    "description": "Elliptiskt bärverk med varm integrerad ljuslist och låga pelarfötter.",
+    "priority": "P1",
+    "zoneId": "06",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      1.7,
+      13.48,
+      33.7
+    ]
+  },
+  {
+    "id": "TB-OBS-CEILING",
+    "kind": "architecture",
+    "label": "Takpaneler och ljuslister",
+    "position": [
+      -84,
+      24,
+      0
+    ],
+    "description": "Längsgående takribbor, varma ljusfält och panelindelning under det välvda taket.",
+    "priority": "P1",
+    "zoneId": "06",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      32,
+      8.74,
+      32.15
+    ]
+  },
+  {
+    "id": "TB-DOOR-06",
+    "kind": "door",
+    "label": "Panoramahissens tröskel",
+    "position": [
+      -67.35,
+      24,
+      0
+    ],
+    "description": "Markerad stängd hissport mot Nexus, med dubbla dörrblad och infälld tröskel.",
+    "priority": "P1",
+    "zoneId": "06",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      0.85,
+      4.2,
+      4.4
+    ]
+  },
+  {
+    "id": "TB-OBS-PLANTER-01",
+    "kind": "planter",
+    "label": "Observation: planter",
+    "position": [
+      -92,
+      24,
+      -12
+    ],
+    "description": "Utbytbar inredningsplatshållare; byt gruppens innehåll med matchande GLB enligt observationsdäckets assetlista.",
+    "priority": "P2",
+    "zoneId": "06",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      5,
+      3.05,
+      2.45
+    ]
+  },
+  {
+    "id": "TB-OBS-PLANTER-02",
+    "kind": "planter",
+    "label": "Observation: planter",
+    "position": [
+      -92,
+      24,
+      12
+    ],
+    "description": "Utbytbar inredningsplatshållare; byt gruppens innehåll med matchande GLB enligt observationsdäckets assetlista.",
+    "priority": "P2",
+    "zoneId": "06",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      5,
+      3.05,
+      2.45
+    ]
+  },
+  {
+    "id": "TB-OBS-PLANTER-03",
+    "kind": "planter",
+    "label": "Observation: planter",
+    "position": [
+      -79,
+      24,
+      -12
+    ],
+    "description": "Utbytbar inredningsplatshållare; byt gruppens innehåll med matchande GLB enligt observationsdäckets assetlista.",
+    "priority": "P2",
+    "zoneId": "06",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      5,
+      3.05,
+      2.45
+    ]
+  },
+  {
+    "id": "TB-OBS-PLANTER-04",
+    "kind": "planter",
+    "label": "Observation: planter",
+    "position": [
+      -79,
+      24,
+      12
+    ],
+    "description": "Utbytbar inredningsplatshållare; byt gruppens innehåll med matchande GLB enligt observationsdäckets assetlista.",
+    "priority": "P2",
+    "zoneId": "06",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      5,
+      3.05,
+      2.45
+    ]
+  },
+  {
+    "id": "TB-OBS-BENCH-01",
+    "kind": "bench",
+    "label": "Observation: bench",
+    "position": [
+      -84,
+      24,
+      -8
+    ],
+    "description": "Utbytbar inredningsplatshållare; byt gruppens innehåll med matchande GLB enligt observationsdäckets assetlista.",
+    "priority": "P2",
+    "zoneId": "06",
+    "rotation": [
+      0,
+      1.5707963267948966,
+      0
+    ],
+    "size": [
+      1.03,
+      1.05,
+      3
+    ]
+  },
+  {
+    "id": "TB-OBS-BENCH-02",
+    "kind": "bench",
+    "label": "Observation: bench",
+    "position": [
+      -84,
+      24,
+      8
+    ],
+    "description": "Utbytbar inredningsplatshållare; byt gruppens innehåll med matchande GLB enligt observationsdäckets assetlista.",
+    "priority": "P2",
+    "zoneId": "06",
+    "rotation": [
+      0,
+      1.5707963267948966,
+      0
+    ],
+    "size": [
+      1.03,
+      1.05,
+      3
+    ]
+  },
+  {
+    "id": "TB-OBS-CONSOLE-01",
+    "kind": "console",
+    "label": "Observation: console",
+    "position": [
+      -95,
+      24,
+      -7
+    ],
+    "description": "Utbytbar inredningsplatshållare; byt gruppens innehåll med matchande GLB enligt observationsdäckets assetlista.",
+    "priority": "P2",
+    "zoneId": "06",
+    "rotation": [
+      0,
+      1.5707963267948966,
+      0
+    ],
+    "size": [
+      0.7,
+      1.28,
+      1.4
+    ]
+  },
+  {
+    "id": "TB-OBS-CONSOLE-02",
+    "kind": "console",
+    "label": "Observation: console",
+    "position": [
+      -95,
+      24,
+      7
+    ],
+    "description": "Utbytbar inredningsplatshållare; byt gruppens innehåll med matchande GLB enligt observationsdäckets assetlista.",
+    "priority": "P2",
+    "zoneId": "06",
+    "rotation": [
+      0,
+      1.5707963267948966,
+      0
+    ],
+    "size": [
+      0.7,
+      1.28,
+      1.4
+    ]
+  },
+  {
+    "id": "TB-ROOM-04",
+    "kind": "room",
+    "label": "Spare Parts Market",
+    "position": [
+      -30,
+      0,
+      52
+    ],
+    "description": "Separat rum med golv, tak, slutna väggar och markerad passage.",
+    "priority": "P1",
+    "zoneId": "04",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      20.5,
+      9.6,
+      24.5
+    ]
+  },
+  {
+    "id": "TB-DOOR-04",
+    "kind": "door",
+    "label": "Passage / lift",
+    "position": [
+      -20.35,
+      0,
+      52
+    ],
+    "description": "Stängd markerad passage; scenövergång representerar färden mellan däck.",
+    "priority": "P2",
+    "zoneId": "04",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      0.23,
+      4.3,
+      3.28
+    ]
+  },
+  {
+    "id": "TB-FIT-04",
+    "kind": "interior",
+    "label": "SPARE PARTS MARKET",
+    "position": [
+      -30,
+      0,
+      52
+    ],
+    "description": "Independent stalls, component displays and a clear central aisle.",
+    "priority": "P2",
+    "zoneId": "04",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      18.4,
+      9,
+      21.3
+    ]
+  },
+  {
+    "id": "TB-04-STALL-L1",
+    "kind": "market-stall",
+    "label": "STALL-L1",
+    "position": [
+      -36,
+      0,
+      45
+    ],
+    "description": "Modular spare-parts stall with counter, canopy and sample components.",
+    "priority": "P2",
+    "zoneId": "04",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      4.5,
+      3.1,
+      2.5
+    ]
+  },
+  {
+    "id": "TB-04-STALL-L2",
+    "kind": "market-stall",
+    "label": "STALL-L2",
+    "position": [
+      -36,
+      0,
+      52
+    ],
+    "description": "Modular spare-parts stall with counter, canopy and sample components.",
+    "priority": "P2",
+    "zoneId": "04",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      4.5,
+      3.1,
+      2.5
+    ]
+  },
+  {
+    "id": "TB-04-STALL-L3",
+    "kind": "market-stall",
+    "label": "STALL-L3",
+    "position": [
+      -36,
+      0,
+      59
+    ],
+    "description": "Modular spare-parts stall with counter, canopy and sample components.",
+    "priority": "P2",
+    "zoneId": "04",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      4.5,
+      3.1,
+      2.5
+    ]
+  },
+  {
+    "id": "TB-04-STALL-R1",
+    "kind": "market-stall",
+    "label": "STALL-R1",
+    "position": [
+      -24,
+      0,
+      45
+    ],
+    "description": "Modular spare-parts stall with counter, canopy and sample components.",
+    "priority": "P2",
+    "zoneId": "04",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      4.5,
+      3.1,
+      2.5
+    ]
+  },
+  {
+    "id": "TB-04-STALL-R2",
+    "kind": "market-stall",
+    "label": "STALL-R2",
+    "position": [
+      -24,
+      0,
+      52
+    ],
+    "description": "Modular spare-parts stall with counter, canopy and sample components.",
+    "priority": "P2",
+    "zoneId": "04",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      4.5,
+      3.1,
+      2.5
+    ]
+  },
+  {
+    "id": "TB-04-STALL-R3",
+    "kind": "market-stall",
+    "label": "STALL-R3",
+    "position": [
+      -24,
+      0,
+      59
+    ],
+    "description": "Modular spare-parts stall with counter, canopy and sample components.",
+    "priority": "P2",
+    "zoneId": "04",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      4.5,
+      3.1,
+      2.5
+    ]
+  },
+  {
+    "id": "TB-ROOM-07",
+    "kind": "room",
+    "label": "Diplomacy Corridor",
+    "position": [
+      -14,
+      12,
+      -40
+    ],
+    "description": "Separat rum med golv, tak, slutna väggar och markerad passage.",
+    "priority": "P1",
+    "zoneId": "07",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      28.5,
+      8.6,
+      10.5
+    ]
+  },
+  {
+    "id": "TB-DOOR-07",
+    "kind": "door",
+    "label": "Passage / lift",
+    "position": [
+      -0.35,
+      12,
+      -40
+    ],
+    "description": "Stängd markerad passage; scenövergång representerar färden mellan däck.",
+    "priority": "P2",
+    "zoneId": "07",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      0.23,
+      4.3,
+      3.28
+    ]
+  },
+  {
+    "id": "TB-FIT-07",
+    "kind": "interior",
+    "label": "DIPLOMACY CORRIDOR",
+    "position": [
+      -14,
+      12,
+      -40
+    ],
+    "description": "Delegation banners and meeting alcoves connect the upper public deck.",
+    "priority": "P2",
+    "zoneId": "07",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      26.4,
+      8,
+      7.3
+    ]
+  },
+  {
+    "id": "TB-07-DELEGATION-1",
+    "kind": "banner",
+    "label": "DELEGATION-1",
+    "position": [
+      -24,
+      12,
+      -43.8
+    ],
+    "description": "Public delegation banner placeholder with wall pedestal, no secret narrative art.",
+    "priority": "P2",
+    "zoneId": "07",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      2,
+      5.5,
+      1.45
+    ]
+  },
+  {
+    "id": "TB-07-DELEGATION-2",
+    "kind": "banner",
+    "label": "DELEGATION-2",
+    "position": [
+      -17.5,
+      12,
+      -43.8
+    ],
+    "description": "Public delegation banner placeholder with wall pedestal, no secret narrative art.",
+    "priority": "P2",
+    "zoneId": "07",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      2,
+      5.5,
+      1.45
+    ]
+  },
+  {
+    "id": "TB-07-DELEGATION-3",
+    "kind": "banner",
+    "label": "DELEGATION-3",
+    "position": [
+      -11,
+      12,
+      -43.8
+    ],
+    "description": "Public delegation banner placeholder with wall pedestal, no secret narrative art.",
+    "priority": "P2",
+    "zoneId": "07",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      2,
+      5.5,
+      1.45
+    ]
+  },
+  {
+    "id": "TB-07-DELEGATION-4",
+    "kind": "banner",
+    "label": "DELEGATION-4",
+    "position": [
+      -4.5,
+      12,
+      -43.8
+    ],
+    "description": "Public delegation banner placeholder with wall pedestal, no secret narrative art.",
+    "priority": "P2",
+    "zoneId": "07",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      2,
+      5.5,
+      1.45
+    ]
+  },
+  {
+    "id": "TB-ROOM-08",
+    "kind": "room",
+    "label": "Crew Quarters",
+    "position": [
+      34,
+      -12,
+      -40
+    ],
+    "description": "Separat rum med golv, tak, slutna väggar och markerad passage.",
+    "priority": "P1",
+    "zoneId": "08",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      20.5,
+      8.6,
+      22.5
+    ]
+  },
+  {
+    "id": "TB-DOOR-08",
+    "kind": "door",
+    "label": "Passage / lift",
+    "position": [
+      43.65,
+      -12,
+      -40
+    ],
+    "description": "Stängd markerad passage; scenövergång representerar färden mellan däck.",
+    "priority": "P2",
+    "zoneId": "08",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      0.23,
+      4.3,
+      3.28
+    ]
+  },
+  {
+    "id": "TB-FIT-08",
+    "kind": "interior",
+    "label": "CREW QUARTERS",
+    "position": [
+      34,
+      -12,
+      -40
+    ],
+    "description": "Sleeping pods, lockers and a shared quiet area for the crew.",
+    "priority": "P2",
+    "zoneId": "08",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      18.4,
+      8,
+      19.3
+    ]
+  },
+  {
+    "id": "TB-08-POD-L1",
+    "kind": "crew-pod",
+    "label": "POD-L1",
+    "position": [
+      28,
+      -12,
+      -47
+    ],
+    "description": "Sleeping berth with mattress, privacy frame and adjacent personal locker.",
+    "priority": "P2",
+    "zoneId": "08",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      3.8,
+      2.4,
+      2
+    ]
+  },
+  {
+    "id": "TB-08-POD-L2",
+    "kind": "crew-pod",
+    "label": "POD-L2",
+    "position": [
+      28,
+      -12,
+      -41
+    ],
+    "description": "Sleeping berth with mattress, privacy frame and adjacent personal locker.",
+    "priority": "P2",
+    "zoneId": "08",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      3.8,
+      2.4,
+      2
+    ]
+  },
+  {
+    "id": "TB-08-POD-L3",
+    "kind": "crew-pod",
+    "label": "POD-L3",
+    "position": [
+      28,
+      -12,
+      -35
+    ],
+    "description": "Sleeping berth with mattress, privacy frame and adjacent personal locker.",
+    "priority": "P2",
+    "zoneId": "08",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      3.8,
+      2.4,
+      2
+    ]
+  },
+  {
+    "id": "TB-08-POD-R1",
+    "kind": "crew-pod",
+    "label": "POD-R1",
+    "position": [
+      40,
+      -12,
+      -47
+    ],
+    "description": "Sleeping berth with mattress, privacy frame and adjacent personal locker.",
+    "priority": "P2",
+    "zoneId": "08",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      3.8,
+      2.4,
+      2
+    ]
+  },
+  {
+    "id": "TB-08-POD-R2",
+    "kind": "crew-pod",
+    "label": "POD-R2",
+    "position": [
+      40,
+      -12,
+      -41
+    ],
+    "description": "Sleeping berth with mattress, privacy frame and adjacent personal locker.",
+    "priority": "P2",
+    "zoneId": "08",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      3.8,
+      2.4,
+      2
+    ]
+  },
+  {
+    "id": "TB-08-POD-R3",
+    "kind": "crew-pod",
+    "label": "POD-R3",
+    "position": [
+      40,
+      -12,
+      -35
+    ],
+    "description": "Sleeping berth with mattress, privacy frame and adjacent personal locker.",
+    "priority": "P2",
+    "zoneId": "08",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      3.8,
+      2.4,
+      2
+    ]
+  },
+  {
+    "id": "TB-ROOM-09",
+    "kind": "room",
+    "label": "Medbay",
+    "position": [
+      12,
+      -12,
+      -40
+    ],
+    "description": "Separat rum med golv, tak, slutna väggar och markerad passage.",
+    "priority": "P1",
+    "zoneId": "09",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      18.5,
+      8.6,
+      22.5
+    ]
+  },
+  {
+    "id": "TB-DOOR-09",
+    "kind": "door",
+    "label": "Passage / lift",
+    "position": [
+      20.65,
+      -12,
+      -40
+    ],
+    "description": "Stängd markerad passage; scenövergång representerar färden mellan däck.",
+    "priority": "P2",
+    "zoneId": "09",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      0.23,
+      4.3,
+      3.28
+    ]
+  },
+  {
+    "id": "TB-FIT-09",
+    "kind": "interior",
+    "label": "MEDBAY",
+    "position": [
+      12,
+      -12,
+      -40
+    ],
+    "description": "Treatment beds and diagnostic equipment beside the crew passage.",
+    "priority": "P2",
+    "zoneId": "09",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      16.4,
+      8,
+      19.3
+    ]
+  },
+  {
+    "id": "TB-09-BED-1",
+    "kind": "medical-bed",
+    "label": "BED-1",
+    "position": [
+      8,
+      -12,
+      -46
+    ],
+    "description": "Treatment bed with headrest and overhead scanner arch; decorative blockout.",
+    "priority": "P2",
+    "zoneId": "09",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      3,
+      3.6,
+      3.5
+    ]
+  },
+  {
+    "id": "TB-09-BED-2",
+    "kind": "medical-bed",
+    "label": "BED-2",
+    "position": [
+      8,
+      -12,
+      -40
+    ],
+    "description": "Treatment bed with headrest and overhead scanner arch; decorative blockout.",
+    "priority": "P2",
+    "zoneId": "09",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      3,
+      3.6,
+      3.5
+    ]
+  },
+  {
+    "id": "TB-09-BED-3",
+    "kind": "medical-bed",
+    "label": "BED-3",
+    "position": [
+      8,
+      -12,
+      -34
+    ],
+    "description": "Treatment bed with headrest and overhead scanner arch; decorative blockout.",
+    "priority": "P2",
+    "zoneId": "09",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      3,
+      3.6,
+      3.5
+    ]
+  },
+  {
+    "id": "TB-09-DIAGNOSTICS",
+    "kind": "console",
+    "label": "DIAGNOSTICS",
+    "position": [
+      16,
+      -12,
+      -45
+    ],
+    "description": "Replaceable control terminal with sloped display and grounded pedestal.",
+    "priority": "P2",
+    "zoneId": "09",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      1.8,
+      1.25,
+      0.89
+    ]
+  },
+  {
+    "id": "TB-ROOM-10",
+    "kind": "room",
+    "label": "Archive / Lore Chamber",
+    "position": [
+      -54,
+      0,
+      52
+    ],
+    "description": "Separat rum med golv, tak, slutna väggar och markerad passage.",
+    "priority": "P1",
+    "zoneId": "10",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      20.5,
+      10.6,
+      24.5
+    ]
+  },
+  {
+    "id": "TB-DOOR-10",
+    "kind": "door",
+    "label": "Passage / lift",
+    "position": [
+      -44.35,
+      0,
+      52
+    ],
+    "description": "Stängd markerad passage; scenövergång representerar färden mellan däck.",
+    "priority": "P2",
+    "zoneId": "10",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      0.23,
+      4.3,
+      3.28
+    ]
+  },
+  {
+    "id": "TB-FIT-10",
+    "kind": "interior",
+    "label": "ARCHIVE / LORE CHAMBER",
+    "position": [
+      -54,
+      0,
+      52
+    ],
+    "description": "Data shelves and reading terminals preserve the public history of the tour.",
+    "priority": "P2",
+    "zoneId": "10",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      18.4,
+      10,
+      21.3
+    ]
+  },
+  {
+    "id": "TB-10-SHELF-L1",
+    "kind": "archive-rack",
+    "label": "SHELF-L1",
+    "position": [
+      -61,
+      0,
+      45
+    ],
+    "description": "Tall archive rack with luminous data volumes and metal shelf divisions.",
+    "priority": "P2",
+    "zoneId": "10",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      2.2,
+      5,
+      4.2
+    ]
+  },
+  {
+    "id": "TB-10-SHELF-L2",
+    "kind": "archive-rack",
+    "label": "SHELF-L2",
+    "position": [
+      -61,
+      0,
+      52
+    ],
+    "description": "Tall archive rack with luminous data volumes and metal shelf divisions.",
+    "priority": "P2",
+    "zoneId": "10",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      2.2,
+      5,
+      4.2
+    ]
+  },
+  {
+    "id": "TB-10-SHELF-L3",
+    "kind": "archive-rack",
+    "label": "SHELF-L3",
+    "position": [
+      -61,
+      0,
+      59
+    ],
+    "description": "Tall archive rack with luminous data volumes and metal shelf divisions.",
+    "priority": "P2",
+    "zoneId": "10",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      2.2,
+      5,
+      4.2
+    ]
+  },
+  {
+    "id": "TB-10-SHELF-R1",
+    "kind": "archive-rack",
+    "label": "SHELF-R1",
+    "position": [
+      -47,
+      0,
+      45
+    ],
+    "description": "Tall archive rack with luminous data volumes and metal shelf divisions.",
+    "priority": "P2",
+    "zoneId": "10",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      2.2,
+      5,
+      4.2
+    ]
+  },
+  {
+    "id": "TB-10-SHELF-R2",
+    "kind": "archive-rack",
+    "label": "SHELF-R2",
+    "position": [
+      -47,
+      0,
+      52
+    ],
+    "description": "Tall archive rack with luminous data volumes and metal shelf divisions.",
+    "priority": "P2",
+    "zoneId": "10",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      2.2,
+      5,
+      4.2
+    ]
+  },
+  {
+    "id": "TB-10-SHELF-R3",
+    "kind": "archive-rack",
+    "label": "SHELF-R3",
+    "position": [
+      -47,
+      0,
+      59
+    ],
+    "description": "Tall archive rack with luminous data volumes and metal shelf divisions.",
+    "priority": "P2",
+    "zoneId": "10",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      2.2,
+      5,
+      4.2
+    ]
+  },
+  {
+    "id": "TB-10-READING",
+    "kind": "console",
+    "label": "READING",
+    "position": [
+      -54,
+      0,
+      49
+    ],
+    "description": "Replaceable control terminal with sloped display and grounded pedestal.",
+    "priority": "P2",
+    "zoneId": "10",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      1.8,
+      1.25,
+      0.89
+    ]
+  },
+  {
+    "id": "TB-ROOM-11",
+    "kind": "room",
+    "label": "Engineering Core",
+    "position": [
+      76,
+      -24,
+      0
+    ],
+    "description": "Separat rum med golv, tak, slutna väggar och markerad passage.",
+    "priority": "P1",
+    "zoneId": "11",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      32.5,
+      18.6,
+      32.5
+    ]
+  },
+  {
+    "id": "TB-DOOR-11",
+    "kind": "door",
+    "label": "Passage / lift",
+    "position": [
+      91.65,
+      -24,
+      0
+    ],
+    "description": "Stängd markerad passage; scenövergång representerar färden mellan däck.",
+    "priority": "P2",
+    "zoneId": "11",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      0.23,
+      4.3,
+      3.28
+    ]
+  },
+  {
+    "id": "TB-FIT-11",
+    "kind": "interior",
+    "label": "ENGINEERING CORE",
+    "position": [
+      76,
+      -24,
+      0
+    ],
+    "description": "A shielded reactor, service ring and control consoles power the carrier.",
+    "priority": "P2",
+    "zoneId": "11",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      30.4,
+      18,
+      29.3
+    ]
+  },
+  {
+    "id": "TB-11-REACTOR",
+    "kind": "reactor",
+    "label": "REACTOR",
+    "position": [
+      76,
+      -24,
+      -3
+    ],
+    "description": "Shielded reactor silhouette, service ring and vertical conduits; no interactive controls.",
+    "priority": "P2",
+    "zoneId": "11",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      10,
+      12,
+      10
+    ]
+  },
+  {
+    "id": "TB-11-CONTROL",
+    "kind": "console",
+    "label": "CONTROL",
+    "position": [
+      68,
+      -24,
+      5
+    ],
+    "description": "Replaceable control terminal with sloped display and grounded pedestal.",
+    "priority": "P2",
+    "zoneId": "11",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      1.8,
+      1.25,
+      0.89
+    ]
+  },
+  {
+    "id": "TB-ROOM-12",
+    "kind": "room",
+    "label": "Cargo & Storage",
+    "position": [
+      28,
+      -12,
+      52
+    ],
+    "description": "Separat rum med golv, tak, slutna väggar och markerad passage.",
+    "priority": "P1",
+    "zoneId": "12",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      20.5,
+      9.6,
+      24.5
+    ]
+  },
+  {
+    "id": "TB-DOOR-12",
+    "kind": "door",
+    "label": "Passage / lift",
+    "position": [
+      37.65,
+      -12,
+      52
+    ],
+    "description": "Stängd markerad passage; scenövergång representerar färden mellan däck.",
+    "priority": "P2",
+    "zoneId": "12",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      0.23,
+      4.3,
+      3.28
+    ]
+  },
+  {
+    "id": "TB-FIT-12",
+    "kind": "interior",
+    "label": "CARGO & STORAGE",
+    "position": [
+      28,
+      -12,
+      52
+    ],
+    "description": "Container racks and loading lanes connect the workshop to the shuttle bay.",
+    "priority": "P2",
+    "zoneId": "12",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      18.4,
+      9,
+      21.3
+    ]
+  },
+  {
+    "id": "TB-12-RACK-L1",
+    "kind": "cargo-rack",
+    "label": "RACK-L1",
+    "position": [
+      22,
+      -12,
+      45
+    ],
+    "description": "Stackable freight containers on a reusable two-level loading rack.",
+    "priority": "P2",
+    "zoneId": "12",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      4,
+      4.8,
+      4
+    ]
+  },
+  {
+    "id": "TB-12-RACK-L2",
+    "kind": "cargo-rack",
+    "label": "RACK-L2",
+    "position": [
+      22,
+      -12,
+      52
+    ],
+    "description": "Stackable freight containers on a reusable two-level loading rack.",
+    "priority": "P2",
+    "zoneId": "12",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      4,
+      4.8,
+      4
+    ]
+  },
+  {
+    "id": "TB-12-RACK-L3",
+    "kind": "cargo-rack",
+    "label": "RACK-L3",
+    "position": [
+      22,
+      -12,
+      59
+    ],
+    "description": "Stackable freight containers on a reusable two-level loading rack.",
+    "priority": "P2",
+    "zoneId": "12",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      4,
+      4.8,
+      4
+    ]
+  },
+  {
+    "id": "TB-12-RACK-R1",
+    "kind": "cargo-rack",
+    "label": "RACK-R1",
+    "position": [
+      34,
+      -12,
+      45
+    ],
+    "description": "Stackable freight containers on a reusable two-level loading rack.",
+    "priority": "P2",
+    "zoneId": "12",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      4,
+      4.8,
+      4
+    ]
+  },
+  {
+    "id": "TB-12-RACK-R2",
+    "kind": "cargo-rack",
+    "label": "RACK-R2",
+    "position": [
+      34,
+      -12,
+      52
+    ],
+    "description": "Stackable freight containers on a reusable two-level loading rack.",
+    "priority": "P2",
+    "zoneId": "12",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      4,
+      4.8,
+      4
+    ]
+  },
+  {
+    "id": "TB-12-RACK-R3",
+    "kind": "cargo-rack",
+    "label": "RACK-R3",
+    "position": [
+      34,
+      -12,
+      59
+    ],
+    "description": "Stackable freight containers on a reusable two-level loading rack.",
+    "priority": "P2",
+    "zoneId": "12",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      4,
+      4.8,
+      4
+    ]
+  },
+  {
+    "id": "TB-ROOM-13",
+    "kind": "room",
+    "label": "Docking Ports / Shuttle Bay",
+    "position": [
+      62,
+      -24,
+      52
+    ],
+    "description": "Separat rum med golv, tak, slutna väggar och markerad passage.",
+    "priority": "P1",
+    "zoneId": "13",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      36.5,
+      18.6,
+      30.5
+    ]
+  },
+  {
+    "id": "TB-DOOR-13",
+    "kind": "door",
+    "label": "Passage / lift",
+    "position": [
+      79.65,
+      -24,
+      52
+    ],
+    "description": "Stängd markerad passage; scenövergång representerar färden mellan däck.",
+    "priority": "P2",
+    "zoneId": "13",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      0.23,
+      4.3,
+      3.28
+    ]
+  },
+  {
+    "id": "TB-FIT-13",
+    "kind": "interior",
+    "label": "SHUTTLE BAY",
+    "position": [
+      62,
+      -24,
+      52
+    ],
+    "description": "Two shuttle berths, a freight apron and a sealed outer docking gate.",
+    "priority": "P2",
+    "zoneId": "13",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      34.4,
+      18,
+      27.8
+    ]
+  },
+  {
+    "id": "TB-13-BERTH-L",
+    "kind": "shuttle-berth",
+    "label": "BERTH-L",
+    "position": [
+      53,
+      -24,
+      49
+    ],
+    "description": "Shuttle footprint and docking support, ready for a shared transport model.",
+    "priority": "P2",
+    "zoneId": "13",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      10,
+      2.2,
+      14
+    ]
+  },
+  {
+    "id": "TB-13-BERTH-R",
+    "kind": "shuttle-berth",
+    "label": "BERTH-R",
+    "position": [
+      71,
+      -24,
+      49
+    ],
+    "description": "Shuttle footprint and docking support, ready for a shared transport model.",
+    "priority": "P2",
+    "zoneId": "13",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      10,
+      2.2,
+      14
+    ]
+  },
+  {
+    "id": "TB-13-DOCK-CONTROL",
+    "kind": "console",
+    "label": "DOCK-CONTROL",
+    "position": [
+      62,
+      -24,
+      59
+    ],
+    "description": "Replaceable control terminal with sloped display and grounded pedestal.",
+    "priority": "P2",
+    "zoneId": "13",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      1.8,
+      1.25,
+      0.89
+    ]
+  },
+  {
+    "id": "TB-ROOM-14",
+    "kind": "room",
+    "label": "Security Nexus",
+    "position": [
+      42,
+      -12,
+      0
+    ],
+    "description": "Separat rum med golv, tak, slutna väggar och markerad passage.",
+    "priority": "P1",
+    "zoneId": "14",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      20.5,
+      9.6,
+      24.5
+    ]
+  },
+  {
+    "id": "TB-DOOR-14",
+    "kind": "door",
+    "label": "Passage / lift",
+    "position": [
+      51.65,
+      -12,
+      0
+    ],
+    "description": "Stängd markerad passage; scenövergång representerar färden mellan däck.",
+    "priority": "P2",
+    "zoneId": "14",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      0.23,
+      4.3,
+      3.28
+    ]
+  },
+  {
+    "id": "TB-FIT-14",
+    "kind": "interior",
+    "label": "SECURITY NEXUS",
+    "position": [
+      42,
+      -12,
+      0
+    ],
+    "description": "A screening threshold and watch desk control access to engineering.",
+    "priority": "P2",
+    "zoneId": "14",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      18.4,
+      9,
+      21.66
+    ]
+  },
+  {
+    "id": "TB-14-WATCH",
+    "kind": "console",
+    "label": "WATCH",
+    "position": [
+      37,
+      -12,
+      -4
+    ],
+    "description": "Replaceable control terminal with sloped display and grounded pedestal.",
+    "priority": "P2",
+    "zoneId": "14",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      1.8,
+      1.25,
+      0.89
+    ]
+  },
+  {
+    "id": "TB-14-WAITING",
+    "kind": "seat",
+    "label": "WAITING",
+    "position": [
+      47,
+      -12,
+      5
+    ],
+    "description": "Replaceable modular bench, with seat and back at human scale.",
+    "priority": "P2",
+    "zoneId": "14",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      3,
+      1.15,
+      1.03
+    ]
+  },
+  {
+    "id": "TB-ROOM-15",
+    "kind": "room",
+    "label": "VIP Gallery / Race Museum",
+    "position": [
+      -60,
+      24,
+      -32
+    ],
+    "description": "Separat rum med golv, tak, slutna väggar och markerad passage.",
+    "priority": "P1",
+    "zoneId": "15",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      22.5,
+      10.6,
+      20.5
+    ]
+  },
+  {
+    "id": "TB-DOOR-15",
+    "kind": "door",
+    "label": "Passage / lift",
+    "position": [
+      -49.35,
+      24,
+      -32
+    ],
+    "description": "Stängd markerad passage; scenövergång representerar färden mellan däck.",
+    "priority": "P2",
+    "zoneId": "15",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      0.23,
+      4.3,
+      3.28
+    ]
+  },
+  {
+    "id": "TB-FIT-15",
+    "kind": "interior",
+    "label": "VIP GALLERY / RACE MUSEUM",
+    "position": [
+      -60,
+      24,
+      -32
+    ],
+    "description": "Exhibition plinths and gallery seating celebrate the championship.",
+    "priority": "P2",
+    "zoneId": "15",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      20.4,
+      10,
+      17.3
+    ]
+  },
+  {
+    "id": "TB-15-DISPLAY-1",
+    "kind": "museum-display",
+    "label": "DISPLAY-1",
+    "position": [
+      -66,
+      24,
+      -36
+    ],
+    "description": "Exhibition pedestal and trophy silhouette; display content remains to be authored.",
+    "priority": "P2",
+    "zoneId": "15",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      3.2,
+      2.28,
+      3.2
+    ]
+  },
+  {
+    "id": "TB-15-DISPLAY-2",
+    "kind": "museum-display",
+    "label": "DISPLAY-2",
+    "position": [
+      -60,
+      24,
+      -36
+    ],
+    "description": "Exhibition pedestal and trophy silhouette; display content remains to be authored.",
+    "priority": "P2",
+    "zoneId": "15",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      3.2,
+      2.28,
+      3.2
+    ]
+  },
+  {
+    "id": "TB-15-DISPLAY-3",
+    "kind": "museum-display",
+    "label": "DISPLAY-3",
+    "position": [
+      -54,
+      24,
+      -36
+    ],
+    "description": "Exhibition pedestal and trophy silhouette; display content remains to be authored.",
+    "priority": "P2",
+    "zoneId": "15",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      3.2,
+      2.28,
+      3.2
+    ]
+  },
+  {
+    "id": "TB-15-GALLERY",
+    "kind": "seat",
+    "label": "GALLERY",
+    "position": [
+      -65,
+      24,
+      -27
+    ],
+    "description": "Replaceable modular bench, with seat and back at human scale.",
+    "priority": "P2",
+    "zoneId": "15",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      3,
+      1.15,
+      1.02
+    ]
+  },
+  {
+    "id": "TB-ROOM-16",
+    "kind": "room",
+    "label": "Restricted",
+    "position": [
+      0,
+      -36,
+      60
+    ],
+    "description": "Separat rum med golv, tak, slutna väggar och markerad passage.",
+    "priority": "P1",
+    "zoneId": "16",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      18.5,
+      8.6,
+      16.5
+    ]
+  },
+  {
+    "id": "TB-DOOR-16",
+    "kind": "door",
+    "label": "Passage / lift",
+    "position": [
+      8.65,
+      -36,
+      60
+    ],
+    "description": "Stängd markerad passage; scenövergång representerar färden mellan däck.",
+    "priority": "P2",
+    "zoneId": "16",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      0.23,
+      4.3,
+      3.28
+    ]
+  },
+  {
+    "id": "TB-HANGAR-ENDS",
+    "kind": "wall",
+    "label": "Hangarens slutväggar",
+    "position": [
+      0,
+      0,
+      0
+    ],
+    "description": "Slutna hangarväggar ersätter den tidigare stora observationsöppningen.",
+    "priority": "P1",
+    "zoneId": "01",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      46,
+      21,
+      66.1
     ]
   }
 ]

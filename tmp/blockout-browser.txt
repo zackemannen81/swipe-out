@@ -1,0 +1,1 @@
+PASS: 10 new rooms, reload, Medbay first visit, mobile selector, Back; no page errors

@@ -1,0 +1,159 @@
+[
+  {
+    "file": "necken.json",
+    "world": "necros",
+    "key": "track19",
+    "name": "Necros - Dark Prime",
+    "authoredId": "synthetic-dreams",
+    "sourceSha256": "9b65b6e9811678823ed6685e42be5bce57941d092bacbdfaa22de3fef0420153",
+    "sourceBytes": 55373855,
+    "outputBytes": 26108,
+    "points": 43,
+    "objects": 96,
+    "assets": [
+      {
+        "url": "/images/tour-stages/bee412bbc06920e3587b0d54a691d4f376c668222914dcb6e879925177660e64.jpg",
+        "sha256": "bee412bbc06920e3587b0d54a691d4f376c668222914dcb6e879925177660e64",
+        "bytes": 17586
+      },
+      {
+        "url": "/images/tour-stages/23054c9c30501a7b81c4b8dab8860b29e20d14e44e1361a1d0a42c9b1647ab72.png",
+        "sha256": "23054c9c30501a7b81c4b8dab8860b29e20d14e44e1361a1d0a42c9b1647ab72",
+        "bytes": 3188893
+      },
+      {
+        "url": "/models/tour-stages/d82980ec2d6e042f1cab510ae36abb73e6c9b10723214f9e4c45f90ebf708e27.glb",
+        "sha256": "d82980ec2d6e042f1cab510ae36abb73e6c9b10723214f9e4c45f90ebf708e27",
+        "bytes": 4433792
+      },
+      {
+        "url": "/images/tour-stages/d024489a8505df104b7886d149d489308ffb69ff1c7e85fb66bcc2398d90e874.png",
+        "sha256": "d024489a8505df104b7886d149d489308ffb69ff1c7e85fb66bcc2398d90e874",
+        "bytes": 20684
+      },
+      {
+        "url": "/images/tour-stages/dba22739e59e1b74911e47cf3863eedea1f88bfe67560db6aa8e2f03098cf47b.png",
+        "sha256": "dba22739e59e1b74911e47cf3863eedea1f88bfe67560db6aa8e2f03098cf47b",
+        "bytes": 13915
+      },
+      {
+        "url": "/images/tour-stages/c58725819098227d98f559a945ce20de9ef3b0c8e9dc26233fdaeb487a297c4a.png",
+        "sha256": "c58725819098227d98f559a945ce20de9ef3b0c8e9dc26233fdaeb487a297c4a",
+        "bytes": 3750424
+      }
+    ]
+  },
+  {
+    "file": "VITRUM LITHOFYTER.json",
+    "world": "vitrum",
+    "key": "track20",
+    "name": "Vitrum Lithofyter · Neural Ascent 5",
+    "authoredId": "vitrum-neural-ascent",
+    "sourceSha256": "eb03723ebb1c678a4a74428798477e25ba83202f119660d9724fc05daf279690",
+    "sourceBytes": 25658333,
+    "outputBytes": 68500,
+    "points": 32,
+    "objects": 238,
+    "assets": [
+      {
+        "url": "/images/tour-stages/68bb0a59fb79dac2a9550a292179f4a32c05fef90a5c09c87bce8a50ee7b716a.png",
+        "sha256": "68bb0a59fb79dac2a9550a292179f4a32c05fef90a5c09c87bce8a50ee7b716a",
+        "bytes": 1025340
+      },
+      {
+        "url": "/images/tour-stages/95703a4df1bf29dd3f81ee846624b08556097b9abcfc3975d92388aee3f8d98c.png",
+        "sha256": "95703a4df1bf29dd3f81ee846624b08556097b9abcfc3975d92388aee3f8d98c",
+        "bytes": 3220937
+      },
+      {
+        "url": "/images/tour-stages/c19e9b3b1085a7f55ae938d4edd81ec2a9d53b80ce093ca4edf71822360a9a35.png",
+        "sha256": "c19e9b3b1085a7f55ae938d4edd81ec2a9d53b80ce093ca4edf71822360a9a35",
+        "bytes": 3602590
+      },
+      {
+        "url": "/images/tour-stages/c0a26f1b4a701b262a48ba6147048fcadd2fadddc58ab816389d731607dfe0f1.png",
+        "sha256": "c0a26f1b4a701b262a48ba6147048fcadd2fadddc58ab816389d731607dfe0f1",
+        "bytes": 3289529
+      },
+      {
+        "url": "/images/tour-stages/ac8058f5da9df76517cb206638a176ca070d05adc8e64126fa1f9a927677bf7d.png",
+        "sha256": "ac8058f5da9df76517cb206638a176ca070d05adc8e64126fa1f9a927677bf7d",
+        "bytes": 672273
+      },
+      {
+        "url": "/images/tour-stages/6525aa52a42f9c1b67d8ed82d40eecb0a6bc923929a35351ae9aa9c92c2b0375.jpg",
+        "sha256": "6525aa52a42f9c1b67d8ed82d40eecb0a6bc923929a35351ae9aa9c92c2b0375",
+        "bytes": 171703
+      }
+    ]
+  },
+  {
+    "file": "the_collective.json",
+    "world": "collective",
+    "key": "track21",
+    "name": "The collective - Tellus",
+    "authoredId": "synthetic-dreams",
+    "sourceSha256": "d82f1ba2d6e18f7b77c0f4f2d003cc3f15d42c6a63a7f86071557fc7a2ed8439",
+    "sourceBytes": 45187972,
+    "outputBytes": 29292,
+    "points": 66,
+    "objects": 71,
+    "assets": [
+      {
+        "url": "/images/tour-stages/179c1d9d3b338f81fe5d3f89ede2c29883fe03adeb78cfcdfcc5f7622c635ce8.jpg",
+        "sha256": "179c1d9d3b338f81fe5d3f89ede2c29883fe03adeb78cfcdfcc5f7622c635ce8",
+        "bytes": 1128293
+      },
+      {
+        "url": "/images/tour-stages/1f83ba84df75f2dfa05565168d36e8c880604ee8b98422c8418dfb172b202e55.png",
+        "sha256": "1f83ba84df75f2dfa05565168d36e8c880604ee8b98422c8418dfb172b202e55",
+        "bytes": 3191531
+      },
+      {
+        "url": "/images/tour-stages/46084c0206b0d42945ba666a27eca11b8b3a33bb07b2e4ef0718834c87d082be.png",
+        "sha256": "46084c0206b0d42945ba666a27eca11b8b3a33bb07b2e4ef0718834c87d082be",
+        "bytes": 89218
+      },
+      {
+        "url": "/images/tour-stages/bee412bbc06920e3587b0d54a691d4f376c668222914dcb6e879925177660e64.jpg",
+        "sha256": "bee412bbc06920e3587b0d54a691d4f376c668222914dcb6e879925177660e64",
+        "bytes": 17586
+      },
+      {
+        "url": "/images/tour-stages/4932f34726702d1c68e9ef51249811d64f4c4adae4167a6532faf5a0c44814b4.jpg",
+        "sha256": "4932f34726702d1c68e9ef51249811d64f4c4adae4167a6532faf5a0c44814b4",
+        "bytes": 2483095
+      },
+      {
+        "url": "/images/tour-stages/81e2a2f18a48fb7bca016259760564509c00a74c97aefb50669226b372974055.jpg",
+        "sha256": "81e2a2f18a48fb7bca016259760564509c00a74c97aefb50669226b372974055",
+        "bytes": 3799370
+      },
+      {
+        "url": "/images/tour-stages/545bb149c6f7d131289f639071f0d3c67b8b4be02df0052b72644ce238bc414f.png",
+        "sha256": "545bb149c6f7d131289f639071f0d3c67b8b4be02df0052b72644ce238bc414f",
+        "bytes": 3138517
+      },
+      {
+        "url": "/images/tour-stages/3f6906579fc65cfc3395a2c8d24bb45a0882088278e6bdbac3d78fdabe5a4127.png",
+        "sha256": "3f6906579fc65cfc3395a2c8d24bb45a0882088278e6bdbac3d78fdabe5a4127",
+        "bytes": 1733807
+      },
+      {
+        "url": "/images/tour-stages/f1886b53e7de2bdf20eff4469d2f703a636669a185bca545a04b1ed41c3bd227.png",
+        "sha256": "f1886b53e7de2bdf20eff4469d2f703a636669a185bca545a04b1ed41c3bd227",
+        "bytes": 2557767
+      },
+      {
+        "url": "/images/tour-stages/16745222a2a093a19c49f8bfa24775d8fd473fe7c61449ce9fafd86a3344ff33.jpg",
+        "sha256": "16745222a2a093a19c49f8bfa24775d8fd473fe7c61449ce9fafd86a3344ff33",
+        "bytes": 3129677
+      },
+      {
+        "url": "/images/tour-stages/ee59b2c7aa399dfdc810078c723373670133fe8505e439601dff4ce6f3cc5ad8.jpg",
+        "sha256": "ee59b2c7aa399dfdc810078c723373670133fe8505e439601dff4ce6f3cc5ad8",
+        "bytes": 1127678
+      }
+    ]
+  }
+]

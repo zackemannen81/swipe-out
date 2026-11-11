@@ -1,14 +1,19 @@
+import {tourTrackKey} from './tour-destinations.js';
+import {createTourSession} from './tour-session.js';
 import {recordKey} from './time-attack.js';
 import {readRaceRecords,saveRaceResult,timeMedal} from './race-records.js';
 import {createTrackCurve} from './track-path.js';
 import {VITRUM_MUSIC,BONUS_TROPHIES,awardConsolation,REWARD_MUSIC,necrosMastered,grantNecrosPreview,SHIPS,PAINTS,MODULES,TROPHIES,unlocked,loadProfile,saveProfile,awardCampaign,loadout,normalizeRaceLaps} from './career.js';
 import './front-end.css';
-const NECROS_TRACK_ID='custom-e7ead7a3-b303-4c3d-9464-ca52f28e8386';
+
 const $=id=>document.getElementById(id);
-export function createFrontEnd({garage,onSettings,onPreview,tracks}){
- const profile=loadProfile(localStorage);let view='home',campaign=false,run=null,preview=false,recordRun=null,bonusRun=null;
+export function createFrontEnd({garage,onSettings,onPreview,tracks,progressStorage=localStorage}){
+ const NECROS_TRACK_ID=tourTrackKey('necros',tracks);
+ let sessionStore;try{sessionStore=window.sessionStorage;}catch{}
+ const tourSession=createTourSession(sessionStore);let busReturn=null,carrierSetup=false,carrierRace=false;
+ const profile=loadProfile(progressStorage);let garageFromBus=false;let view='home',campaign=false,run=null,preview=false,recordRun=null,bonusRun=null;
  // Explicit author testing grant, restricted to local Vite development. Never grants trophies.
- if(import.meta.env.DEV&&['localhost','127.0.0.1','[::1]'].includes(location.hostname)){grantNecrosPreview(profile);saveProfile(localStorage,profile);}
+ if(import.meta.env.DEV&&['localhost','127.0.0.1','[::1]'].includes(location.hostname)){grantNecrosPreview(profile);}
  const root=$('start-screen'),setup=document.createElement('div');setup.id='menu-race';setup.dataset.view='race';
  setup.append(...root.childNodes);root.append(setup);root.classList.add('front-end');root.removeAttribute('aria-labelledby');root.removeAttribute('aria-describedby');root.setAttribute('aria-label','SwipeOut menu');
  $('headline').textContent='RACE SETUP';
@@ -38,7 +43,12 @@ export function createFrontEnd({garage,onSettings,onPreview,tracks}){
  const setupNote=document.createElement('p');setupNote.id='loadout-note';setupNote.className='menu-muted';$('start-button').before(setupNote);
  const overlay=document.createElement('div');overlay.id='world-preview-overlay';overlay.hidden=true;overlay.innerHTML='<div><span>NECROS / RECONNAISSANCE FLIGHT</span><button id="end-world-preview">BACK · ESC</button></div>';document.querySelector('.experience').append(overlay);
  const trailer=new Audio('/audio/necros-trailer.mp3');trailer.preload='none';
- function persist(){ $('profile-status').textContent=saveProfile(localStorage,profile); }
+ let saveSerial=0;
+ function persist(){
+  const serial=++saveSerial,error=saveProfile(progressStorage,profile),status=$('profile-status');
+  status.textContent=error;
+  if(!error&&progressStorage.flush){status.textContent='Saving progress…';progressStorage.flush().then(()=>{if(serial===saveSerial)status.textContent='';},()=>{if(serial===saveSerial)status.textContent='Could not save progress on this device. Keep this session open.';});}
+ }
  function settings(){onSettings(profile.settings);trailer.volume=profile.settings.mute?0:profile.settings.music;for(const k of ['sfx','glow'])$(''+k+'-value').textContent=Math.round(profile.settings[k]*100)+'%';$('music-value').textContent=Math.round(profile.settings.music*100)+'%';}
  $('menu-music').value=profile.settings.music*100;$('menu-quality').value=profile.settings.quality;
  for(const k of ['bloom','shake','motion','mute','musicPulse']){$('menu-'+k).checked=profile.settings[k];$('menu-'+k).addEventListener('change',()=>{profile.settings[k]=$('menu-'+k).checked;settings();persist();});}
@@ -92,33 +102,48 @@ export function createFrontEnd({garage,onSettings,onPreview,tracks}){
   const laps=$('race-mode-select').value==='race'?profile.laps:3;
   const targets=document.createElement('p');targets.className='menu-muted';targets.textContent=`${laps}-lap race time medals: Gold ${(curve.getLength()*laps/110).toFixed(1)}s / Silver ${(curve.getLength()*laps/95).toFixed(1)}s / Bronze ${(curve.getLength()*laps/80).toFixed(1)}s. Initial targets; lap counts and loadouts have separate records.`;card.append(targets);
   const key=[select.value,recordKey({track:t.data}),$('cpu-difficulty-select').value,$('handling-select').value,Number($('assist-select').value),$('combat-enabled').checked,profile.ship,profile.module,...(laps===3?[]:[`laps${laps}`])].join('|');
-  const best=readRaceRecords(localStorage).find(r=>r.key===key);const record=document.createElement('p');record.className='menu-muted';record.textContent=$('race-mode-select').value==='race'?`Current setup PB: ${best?best.time.toFixed(2)+'s':'no record yet'}`:'Factory performance — separate event records.';card.append(record);
+  const best=readRaceRecords(progressStorage).find(r=>r.key===key);const record=document.createElement('p');record.className='menu-muted';record.textContent=$('race-mode-select').value==='race'?`Current setup PB: ${best?best.time.toFixed(2)+'s':'no record yet'}`:'Factory performance — separate event records.';card.append(record);
  }
  select.addEventListener('change',drawTrackCard);for(const id of ['cpu-difficulty-select','handling-select','assist-select','combat-enabled','race-mode-select'])$(id).addEventListener('change',()=>{if(view==='race')drawTrackCard();});
- function drawRecords(){const list=$('race-record-list');list.replaceChildren();const rows=readRaceRecords(localStorage);for(const r of rows){const p=document.createElement('p');p.className='career-goal';p.textContent=`${r.name} — ${r.time.toFixed(2)}s · Best lap ${r.bestLap?.toFixed(2)??'—'}s · #${r.position} · ${r.label??''}`;list.append(p);}if(!rows.length)list.textContent='Finish a race to set your first record.';}
+ function drawRecords(){const list=$('race-record-list');list.replaceChildren();const rows=readRaceRecords(progressStorage);for(const r of rows){const p=document.createElement('p');p.className='career-goal';p.textContent=`${r.name} — ${r.time.toFixed(2)}s · Best lap ${r.bestLap?.toFixed(2)??'—'}s · #${r.position} · ${r.label??''}`;list.append(p);}if(!rows.length)list.textContent='Finish a race to set your first record.';}
 
  function stopPreview(){preview=false;trailer.pause();trailer.currentTime=0;overlay.hidden=true;root.hidden=false;onPreview(false);}
- function show(next){stopPreview();view=next;root.dataset.page=view;document.body.classList.add('in-menu');for(const p of root.querySelectorAll('[data-view]'))p.hidden=p.dataset.view!==view;$('menu-back').hidden=view==='home';if(view==='garage')drawGarage();if(view==='records')drawRecords();if(view==='race')drawTrackCard();if(view==='campaign'||view==='trophies')drawCareer();const heading=root.querySelector(`[data-view="${view}"] h1,[data-view="${view}"] h2`);if(heading){heading.tabIndex=-1;heading.focus({preventScroll:true});}root.querySelector('#menu-pages').scrollTop=0;}
+ let workshopTransition=false;
+ const workshopFade=document.createElement('div');workshopFade.className='workshop-fade';workshopFade.hidden=true;workshopFade.setAttribute('aria-hidden','true');root.append(workshopFade);
+ function show(next){
+  if(workshopTransition)return;
+  const localMove=(next==='garage'&&view==='bus')||(next==='bus'&&view==='garage'&&garageFromBus);
+  if(!localMove||!profile.settings.motion||matchMedia('(prefers-reduced-motion: reduce)').matches){commitShow(next);return;}
+  workshopTransition=true;root.inert=true;workshopFade.hidden=false;
+  void (async()=>{try{
+   await workshopFade.animate([{opacity:0},{opacity:1}],{duration:160,fill:'forwards'}).finished;
+   commitShow(next);
+   await workshopFade.animate([{opacity:1},{opacity:0}],{duration:180,fill:'forwards'}).finished;
+  }finally{workshopFade.getAnimations().forEach(a=>a.cancel());workshopFade.hidden=true;root.inert=false;workshopTransition=false;root.querySelector(`[data-view="${view}"] h2`)?.focus({preventScroll:true});}})();
+ }
+ function commitShow(next){if(next==='bus')tourSession.location('bus');else if(next==='home'){tourSession.location('home');carrierSetup=false;}garageFromBus=next==='garage'&&(view==='bus'||garageFromBus);stopPreview();view=next;root.dataset.page=view;root.dataset.busGarage=String(view==='garage'&&garageFromBus);document.body.classList.add('in-menu');for(const p of root.querySelectorAll('[data-view]'))p.hidden=p.dataset.view!==view&&!(garageFromBus&&p.dataset.view==='bus');$('menu-back').hidden=view==='home';$('menu-back').textContent=view==='bus'||garageFromBus||(view==='race'&&carrierSetup)?'← BACK':'← MAIN MENU';const garagePage=root.querySelector('[data-view=garage]');garagePage.querySelector('h2').textContent=garageFromBus?'SERVICE BAY':'GARAGE';garagePage.querySelector('.menu-kicker').textContent=garageFromBus?'DECK 03 / YOUR WORKSHOP':'DARK PRIME / SERVICE HANGAR 01';if(view==='garage')drawGarage();if(view==='records')drawRecords();if(view==='race')drawTrackCard();if(view==='campaign'||view==='trophies')drawCareer();const heading=root.querySelector(`[data-view="${view}"] h1,[data-view="${view}"] h2`);if(heading){heading.tabIndex=-1;heading.focus({preventScroll:true});}root.querySelector('#menu-pages').scrollTop=0;}
  function event(mode,isCampaign=false){campaign=isCampaign;$('race-mode-select').value=mode;$('race-mode-select').dispatchEvent(new Event('change'));$('track-select').disabled=isCampaign||mode==='cup';$('loadout-note').textContent=isCampaign?'CAMPAIGN · NECROS · Garage loadout active.':mode==='race'?'Garage loadout active. Change craft and modules in Garage.':'Factory Racer performance. Garage modules are disabled for this event.';show('race');}
  root.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>show(b.dataset.go)));
  root.querySelectorAll('[data-event]').forEach(b=>b.addEventListener('click',()=>event(b.dataset.event)));
  $('race-mode-select').addEventListener('change',()=>{campaign=false;$('loadout-note').textContent=$('race-mode-select').value==='race'?'Garage loadout active.':'Factory Racer performance; modules disabled.';});
- function necros(){return tracks[NECROS_TRACK_ID]?.custom?NECROS_TRACK_ID:null;}
+ function necros(){return NECROS_TRACK_ID;}
  const available=Boolean(necros());
  $('campaign-enter').disabled=!available;$('world-preview').disabled=!available;
- $('campaign-availability').textContent=available?'NECROS · DARK PRIME — authored circuit ready.':'Dark PRIME is not saved in this browser origin. Open the localhost address where you created the track, or import its saved track library here. No substitute circuit will be used.';
+ $('campaign-availability').textContent=available?'NECROS · DARK PRIME — authored playable preview ready.':'Dark PRIME is not saved in this browser origin. Open the localhost address where you created the track, or import its saved track library here. No substitute circuit will be used.';
  $('campaign-enter').addEventListener('click',()=>{if(!necros())return;$('track-select').value=necros();$('track-select').dispatchEvent(new Event('change'));event('race',true);campaign=true;});
  $('world-preview').addEventListener('click',()=>{if(!necros())return;if(!profile.settings.motion||matchMedia('(prefers-reduced-motion: reduce)').matches){$('profile-status').textContent='Enable menu motion in Settings to watch the fly-by.';return;}preview=true;root.hidden=true;overlay.hidden=false;onPreview(true,necros());trailer.currentTime=0;trailer.play().catch(()=>{$('profile-status').textContent='Trailer audio unavailable; fly-by remains available.';});$('end-world-preview').focus();});
  $('end-world-preview').addEventListener('click',()=>{stopPreview();show('campaign');});
- $('menu-home').addEventListener('click',e=>{e.preventDefault();show('home');});$('menu-back').addEventListener('click',()=>show('home'));
- window.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.body.classList.contains('in-menu')){e.preventDefault();show(preview?'campaign':'home');}});
+ let busBack=null;
+ function navigateBack(){if(workshopTransition)return;if(view==='race'&&carrierSetup){carrierSetup=false;show('bus');return;}if(view==='garage'&&garageFromBus){show('bus');return;}if(view==='bus'&&busBack?.())return;show(preview?'campaign':'home');}
+ $('menu-home').addEventListener('click',e=>{e.preventDefault();show('home');});$('menu-back').addEventListener('click',navigateBack);
+ window.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.body.classList.contains('in-menu')){e.preventDefault();navigateBack();}});
  let padHeld=false;
  function gamepad(externalScope=null,onBack=null){
   const pad=Array.from(navigator.getGamepads?.()??[]).find(Boolean);if(!pad)return;
   const direction=pad.buttons[12]?.pressed||pad.axes[1]<-.6?-1:pad.buttons[13]?.pressed||pad.axes[1]>.6?1:0;
   const horizontal=pad.buttons[14]?.pressed||pad.axes[0]<-.6?-1:pad.buttons[15]?.pressed||pad.axes[0]>.6?1:0;
   const accept=pad.buttons[0]?.pressed,back=pad.buttons[1]?.pressed,held=!!(direction||horizontal||accept||back);if(held&&!padHeld){
-   if(back){if(onBack)onBack();else show(preview?'campaign':'home');}
+   if(back){if(onBack)onBack();else navigateBack();}
    else{const scope=externalScope??(preview?overlay:root);const items=[...scope.querySelectorAll('button,a,input,select')].filter(e=>!e.disabled&&e.getClientRects().length);const active=document.activeElement;
     if(direction){const i=items.indexOf(active);items[(i+direction+items.length)%items.length]?.focus();}
     else if(horizontal&&active?.tagName==='SELECT'){active.selectedIndex=Math.max(0,Math.min(active.options.length-1,active.selectedIndex+horizontal));active.dispatchEvent(new Event('change'));}
@@ -127,20 +152,25 @@ export function createFrontEnd({garage,onSettings,onPreview,tracks}){
    }
   }padHeld=held;
  }
- settings();drawGarage();show('home');$('front-loading')?.remove();
- return {profile,gamepad,show,depart(world){
-   if(world==='necros'){if(necros())$('campaign-enter').click();return;}
-   if(world!=='vitrum'||!tracks.track18)return;
-   event('race');$('track-select').value='track18';$('track-select').dispatchEvent(new Event('change'));
-  },get view(){return view;},get preview(){return preview;},get visible(){return document.body.classList.contains('in-menu');},
-  open(){bonusRun=null;show('home');},
-  begin(trackKey,revision,config){stopPreview();const laps=normalizeRaceLaps(config.laps);bonusRun={event:$('race-mode-select').value,entrants:5,difficulty:config.difficulty,handling:config.handling,assist:config.assist};const standard=$('race-mode-select').value!=='race';const spec=loadout(profile,standard);recordRun=!standard?{key:[trackKey,revision,config.difficulty,config.handling,config.assist,config.combat,spec.ship,profile.module,...(laps===3?[]:[`laps${laps}`])].join('|'),name:tracks[trackKey].name,label:[`${laps} laps`,config.difficulty,config.handling,'assist '+config.assist,config.combat?'combat':'clean',spec.ship,profile.module].join(' · '),length:createTrackCurve(tracks[trackKey].data).getLength(),laps}:null;run=campaign&&trackKey===NECROS_TRACK_ID&&!standard?{length:recordRun.length,laps,difficulty:config.difficulty,key:[revision,config.difficulty,config.handling,'assist '+config.assist,config.combat?'combat':'clean',spec.ship,profile.module,...(laps===3?[]:[`laps${laps}`])].join('|')}:null;document.body.classList.remove('in-menu');root.hidden=true;return {...spec,paint:PAINTS.find(p=>p.id===profile.paint)?.color};},
+ settings();drawGarage();show(tourSession.state.location==='bus'?'bus':'home');$('front-loading')?.remove();
+ return {profile,gamepad,show,tourSession,markZoneIntro(id){profile.visitedZoneIntros[id]=true;persist();},setBusReturn(handler){busReturn=handler;},setBusBack(handler){busBack=handler;},depart(world){
+   if(world==='necros'){if(necros()){carrierSetup=true;tourSession.location('setup');$('campaign-enter').click();}return;}
+   const destination=tourTrackKey(world,tracks);if(!destination)return;
+   carrierSetup=true;tourSession.location('setup');event('race');$('track-select').value=destination;$('track-select').dispatchEvent(new Event('change'));
+  },get isBusGarage(){return view==='garage'&&garageFromBus;},get workshopTransition(){return workshopTransition;},get view(){return view;},get preview(){return preview;},get visible(){return document.body.classList.contains('in-menu');},
+  open(){bonusRun=null;run=null;recordRun=null;if(carrierRace){carrierRace=false;carrierSetup=false;tourSession.returnToHangar();busReturn?.();show('bus');}else show('home');},
+  begin(trackKey,revision,config){carrierRace=carrierSetup||carrierRace;carrierSetup=false;tourSession.location(carrierRace?'race':'home');$('menu-button').textContent=carrierRace?'RETURN TO TOUR BUS':'MAIN MENU';const pauseReturn=$('pause-menu-button');if(pauseReturn)pauseReturn.textContent=carrierRace?'ABANDON RACE · TOUR BUS':'ABANDON RACE · MENU';stopPreview();const laps=normalizeRaceLaps(config.laps);bonusRun={event:$('race-mode-select').value,entrants:5,difficulty:config.difficulty,handling:config.handling,assist:config.assist};const standard=$('race-mode-select').value!=='race';const spec=loadout(profile,standard);recordRun=!standard?{key:[trackKey,revision,config.difficulty,config.handling,config.assist,config.combat,spec.ship,profile.module,...(laps===3?[]:[`laps${laps}`])].join('|'),name:tracks[trackKey].name,label:[`${laps} laps`,config.difficulty,config.handling,'assist '+config.assist,config.combat?'combat':'clean',spec.ship,profile.module].join(' · '),length:createTrackCurve(tracks[trackKey].data).getLength(),laps}:null;run=campaign&&trackKey===NECROS_TRACK_ID&&!standard?{length:recordRun.length,laps,difficulty:config.difficulty,key:[revision,config.difficulty,config.handling,'assist '+config.assist,config.combat?'combat':'clean',spec.ship,profile.module,...(laps===3?[]:[`laps${laps}`])].join('|')}:null;document.body.classList.remove('in-menu');root.hidden=true;return {...spec,paint:PAINTS.find(p=>p.id===profile.paint)?.color};},
   finish(position,time,bestLap,completed=false){
    const bonus=awardConsolation(profile,{...bonusRun,position,time,completed});bonusRun=null;
    $('bonus-result')?.remove();
-   if(bonus.length){persist();const p=document.createElement('p');p.id='bonus-result';p.textContent='YOUR SACRIFICE HAS BEEN APPROVED. · Unlocked: The sacrifice · Visit Garage.';$('results-screen').querySelector('.results-details').append(p);}
-   if(recordRun){const saved=saveRaceResult(localStorage,{...recordRun,position,time,bestLap});const medal=timeMedal(time,recordRun.length,recordRun.laps);recordRun=null;const p=document.createElement('p');p.id='race-record-result';p.textContent=`${medal?medal+' TIME MEDAL · ':''}${saved?.improved?'NEW PERSONAL BEST':saved?.delta!=null?'PB +'+saved.delta.toFixed(2)+'s':'RESULT RECORDED'} ${saved?.error??''}`;$('results-screen').querySelector('.results-details').append(p);}
-   if(!run)return;const fresh=awardCampaign(profile,{...run,position,time,medal:timeMedal(time,run.length,run.laps)});run=null;persist();drawMusic();const p=$('career-result')??document.createElement('p');p.id='career-result';p.textContent=`NECROS CAMPAIGN · ${fresh.length?'UNLOCKED: '+fresh.map(id=>TROPHIES.find(t=>t.id===id).name).join(' / '):'RESULT RECORDED'} · Next: ${TROPHIES.find(t=>!profile.trophies.includes(t.id))?.description??'All challenges complete: Necron Crimson Citadel + Vi lever inte unlocked.'} · Visit Garage & Trophies. ${$('profile-status').textContent}`;$('results-screen').querySelector('.results-details').append(p);},
+   if(bonus.length){persist();const p=document.createElement('p');p.id='bonus-result';p.textContent='YOUR SACRIFICE HAS BEEN APPROVED. · Unlocked: The sacrifice · Visit Garage.';$('results-screen').querySelector('.results-details').append(p);if(progressStorage.flush)progressStorage.flush().catch(()=>{p.textContent+=' Progress could not be saved. Keep this session open.';});}
+   if(recordRun){const saved=saveRaceResult(progressStorage,{...recordRun,position,time,bestLap});const medal=timeMedal(time,recordRun.length,recordRun.laps);recordRun=null;const p=document.createElement('p');p.id='race-record-result';p.textContent=`${medal?medal+' TIME MEDAL · ':''}${saved?.improved?'NEW PERSONAL BEST':saved?.delta!=null?'PB +'+saved.delta.toFixed(2)+'s':'RESULT RECORDED'} ${saved?.error??''}`;$('results-screen').querySelector('.results-details').append(p);
+    if(!saved?.error&&progressStorage.flush){const label=p.textContent;p.textContent=label+' Saving record…';progressStorage.flush().then(()=>{p.textContent=label+' Saved.';},()=>{p.textContent=label+' Record could not be saved. Keep this session open.';});}
+   }
+   if(!run)return;const fresh=awardCampaign(profile,{...run,position,time,medal:timeMedal(time,run.length,run.laps)});run=null;persist();drawMusic();const p=$('career-result')??document.createElement('p');p.id='career-result';p.textContent=`NECROS CAMPAIGN · ${fresh.length?'UNLOCKED: '+fresh.map(id=>TROPHIES.find(t=>t.id===id).name).join(' / '):'RESULT RECORDED'} · Next: ${TROPHIES.find(t=>!profile.trophies.includes(t.id))?.description??'All challenges complete: Necron Crimson Citadel + Vi lever inte unlocked.'} · Visit Garage & Trophies. `; $('results-screen').querySelector('.results-details').append(p);
+   if(progressStorage.flush){const label=p.textContent;p.textContent=label+' Saving progress…';progressStorage.flush().then(()=>{p.textContent=label+' Saved.';},()=>{p.textContent=label+' Progress could not be saved. Keep this session open.';});}
+  },
+  saveProfile:persist,
   dispose(){trailer.pause();garage.dispose();}
  };
 }

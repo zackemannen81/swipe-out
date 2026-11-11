@@ -1218,3 +1218,171 @@ Catch-up suite 7/7; difficulty suite 5/6: Elite now beats Pilot, but existing
 Pilot-faster-than-Rookie assertion fails. Latest Foundry means: Rookie 111.271 s,
 Pilot 111.446 s, Elite 105.378 s. Remaining Rookie/Pilot ordering needs later tuning.
 Build passes with existing bundle-size warning. Player feel still needs playtest.
+
+## 2026-11-10 — TOUR-ZONES-001
+Five existing stations now belong to separate rooms following the supplied
+carrier plan. The hangar retains docks, shuttles, crane and cargo. Service pad,
+player craft and terminal moved to the workshop; Nexus, lounge and observation
+moved into independent room shells with preserved object IDs and asset loading.
+All sixteen zones have locations/decks and connection IDs; five are available.
+Diplomacy Corridor is a logical transit node. Camera cuts occur only under full
+fade, or immediately with reduced motion. History supports Escape/footer/gamepad
+Back. Garage entered from the bus returns to the same workshop station.
+No profile schema, track storage, audio engine or race-physics changes.
+See TOUR_BUS_ZONES.md for asset needs and limits; room art remains simple geometry.
+Validation: 10 focused scene/navigation/career tests pass, including every ordered
+station pair and full-mask-only camera cuts. Production build passes with the
+existing large-chunk warning. Isolated Chrome passes five stations, garage return,
+footer/Escape history, Vitrum actual race/departure, missing and seeded Necros,
+mobile viewport and reduced motion with no page exceptions. Five room screenshots
+visually inspected. Profile persistence covered by career tests; no listening or
+physical gamepad/mobile performance test, and no full racing-suite rerun.
+
+## 2026-11-10 — TOUR-LOOP-001
+M1-07 carrier round-trip implemented. Nexus-origin races return to hangar after
+results or abandonment; retries retain origin. Setup Back returns to Nexus.
+Ordinary menu races still return home. Result/pause buttons name the destination.
+Per-tab sessionStorage restores station/world on reload; interrupted setup goes
+to briefing and interrupted carrier race to hangar, never an automatic award.
+Malformed/blocked session storage falls back safely; career and track schemas
+unchanged. Garage return and existing navigation retained.
+Validation: 12 focused tests and production build pass (existing chunk warning).
+Isolated Chrome passes station/world reload, setup Back, abandonment without
+new trophies, real finish handler and result return, retry origin, in-race reload
+and ordinary-race isolation; zero page exceptions. Finish was driven with a
+controlled terminal distance, not a full manual race. No physical-device test.
+M1 art replacements and zone audio remain open; this does not complete all M1.
+
+## 2026-11-10 — TOUR-AUDIO-001
+Copied all supplied tourbus media (20 MP3 + README, 76,206,633 bytes) with matching
+source hashes. Generated 18 exact scripts from README; recordings 00–09 exist,
+10–16 and 16B are absent. All five navigable rooms have recordings. First arrival
+shows Welcome Aboard, then settled-room intro, persisted as visitedZoneIntros.
+Holographic scrollable transcript supports Space/Enter skip, Escape dismissal,
+Play Voice retry, and archive replay of discovered intros. Archive is an overlay,
+not a new 3D room. All nine music/hymn tracks and standalone announcement are
+available manually; five room defaults reuse supplied tracks. Music ducks to 18%
+under speech; music/SFX/mute settings apply. Navigation, hidden tab and leaving
+hub stop voice; leaving/hidden tab pause music. Race audio remains separate.
+Validation: all 20 MP3s decode, copied hashes match, 15 targeted tests and build
+pass (existing chunk warning). Chrome passes actual voice playback/ducking,
+first-visit flags, settled trigger, skip, navigation interruption, keyboard archive
+replay/Play Voice, music/announcement selection, reload, mute, mobile layout and
+leaving hub; no page or tourbus HTTP errors. Desktop/mobile screenshots inspected.
+Physical audio listening/mix and gamepad device testing remain author checks.
+Some supplied narration mentions future facilities; those are not implemented.
+See TOUR_BUS_AUDIO.md for missing recordings and exact playback boundaries.
+
+## 2026-11-10 — TOUR-AUDIO-002
+Added supplied voices 10–15 with exact source hashes and successful FFmpeg decode.
+Manifest now links 00–15. 16/16B intentionally await Zacke's personal surprise
+narration; no replacement speech or premature zone access. Public audio set now
+contains 26 MP3 + README (87,067,935 bytes). Manifest assertions and production
+build pass (existing chunk warning). Playback code and unbuilt-room access unchanged.
+
+## 2026-11-10 — TOUR-WORKSHOP-001
+Garage opened from Service Bay now remains in the carrier shell: room navigation,
+crew archive and presentation remain visible; header reads SERVICE BAY / Deck 03 /
+Your Workshop. Same background, craft framing and customization implementation.
+Music and voice remain on the same media elements and continue through the local
+160/180 ms fade. Reduced motion switches immediately. Back/Escape returns to the
+platform; room buttons leave the work view and follow the existing graph. Standalone
+home-menu garage remains separate, with original heading and no bus audio.
+15 targeted tests and production build pass (existing chunk warning). Chrome checks
+voice/music continuity, fade, crew overlay, paint selection/persistence, Back/room
+navigation, reduced motion, mobile controls and standalone isolation: pass, no page
+errors. Desktop/mobile screenshots inspected. Physical gamepad/mobile audio untested.
+
+## 2026-11-10 — TOUR-ART-REVIEW-001
+Reviewed all 29 images in Desktop/tourbus/artwork and documented proposed zone
+uses in TOUR_BUS_ARTWORK.md. Images 11/12 are SHA-256-identical. Observation and
+hangar concepts are direct environment references; pilots/posters suit later
+lounge/Nexus work. Late-story imagery remains reference-only. No runtime assets
+or behavior changed; existing garage retained. Build not needed for this review.
+
+## 2026-11-10 — TOUR-OBSERVATION-001
+Replaced zone 06 box-room presentation with a modeled 34×34 m observation deck:
+elliptical vaulted shell, three interior ribs, layered 32 m panorama frame,
+curved 1.15 m rail, panel-jointed floor, warm/cool strips and an entry threshold.
+Added eight named replacement slots: four planter/foliage assemblies, two benches
+and two consoles. Existing planet/moon/world switch retained; camera reframed to
+show architecture. Existing TB-ROOM-06 / WINDOW-01 / RAIL-01 / DOOR-06 IDs kept.
+No external art, GLB or PBR maps imported. Procurement guide and machine-readable
+slot manifest in OBSERVATION_DECK_ASSETS.md and OBSERVATION_DECK_SLOTS.json.
+16 focused tests pass, including grounded slots, finite geometry, centre sightline,
+resource disposal and navigation/audio/profile regressions. Build passes with
+existing chunk warning. Chrome verifies actual room, Necros/Vitrum, mobile and Back
+without page errors; screenshots inspected. Physical-device FPS not measured.
+Furniture/vegetation are proxies; Vitrum retains the existing plain planet.
+
+## 2026-11-11 — TOUR-STAGES-001
+Imported all three supplied authored previews as track19 Necros, track20 Vitrum,
+track21 Collective; available in game/editor and Nexus. Necros uses existing
+campaign; others use open races. Collective selection persists. Old built-ins,
+browser saves and records retained. Original source exports untouched; embedded
+media extracted byte-identically, verified by hash and recursive source parity.
+21 targeted tests pass; production build passes (existing chunk-size warning).
+Chrome launches all three real races, waits for every GLB, checks no model/page
+errors and returns each to carrier hangar. Editor exposes all three entries.
+Screenshots inspected. Full suite: 171 pass, 6 fail in catch-up, Foundry/Necros
+physics and hull appearance tests; not a clean global suite. These areas were not
+modified by this import. Full laps/balance/device performance not certified.
+Collective observation planet is still a simple purple placeholder.
+
+## 2026-11-11 — AMBIENT-PARTICLES-001
+Connected existing ambient-particles.js to every non-Vitrum track. Removed the
+Collective-only authored-ID gate (supplied Collective shares synthetic-dreams ID).
+Race and flyover update time/speed uniforms; race pause freezes animation. Editor
+scenery-preview controls it alongside spores. Vitrum keeps its original effect.
+Particle counts/palette/shaders and all authored track data/physics unchanged.
+Two focused Node tests pass, build passes with existing chunk warning. Chrome
+checks Necros/Collective live uniforms, pause freeze, GLB loading and carrier
+return; separate editor preview on/off passes. No page errors. Both race screenshots
+inspected. Physical-device performance not measured; broader unrelated tests not rerun.
+
+## 2026-11-11 — User playtest acceptance
+User reports successful Rookie and Elite playtests, a close Elite win, and exactly
+right particle density. Preserve current authored tracks, handling and particle art.
+This is user-reported playtest evidence, not a new automated balance certification.
+
+## 2026-11-11 — PROGRESS-SAVE-001
+Screenshot showed 'Record could not be saved'. Exact user-browser cause unverified;
+code previously depended solely on localStorage for race records and career.
+Added progress-storage adapter for career and race records: in-memory session view,
+ordered versioned snapshots in localStorage and separate IndexedDB database,
+latest timestamp chosen on load, legacy values used when no snapshot exists.
+Original local saves and tracks are not deleted or overwritten. UI waits for at
+least one durable write before reporting Saved; both-store failure remains visible.
+Profile paths include settings, garage, intros, rewards and pause soundtrack changes.
+10 focused Node tests pass. Chrome simulates full localStorage, verifies profile
+and result persistence after reload, then blocks both stores and verifies errors.
+No page errors. Final production build passes with existing chunk-size warning.
+Tests use a controlled frontend result, not a newly completed full race. Past failed
+writes cannot be recovered from the screenshot automatically. No balance changes.
+
+## 2026-11-11 — TOUR-BLOCKOUT-001
+All 15 public carrier zones are now visitable. Added market, diplomacy corridor,
+quarters, Medbay, archive, engineering, cargo, shuttle bay, security and museum
+shells with distinctive proxy interiors and named replacement groups. Restricted
+zone 16 has a sealed shell and remains unreachable; no 16/16B reveal or narration.
+Five shortcuts retained; accessible room select lists all public stations, new-room
+panels offer adjacent destinations. Existing intro/voice/archive pipeline covers
+new arrivals. Session storage derives valid stations from the shared view registry.
+Only current-zone geometry/point lights (plus sky) render; existing observation,
+garage and imported hangar assets preserved. 143 registered replacement groups.
+TOUR_BUS_ASSET_LIST.md is the whole-ship procurement guide (shared kit + each zone).
+10 focused tests pass, production build passes with existing chunk-size warning.
+Chrome visits all ten new rooms, verifies reload, Medbay narration, mobile selector
+and Back without page errors. All screenshots inspected; archive/cargo cameras
+were moved out of the shelf foreground and browser checks rerun successfully.
+This is camera-station blockout, not free walking, final materials, trade, treatment,
+security gameplay or physical-device performance validation.
+
+## 2026-11-11 — TOUR-ASSET-COLLECTION-001 (in progress)
+User requests one candidate per needed type; genuinely unavailable types get a
+Meshy/ComfyUI generation list. Created Desktop/tourbus/assets with procurement docs,
+object manifest and ATT_GENERERA.md. Copied existing Leafy Fern download unchanged:
+7,209,404 bytes, 84,201 triangles, 1 material. Source hash recorded; original retained.
+This is a candidate needing optimization/license verification, not an integrated model.
+CUA and node_repl cannot initialize (kernel assets path missing, OS error 3); Browser
+MCP has no connection. No new remote downloads; all remaining types are unsearched.

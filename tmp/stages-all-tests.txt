@@ -1,0 +1,313 @@
+✔ announcer prioritizes and preempts only for imminent missiles; bounded deduplicated queue (4.9444ms)
+✔ announcer expiry, cooldown, pause, reset and countdown protection (0.7323ms)
+✔ missing clips do not block ready clips and stale downloads never speak (0.5355ms)
+✔ volume defaults, clamps, storage failures and mute clear speech (0.7204ms)
+✔ every integrated voice has an actual WAV asset (4.2976ms)
+✔ swipeout: banking follows steering regardless of sideslip direction (20.3725ms)
+✔ wipeout: banking follows steering regardless of sideslip direction (10.2734ms)
+✔ Swipeout chase does not kick a surface-bound hull vertically on original Vitrum rises (before intentional stunts) (115.2309ms)
+✔ career unlocks earned from campaign finishing, podium and Elite win; replay is idempotent (7.1862ms)
+✔ locked choices and malformed persistence fall back; earned loadout survives reload; standards isolate upgrades (5.3445ms)
+✔ all five Necros challenges unlock craft and soundtrack; partial/old profiles normalize correctly (1.0568ms)
+✔ preview grants only the two mastery rewards, persists, and never fakes trophies (1.0532ms)
+✔ The sacrifice requires completed last place, automatic full assist and Rookie in a race (1.0923ms)
+✔ GOA by ME is selectable and persists as an allowed soundtrack (0.4292ms)
+✔ race lap options persist and invalid values fall back to three laps (1.693ms)
+✖ 2/8-second thresholds and smooth target stay inside the agreed 0–8% range (6.017ms)
+✔ player and all CPU slots receive identical help at identical gaps; leader stays unchanged (2.1764ms)
+✔ smoothing matches at 30/60/120 Hz, fades out gradually and pauses without changing state (2.8992ms)
+✔ gap includes laps, ignores leader boost/crash speed, and clamps finished victory laps (0.5311ms)
+✖ extra speed is attainable for player and CPU through acceleration, with braking and wall loss intact (122.411ms)
+✖ physical pads combine multiplicatively with catch-up for both player and CPU (1.5494ms)
+✔ CPU catch-up respects braking for nearby traffic (2.4464ms)
+✔ cathedral kit resolves to six available external GLB files (4.3069ms)
+✔ staging six cathedral pieces keeps track JSON small and importable (7.4202ms)
+✔ X/touch request deflects homing at 30/60/120 Hz without damage; same cooldown (168.9892ms)
+✔ CPU uses same flare window, cooldown and homing-only rules (36.2536ms)
+✔ pause, inactive, disabled, retry, recovery and finished eligibility (9.1204ms)
+✔ impact/flare visuals are bounded, fade, expire and dispose (21.0305ms)
+✔ difficulty settings survive reload and safely reject unavailable/corrupt storage (2.8886ms)
+✔ level reset retains tuned physical performance and freezes decisions when inactive (10.7126ms)
+✔ shortcut decisions reflect level and personality, are repeatable and vary by lap (7.4957ms)
+✔ Difficulty catch-up caps apply equally to player and CPU (14.5775ms)
+✔ drivers wait behind blocked passing lanes and use a clear lane when available (8.0384ms)
+✔ all difficulties complete Foundry with jumps and boosts; Elite beats Rookie by driving (7331.9914ms)
+✔ circuit CPU calibration scales speed, acceleration and braking without changing factory definitions (0.6023ms)
+✔ three rounds score once, medals and best finish survive reload (5.3367ms)
+✔ interrupted race resumes same round and fixed settings (0.5643ms)
+✔ all actual finish times beat DNF; DNF uses distance and earns no points (1.9306ms)
+✔ ties use countback then most recent race, deterministic even for equal finish times (0.6281ms)
+✔ invalid storage/settings/results rejected and write failure retains session (2.1433ms)
+✔ Swipeout remains default; classic keeps an offset and heading instead of centering (31.6475ms)
+✔ classic rail impact cannot start an uncommanded wall-to-wall oscillation, on either side or at 30/60/120 Hz (336.6906ms)
+✔ classic contact preserves deliberate escape steering and cooldown contact stops only outward motion (1.6419ms)
+✔ after a classic wall hit a short steer-away followed by straightening is controllable without another hit (38.6235ms)
+✔ countersteer decelerates rotation faster; analog steering and airbrakes are independent (5.4037ms)
+✔ classic dynamics agree at 30/60/120 Hz, pause freezes, recovery resets transient state (60.2051ms)
+✔ classic player launches and lands both Foundry gaps at normal and boosted speed (74.2791ms)
+✔ classic input-driven lap retains gates, branches, walls, gaps and reset integration (1111.6605ms)
+✔ classic chase/cockpit follow heading, exclude hull roll from chase, and stay local through loops (50.4973ms)
+✔ preferences are independent and safe with malformed/unavailable storage; R2 never accelerates classic (5.6363ms)
+✔ classic weapons follow the nose while Swipeout keeps its existing track-forward aim (4.0433ms)
+✔ multi-select is sorted and excludes stale indexes (5.4547ms)
+✔ multi-copy and paste preserve exact transforms while giving unique IDs (2.5587ms)
+✔ paste rejects object and point light capacity overflow (1.1697ms)
+✔ glow responds to kick, scales safely, and restores its original baseline (140.7432ms)
+✔ new saved preferences default safely and gold time unlocks its finish (1.9903ms)
+✔ records preserve best time and lap, isolate configuration and report storage failures (1.2223ms)
+✔ audio preferences independently control music/effects and preserve voice on unmute (11.498ms)
+✔ Necros gets distant animated patrols and raised amber warning signs (244.6581ms)
+✔ race time medals scale with selected lap count (0.7356ms)
+✔ Foundry is portable v3 content with compact local delivery assets and a useful shortcut (155.352ms)
+✔ both jumps land from normal race to boosted speed, and a slow miss recovers safely (214.9559ms)
+✔ player physics completes main and shortcut races with all six landings and ordered laps (932.4532ms)
+✖ all four CPU profiles finish Foundry using both paths, real boosts and contacts (3557.3066ms)
+✔ scenery clears the entire racing deck and camera-height envelope on both paths (458.1683ms)
+✔ scenery shares static GPU assets, isolates scrolling and disposes once on rebuild (27.1001ms)
+✔ GLB v6 roundtrip, old v5 compatibility and invalid imports (9.9663ms)
+✔ GLB instances load shared geometry with independent editable transforms and dispose (219.8109ms)
+✔ mirrored bend drift cannot rotate or reverse a held inward heading (9.0707ms)
+✔ with neutral nose, curvature still pushes the whole ship outward (1.5519ms)
+✔ both handling modes gain downhill momentum, lose uphill speed and coast on flat (258.1919ms)
+✔ engine has a limit, momentum does not; brakes and expired boost do not teleport speed (170.0994ms)
+✔ CPU keeps downhill overspeed on clear straights under the shared physics (148.8642ms)
+✔ magnetic adhesion does not eliminate unassisted outward drift (51.5254ms)
+✔ Necros is an object-free continuous ordered route with a steep dive (181.4808ms)
+✔ Necros CPU field finishes three laps at each difficulty (6413.728ms)
+✖ Necros player traverses the dive and completes three ordered laps (615.8384ms)
+✔ intro restores chase pose, converges without a cut and ends once at 30/60/120 Hz (41.7883ms)
+✔ skip and reduced motion end at supplied chase pose; restart clears skip (4.3844ms)
+✔ CPU profiles accelerate gradually to their own caps without player-distance rubber-banding (296.564ms)
+✔ shared boost pads require lane/height contact, sweep fast crossings and reset per lap (1.0044ms)
+✔ wall contact bounces and slows both types, honors width and avoids repeated damage (1.0544ms)
+✔ rear impact transfers speed to both racers and persists into the next physics tick (2.3424ms)
+✔ side contact respects mass, CPU/CPU collisions and separating contact has no extra impact (0.8725ms)
+✔ swept collision catches a fast pass-through, but vertically separated craft do not collide (3.3485ms)
+✔ CPU 30/60/120 Hz simulation stays consistent; pause/finish/reset are complete (62.0511ms)
+✔ on the real Neon Causeway all CPU racers collect pads, recover from walls and finish (1440.7118ms)
+✔ CPU finish distance follows selected race laps instead of always three (1.5761ms)
+✔ v3 branch round-trip, v1/v2 compatibility and invalid topology rejection (15.4658ms)
+✔ branch endpoints/frames join main road and shorter distance gives a real time saving (67.6668ms)
+✔ pads belong to a route, ordered gates reject skipped sectors and state resets (55.0523ms)
+✔ all CPUs race both routes and finish three validated laps with contacts and pads (1834.2169ms)
+✔ equal section progress gets equal catch-up; recovery after a fork uses the shared merge (12.3804ms)
+✔ rockets hit swept hulls at 30/60/120 Hz; damage persists and moving aside dodges (143.0856ms)
+✔ homing requires continuous visible lock, warns its target and can lose sight (12.0627ms)
+✔ finite ammo, rate limits, shared hit protection and bounded projectile/effect resources (63.624ms)
+✔ combat off, pause, finish/retry and airborne knockback preserve lifecycle rules (14.7874ms)
+✔ lights and motion roundtrip, legacy reading and malformed limits (10.1064ms)
+✔ light illumination, world-space motion, reset and transform reuse (13.255ms)
+✔ spin and orbit retain authored pose at zero and loop without drift (4.8192ms)
+✔ Necros rail materials use blood red while other tracks retain cyan (206.4352ms)
+✔ embedded GLB clip loops independently and mixer is released on disposal (171.7001ms)
+✔ ribbon core and halo narrow from full nozzle width to a fine aged tail (25.9456ms)
+✔ 30/60/120 Hz produce the same world-space wake and evenly staggered ages (165.3042ms)
+✔ idle stays visible; throttle and boost grow and decay smoothly (29.7364ms)
+✔ five ships fade after shutoff, reset without ghost trails, and release resources (69.5236ms)
+✔ turns, teleports, camera along exhaust, and long runs keep geometry finite and bounded (382.9759ms)
+✔ reward hulls switch between four/five red outlets and factory twin outlets without leaked wakes (31.8017ms)
+✖ only reward hulls use red; wider jets and enlarged Crimson outlets retain original CPU accents (6.9118ms)
+✔ out lap is unranked; three flying laps have interpolated identical timing/replay at 30/60/120 Hz (134.1894ms)
+✔ recovery invalidates only that lap; failed gates, discontinuities and a long lap cannot save (80.9296ms)
+✔ off-frame sector/finish crossings and quaternion interpolation do not quantize to render frames (28.8566ms)
+✔ pause repeats no samples, saved PB survives retry; slower lap never overwrites faster lap (9.6632ms)
+✔ record keys isolate geometry, handling, effective assist, ship and speed; camera is irrelevant (2.7862ms)
+✔ malformed/quota/unavailable storage is contained; in-memory best remains available (10.1923ms)
+✔ ghost slerps recorded orientation, fades on overlap, shares only geometry and never enters racer simulation (37.3135ms)
+✔ guide respects margins, transported surfaces, gaps and connected shortcut; bounded geometry releases resources (280.6171ms)
+✔ turn warning uses local signed curvature and pad guidance approaches a reachable pad (11.2976ms)
+✔ real classic physics records four Foundry laps with branches, gates, flight and a reloadable world-pose replay (1320.2794ms)
+✔ voice ducks music, end/skip restores mix, lifecycle pauses both, mute applies to both (24.8097ms)
+✔ failed autoplay retries only on gesture; stale voice rejection cannot alter next presentation (1.0061ms)
+✔ visited intros migrate conservatively and survive normalized profile saves (6.8903ms)
+✔ plan registry has sixteen locations, five destinations and valid reciprocal links (3.8055ms)
+✔ all station pairs cut only under full mask and settle exactly; rapid input is rejected (285.6874ms)
+✔ Tour Bus replacement inventory covers named groups and navigation has finite camera poses (257.5179ms)
+✔ observation has owned finite geometry, clear camera sightline and grounded replaceable slots (242.041ms)
+✔ carrier reload retains world and station; setup and race restore safe destinations (4.5032ms)
+✔ invalid/unavailable storage falls back safely and cannot introduce unknown destinations (1.0269ms)
+✔ three supplied stages retain authored identity and media are present and byte-verified (2413.6627ms)
+✔ shipped tracks do not overwrite saved legacy tracks or overrides; Collective session persists (150.4042ms)
+✔ v2 round-trips gaps/magnetic/banks, v1 and legacy remain non-magnetic (18.0381ms)
+✔ transported frames remain orthonormal/continuous at verticals, inversion, roll and lap seam (113.0259ms)
+✔ gap cuts exact road mesh boundaries and removes fixtures/pads throughout the opening (101.8635ms)
+✔ real launch momentum and world gravity are independent of the invisible gap centerline (8.0392ms)
+✔ normal/boosted jumps land; low-speed and sideways misses recover before the gap without phantom sweeps (113.9916ms)
+✔ 30/60/120 Hz agree on free flight, landing and magnetic loop traversal (380.6923ms)
+✔ airborne collision impulses change real flight velocity and recovery craft are excluded (2.3754ms)
+✔ all CPU profiles complete three laps on both feature tracks with real pads and contacts (2416.2357ms)
+✔ magnetic chase camera follows the local up direction through loops/rolls and snaps safely on recovery (25.0907ms)
+✔ magnetic camera filters abrupt bank changes and preserves reset/paused pose (1.1411ms)
+✔ texture alpha modes round-trip through export, storage and undo; versions 1–7 stay readable (169.6871ms)
+✔ every shipped track migrates and round-trips without losing geometry, scenery or textures (821.0793ms)
+✔ legacy optional fields and fourth-coordinate bank metadata survive migration (1.7448ms)
+✔ reject malformed, unsupported, degenerate and excessive track data with field-specific errors (5.6031ms)
+✔ mixed legacy/versioned library isolates corrupt records and safely loads built-in fallback (113.7526ms)
+✔ save/reset affect only the chosen track; invalid writes and quota failure preserve prior data (129.0371ms)
+✔ undo/redo retain scenery and edits independently of saved snapshots, and discard redo after new edits (1.4937ms)
+✔ history bounds large snapshots while keeping the most recent undo step (0.6837ms)
+✔ v9 editor settings survive JSON and storage; older circuit files remain valid (43.1294ms)
+✔ road presets and independent rail tint apply to actual road meshes (36.4441ms)
+✔ v4 round trips widths, authored pads and style; v3 keeps legacy semantics (78.564ms)
+✔ width interpolates at control points and closes smoothly; branch endpoints match main road (8.922ms)
+✔ mesh width matches physics at samples and narrowing walls actually collide (190.7602ms)
+✔ brakes are swept once per crossing at 30/60/120 Hz, can be missed, reset next lap (2.3574ms)
+✔ route pad footprint uses physical metres and ignores the main road (0.7087ms)
+✔ suggestions validate and remain opt-in; animation changes no hitboxes (191.2821ms)
+✔ all CPU levels finish three laps of variable-width workshop with branch/pads (2962.2843ms)
+✔ forest cutouts ship as real RGBA PNGs and use five instanced depth layers (203.7094ms)
+✔ full forest/curtain rectangles leave racing and camera space clear around the lap (660.8059ms)
+✔ world-fixed forest layers produce different parallax and adapt to edited routes (142.3936ms)
+✔ screen is Vitrum-only and its shared resources are released once on track disposal (1354.9381ms)
+✔ spores have bounded deterministic batches, immutable bases and pauseable uniforms (233.1401ms)
+✔ Vitrum round-trips editor data, ships self-contained models and safe off-centre pads (905.7613ms)
+✔ Vitrum has seven ordered sectors, a smooth full magnetic roll, descent and no road overlap (39.2178ms)
+✔ Vitrum CPU field finishes three laps on Rookie, Pilot and Elite without recovery (5080.2877ms)
+✔ Vitrum player completes ordered three laps with both handling modes and assistance off (1047.2185ms)
+✔ all supplied GLB bounds leave the full racing corridor clear (886.9087ms)
+✔ organic passages leave real ship space open inside their enclosing bounds (25237.1065ms)
+✔ empty start; pickup is a single replacing slot, no free ammo or reload (68.0453ms)
+✔ swept pickups match 30/60/120 Hz; side miss, airborne and recovery rejected (62.7351ms)
+✔ shared eight-second cooldown awards first crossing independent of racer order (49.6704ms)
+✔ fork and merge sweeps use correct route and physical pad length (11.2699ms)
+✔ v5 weapon metadata round-trips and old versions reject new fields; fallback validates on all tracks (2940.5996ms)
+✔ weapon pads are hidden outside combat, dim on pickup and reset on retry (25.9449ms)
+✔ CPU races seek, collect and fire finite weapons through the production update path (628.6318ms)
+✔ same equipped weapon is ignored without ammo refill, cooldown or announcer event (10.7506ms)
+✔ automatic weapon stations are single pads at doubled spacing (3.889ms)
+ℹ tests 177
+ℹ suites 0
+ℹ pass 171
+ℹ fail 6
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 36608.4093
+
+✖ failing tests:
+
+test at tests\catch-up.test.js:20:1
+✖ 2/8-second thresholds and smooth target stay inside the agreed 0–8% range (6.017ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 0.031111111111111107
+  - 0
+  
+      at TestContext.<anonymous> (file:///C:/code/swipe-out/tests/catch-up.test.js:22:10)
+      at Test.runInAsyncScope (node:async_hooks:228:14)
+      at Test.run (node:internal/test_runner/test:1118:25)
+      at Test.start (node:internal/test_runner/test:1015:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:358:17) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 0.031111111111111107,
+    expected: 0,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\catch-up.test.js:86:1
+✖ extra speed is attainable for player and CPU through acceleration, with braking and wall loss intact (122.411ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+  
+    assert.ok(player.physics.speed > 133 * 1.075 && player.physics.speed <= 133 * 1.08)
+  
+      at TestContext.<anonymous> (file:///C:/code/swipe-out/tests/catch-up.test.js:99:10)
+      at Test.runInAsyncScope (node:async_hooks:228:14)
+      at Test.run (node:internal/test_runner/test:1118:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:787:18)
+      at Test.postRun (node:internal/test_runner/test:1247:19)
+      at Test.run (node:internal/test_runner/test:1175:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:787:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at tests\catch-up.test.js:113:1
+✖ physical pads combine multiplicatively with catch-up for both player and CPU (1.5494ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+  
+    assert.ok(Math.abs(ship.speed - topSpeed * 1.08 * 1.3) < 1e-9)
+  
+      at TestContext.<anonymous> (file:///C:/code/swipe-out/tests/catch-up.test.js:118:12)
+      at Test.runInAsyncScope (node:async_hooks:228:14)
+      at Test.run (node:internal/test_runner/test:1118:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:787:18)
+      at Test.postRun (node:internal/test_runner/test:1247:19)
+      at Test.run (node:internal/test_runner/test:1175:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:787:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at tests\foundry.test.js:65:1
+✖ all four CPU profiles finish Foundry using both paths, real boosts and contacts (3557.3066ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+  
+    assert.ok(o.physics.routeEntries > 0 && o.physics.routeEntries < 3)
+  
+      at TestContext.<anonymous> (file:///C:/code/swipe-out/tests/foundry.test.js:76:12)
+      at Test.runInAsyncScope (node:async_hooks:228:14)
+      at Test.run (node:internal/test_runner/test:1118:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:787:18)
+      at Test.postRun (node:internal/test_runner/test:1247:19)
+      at Test.run (node:internal/test_runner/test:1175:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:787:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at tests\necros.test.js:34:1
+✖ Necros player traverses the dive and completes three ordered laps (615.8384ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+  
+    assert.ok(canFinishRace(curve, ship))
+  
+      at TestContext.<anonymous> (file:///C:/code/swipe-out/tests/necros.test.js:42:12)
+      at Test.runInAsyncScope (node:async_hooks:228:14)
+      at Test.run (node:internal/test_runner/test:1118:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:787:18)
+      at Test.postRun (node:internal/test_runner/test:1247:19)
+      at Test.run (node:internal/test_runner/test:1175:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:787:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at tests\thrusters.test.js:149:1
+✖ only reward hulls use red; wider jets and enlarged Crimson outlets retain original CPU accents (6.9118ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  0.775 !== 0.675
+  
+      at TestContext.<anonymous> (file:///C:/code/swipe-out/tests/thrusters.test.js:153:55)
+      at Test.runInAsyncScope (node:async_hooks:228:14)
+      at Test.run (node:internal/test_runner/test:1118:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:787:18)
+      at Test.postRun (node:internal/test_runner/test:1247:19)
+      at Test.run (node:internal/test_runner/test:1175:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:787:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 0.775,
+    expected: 0.675,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

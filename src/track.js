@@ -31,7 +31,6 @@ function addInstances(group, geometry, material, transforms) {
 export function createTrack(definition = NEON_CAUSEWAY) {
   const necros=/necros/i.test(definition.name??'');
   const vitrum=definition.id==='vitrum-neural-ascent';
-  const collective=definition.id==='collective-tellus';
   const curve = createTrackCurve(definition);
   const junctionClear = d => !curve.track.branches.some(b => [b.start,b.end].some(u => Math.abs(d-u*curve.getLength()) < 35));
   const group = new THREE.Group();
@@ -386,7 +385,7 @@ export function createTrack(definition = NEON_CAUSEWAY) {
   if(vitrum)group.add(createVitrumLighting(curve));
   if(vitrum)group.add(createVitrumSpores(curve));
 
-  if(collective)group.add(createAmbientParticles(curve));
+  if(!vitrum)group.add(createAmbientParticles(curve));
 
 return { group, curve, length: curve.getLength(), boostPads: boostPadPlacements, weaponPads };
 }

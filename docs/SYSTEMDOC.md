@@ -559,3 +559,77 @@ Load each source once, clone scene nodes, share immutable GPU resources and reta
 fallback primitives on failure. Imported group descriptions track provisional art.
 
 2026-11-04: Elite catch-up ceiling is now 8%, shared equally by player and CPU; this supersedes the earlier 2% cap. Thresholds and smoothing remain unchanged.
+
+## 2026-11-10 — TOUR-ZONES-001
+Tour Bus uses a shared 16-zone plan registry with five camera destinations,
+logical passage/lift connections and masked station transitions. Deck 3 holds
+hangar/workshop, deck 4 Nexus/lounge and deck 5 the separate observation room.
+Asset IDs and existing garage/world flows remain the integration boundaries.
+Diplomacy Corridor can be a transit node without a modeled corridor or camera.
+Unavailable future zones must not become selectable merely because registered.
+
+## 2026-11-10 — Tour Bus round-trip continuity
+Carrier session state is per-tab sessionStorage, separate from progression.
+A reload restores a settled hub destination, never a live race or award event.
+Races launched from Nexus retain carrier origin through retries and return to
+hangar after results/abandon. Ordinary menu launches retain home as their return.
+
+## 2026-11-10 — Tour Bus crew media
+Tour crew presentations use copied voices/README as exact script source and
+stable zone IDs (00 is welcome; 16B is restricted authorized-entry material).
+visitedZoneIntros is an optional normalized profile map, independent of rewards.
+Only settled playable rooms auto-present; discovered intros replay via archive.
+The tour-audio owner has separate music/voice elements, explicit lifecycle and
+18% music ducking; it must not take over race/trailer audio. No implicit download
+or fabricated speech for missing recordings; transcript remains usable.
+
+### Restricted-area narration casting
+User reserves room 16 and 16B recordings for their own voice, Zacke, as a surprise.
+Keep those audio slots pending until supplied; do not synthesize substitutes.
+
+## 2026-11-10 — Service Bay garage work view
+The existing photographic garage is the player's work view within Service Bay.
+OPEN GARAGE preserves carrier navigation, crew presentation and workshop music.
+A short fade changes presentation without changing the logical zone. Back returns
+to the service platform; another room selection follows the carrier graph.
+The standalone garage entry remains available from home. Existing customization,
+loadout rules, backdrop and craft composition remain the shared implementation.
+
+## Observation architecture
+Zone 06 uses its own procedural vaulted architecture module, registered through
+the existing scene asset/resource owner. Shared planet/world and navigation remain
+separate. OBSERVATION_SLOTS defines replaceable furniture positions; preserve those
+IDs when importing GLBs. The procurement guide owns proposed material/model needs.
+
+## 2026-11-10 — Supplied Tour stages
+The shipped stage library owns three separate entries (track19/20/21) for authored
+Necros, Vitrum and Collective previews. Nexus resolves through tour-destinations.js;
+Necros joins existing campaign logic, the others use open race. Original authored
+IDs are not library keys. Browser overrides remain authoritative per key.
+Embedded media is extracted losslessly by the import tool, with a source/asset hash
+manifest. Existing stage entries and records remain intact. See TOUR_STAGES.md.
+
+## 2026-11-11 — Ambient track particles
+Non-Vitrum track groups use the existing ambient-particles.js effect. Vitrum keeps
+vitrum-spores.js exclusively. Both are updated through the same race scenery clock
+(after the pause guard), flyover preview, and editor scenery-preview control.
+Particles are visual-only track-owned resources, disposed with the track group.
+Authored data, driving physics and particle palettes/counts remain unchanged.
+
+## Progress persistence
+Career and race records use progress-storage.js through the game/front-end owner.
+The adapter hydrates legacy values, then selects the newest versioned local/IndexedDB
+snapshot. Writes are ordered; synchronous profile/record helpers use the session
+cache, while UI observes flush() before claiming durable success. Either store can
+preserve progress independently. Failure of both retains session data with a visible
+warning. No old track/profile/record keys are erased. Time Attack storage is separate
+and unchanged by this task. This is local device storage, not cloud/account sync.
+
+## Whole-carrier blockout
+All public zones 01–15 have camera stations connected by the existing graph and
+masked passage/lift transitions. tour-blockout.js owns ten new room specifications
+and named proxy furnishings; tour-bus-zones.js remains navigation truth. Zone 16
+is sealed and unavailable. Room services beyond existing garage/Nexus/crew UI remain
+future work. Scene visibility and point lights follow the current zone to prevent
+adjacent-room occlusion and avoid illuminating all rooms at once. Asset procurement
+is tracked in TOUR_BUS_ASSET_LIST.md and the generated TOUR_BUS_OBJECTS manifest.

@@ -1,0 +1,131 @@
+{
+  "zoneId": "06",
+  "origin": [
+    -84,
+    24,
+    0
+  ],
+  "units": "metres",
+  "slots": [
+    {
+      "id": "TB-OBS-PLANTER-01",
+      "type": "planter",
+      "position": [
+        -8,
+        0,
+        -12
+      ],
+      "size": [
+        5,
+        1,
+        2.4
+      ],
+      "yaw": 0
+    },
+    {
+      "id": "TB-OBS-PLANTER-02",
+      "type": "planter",
+      "position": [
+        -8,
+        0,
+        12
+      ],
+      "size": [
+        5,
+        1,
+        2.4
+      ],
+      "yaw": 0
+    },
+    {
+      "id": "TB-OBS-PLANTER-03",
+      "type": "planter",
+      "position": [
+        5,
+        0,
+        -12
+      ],
+      "size": [
+        5,
+        1,
+        2.4
+      ],
+      "yaw": 0
+    },
+    {
+      "id": "TB-OBS-PLANTER-04",
+      "type": "planter",
+      "position": [
+        5,
+        0,
+        12
+      ],
+      "size": [
+        5,
+        1,
+        2.4
+      ],
+      "yaw": 0
+    },
+    {
+      "id": "TB-OBS-BENCH-01",
+      "type": "bench",
+      "position": [
+        0,
+        0,
+        -8
+      ],
+      "size": [
+        3,
+        0.9,
+        1
+      ],
+      "yaw": 1.5707963267948966
+    },
+    {
+      "id": "TB-OBS-BENCH-02",
+      "type": "bench",
+      "position": [
+        0,
+        0,
+        8
+      ],
+      "size": [
+        3,
+        0.9,
+        1
+      ],
+      "yaw": 1.5707963267948966
+    },
+    {
+      "id": "TB-OBS-CONSOLE-01",
+      "type": "console",
+      "position": [
+        -11,
+        0,
+        -7
+      ],
+      "size": [
+        1.4,
+        1.25,
+        0.7
+      ],
+      "yaw": 1.5707963267948966
+    },
+    {
+      "id": "TB-OBS-CONSOLE-02",
+      "type": "console",
+      "position": [
+        -11,
+        0,
+        7
+      ],
+      "size": [
+        1.4,
+        1.25,
+        0.7
+      ],
+      "yaw": 1.5707963267948966
+    }
+  ]
+}

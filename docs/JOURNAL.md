@@ -1082,3 +1082,140 @@ Catch-up suite 7/7; difficulty suite 5/6: Elite now beats Pilot, but existing
 Pilot-faster-than-Rookie assertion fails. Latest Foundry means: Rookie 111.271 s,
 Pilot 111.446 s, Elite 105.378 s. Remaining Rookie/Pilot ordering needs later tuning.
 Build passes with existing bundle-size warning. Player feel still needs playtest.
+## 2026-11-10 — TOUR-ZONES-001
+Implemented plan-based Tour Bus room separation, retaining existing object IDs,
+GLB assets, racer loadout, world selection and departure wiring. Added shared
+16-zone graph and five stations across decks 3–5. Diplomacy transit is logical;
+future zones stay unavailable. Short fade cuts mask all between-room relocation;
+back history is shared by Escape/footer/gamepad, and garage returns to workshop.
+Supplied overview received during implementation and used for all logical positions.
+Prior Vitrum task archived as unfinished, not claimed complete.
+10 targeted tests and build pass (existing chunk warning). Isolated Chrome checks
+all destinations, garage return, footer/Escape, Vitrum actual race and menu return,
+missing/seeded exact Necros track, mobile viewport and reduced motion: PASS, zero
+page errors. Screenshots inspected at tmp/tour-{hangar,workshop,briefing,lounge,
+observation,mobile}.png. First browser attempt was interrupted by development hot
+reload; final unchanged-source run passes. Physical devices/listening untested.
+Updated generated object inventory and model/audio recommendations; existing images
+suffice. Room shells are functional blockout, with detailed art left for later.
+
+## 2026-11-10 — TOUR-LOOP-001
+Selected GDD M1-07 as next step after accepted room separation. Added guarded
+per-tab Tour Bus session storage and carrier-origin setup/race/results routing.
+Preserves world/station on reload, resets interrupted races to hangar without
+awards, preserves origin through retry, and keeps ordinary menu return behavior.
+Existing game race/finish/countdown code unchanged; frontend owns return context.
+12 focused tests pass; build passes with pre-existing chunk-size warning.
+Browser tools/verify-tour-loop.mjs passes reload, setup Back, actual abandon,
+controlled real finish/result return, retry and regular-menu race isolation;
+zero page errors. Prior zone work remains intact and task archived.
+Remaining M1 work: final chosen GLB art and zone music/ambient announcements.
+
+## 2026-11-10 — TOUR-AUDIO-001
+Integrated user-supplied media and exact README scripts. All source copies hash
+match; 20 MP3 files decode. Actual recordings are 00–09; eight scripts lack audio
+(10–16, 16B), documented rather than assuming the user's estimate of five.
+Implemented first-arrival welcome/room transcript, normalized visited flags,
+holographic panel, skip/retry, discovered archive replay and room music ducking.
+Imported extra tracks are manually selectable; standalone announcement has no
+README transcript and is treated as audio-only. Future/locked rooms stay hidden.
+15 targeted tests/build pass; final Chrome flow passes actual playback, ducking,
+keyboard skip/archive/retry, navigation cancellation, saved flags, mute/mobile
+and leave-hub cleanup with zero page/media HTTP errors. Screenshots inspected.
+First browser attempt had an ambiguous test locator (nav and archive share a
+room title); scoped to archive, then reran successfully including keyboard checks.
+Listening quality and real devices remain unverified. Earlier race-flow harnesses
+seed visited intro flags so their Escape navigation assertions remain isolated.
+
+## 2026-11-10 — TOUR-AUDIO-002
+User supplied voices 10–15 and reserved 16/16B for personal Zacke narration.
+Copied six MP3s unchanged; regenerated manifest and updated coverage document.
+All six hashes match and full decoding succeeds, lengths 37.56–62.136 seconds.
+Manifest assertions verify 00–15 URLs and null 16/16B; build passes with existing
+chunk warning. No navigation, profile or playback-code changes.
+
+## 2026-11-10 — TOUR-WORKSHOP-001
+User approved making Open Garage feel like an interior Service Bay work view.
+Reused frontend garage and existing bus navigation/crew UI with contextual headings,
+local fade and continuous workshop audio. No new customization path or art changes.
+15 targeted Node tests/build pass. Isolated browser verifies same live media elements
+advance through the transition, paint persists after reload, Back/room navigation,
+reduced motion, mobile layout and standalone garage. Zero page errors; screenshots
+at tmp/workshop-integrated.png, workshop-crew.png and workshop-mobile*.png inspected.
+Initial harness attempted standalone home navigation in portrait and encountered the
+existing rotate-device overlay; final test uses desktop for that separate flow.
+Prior general bus test now awaits the local garage transition before assertions.
+
+## 2026-11-10 — TOUR-ART-REVIEW-001
+Inventoried and visually reviewed 29 supplied artwork images via three contact
+sheets. Recorded filenames, dimensions, proposed roles and exact duplicate pair.
+Recommended Observation as next environment pass, then hangar and pilot/poster
+presentation. No runtime import/replacement; no testing/build for documentation.
+
+## 2026-11-10 — TOUR-OBSERVATION-001
+User requested modeled observation architecture plus an asset shopping list for
+a future free-model GitHub connection. Used concept 29 for vaulted aperture,
+railing, vegetation placements and warm lighting, preserving existing world systems.
+Implemented via shared Tour Bus helpers/resource owner in src/tour-observation.js.
+Updated object inventory (67 groups), camera and prior browser camera expectation.
+Delivered detailed model/texture priorities, searches, slot IDs, local/world
+coordinates, sizes, import guidance and JSON slots. No repo access needed yet.
+16 Node tests/build pass. Browser Necros/Vitrum/mobile/Back checks pass with no
+page errors; screenshots tmp/observation-{necros,vitrum,mobile}.png inspected.
+This is architecture with colored materials/proxy props, not final textured art.
+
+## 2026-11-11 — TOUR-STAGES-001
+Integrated three Desktop stage exports with separate library keys because Necros
+and Collective share an authored ID. Import validates v9 and exact field parity;
+content-addressed extracted PNG/JPEG/GLB files avoid large embedded JSON strings.
+Nexus now offers all three and uses existing campaign/open-race navigation.
+Verification: 21 targeted tests pass; build passes; all three real Chrome races
+load all GLBs without page/model errors, return to hangar, and appear in editor.
+Screenshots tmp/stage-{necros,vitrum,collective}.png inspected. Initial browser
+wait used Playwright timeout in the argument slot; corrected to the third argument
+and reran successfully. Vitrum is dense; no device-performance claim.
+Broader suite: 177 tests, 171 pass, 6 fail (3 catch-up, Foundry path traversal,
+Necros dive completion, hull accent expectation). Import does not change these
+physics/render modules; failures documented rather than changing game balance.
+Desktop originals and prior library/browser data preserved. See TOUR_STAGES.md.
+
+## 2026-11-11 — AMBIENT-PARTICLES-001
+User confirms the three stages play as intended and requests connection of their
+existing ambient effect instead of physics work. Kept their module intact, enabled
+on non-Vitrum tracks, added game/flyover/editor uniform updates. Existing Vitrum
+spores remain exclusive. Tests verify actual group construction, disposal and
+immutable positions; browser verifies real race animation/pause and editor toggle.
+2 targeted tests/build pass; Chrome Necros/Collective and editor pass without page
+errors, screenshots inspected. Test hook was corrected to read the current rebuilt
+track through a getter rather than the startup track. No gameplay changes.
+
+## 2026-11-11 — PROGRESS-SAVE-001
+User approved particle density and reported Rookie/Elite playtests and a close win.
+Selected the screenshot's explicit record-write error as the next concrete fix.
+Added ordered dual-store snapshots for career/race records, legacy read-through,
+async success/error feedback, and pause-soundtrack persistence via the shared owner.
+Retained original local data. No changes to track art, difficulty or particles.
+10 tests pass (career plus quota/reload/legacy/order/failure recovery cases).
+Chrome injected QuotaExceededError and confirmed result/profile survive reload via
+IndexedDB; both stores blocked reports failure, with no page errors. Controlled
+frontend finish used for persistence verification. Build passes with chunk warning.
+Exact cause on user's active browser remains unknown; no claim of recovered old time.
+
+## 2026-11-11 — TOUR-BLOCKOUT-001
+User collects assets while development completes whole-carrier blockout and shared
+procurement list. Added ten public rooms and sealed restricted volume; kept the
+five established scenes, real imported assets and garage flow. Added public room
+select, adjacent links, shared session validation and existing supplied intros.
+Current-zone geometry/light visibility limits render work. Generated 143 object
+entries and delivered room-by-room/shared-kit asset guide with candidate handoff.
+10 focused tests/build pass. Browser visits all new rooms, reloads museum, triggers
+Medbay first visit, checks mobile and Back without errors. Inspected all room images;
+corrected archive/cargo camera obstructions then reran browser checks. No final
+material/lighting pass, room-service gameplay or free-walking implementation.
+
+## 2026-11-11 — TOUR-ASSET-COLLECTION-001
+Clarified one candidate per asset type, with separate generation backlog. Browser
+initialization failed in both CUA and node_repl; Chrome connector also unconnected.
+Prepared external candidate folder and copied user's already-downloaded Leafy Fern,
+verified exact SHA-256 and parsed GLB metadata. Did not label unsearched types as
+missing or claim downloads. Task remains in progress pending working browser tools.

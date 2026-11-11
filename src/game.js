@@ -1,4 +1,6 @@
-import {selectedSoundtrack,REWARD_MUSIC,unlocked,saveProfile} from './career.js';
+import {createProgressStorage} from './progress-storage.js';
+import {updateAmbientParticles} from './ambient-particles.js';
+import {selectedSoundtrack,REWARD_MUSIC,unlocked} from './career.js';
 import {updateRailGlow} from './rail-glow.js';
 import {updateScenery} from './scenery-motion.js';
 import {updateVitrumSpores} from './vitrum-spores.js';
@@ -171,6 +173,7 @@ particleSystem.initParticleSystem();
 configureImpactParticles(particleSystem, sparks_material);
 
 const loadedTracks = await loadTrackLibrary(localStorage);
+const progressStorage = await createProgressStorage(localStorage);
 let drivingSettings = loadDrivingSettings(localStorage);
 let activeDrivingSettings = { ...drivingSettings };
 let selectedCpuDifficulty = loadCpuDifficulty(localStorage);
@@ -864,9 +867,9 @@ function beginRace() {
   const vitrumWorld=trackData.id==='vitrum-neural-ascent';
   camera.far=vitrumWorld?2200:512;camera.updateProjectionMatrix();
   scene.fog.color.setHex(vitrumWorld?0x263e38:0x202032);
-  scene.fog.density=vitrumWorld?0.0048:0.00019;
+  //scene.fog.density=vitrumWorld?0.0048:0.00019;
 
-  //scene.fog.density = vitrumWorld ? 0.0025 : 0.0005;
+  scene.fog.density = vitrumWorld ? 0.0055 : 0.0035;
   camera.far = 3000;
 
   keyLight.color.setHex(vitrumWorld?0xffdfa0:0xd8e8ff);
@@ -1413,7 +1416,7 @@ musicSelect.addEventListener('change', async (event) => {
   const newAudioUrl = event.target.value;
   if(newAudioUrl===REWARD_MUSIC.url&&!unlocked(REWARD_MUSIC,frontEnd.profile))return;
   frontEnd.profile.soundtrack=selectedSoundtrack({...frontEnd.profile,soundtrack:newAudioUrl},'');
-  saveProfile(localStorage,frontEnd.profile);
+  frontEnd.saveProfile();
   document.querySelector('#menu-soundtrack').value=frontEnd.profile.soundtrack;
   raceAudio.dispose();
   raceAudio = new RaceAudio(newAudioUrl);
@@ -1482,7 +1485,7 @@ function applyPlayerLoadout(spec){
   for(const ghost of ghostPool){scene.remove(ghost.group);ghost.material.dispose();}ghostPool.length=0;createGhostPool(spec);
 }
 let previewStart=0;
-frontEnd=createFrontEnd({garage,tracks:TRACK_CONFIG,
+frontEnd=createFrontEnd({garage,tracks:TRACK_CONFIG,progressStorage,
  onSettings(settings){graphics.setPreferences(settings);raceAudio.setPreferences(settings);garage.setGlow(settings.glow);document.body.classList.toggle('reduce-menu-motion',!settings.motion);},
  onPreview(enabled,id){
   if(!enabled){craft.visible=true;for(const o of opponents)o.group.visible=true;return;}
@@ -1500,6 +1503,7 @@ pauseScreen.append(pauseMenuButton);
 
 let sceneryTime=0;
 function render() {
+  tourBus.updateAudio();
   if(frontEnd?.visible){
     frontEnd.gamepad();
     clock.getDelta();
@@ -1521,7 +1525,7 @@ function render() {
 
       // The equirectangular scene background follows the camera automatically.
       updateTrackPresentation(track,t);
-      updateVitrumSpores(track,t,0);
+      updateVitrumSpores(track,t,0); updateAmbientParticles(track,t,0);
       updateRailGlow(track,frontEnd.profile.settings);
       updateScenery(scene,t-previewStart);
       graphics.render();
@@ -1549,6 +1553,7 @@ function render() {
   let crossedFinish = false;
   sceneryTime+=delta;updateScenery(scene, sceneryTime);
   updateVitrumSpores(track,sceneryTime,shipPhysics.speed);
+  updateAmbientParticles(track,sceneryTime,shipPhysics.speed);
 
   if(practice.active){shipPhysics.catchUpBonus=shipPhysics.catchUpGap=0;}
   else updateCatchUp([

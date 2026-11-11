@@ -23,3 +23,23 @@ body.in-menu:has(#start-screen[data-page="bus"]) #rotate-device-overlay{display:
 #start-screen[data-page="home"] #menu-carrier,#start-screen[data-page="bus"] #menu-carrier{display:none;}
 #start-screen[data-page="bus"] #menu-location{font-size:0;}
 #start-screen[data-page="bus"] #menu-location::after{content:'INTERSTELLAR CHAMPIONSHIP CARRIER';font-size:10px;}
+
+.bus-transition{position:fixed;inset:0;background:#030912;z-index:8;opacity:0;pointer-events:none;display:grid;place-items:center;color:#a5d9dc;font:12px monospace;letter-spacing:2px;text-align:center;padding:24px;}
+#tour-bus-view[aria-busy=true] .bus-nav{visibility:hidden;}
+.bus-archive-button{position:absolute;right:4%;top:24px;pointer-events:auto;background:#092630df;color:#b8fff3;border:1px solid #579a99;padding:12px;font:10px monospace;cursor:pointer;}
+.bus-crew{position:absolute;right:4%;top:80px;width:min(400px,42vw);max-height:calc(100% - 180px);overflow:auto;pointer-events:auto;padding:24px;background:linear-gradient(135deg,#062632f5,#06121cf5);border:1px solid #70ddd1;box-shadow:0 0 30px #39e9dd22,inset 0 0 25px #39e9dd0d;z-index:9;color:#defbf5;backdrop-filter:blur(12px);}
+.bus-crew[hidden]{display:none}.bus-crew>p:first-child{font:10px monospace;letter-spacing:2px;color:#8ef8e4}.bus-crew h3{font:18px monospace}.bus-crew small{font:10px monospace;color:#a4cbc9}.bus-transcript{white-space:pre-line;font:13px/1.6 sans-serif;max-height:30vh;overflow:auto;margin:18px 0;padding-right:10px;}.bus-crew button,.bus-crew select{display:block;width:100%;margin-top:10px;padding:10px;background:#0b303b;border:1px solid #508b91;color:#d8fff6;font:10px monospace;cursor:pointer}.bus-voice-status{font:11px/1.5 sans-serif;color:#ecd3a4}
+@media(max-width:700px){.bus-archive-button{top:60px;font-size:8px;padding:8px}.bus-crew{top:100px;left:4%;right:4%;width:auto;padding:16px;max-height:calc(100% - 185px)}.bus-transcript{max-height:24vh;font-size:12px}}
+/* The same carrier shell surrounds the existing garage work view. */
+#start-screen[data-bus-garage=true] #tour-bus-view{z-index:3;}
+#start-screen[data-bus-garage=true] .bus-heading,#start-screen[data-bus-garage=true] .bus-panel,#start-screen[data-bus-garage=true] .bus-hotspots,#start-screen[data-bus-garage=true] #menu-carrier{display:none;}
+#start-screen[data-bus-garage=true] #menu-pages{margin-bottom:70px;padding-bottom:30px;}
+#start-screen[data-bus-garage=true] #menu-location{font-size:0;}
+#start-screen[data-bus-garage=true] #menu-location::after{content:'THE TOUR BUS · SERVICE BAY';font-size:10px;}
+#start-screen[data-bus-garage=true] [data-view=garage]{animation:none;}
+.workshop-fade{position:fixed;inset:0;z-index:30;background:#030912;pointer-events:all;}
+body.in-menu:has(#start-screen[data-bus-garage=true]) #rotate-device-overlay{display:none!important;}
+@media(max-width:700px){#start-screen[data-bus-garage=true] #menu-pages{margin-bottom:82px;padding-top:70px;}#start-screen[data-bus-garage=true] .bus-archive-button{top:8px;}}
+/* All rooms remain accessible without expanding the five quick shortcuts. */
+.bus-directory{position:absolute;right:4%;bottom:78px;width:min(390px,43vw);padding:12px;background:#0b2530;color:#d8fff6;border:1px solid #63939e;font:11px monospace;pointer-events:auto;}
+@media(max-width:700px){.bus-directory{left:4%;right:4%;bottom:88px;width:92%;padding:10px;font-size:10px}.bus-panel{bottom:136px;max-height:26vh}}

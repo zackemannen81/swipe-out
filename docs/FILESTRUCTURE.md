@@ -476,3 +476,80 @@ New regression tests: tests/finish-features.test.js. Prior task archived in
 - public/models/tour-bus/outside-hangar.glb / hangar-port.glb: supplied dock architecture.
 - public/models/tour-bus/cargo-shuttle.glb: simplified copy of supplied Meshy Space Shuttle, shared by background transports.
 - docs/archive/TOUR-SKY-002.md: completed warm sky replacement.
+
+## 2026-11-10 — TOUR-ZONES-001
+- src/tour-bus-zones.js: all 16 plan zones, connections, camera stations and routing.
+- tests/tour-bus-zones.test.js: plan graph, station pairs and masked-cut validation.
+- docs/TOUR_BUS_ZONES.md: spatial decisions, transition contract and asset/audio needs.
+- docs/archive/VITRUM-EDGES-001-in-progress.md: preserved unfinished previous task.
+- Existing tour-bus scene/UI, frontend back flow, inventory generator and browser
+  verification updated; no new runtime image/model assets.
+
+## 2026-11-10 — TOUR-LOOP-001
+- src/tour-session.js: validated, failure-tolerant per-tab carrier session state.
+- tests/tour-session.test.js: safe reload recovery and malformed/blocked storage.
+- tools/verify-tour-loop.mjs: isolated browser carrier/race/result/reload lifecycle.
+- docs/archive/TOUR-ZONES-001.md: completed spatial-navigation task.
+
+## 2026-11-10 — TOUR-AUDIO-001
+- public/audio/tourbus/: 20 supplied MP3 files and original voices/README.md.
+- src/tour-intros.json: generated exact numbered scripts and existing voice URLs.
+- src/tour-audio.js: music mapping and disposable two-channel media owner.
+- src/tour-crew.js: first-visit transcript, skip, discovered archive and music UI.
+- tools/import-tour-intros.mjs: rebuild script/voice manifest from copied source.
+- tests/tour-audio.test.js: ducking, failure/lifecycle and profile migration.
+- tools/verify-tour-crew.mjs: isolated browser media and information flow checks.
+- docs/TOUR_BUS_AUDIO.md: assets, missing recordings, playback contract and limits.
+- docs/archive/TOUR-LOOP-001.md: previous completed task.
+
+## 2026-11-10 — TOUR-AUDIO-002
+- public/audio/tourbus/voices/10.mp3 through 15.mp3: six supplied recordings.
+- docs/archive/TOUR-AUDIO-001.md: completed first audio integration task.
+
+## 2026-11-10 — TOUR-WORKSHOP-001
+- tools/verify-tour-workshop.mjs: integrated garage audio/navigation/customization
+  browser verification, standalone isolation and desktop/mobile screenshots.
+- docs/archive/TOUR-AUDIO-002.md: completed additional-recordings task.
+
+## 2026-11-10 — TOUR-ART-REVIEW-001
+- docs/TOUR_BUS_ARTWORK.md: supplied concept inventory and proposed room mapping.
+- docs/archive/TOUR-WORKSHOP-001.md: completed integrated garage task.
+
+## 2026-11-10 — TOUR-OBSERVATION-001
+- src/tour-observation.js: observation shell, lighting and named prop placements.
+- tests/tour-observation.test.js: sightline, grounding, geometry and disposal checks.
+- tools/verify-observation.mjs: browser room/world/mobile/navigation verification.
+- docs/OBSERVATION_DECK_ASSETS.md: architecture and prioritized model/texture list.
+- docs/OBSERVATION_DECK_SLOTS.json: local asset placement data for zone 06.
+- docs/archive/TOUR-ART-REVIEW-001.md: completed concept-review task.
+
+## 2026-11-10 — TOUR-STAGES-001
+- src/tour-stages/{necros,vitrum,collective}.json: compact authored v9 snapshots.
+- src/tour-destinations.js: shared Nexus/campaign library-key resolution.
+- public/{images,models}/tour-stages/: byte-identical extracted embedded media.
+- tools/import-tour-stages.mjs: validation, extraction and parity/hash verification.
+- tools/verify-tour-stages.mjs: real race launch/GLB loading/return and editor checks.
+- tests/tour-stages.test.js: source identity, asset hashes, saves and world persistence.
+- docs/TOUR_STAGES.md and TOUR_STAGES_MANIFEST.json: provenance and limitations.
+- docs/archive/TOUR-OBSERVATION-001.md: previous completed task.
+
+## 2026-11-11 — AMBIENT-PARTICLES-001
+- tests/ambient-particles.test.js: destination selection, uniform updates, immutable
+  geometry and particle material/geometry disposal coverage.
+- tools/verify-ambient-particles.mjs: actual race animation/pause and screenshot checks.
+- docs/archive/TOUR-STAGES-001.md: completed previous import task.
+- tools/verify-ambient-editor.mjs: browser scenery-preview toggle verification.
+
+## 2026-11-11 — PROGRESS-SAVE-001
+- src/progress-storage.js: versioned dual-store career/record snapshots and flush.
+- tests/progress-storage.test.js: legacy preservation, quota, ordering and recovery.
+- tools/verify-progress-storage.mjs: browser quota/reload and both-store failure checks.
+- docs/archive/AMBIENT-PARTICLES-001.md: previous completed task.
+
+## 2026-11-11 — TOUR-BLOCKOUT-001
+- src/tour-blockout.js: ten public room specifications and replaceable proxy groups.
+- docs/TOUR_BUS_ASSET_LIST.md: whole-ship prioritized model/material procurement list.
+- tests/tour-blockout.test.js: room/camera/visibility/narration/session/restriction checks.
+- tools/verify-tour-blockout.mjs: desktop/mobile room and narration checks.
+- docs/TOUR_BUS_OBJECTS.md/.json: regenerated 143 named replacement groups.
+- docs/archive/PROGRESS-SAVE-001.md: completed previous task.

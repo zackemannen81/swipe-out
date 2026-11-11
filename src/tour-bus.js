@@ -1,3 +1,5 @@
+import {buildCarrierBlockout} from './tour-blockout.js';
+import {buildObservationDeck} from './tour-observation.js';
 import * as THREE from 'three';
 import {loadGlb} from './glb-scenery.js';
 
@@ -9,15 +11,11 @@ export const TOUR_PLANET = {
  radius:27, cloudRadius:27.55, cloudOpacity:.25,
 };
 
-export const TOUR_VIEWS = {
- hangar:{title:'GRAND HANGAR',subtitle:'Deck 03 / Flight operations',position:[15,9,27],target:[0,3,-7]},
- workshop:{title:'SERVICE BAY',subtitle:'Deck 03 / Your race craft',position:[12,7,15],target:[4,2.1,4]},
- briefing:{title:'TOURNAMENT NEXUS',subtitle:'Deck 03 / Destination briefing',position:[19,5,-4],target:[12,2,-15]},
- lounge:{title:'PILOTS’ LOUNGE',subtitle:'Deck 03 / Diplomatic annex',position:[-5,5,23],target:[-14,2,12]},
- observation:{title:'OBSERVATION',subtitle:'Deck 03 / Orbital gallery',position:[0,5,-16],target:[0,8,-65]},
-};
+import {TOUR_VIEWS,TOUR_ZONES,tourRoute} from './tour-bus-zones.js';
+export {TOUR_VIEWS,TOUR_ZONES} from './tour-bus-zones.js';
 export const TOUR_WORLDS = {
  necros:{title:'NECROS',track:'Dark PRIME',color:0xb75537,description:'An empire that conquered death. A world that still fears its end.'},
+ collective:{title:'THE COLLECTIVE',track:'The collective - Tellus',color:0x7c58b5,description:'Tellus · The Collective. An orbital industrial circuit built around monumental energy systems.'},
  vitrum:{title:'VITRUM LITHOFYTER',track:'Neural Ascent',color:0x49a58b,description:'A living forest. Every root carries a memory. Every crystal carries a thought.'},
 };
 
@@ -85,7 +83,7 @@ export function createTourBusScene() {
    model.scale.multiplyScalar(scale);model.position.set(-center.x*scale,-bounds.min.y*scale,-center.z*scale);
    model.name='service-platform-model';heroPad.clear();heroPad.add(model);heroPad.updateMatrixWorld(true);
    // Use the central deck, not the highest peripheral tool/gantry, as the craft's support.
-   const ray=new THREE.Raycaster(new THREE.Vector3(4,size.y*scale+2,4),new THREE.Vector3(0,-1,0));
+   const ray=new THREE.Raycaster(new THREE.Vector3(heroPad.position.x,heroPad.position.y+size.y*scale+2,heroPad.position.z),new THREE.Vector3(0,-1,0));
    const hit=ray.intersectObject(model,true)[0];
    ship.position.y=(hit?.point.y??size.y*scale)+.65;
    heroPad.userData.loadState='loaded';
@@ -163,10 +161,53 @@ export function createTourBusScene() {
  const starGeo=new THREE.BufferGeometry();starGeo.setAttribute('position',new THREE.Float32BufferAttribute(starData,3));geometries.add(starGeo);const starMat=new THREE.PointsMaterial({color:0xb9d9eb,size:.18,fog:false});materials.add(starMat);stars.add(new THREE.Points(starGeo,starMat));
  scene.add(new THREE.HemisphereLight(0xb0d9ef,0x172030,2));const sun=new THREE.DirectionalLight(0xffd4a0,3);sun.position.set(10,20,-40);scene.add(sun);
  for(const [x,z] of [[4,4],[-12,-10],[12,-15],[-14,14]]){const l=new THREE.PointLight(0x8bd7f0,90,25,2);l.position.set(x,6,z);scene.add(l);}
- const target=new THREE.Vector3(),dest=new THREE.Vector3();let view='hangar';
- function setView(id,snap=false){if(!TOUR_VIEWS[id])return;view=id;dest.fromArray(TOUR_VIEWS[id].position);if(snap){camera.position.copy(dest);target.fromArray(TOUR_VIEWS[id].target);camera.lookAt(target);}}
- setView('hangar',true);
- function update(dt,motion=true){camera.position.lerp(dest,motion?1-Math.exp(-4*dt):1);target.lerp(new THREE.Vector3(...TOUR_VIEWS[view].target),motion?1-Math.exp(-4*dt):1);camera.lookAt(target);camera.updateMatrixWorld();if(motion){holo.rotation.y+=dt*.2;planet.rotation.y+=dt*.006;clouds.rotation.y+=dt*.009;}}
+ // Reuse existing object IDs, relocating complete groups into their own rooms.
+ function move(id,zoneId,offset){const row=registry.find(r=>r.id===id);row.group.position.add(new THREE.Vector3(...offset));row.zoneId=zoneId;}
+ for(const id of ['TB-PAD-01','TB-RACER-01','TB-CONSOLE-01'])move(id,'03',[0,0,48]);
+ move('TB-NEXUS-01','05',[-58,12,21]);
+ for(const row of registry.filter(r=>r.kind==='seat'||r.kind==='lounge'))move(row.id,'02',[-30,12,-50]);
+ for(const [i,row] of registry.filter(r=>r.kind==='banner').entries()){row.group.position.set(-54+i*6,10,-49);row.group.rotation.y=0;row.zoneId='02';}
+ // Observation glazing looks to port (-X), never through the hangar.
+ const windowRow=registry.find(r=>r.id==='TB-WINDOW-01');windowRow.group.position.set(-101,24,0);windowRow.group.rotation.y=Math.PI/2;windowRow.group.scale.set(.7,.65,1);windowRow.zoneId='06';
+ const railRow=registry.find(r=>r.id==='TB-RAIL-01');railRow.group.position.set(-98,24,0);railRow.group.rotation.y=Math.PI/2;railRow.group.scale.x=.7;railRow.zoneId='06';
+ for(const [id,pos] of [['TB-PLANET-01',[-158,38,0]],['TB-MOON-01',[-174,49,-37]]]){const row=registry.find(r=>r.id===id);row.group.position.fromArray(pos);row.zoneId='06';}
+ // Solid room shells: no direct camera flight between rooms. Doors are readable
+ // closed thresholds; the short masked cut represents passage/lift travel.
+ function room(zoneId,w,d,h,openWest=false){
+  const zone=TOUR_ZONES[zoneId],g=asset(`TB-ROOM-${zoneId}`,'room',zone.name,zone.position.slice(),'Separat rum med golv, tak, slutna väggar och markerad passage.','P1');registry.at(-1).zoneId=zoneId;
+  box(g,[w,.4,d],[0,-.2,0],floor);box(g,[w,.4,d],[0,h,0],dark);
+  for(const z of [-d/2,d/2])box(g,[w,h,.5],[0,h/2,z],steel);
+  box(g,[.5,h,d],[w/2,h/2,0],dark);
+  if(!openWest)box(g,[.5,h,d],[-w/2,h/2,0],dark);
+  const door=asset(`TB-DOOR-${zoneId}`,'door','Passage / lift',[zone.position[0]+w/2-.35,zone.position[1],zone.position[2]],'Stängd markerad passage; scenövergång representerar färden mellan däck.');registry.at(-1).zoneId=zoneId;
+  box(door,[.1,4,3],[0,2,0],brass);for(const z of [-1.6,1.6])box(door,[.15,4.3,.08],[-.1,2.15,z],cyan);
+  const light=new THREE.PointLight(zoneId==='02'?0xffc58a:0x8bd7f0,180,32,2);light.position.set(...zone.position);light.position.y+=7;light.userData.zoneId=zoneId;scene.add(light);
+ }
+ room('03',32,30,12);room('05',28,28,11);room('02',28,28,11);buildObservationDeck({asset,box,mesh,beam,mat,registry,scene,materials,geometries});
+ buildCarrierBlockout({asset,box,cylinder,beam,room,registry,zones:TOUR_ZONES,steel,dark,brass,ivory,cyan,amber});
+ const ends=asset('TB-HANGAR-ENDS','wall','Hangarens slutväggar',[0,0,0],'Slutna hangarväggar ersätter den tidigare stora observationsöppningen.','P1');
+ for(const z of [-32.8,32.8])box(ends,[46,21,.5],[0,10.5,z],dark);
+ for(const row of registry){row.zoneId??='01';row.position=row.group.position.toArray();row.group.userData.zoneId=row.zoneId;}
+ const target=new THREE.Vector3();let view='hangar',pending=null,elapsed=0,opacity=0,route=[];
+ function pose(id){
+  const zone=TOUR_VIEWS[id].zoneId;
+  for(const row of registry)row.group.visible=(row.zoneId===zone||row.kind==='stars')&&(row.id!=='TB-MOON-01'||clouds.visible);
+  for(const o of scene.children)if(o.isPointLight)o.visible=(o.userData.zoneId??(o.name.startsWith('TB-OBS-')?'06':'01'))===zone;
+  camera.position.fromArray(TOUR_VIEWS[id].position);target.fromArray(TOUR_VIEWS[id].target);camera.lookAt(target);camera.updateMatrixWorld();}
+ function setView(id,snap=false){
+  if(!TOUR_VIEWS[id]||pending)return false;if(id===view){if(snap)pose(id);return true;}
+  route=tourRoute(TOUR_VIEWS[view].zoneId,TOUR_VIEWS[id].zoneId);if(!route)return false;
+  if(snap){view=id;pose(id);return true;}pending=id;elapsed=0;return true;
+ }
+ pose(view);
+ function update(dt,motion=true){
+  if(pending){elapsed+=Math.max(0,dt);opacity=motion?Math.min(1,elapsed/.25):1;
+   if(elapsed>=.25||!motion){view=pending;pose(view);}
+   if(elapsed>.4)opacity=Math.max(0,1-(elapsed-.4)/.3);
+   if(elapsed>=.7||!motion){pending=null;opacity=0;}
+  }
+  if(motion){holo.rotation.y+=dt*.2;planet.rotation.y+=dt*.006;clouds.rotation.y+=dt*.009;}
+ }
  function setWorld(id){
   if(!TOUR_WORLDS[id])return;
   const necros=id==='necros';
@@ -174,10 +215,10 @@ export function createTourBusScene() {
   planetMaterial.map=necros?surfaceMap:null;
   planetMaterial.emissiveMap=necros?surfaceMap:null;
   planetMaterial.emissive.setHex(necros?0xffffff:0x000000);planetMaterial.emissiveIntensity=.25;
-  planetMaterial.needsUpdate=true;clouds.visible=necros;moonGroup.visible=necros;bands.visible=!necros;
+  planetMaterial.needsUpdate=true;clouds.visible=necros;moonGroup.visible=necros&&TOUR_VIEWS[view].zoneId==='06';bands.visible=!necros;
  }
  setWorld('necros');
  function manifest(){scene.updateMatrixWorld(true);return registry.map(({group,modelSize,...entry})=>({...entry,rotation:group.rotation.toArray().slice(0,3),size:modelSize??new THREE.Box3().setFromObject(group).getSize(new THREE.Vector3()).toArray().map(n=>+n.toFixed(2))}));}
  function disposeResources(){geometries.forEach(g=>g.dispose());materials.forEach(m=>m.dispose());textures.forEach(t=>t.dispose());geometries.clear();materials.clear();textures.clear();}
- return {scene,camera,registry,ship,setView,update,manifest,setWorld,loadAssets,dispose(){disposed=true;disposeResources();}};
+ return {get navigation(){return {station:view,pending,opacity,route};},scene,camera,registry,ship,setView,update,manifest,setWorld,loadAssets,dispose(){disposed=true;disposeResources();}};
 }

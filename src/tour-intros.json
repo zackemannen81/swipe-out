@@ -1,0 +1,110 @@
+{
+  "10": {
+    "id": "10",
+    "title": "ARCHIVE / LORE CHAMBER",
+    "text": "Welcome to the Championship Archive.\r\n\r\nWithin these halls, the histories of participating civilizations, remarkable achievements, and significant tournament events are preserved for future generations.\r\n\r\nHere you may review discovered records, revisit presentations, and explore information gathered throughout your journey.\r\n\r\nAccess to certain documents requires additional clearance.\r\n\r\nPlease note that the archive contains only officially authorized information.\r\n\r\nHistorical accuracy is a matter of administrative policy.",
+    "voice": "/audio/tourbus/voices/10.mp3"
+  },
+  "11": {
+    "id": "11",
+    "title": "ENGINEERING CORE",
+    "text": "Welcome to Engineering.\r\n\r\nThis section houses the primary systems responsible for maintaining the vessel's propulsion, environmental stability, and operational power distribution.\r\n\r\nOur engineering personnel continuously monitor thousands of interconnected processes to ensure uninterrupted functionality.\r\n\r\nFor your safety, access to critical systems is restricted.\r\n\r\nPlease avoid touching unfamiliar equipment.\r\n\r\nParticularly equipment that appears to be touching you.\r\n\r\nThank you.",
+    "voice": "/audio/tourbus/voices/11.mp3"
+  },
+  "12": {
+    "id": "12",
+    "title": "CARGO & STORAGE",
+    "text": "Welcome to Cargo and Storage.\r\n\r\nThis facility manages the enormous quantity of equipment, materials, and replacement components required to support an interstellar championship.\r\n\r\nAll cargo is catalogued, inspected, and assigned according to operational priority.\r\n\r\nAuthorized personnel may retrieve approved equipment from designated storage areas.\r\n\r\nPlease do not open containers marked as restricted.\r\n\r\nTheir contents are not relevant to your participation.\r\n\r\nHave a pleasant day.",
+    "voice": "/audio/tourbus/voices/12.mp3"
+  },
+  "13": {
+    "id": "13",
+    "title": "DOCKING PORTS / SHUTTLE BAY",
+    "text": "Welcome to the Shuttle Bay.\r\n\r\nThis facility provides transportation between The Tour Bus and authorized destinations on the planetary surface.\r\n\r\nFrom here, you may visit local racing clubs, meet representatives of the host civilization, and participate in optional challenges.\r\n\r\nSome opportunities may provide access to equipment unavailable elsewhere.\r\n\r\nPlease ensure that your return transportation is confirmed before departure.\r\n\r\nThe Tour Bus operates according to its own schedule.\r\n\r\nIt will not wait for you.",
+    "voice": "/audio/tourbus/voices/13.mp3"
+  },
+  "14": {
+    "id": "14",
+    "title": "SECURITY NEXUS",
+    "text": "Welcome to the Security Nexus.\r\n\r\nThis department monitors shipboard access, security clearances, and the integrity of restricted facilities.\r\n\r\nYour authorization level determines which areas of the vessel are available for exploration.\r\n\r\nAdditional permissions may be granted as your championship status develops.\r\n\r\nPlease remember that security restrictions exist for your protection.\r\n\r\nRequests for further explanation may be submitted through the appropriate channels.\r\n\r\nThey will be reviewed.\r\n\r\nEventually.",
+    "voice": "/audio/tourbus/voices/14.mp3"
+  },
+  "15": {
+    "id": "15",
+    "title": "VIP GALLERY / RACE MUSEUM",
+    "text": "Welcome to the Championship Museum.\r\n\r\nHere we celebrate the extraordinary individuals and civilizations that have distinguished themselves throughout the tournament's long and prestigious history.\r\n\r\nDiscover legendary racing vessels, examine historical records, and admire the trophies awarded to our most accomplished competitors.\r\n\r\nVictory is a rare achievement.\r\n\r\nRecognition is eternal.\r\n\r\nFor as long as the records are maintained.\r\n\r\nEnjoy your visit.",
+    "voice": "/audio/tourbus/voices/15.mp3"
+  },
+  "16": {
+    "id": "16",
+    "title": "DECK 3060",
+    "text": "Attention.\r\n\r\nYou have reached a restricted section of the vessel.\r\n\r\nAccess to Deck 3060 is currently unavailable under your championship clearance.\r\n\r\nThis area is not included in the official passenger directory.\r\n\r\nThere is no reason for you to proceed further.\r\n\r\nPlease return to an authorized section of the ship.\r\n\r\nThank you.",
+    "voice": null
+  },
+  "00": {
+    "id": "00",
+    "title": "WELCOME ABOARD",
+    "text": "Welcome aboard THE TOUR BUS.\r\n\r\nThe official interstellar transport vessel of the Anti-Gravity World Championship.\r\n\r\nFor the duration of the tournament, this vessel will serve as your home, your headquarters, and your gateway to the competing worlds.\r\n\r\nWe invite you to explore our facilities, meet your fellow pilots, and prepare for the challenges ahead.\r\n\r\nYour comfort is our priority.\r\n\r\nYour survival... is your responsibility.\r\n\r\nEnjoy your stay.",
+    "voice": "/audio/tourbus/voices/00.mp3"
+  },
+  "01": {
+    "id": "01",
+    "title": "GRAND HANGAR",
+    "text": "Welcome to the Grand Hangar.\r\n\r\nThis is the operational heart of The Tour Bus, where championship racing vessels are stored, serviced, and prepared for deployment.\r\n\r\nYour assigned craft is available for inspection and customization in the adjoining Service Bay.\r\n\r\nPlease refrain from activating your propulsion systems while inside the hangar.\r\n\r\nThe structural repair department has requested this announcement.\r\n\r\nRepeatedly.",
+    "voice": "/audio/tourbus/voices/01.mp3"
+  },
+  "02": {
+    "id": "02",
+    "title": "PILOTS' LOUNGE",
+    "text": "This is the Pilots' Lounge.\r\n\r\nHere, representatives of the championship's four competing civilizations may relax, exchange information, and engage in diplomatic conversation.\r\n\r\nWe encourage you to become acquainted with your fellow pilots.\r\n\r\nEach of them is absolutely convinced that their civilization will emerge victorious.\r\n\r\nStatistically speaking...\r\n\r\nMost of them are mistaken.\r\n\r\nPlease enjoy the refreshments.",
+    "voice": "/audio/tourbus/voices/02.mp3"
+  },
+  "03": {
+    "id": "03",
+    "title": "WORKSHOP / SERVICE BAY",
+    "text": "Welcome to the Service Bay.\r\n\r\nOur engineering facilities provide everything required to maintain, customize, and enhance your racing vessel.\r\n\r\nSelect your preferred craft, modify its appearance, and install performance modules to suit your driving style.\r\n\r\nPlease remember that increased performance may come at the expense of stability, efficiency, or control.\r\n\r\nThe engineering department accepts no responsibility for modifications performed without adequate consideration.\r\n\r\nWe do, however, appreciate the resulting data.",
+    "voice": "/audio/tourbus/voices/03.mp3"
+  },
+  "04": {
+    "id": "04",
+    "title": "SPARE PARTS MARKET",
+    "text": "Welcome to the Spare Parts Market.\r\n\r\nHere, pilots may acquire specialized components, equipment, and cosmetic enhancements from across the participating civilizations.\r\n\r\nCertain items are available for purchase.\r\n\r\nOthers must be earned through exceptional performance, local challenges, or personal agreements.\r\n\r\nPlease inspect all components carefully before installation.\r\n\r\nRefunds are subject to availability.\r\n\r\nAvailability is not guaranteed.",
+    "voice": "/audio/tourbus/voices/04.mp3"
+  },
+  "05": {
+    "id": "05",
+    "title": "TOURNAMENT NEXUS",
+    "text": "Welcome to the Tournament Nexus.\r\n\r\nThis facility coordinates all official championship events, planetary destinations, and race operations.\r\n\r\nHere you may review upcoming competitions, examine participating civilizations, and select your next assignment.\r\n\r\nAuthorized surface visits are also available.\r\n\r\nPlease ensure that your vessel is properly configured before entering an event.\r\n\r\nRemember...\r\n\r\nAn entire world is depending on your performance.\r\n\r\nNo pressure.",
+    "voice": "/audio/tourbus/voices/05.mp3"
+  },
+  "06": {
+    "id": "06",
+    "title": "OBSERVATION DECK",
+    "text": "Welcome to the Observation Deck.\r\n\r\nFrom here, you may observe our current planetary destination and the extraordinary civilization that calls it home.\r\n\r\nThe observation systems provide information about local environments, cultural characteristics, and available surface activities.\r\n\r\nWe encourage all passengers to appreciate the remarkable beauty of the universe.\r\n\r\nWhile the opportunity remains.\r\n\r\nEnjoy the view.",
+    "voice": "/audio/tourbus/voices/06.mp3"
+  },
+  "07": {
+    "id": "07",
+    "title": "DIPLOMATIC CORRIDOR",
+    "text": "Welcome to the Diplomatic Corridor.\r\n\r\nThis gallery honors the four great civilizations participating in the championship.\r\n\r\nEach banner represents an extraordinary history of innovation, achievement, and unwavering belief in its own superiority.\r\n\r\nWe encourage you to explore their philosophies and traditions.\r\n\r\nPlease remember that diplomatic neutrality is strictly enforced aboard this vessel.\r\n\r\nPersonal opinions are permitted.\r\n\r\nArmed disagreements are not.",
+    "voice": "/audio/tourbus/voices/07.mp3"
+  },
+  "08": {
+    "id": "08",
+    "title": "CREW QUARTERS",
+    "text": "Welcome to the Crew Quarters.\r\n\r\nThese facilities provide accommodation and essential services for the personnel responsible for maintaining our vessel.\r\n\r\nOur dedicated crew works continuously to ensure the championship proceeds according to schedule.\r\n\r\nPlease respect designated rest periods and restricted personal areas.\r\n\r\nThe crew has been informed that their contribution is invaluable.\r\n\r\nAdditional compensation has not been discussed.\r\n\r\nThank you for your cooperation.",
+    "voice": "/audio/tourbus/voices/08.mp3"
+  },
+  "09": {
+    "id": "09",
+    "title": "MEDBAY",
+    "text": "Welcome to the Medical Bay.\r\n\r\nOur advanced medical facilities are equipped to assist with injuries, physiological stress, and other unfortunate consequences of high-velocity competition.\r\n\r\nRecovery services are available to authorized personnel throughout the tournament.\r\n\r\nWe recommend reporting any unusual symptoms immediately.\r\n\r\nThis includes dizziness, disorientation, and temporary loss of consciousness.\r\n\r\nExcessive confidence, however...\r\n\r\nRemains untreatable.",
+    "voice": "/audio/tourbus/voices/09.mp3"
+  },
+  "16B": {
+    "id": "16B",
+    "title": "DECK 3060",
+    "text": "Authorization confirmed.\r\n\r\nAccess to Deck 3060 has been granted.\r\n\r\nPlease proceed according to the instructions provided.\r\n\r\nNormal passenger services are unavailable in this section.\r\n\r\nFurther information will be provided when necessary.",
+    "voice": null
+  }
+}

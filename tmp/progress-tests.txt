@@ -1,0 +1,18 @@
+✔ career unlocks earned from campaign finishing, podium and Elite win; replay is idempotent (4.359ms)
+✔ locked choices and malformed persistence fall back; earned loadout survives reload; standards isolate upgrades (3.5015ms)
+✔ all five Necros challenges unlock craft and soundtrack; partial/old profiles normalize correctly (0.9863ms)
+✔ preview grants only the two mastery rewards, persists, and never fakes trophies (0.4573ms)
+✔ The sacrifice requires completed last place, automatic full assist and Rookie in a race (0.8308ms)
+✔ GOA by ME is selectable and persists as an allowed soundtrack (0.3062ms)
+✔ race lap options persist and invalid values fall back to three laps (0.8527ms)
+✔ full localStorage retains legacy profile and saves records/profile through durable storage (4.8888ms)
+✔ both-store failure rejects, retains session values and subsequent save can recover (1.2804ms)
+✔ serialized snapshots and newer local fallback survive unavailable durable writes (0.7484ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 10
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 188.6225

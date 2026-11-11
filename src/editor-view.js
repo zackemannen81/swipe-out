@@ -1,3 +1,4 @@
+import {updateAmbientParticles} from './ambient-particles.js';
 import {updateScenery} from './scenery-motion.js';
 import {updateVitrumSpores} from './vitrum-spores.js';
 import { updateWeaponPads } from './weapon-pads.js';
@@ -299,7 +300,9 @@ export function createEditorView(canvas, { onSelect, onMove, onCommit, onError }
       marker.scale.setScalar(camera.position.distanceTo(marker.position) * 0.006);
     }
     updateTrackPresentation(road, performance.now()/1000);
-    updateVitrumSpores(road,document.getElementById('scenery-preview')?.checked?performance.now()/1000:0);
+    const particleTime=document.getElementById('scenery-preview')?.checked?performance.now()/1000:0;
+    updateVitrumSpores(road,particleTime);
+    updateAmbientParticles(road,particleTime);
     updateWeaponPads(road, performance.now()/1000, null, true);
     const errors=scene.getObjectByName('customTrackObjects')?.userData.loadErrors;
     if(errors?.length)onError?.('GLB: '+errors.splice(0).join('; '));

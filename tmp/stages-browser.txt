@@ -1,0 +1,4 @@
+PASS necros: track19, race, scenery, carrier return
+PASS vitrum: track20, race, scenery, carrier return
+PASS collective: track21, race, scenery, carrier return
+PASS editor: all three supplied stages available
