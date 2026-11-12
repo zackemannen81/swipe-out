@@ -1,0 +1,178 @@
+[
+  {
+    "file": "Meshy_AI_A_vine_growing_on_a_w_1111141346_texture.glb",
+    "bytes": 2160140,
+    "sha256": "3ede24aed0fb3bc71cc89cf21fb2f6f4c8b6ae935f643674de4687029afaa641",
+    "triangles": 9977,
+    "materials": 1,
+    "images": 1,
+    "requiredExtensions": [],
+    "externalUris": [],
+    "bounds": {
+      "size": [
+        1.0471349954605103,
+        1.8928210139274597,
+        0.3311539962887764
+      ],
+      "center": [
+        -0.005547523498535156,
+        -0.004821509122848511,
+        0.045726995915174484
+      ]
+    }
+  },
+  {
+    "file": "Meshy_AI_Concrete_Raised_Garde_1111140108_texture.glb",
+    "bytes": 18722596,
+    "sha256": "45c90398c899f140631c8d20e1fb628dd3f92204e9f6206a1e1814139b2f7673",
+    "triangles": 27286,
+    "materials": 1,
+    "images": 3,
+    "requiredExtensions": [],
+    "externalUris": [],
+    "bounds": {
+      "size": [
+        1.9023180603981018,
+        0.29329200088977814,
+        0.4912690073251724
+      ],
+      "center": [
+        -0.0006050169467926025,
+        0.0017830058932304382,
+        0.0005334988236427307
+      ]
+    }
+  },
+  {
+    "file": "Meshy_AI_Futuristic_modular_bench_1111140748_texture.glb",
+    "bytes": 7437396,
+    "sha256": "1d877651e01045417c49f1ccdb55ffab597668a2b1fb2239f0d4cf3998e49606",
+    "triangles": 20712,
+    "materials": 1,
+    "images": 3,
+    "requiredExtensions": [],
+    "externalUris": [],
+    "bounds": {
+      "size": [
+        1.999639868736267,
+        0.28419601917266846,
+        0.8347010016441345
+      ],
+      "center": [
+        0.00009101629257202148,
+        -0.0000880211591720581,
+        0.0001944899559020996
+      ]
+    }
+  },
+  {
+    "file": "Meshy_AI_LED_Light_1111073825_texture.glb",
+    "bytes": 7700516,
+    "sha256": "214d6c6431051293b3ea3fa3f576d9a88b07876a4e343da81d13a27441347a72",
+    "triangles": 10000,
+    "materials": 1,
+    "images": 3,
+    "requiredExtensions": [],
+    "externalUris": [],
+    "bounds": {
+      "size": [
+        2,
+        0.16636128723621368,
+        0.2945057451725006
+      ],
+      "center": [
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "Meshy_AI_wall_decor_1111141431_texture.glb",
+    "bytes": 5819000,
+    "sha256": "a4a5bf78030fee90fd298881068ee7155ab3697af51ee5a6d748fd170eeccf48",
+    "triangles": 6909,
+    "materials": 1,
+    "images": 3,
+    "requiredExtensions": [],
+    "externalUris": [],
+    "bounds": {
+      "size": [
+        1.900059998035431,
+        0.37478597462177277,
+        0.05945099517703056
+      ],
+      "center": [
+        -0.00045797228813171387,
+        -0.000514008104801178,
+        -0.00039350613951683044
+      ]
+    }
+  },
+  {
+    "file": "planteringskärl_lång.glb",
+    "bytes": 19647372,
+    "sha256": "f0c16f78505018cdf5e998db9e7333e350ef1eca9c5394cd3959fa206605fc45",
+    "triangles": 98857,
+    "materials": 1,
+    "images": 4,
+    "requiredExtensions": [],
+    "externalUris": [],
+    "bounds": {
+      "size": [
+        1.8654789924621582,
+        0.8508130609989166,
+        1.338832974433899
+      ],
+      "center": [
+        -0.008526504039764404,
+        -0.004388496279716492,
+        0.007119536399841309
+      ]
+    }
+  },
+  {
+    "file": "observation\\TB-OBS-CONSOLE-01.glb",
+    "bytes": 10641112,
+    "sha256": "6d4989b62481f786bf6f9d9194ba5d00788908e569f495391664cf67a4138901",
+    "triangles": 20824,
+    "materials": 1,
+    "images": 3,
+    "requiredExtensions": [],
+    "externalUris": [],
+    "bounds": {
+      "size": [
+        1.7596369981765747,
+        1.9032551050186157,
+        1.1855549812316895
+      ],
+      "center": [
+        -0.0010774731636047363,
+        -0.0004475116729736328,
+        -0.0012854933738708496
+      ]
+    }
+  },
+  {
+    "file": "observation\\leafy-fern\\Meshy_AI_Leafy_Fern__1110140643_texture.glb",
+    "bytes": 7209404,
+    "sha256": "73bee29c134c5c8bdfc5ccd383810acec0ddb958fe2e5fbe93201ec1d6dd0a4e",
+    "triangles": 84201,
+    "materials": 1,
+    "images": 1,
+    "requiredExtensions": [],
+    "externalUris": [],
+    "bounds": {
+      "size": [
+        1.9199979901313782,
+        1.7918300032615662,
+        1.8760929703712463
+      ],
+      "center": [
+        0.014687985181808472,
+        0.0070810019969940186,
+        0.01567050814628601
+      ]
+    }
+  }
+]

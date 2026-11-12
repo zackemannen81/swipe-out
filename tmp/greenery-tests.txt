@@ -1,0 +1,10 @@
+✔ all new public interiors have grounded shells, interior cameras, narration and persistent destinations (290.3243ms)
+✔ observation has owned finite geometry, clear camera sightline and grounded replaceable slots (294.0163ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 601.406

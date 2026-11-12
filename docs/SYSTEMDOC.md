@@ -1,5 +1,13 @@
 # System Document
 
+## Environment authoring
+
+The existing editor has an object-only environment mode with a separate scene
+storage/JSON boundary. Saved presentation cameras and lighting travel with scene
+objects. Track exports can supply scenery without carrying racing geometry into
+the environment renderer. Tour Bus runtime integration remains a separate step.
+See ENVIRONMENT_EDITOR.md for the authoring workflow.
+
 ## Product summary
 
 Swipe-out is a fast-paced mobile 3D anti-gravity racing game built with
@@ -633,3 +641,27 @@ is sealed and unavailable. Room services beyond existing garage/Nexus/crew UI re
 future work. Scene visibility and point lights follow the current zone to prevent
 adjacent-room occlusion and avoid illuminating all rooms at once. Asset procurement
 is tracked in TOUR_BUS_ASSET_LIST.md and the generated TOUR_BUS_OBJECTS manifest.
+
+## First observation furniture import
+The shared carrier asset loader now also fits and clones supplied observation bench,
+console and vine GLBs. Original fixed slot IDs remain for benches/consoles; two named
+vine groups attach to side ribs. Existing resource ownership/fallback/disposal stays
+in createTourBusScene. No custom model loaders or scene-independent GPU owners added.
+
+## Observation planting assets
+Planter shells retain stable slot IDs. Separate foliage groups own shared shrub
+instances, with two potted tree groups beside the beds. Soil color/roughness maps
+use the carrier texture owner with explicit color/data spaces.
+
+## Observation visual target
+OBSERVATION_ART_DIRECTION.md records the user-approved reference: layered dark
+vault, low planetary horizon, perimeter greenery, warm/cool inset lights and
+external ships for scale. These are art targets; current implementation is tracked
+in CURRENT_STATUS. Supplied space.jpg is the carrier sky texture.
+
+## Observation presentation pass
+The observation planet is positioned for a low orbital horizon; a carrier-owned
+shader supplies a world-tinted limb. Exterior traffic shares existing model assets
+and follows the menu motion flag. Quiet view is transient UI state, not profile
+state: it hides room controls while maintaining camera/music, restores with Back
+or a visible button and resets on navigation/return to hangar.

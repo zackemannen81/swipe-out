@@ -6,7 +6,7 @@ import {loadGlb} from './glb-scenery.js';
 export const TOUR_PLANET = {
  surface:'/images/tour-bus/necros-surface.jpg',
  clouds:'/images/tour-bus/necros-clouds.jpg',
- sky:'/images/tour-bus/space-skybox-warm.jpg',
+ sky:'/images/tour-bus/space.jpg',
  moon:'/images/tour-bus/necros-moon.jpg',
  radius:27, cloudRadius:27.55, cloudOpacity:.25,
 };
@@ -28,7 +28,7 @@ export function createTourBusScene() {
  const registry=[],materials=new Set(),geometries=new Set(),textures=new Set();
  // Node inventory generation needs geometry only; browser owns texture loading.
  const loader=typeof document==='undefined'?null:new THREE.TextureLoader();
- const texture=path=>{if(!loader)return null;const t=loader.load(path);t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=4;textures.add(t);return t;};
+ const texture=(path,srgb=true)=>{if(!loader)return null;const t=loader.load(path);t.colorSpace=srgb?THREE.SRGBColorSpace:THREE.NoColorSpace;t.anisotropy=4;textures.add(t);return t;};
  const mat=(color,metalness=.5,roughness=.55)=>{const m=new THREE.MeshStandardMaterial({color,metalness,roughness});materials.add(m);return m;};
  const steel=mat(0x233440),dark=mat(0x101923),floor=mat(0x263039,.65,.4),brass=mat(0x957352,.7,.38),ivory=mat(0x82939a,.45,.6);
  const cyan=mat(0x3ae7ee);cyan.emissive.set(0x3ae7ee);cyan.emissiveIntensity=2;
@@ -154,7 +154,7 @@ export function createTourBusScene() {
  const moonMaterial=mat(0xb9bdc3,0,.95);moonMaterial.map=texture(TOUR_PLANET.moon);moonMaterial.fog=false;
  const moon=mesh(moonGroup,new THREE.SphereGeometry(5.2,48,32),moonMaterial);moon.name='necros-moon';
  const bands=mesh(planetGroup,new THREE.TorusGeometry(29,.12,6,96),cyan);bands.rotation.x=1.25;bands.rotation.z=.3;
- const stars=asset('TB-STARS-01','stars','Stjärnfält',[0,0,0],'Användarens varma rymdbild (space-skybox-warm.jpg) på en inåtvänd sfär, kompletterad med ett glest punktstjärnfält bakom fönstret.');
+ const stars=asset('TB-STARS-01','stars','Stjärnfält',[0,0,0],'Användarens valda rymdbild (space.jpg) på en inåtvänd sfär, kompletterad med ett glest punktstjärnfält bakom fönstret.');
  const skyMaterial=new THREE.MeshBasicMaterial({map:texture(TOUR_PLANET.sky),side:THREE.BackSide,fog:false,depthWrite:false});materials.add(skyMaterial);
  const sky=mesh(stars,new THREE.SphereGeometry(280,48,32),skyMaterial);sky.name='tour-space-sky';sky.renderOrder=-1;
  const starData=[];let seed=314;const random=()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296;};for(let i=0;i<500;i++)starData.push((random()-.5)*260,(random()-.25)*160,-140-random()*70);
@@ -170,7 +170,27 @@ export function createTourBusScene() {
  // Observation glazing looks to port (-X), never through the hangar.
  const windowRow=registry.find(r=>r.id==='TB-WINDOW-01');windowRow.group.position.set(-101,24,0);windowRow.group.rotation.y=Math.PI/2;windowRow.group.scale.set(.7,.65,1);windowRow.zoneId='06';
  const railRow=registry.find(r=>r.id==='TB-RAIL-01');railRow.group.position.set(-98,24,0);railRow.group.rotation.y=Math.PI/2;railRow.group.scale.x=.7;railRow.zoneId='06';
- for(const [id,pos] of [['TB-PLANET-01',[-158,38,0]],['TB-MOON-01',[-174,49,-37]]]){const row=registry.find(r=>r.id===id);row.group.position.fromArray(pos);row.zoneId='06';}
+ for(const [id,pos] of [['TB-PLANET-01',[-185,-65,-8]],['TB-MOON-01',[-205,60,-58]]]){const row=registry.find(r=>r.id===id);row.group.position.fromArray(pos);row.zoneId='06';}
+ // A close orbital horizon: the large body sits below the window, not at its centre.
+ planetGroup.scale.setScalar(3.7);
+ const atmosphereMaterial=new THREE.ShaderMaterial({
+  uniforms:{tint:{value:new THREE.Color(0x77bcff)}},transparent:true,depthWrite:false,
+  blending:THREE.AdditiveBlending,
+  vertexShader:`varying vec3 n; varying vec3 v;
+   void main(){vec4 p=modelViewMatrix*vec4(position,1.);n=normalize(normalMatrix*normal);v=-p.xyz;gl_Position=projectionMatrix*p;}`,
+  fragmentShader:`uniform vec3 tint; varying vec3 n; varying vec3 v;
+   void main(){float rim=pow(1.-max(dot(normalize(n),normalize(v)),0.),5.);gl_FragColor=vec4(tint,rim*.7);}`
+ });materials.add(atmosphereMaterial);
+ const atmosphere=mesh(planetGroup,new THREE.SphereGeometry(27.45,64,48),atmosphereMaterial);atmosphere.name='tour-atmosphere';
+ const traffic=[];
+ for(const [i,pos] of [[-128,35,-25],[-145,39,4],[-122,33,-4]].entries()){
+  const g=asset(`TB-ORBIT-SHUTTLE-${i+1}`,'orbital-traffic','Orbital service traffic',pos,'Slow background shuttle outside the observation window; visual scale cue only, no race or gameplay collision.','P2');
+  registry.at(-1).zoneId='06';
+  box(g,[3,.5,1],[0,0,0],steel);
+  importInto(g,'cargo-shuttle.glb',i===0?4:2.8,0);
+  traffic.push({group:g,base:new THREE.Vector3(...pos),phase:i*2.1});
+ }
+ let orbitTime=0;
  // Solid room shells: no direct camera flight between rooms. Doors are readable
  // closed thresholds; the short masked cut represents passage/lift travel.
  function room(zoneId,w,d,h,openWest=false){
@@ -183,7 +203,28 @@ export function createTourBusScene() {
   box(door,[.1,4,3],[0,2,0],brass);for(const z of [-1.6,1.6])box(door,[.15,4.3,.08],[-.1,2.15,z],cyan);
   const light=new THREE.PointLight(zoneId==='02'?0xffc58a:0x8bd7f0,180,32,2);light.position.set(...zone.position);light.position.y+=7;light.userData.zoneId=zoneId;scene.add(light);
  }
- room('03',32,30,12);room('05',28,28,11);room('02',28,28,11);buildObservationDeck({asset,box,mesh,beam,mat,registry,scene,materials,geometries});
+ room('03',32,30,12);room('05',28,28,11);room('02',28,28,11);buildObservationDeck({asset,box,mesh,beam,mat,registry,scene,materials,geometries,texture});
+ // Reviewed local greenery, one source load per type and grounded instances.
+ for(const row of registry.filter(r=>r.id.startsWith('TB-OBS-FOLIAGE-'))){
+  importInto(row.group,'observation-bush.glb',2.2);
+  row.modelSize=[1.922,1.268,2.2];
+ }
+ for(const side of [-1,1]){
+  const g=asset(`TB-OBS-TREE-${side<0?'L':'R'}`,'foliage','Observation: indoor tree',[-86,24,side*13.5],'Supplied potted money tree, grounded beside the planting beds; keeps the central panorama clear.','P2');
+  registry.at(-1).zoneId='06';registry.at(-1).modelSize=[2.387,3.229,2.4];
+  cylinder(g,.45,.65,[0,.325,0],steel);
+  importInto(g,'observation-tree.glb',2.4,side<0?.25:-.25);
+ }
+ // First supplied observation furniture pass; originals remain in Desktop assets.
+ for(const row of registry.filter(r=>r.id.startsWith('TB-OBS-BENCH-')||r.id.startsWith('TB-OBS-CONSOLE-'))){
+  const bench=row.kind==='bench';importInto(row.group,bench?'observation-bench.glb':'observation-console.glb',bench?3:1.25);
+  row.description=bench?'Supplied modular bench GLB, shared between the two observation seating slots.':'Supplied information console GLB, proportionally fitted and grounded; decorative screen, existing UI retains controls.';
+  row.modelSize=bench?[3,.426,1.252]:[1.25,1.352,.842];
+ }
+ for(const side of [-1,1]){
+  const g=asset(`TB-OBS-VINE-${side<0?'L':'R'}`,'foliage','Observation: hanging vine',[-91,27,side*15.5],'Supplied climbing-vine GLB mounted along the side wall, outside the central panorama sightline.','P2');
+  registry.at(-1).zoneId='06';registry.at(-1).modelSize=[1.3,2.35,.411];importInto(g,'observation-vine.glb',1.3,side>0?Math.PI:0);
+ }
  buildCarrierBlockout({asset,box,cylinder,beam,room,registry,zones:TOUR_ZONES,steel,dark,brass,ivory,cyan,amber});
  const ends=asset('TB-HANGAR-ENDS','wall','Hangarens slutväggar',[0,0,0],'Slutna hangarväggar ersätter den tidigare stora observationsöppningen.','P1');
  for(const z of [-32.8,32.8])box(ends,[46,21,.5],[0,10.5,z],dark);
@@ -206,11 +247,12 @@ export function createTourBusScene() {
    if(elapsed>.4)opacity=Math.max(0,1-(elapsed-.4)/.3);
    if(elapsed>=.7||!motion){pending=null;opacity=0;}
   }
-  if(motion){holo.rotation.y+=dt*.2;planet.rotation.y+=dt*.006;clouds.rotation.y+=dt*.009;}
+  if(motion){orbitTime+=Math.max(0,dt);for(const item of traffic){item.group.position.copy(item.base);item.group.position.z+=Math.sin(orbitTime*.025+item.phase)*7;item.group.position.y+=Math.sin(orbitTime*.018+item.phase)*.35;}holo.rotation.y+=dt*.2;planet.rotation.y+=dt*.006;clouds.rotation.y+=dt*.009;}
  }
  function setWorld(id){
   if(!TOUR_WORLDS[id])return;
   const necros=id==='necros';
+  atmosphereMaterial.uniforms.tint.value.setHex(necros?0x77bcff:id==='vitrum'?0x74eec9:0xa98dff);
   planetMaterial.color.setHex(necros?0xffffff:TOUR_WORLDS[id].color);
   planetMaterial.map=necros?surfaceMap:null;
   planetMaterial.emissiveMap=necros?surfaceMap:null;

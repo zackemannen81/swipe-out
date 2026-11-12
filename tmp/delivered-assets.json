@@ -1,0 +1,139 @@
+[
+  {
+    "file": "Meshy_AI_A_vine_growing_on_a_w_1111141346_texture.glb",
+    "bytes": 2160140,
+    "sha256": "3ede24aed0fb3bc71cc89cf21fb2f6f4c8b6ae935f643674de4687029afaa641",
+    "triangles": 9977,
+    "materials": 1,
+    "images": 1,
+    "requiredExtensions": [],
+    "externalUris": []
+  },
+  {
+    "file": "Meshy_AI_Concrete_Raised_Garde_1111140108_texture.glb",
+    "bytes": 18722596,
+    "sha256": "45c90398c899f140631c8d20e1fb628dd3f92204e9f6206a1e1814139b2f7673",
+    "triangles": 27286,
+    "materials": 1,
+    "images": 3,
+    "requiredExtensions": [],
+    "externalUris": []
+  },
+  {
+    "file": "Meshy_AI_Futuristic_modular_bench_1111140748_texture.glb",
+    "bytes": 7437396,
+    "sha256": "1d877651e01045417c49f1ccdb55ffab597668a2b1fb2239f0d4cf3998e49606",
+    "triangles": 20712,
+    "materials": 1,
+    "images": 3,
+    "requiredExtensions": [],
+    "externalUris": []
+  },
+  {
+    "file": "Meshy_AI_LED_Light_1111073825_texture.glb",
+    "bytes": 7700516,
+    "sha256": "214d6c6431051293b3ea3fa3f576d9a88b07876a4e343da81d13a27441347a72",
+    "triangles": 10000,
+    "materials": 1,
+    "images": 3,
+    "requiredExtensions": [],
+    "externalUris": []
+  },
+  {
+    "file": "Meshy_AI_wall_decor_1111141431_texture.glb",
+    "bytes": 5819000,
+    "sha256": "a4a5bf78030fee90fd298881068ee7155ab3697af51ee5a6d748fd170eeccf48",
+    "triangles": 6909,
+    "materials": 1,
+    "images": 3,
+    "requiredExtensions": [],
+    "externalUris": []
+  },
+  {
+    "file": "planteringskärl_lång.glb",
+    "bytes": 19647372,
+    "sha256": "f0c16f78505018cdf5e998db9e7333e350ef1eca9c5394cd3959fa206605fc45",
+    "triangles": 98857,
+    "materials": 1,
+    "images": 4,
+    "requiredExtensions": [],
+    "externalUris": []
+  },
+  {
+    "file": "observation\\TB-OBS-CONSOLE-01.glb",
+    "bytes": 10641112,
+    "sha256": "6d4989b62481f786bf6f9d9194ba5d00788908e569f495391664cf67a4138901",
+    "triangles": 20824,
+    "materials": 1,
+    "images": 3,
+    "requiredExtensions": [],
+    "externalUris": []
+  },
+  {
+    "file": "observation\\leafy-fern\\Meshy_AI_Leafy_Fern__1110140643_texture.glb",
+    "bytes": 7209404,
+    "sha256": "73bee29c134c5c8bdfc5ccd383810acec0ddb958fe2e5fbe93201ec1d6dd0a4e",
+    "triangles": 84201,
+    "materials": 1,
+    "images": 1,
+    "requiredExtensions": [],
+    "externalUris": []
+  },
+  {
+    "file": "damp_moss_scokevf0_2k.zip",
+    "zipFiles": [
+      "Damp_Moss_scokevf0_2K_AO.jpg",
+      "Damp_Moss_scokevf0_2K_BaseColor.jpg",
+      "Damp_Moss_scokevf0_2K_Bump.jpg",
+      "Damp_Moss_scokevf0_2K_Cavity.jpg",
+      "Damp_Moss_scokevf0_2K_Displacement.jpg",
+      "Damp_Moss_scokevf0_2K_Gloss.jpg",
+      "Damp_Moss_scokevf0_2K_Normal.jpg",
+      "Damp_Moss_scokevf0_2K_Roughness.jpg",
+      "Damp_Moss_scokevf0_2K_Specular.jpg",
+      "scokevf0.json"
+    ]
+  },
+  {
+    "file": "dark_mossy_rock_shrkdejk_2k.zip",
+    "zipFiles": [
+      "Dark_Mossy_Rock_shrkdejk_2K_AO.jpg",
+      "Dark_Mossy_Rock_shrkdejk_2K_BaseColor.jpg",
+      "Dark_Mossy_Rock_shrkdejk_2K_Bump.jpg",
+      "Dark_Mossy_Rock_shrkdejk_2K_Cavity.jpg",
+      "Dark_Mossy_Rock_shrkdejk_2K_Displacement.jpg",
+      "Dark_Mossy_Rock_shrkdejk_2K_Gloss.jpg",
+      "Dark_Mossy_Rock_shrkdejk_2K_Normal.jpg",
+      "Dark_Mossy_Rock_shrkdejk_2K_Roughness.jpg",
+      "Dark_Mossy_Rock_shrkdejk_2K_Specular.jpg",
+      "shrkdejk.json"
+    ]
+  },
+  {
+    "file": "dark_soil_scmlbap0_2k.zip",
+    "zipFiles": [
+      "Dark_Soil_scmlbap0_2K_AO.jpg",
+      "Dark_Soil_scmlbap0_2K_BaseColor.jpg",
+      "Dark_Soil_scmlbap0_2K_Bump.jpg",
+      "Dark_Soil_scmlbap0_2K_Cavity.jpg",
+      "Dark_Soil_scmlbap0_2K_Displacement.jpg",
+      "Dark_Soil_scmlbap0_2K_Gloss.jpg",
+      "Dark_Soil_scmlbap0_2K_Normal.jpg",
+      "Dark_Soil_scmlbap0_2K_Roughness.jpg",
+      "Dark_Soil_scmlbap0_2K_Specular.jpg",
+      "scmlbap0.json"
+    ]
+  },
+  {
+    "file": "furniture_fabric_sjfvcbtc_2k.zip",
+    "zipFiles": [
+      "Furniture_Fabric_sjfvcbtc_2K_BaseColor.jpg",
+      "Furniture_Fabric_sjfvcbtc_2K_Cavity.jpg",
+      "Furniture_Fabric_sjfvcbtc_2K_Gloss.jpg",
+      "Furniture_Fabric_sjfvcbtc_2K_Normal.jpg",
+      "Furniture_Fabric_sjfvcbtc_2K_Roughness.jpg",
+      "Furniture_Fabric_sjfvcbtc_2K_Specular.jpg",
+      "sjfvcbtc.json"
+    ]
+  }
+]

@@ -20,6 +20,16 @@ export function createTourBus({container,templates,frontEnd,tracks}){
  for(const [id,v] of Object.entries(TOUR_VIEWS)){const option=document.createElement('option');option.value=id;option.textContent=`${v.subtitle} · ${v.title}`;directory.append(option);}
  directory.addEventListener('change',()=>go(directory.value));container.append(directory);
  const crew=createTourCrew({container,frontEnd});
+ let quietView=false;
+ const restoreView=document.createElement('button');restoreView.type='button';restoreView.className='bus-restore-view';restoreView.hidden=true;restoreView.textContent='RETURN TO CONTROLS · ESC';
+ container.append(restoreView);
+ function setQuietView(enabled){
+  quietView=enabled;container.classList.toggle('bus-quiet-view',enabled);restoreView.hidden=!enabled;
+  if(enabled)restoreView.focus({preventScroll:true});
+  else if(station==='observation')$('#bus-view-toggle')?.focus({preventScroll:true});
+ }
+ restoreView.onclick=()=>setQuietView(false);
+
  const hotspotRoot=$('.bus-hotspots');
  for(const anchor of anchors){const b=document.createElement('button');b.type='button';b.className='bus-hotspot';b.textContent=anchor.label;b.addEventListener('click',()=>go(anchor.id));anchor.button=b;hotspotRoot.append(b);}
  container.querySelectorAll('[data-station]').forEach(b=>b.addEventListener('click',()=>go(b.dataset.station)));
@@ -44,7 +54,7 @@ export function createTourBus({container,templates,frontEnd,tracks}){
    const b=button(`DEPART · ${entry?.name??TOUR_WORLDS[world].track} →`,()=>frontEnd.depart(world),!entry);b.id='bus-depart';
    button('VIEW PLANET →',()=>go('observation'));
   }
-  if(station==='observation'){text(`IN ORBIT / ${TOUR_WORLDS[world].title}`);text(TOUR_WORLDS[world].description);button('RETURN TO BRIEFING →',()=>go('briefing'));}
+  if(station==='observation'){text(`IN ORBIT / ${TOUR_WORLDS[world].title}`);text(TOUR_WORLDS[world].description);const viewButton=button('ENJOY THE VIEW',()=>setQuietView(true));viewButton.id='bus-view-toggle';button('RETURN TO BRIEFING →',()=>go('briefing'));}
   const blockout=BLOCKOUT_ROOMS.find(r=>r.station===station);
   if(blockout){text(blockout.description);text('CREW ACCESS · Interior services are being prepared.');
    const zone=TOUR_VIEWS[station].zoneId;
@@ -65,6 +75,7 @@ export function createTourBus({container,templates,frontEnd,tracks}){
   if(frontEnd.workshopTransition)return;
   if(frontEnd.isBusGarage)frontEnd.show('bus');
   if(id===station||!hub.setView(id))return;
+  if(quietView)setQuietView(false);
   if(remember)history.push(station);
   directory.disabled=true;container.setAttribute('aria-busy','true');
   $('.bus-panel').hidden=true;
@@ -72,6 +83,7 @@ export function createTourBus({container,templates,frontEnd,tracks}){
   container.querySelectorAll('[data-station]').forEach(b=>b.disabled=true);
  }
  function back(){
+  if(quietView){setQuietView(false);return true;}
   if(crew.back())return true;
   if(hub.navigation.pending)return true;
   if(history.length){go(history.pop(),false);return true;}
@@ -80,6 +92,7 @@ export function createTourBus({container,templates,frontEnd,tracks}){
  }
  frontEnd.setBusBack(back);
  function returnToHangar(){
+  if(quietView)setQuietView(false);
   hub.update(1,false);hub.setView('hangar',true);station='hangar';history.length=0;
   directory.disabled=false;container.setAttribute('aria-busy','false');$('.bus-panel').hidden=false;
   $('.bus-transition').style.opacity='0';container.querySelectorAll('[data-station]').forEach(b=>b.disabled=false);draw();

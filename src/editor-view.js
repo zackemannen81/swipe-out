@@ -9,12 +9,13 @@ import { TransformControls } from 'three/addons/controls/TransformControls.js';
 import { createTrack, spawnTrackObjects, disposeTrackGroup } from './track.js';
 import { hasSurface, createTrackCurve } from './track-path.js';
 
-export function createEditorView(canvas, { onSelect, onMove, onCommit, onError }) {
+export function createEditorView(canvas, { onSelect, onMove, onCommit, onError, environmentMode=false }) {
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   const scene = new THREE.Scene();
   scene.background = new THREE.Color('#080f1a');
+  let cleanPreview=false;
   let skyPath='', skyTexture=null, skyRequest=0;
   const skyLoader=new THREE.TextureLoader();
   function setSky(path) {
@@ -133,7 +134,7 @@ export function createEditorView(canvas, { onSelect, onMove, onCommit, onError }
     const vertical = Number(flyKeys.has('KeyE')) - Number(flyKeys.has('KeyQ'));
     flyMove.set(0, 0, 0).addScaledVector(flyForward, forward).addScaledVector(flyRight, strafe).addScaledVector(flyUp, vertical);
     if (flyMove.lengthSq() > 0) {
-      const speed = flyKeys.has('ShiftLeft') || flyKeys.has('ShiftRight') ? 300 : 65;
+      const speed = (flyKeys.has('ShiftLeft') || flyKeys.has('ShiftRight') ? 300 : 65)*(environmentMode?.1:1);
       camera.position.addScaledVector(flyMove.normalize(), delta * speed);
     }
     orbit.target.copy(camera.position).addScaledVector(flyForward, 40);
@@ -141,7 +142,7 @@ export function createEditorView(canvas, { onSelect, onMove, onCommit, onError }
   const markerGeometry = new THREE.SphereGeometry(1, 12, 8);
   const markerMaterial = new THREE.MeshBasicMaterial({ color: '#b6ffff', depthTest: false });
   const selectedMaterial = new THREE.MeshBasicMaterial({ color: '#ff5f98', depthTest: false });
-  const grid = new THREE.GridHelper(2000, 40, 0x1d3542, 0x10212c);
+  const grid = new THREE.GridHelper(environmentMode?200:2000, environmentMode?200:40, 0x1d3542, 0x10212c);
   scene.add(grid);
   let track, road, selection = { kind: 'point', index: 0 };
   let sceneryKey = '', dirty = false, lastBuild = 0;
@@ -159,6 +160,21 @@ export function createEditorView(canvas, { onSelect, onMove, onCommit, onError }
     fillLight.color.setHex(vitrum?0xc8d8ac:0xc5edff);
     fillLight.groundColor.setHex(vitrum?0x29351c:0x182238);
     if (road) { scene.remove(road); disposeTrackGroup(road); }
+    if(environmentMode){
+      road=new THREE.Group();scene.add(road);
+      light.intensity=track.environment.lighting.key;fillLight.intensity=track.environment.lighting.ambient;
+      if(!skyPath)scene.background=new THREE.Color(track.environment.background);
+      const key=JSON.stringify([track.horizontalScale,track.objects]);
+      if(key!==sceneryKey){
+        spawnTrackObjects(scene,track);
+        // Neutral blockout surfaces stay legible without a reflection panorama.
+        scene.getObjectByName('customTrackObjects')?.children.forEach((mesh,i)=>{
+          if(track.objects[i]?.type!=='glb'&&mesh.material?.isMeshStandardMaterial){mesh.material.metalness=.08;mesh.material.roughness=.8;}
+        });
+        sceneryKey=key;
+      }
+      syncHighlights();dirty=false;lastBuild=performance.now();return;
+    }
     const assets = createTrack(track);
     road = assets.group;
     // A thin centerline keeps the route legible at editing distances where
@@ -187,6 +203,7 @@ export function createEditorView(canvas, { onSelect, onMove, onCommit, onError }
   }
 
   function syncSelection() {
+    if(cleanPreview||(environmentMode&&selection.kind!=='object')){transform.detach();return;}
     markers.children.forEach((mesh, i) => { const s=markerSelections[i]; mesh.material = s.kind===selection.kind && s.index===selection.index && s.branch===selection.branch ? selectedMaterial : markerMaterial; });
     const source = selection.kind === 'point' ? track.centerline[selection.index] : selection.kind === 'branch' ? track.branches?.[selection.branch]?.points[selection.index] : track.objects[selection.index]?.position;
     if (!source) { transform.detach(); return; }
@@ -204,6 +221,7 @@ export function createEditorView(canvas, { onSelect, onMove, onCommit, onError }
     onMove(selection, [p.x / track.horizontalScale, p.y, p.z / track.horizontalScale].map(n => Math.round(n * 100) / 100));
   });
   canvas.addEventListener('pointerdown', event => {
+    if(cleanPreview)return;
     if (flyMode) {
       if (event.button === 0) {
         flyPointer = { id: event.pointerId, x: event.clientX, y: event.clientY };
@@ -224,6 +242,7 @@ export function createEditorView(canvas, { onSelect, onMove, onCommit, onError }
   canvas.addEventListener('pointercancel', () => { flyPointer = null; down = null; });
   canvas.addEventListener('contextmenu', event => { if (flyMode) event.preventDefault(); });
   canvas.addEventListener('pointerup', event => {
+    if(cleanPreview)return;
     if (flyMode) { flyPointer = null; return; }
     if (!down || wasDragging || Math.hypot(event.clientX - down[0], event.clientY - down[1]) > 5) return;
     const rect = canvas.getBoundingClientRect();
@@ -244,8 +263,8 @@ export function createEditorView(canvas, { onSelect, onMove, onCommit, onError }
     track = value;
     selection = nextSelection;
     selectedObjects = new Set(indexes.filter(i => i >= 0 && i < track.objects.length));
-    const sources = track.centerline.map((p,index)=>({p,selection:{kind:'point',index}}));
-    (track.branches??[]).forEach((b,branch)=>b.points.forEach((p,index)=>sources.push({p,selection:{kind:'branch',branch,index}})));
+    const sources = (environmentMode?[]:track.centerline).map((p,index)=>({p,selection:{kind:'point',index}}));
+    (environmentMode?[]:(track.branches??[])).forEach((b,branch)=>b.points.forEach((p,index)=>sources.push({p,selection:{kind:'branch',branch,index}})));
     markerSelections = sources.map(s=>s.selection);
     while (markers.children.length < sources.length) {
       const mesh = new THREE.Mesh(markerGeometry, markerMaterial);
@@ -258,12 +277,18 @@ export function createEditorView(canvas, { onSelect, onMove, onCommit, onError }
       markers.children[i].position.set(p[0] * track.horizontalScale, p[1], p[2] * track.horizontalScale);
       bounds.expandByPoint(markers.children[i].position);
     });
-    grid.position.y = bounds.min.y - 10;
+    if(environmentMode){
+      for(const o of track.objects){const p=new THREE.Vector3(o.position[0]*track.horizontalScale,o.position[1],o.position[2]*track.horizontalScale);bounds.expandByPoint(p);}
+      if(bounds.isEmpty())bounds.set(new THREE.Vector3(-12,0,-12),new THREE.Vector3(12,8,12));
+    }
+    grid.position.y = environmentMode?0:bounds.min.y - 10;
     dirty = true;
     syncSelection();
   }
 
   function fit(top = false) {
+    if(environmentMode){const objects=scene.getObjectByName('customTrackObjects');if(objects?.children.length){const b=new THREE.Box3().setFromObject(objects);if(!b.isEmpty())bounds.copy(b);}}
+
     const center = bounds.getCenter(new THREE.Vector3());
     const size = Math.max(bounds.getSize(new THREE.Vector3()).length(), 30);
     const distance = size / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2))) / Math.min(camera.aspect, 1) * 0.9;
@@ -291,7 +316,7 @@ export function createEditorView(canvas, { onSelect, onMove, onCommit, onError }
     previousFrame = now;
     if (dirty && (!transform.dragging || now - lastBuild > 120)) build();
     if (flyMode) updateFly(delta);
-    else orbit.update();
+    else if(!cleanPreview)orbit.update();
     if (selectionHelpers.children.length && (transform.dragging || now - lastHighlightRefresh > 120)) {
       for (const helper of selectionHelpers.children) helper.update();
       lastHighlightRefresh = now;
@@ -306,11 +331,15 @@ export function createEditorView(canvas, { onSelect, onMove, onCommit, onError }
     updateWeaponPads(road, performance.now()/1000, null, true);
     const errors=scene.getObjectByName('customTrackObjects')?.userData.loadErrors;
     if(errors?.length)onError?.('GLB: '+errors.splice(0).join('; '));
-    updateScenery(scene, performance.now()/1000, {preview:document.getElementById('scenery-preview')?.checked,helpers:true});
+    updateScenery(scene, performance.now()/1000, {preview:document.getElementById('scenery-preview')?.checked,helpers:!cleanPreview});
     renderer.render(scene, camera);
   });
   return {
     setTrack, setSky, fit, setFlyMode,
+    getCamera(){return {position:camera.position.toArray(),target:orbit.target.toArray(),fov:camera.fov};},
+    setCamera(value){if(flyMode)setFlyMode(false);camera.position.fromArray(value.position);orbit.target.fromArray(value.target);camera.up.set(0,1,0);camera.fov=value.fov;camera.updateProjectionMatrix();orbit.update();},
+    setPreview(value){cleanPreview=!!value;grid.visible=!cleanPreview;markers.visible=!cleanPreview;selectionHelpers.visible=!cleanPreview;orbit.enabled=!cleanPreview&&!flyMode;transform.enabled=!cleanPreview&&!flyMode;transform.getHelper().visible=!cleanPreview&&!flyMode;if(cleanPreview)transform.detach();else syncSelection();},
+
     focusPad(pad) {
       const assets = createTrackCurve(track), p = padPlacement(assets,pad), f = p.frameAt(p.d);
       orbit.target.copy(f.center).addScaledVector(f.right,p.offset);
@@ -331,7 +360,7 @@ export function createEditorView(canvas, { onSelect, onMove, onCommit, onError }
       const bounds = new THREE.Box3().setFromPoints(positions);
       const center = bounds.getCenter(new THREE.Vector3());
       const direction = camera.position.clone().sub(orbit.target).normalize();
-      const distance = Math.max(track.width * 7, 60, bounds.getSize(new THREE.Vector3()).length() * 1.3);
+      const distance = Math.max(environmentMode?6:track.width * 7, environmentMode?8:60, bounds.getSize(new THREE.Vector3()).length() * 1.3);
       orbit.target.copy(center);
       camera.position.copy(center).addScaledVector(direction, distance);
       if (flyMode) setFlyMode(false);

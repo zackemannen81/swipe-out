@@ -43,3 +43,13 @@ body.in-menu:has(#start-screen[data-bus-garage=true]) #rotate-device-overlay{dis
 /* All rooms remain accessible without expanding the five quick shortcuts. */
 .bus-directory{position:absolute;right:4%;bottom:78px;width:min(390px,43vw);padding:12px;background:#0b2530;color:#d8fff6;border:1px solid #63939e;font:11px monospace;pointer-events:auto;}
 @media(max-width:700px){.bus-directory{left:4%;right:4%;bottom:88px;width:92%;padding:10px;font-size:10px}.bus-panel{bottom:136px;max-height:26vh}}
+
+.bus-quiet-view > .bus-heading,
+.bus-quiet-view > .bus-panel,
+.bus-quiet-view > .bus-nav,
+.bus-quiet-view > .bus-directory,
+.bus-quiet-view > .bus-hotspots,
+.bus-quiet-view > .bus-archive-button{display:none!important}
+.bus-restore-view{pointer-events:auto;position:absolute;right:4%;bottom:3%;z-index:12;padding:12px 18px;background:rgba(5,15,22,.8);color:#c6eeed;border:1px solid #538582;font:12px monospace;cursor:pointer}
+.bus-restore-view[hidden]{display:none}
+.bus-restore-view:focus-visible{outline:2px solid #6ff5e8;outline-offset:4px}

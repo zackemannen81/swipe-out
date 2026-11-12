@@ -1,0 +1,1 @@
+PASS: six loaded/shared/grounded greenery props, clear sightline, soil textures, observation architecture, all three worlds, quiet view + focus + mobile return, Back; no page errors

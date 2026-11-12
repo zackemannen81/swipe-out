@@ -1,0 +1,13 @@
+✔ all new public interiors have grounded shells, interior cameras, narration and persistent destinations (168.2412ms)
+✔ plan registry has sixteen locations, fifteen destinations and valid reciprocal links (4.6817ms)
+✔ all station pairs cut only under full mask and settle exactly; rapid input is rejected (275.1296ms)
+✔ Tour Bus replacement inventory covers named groups and navigation has finite camera poses (200.5053ms)
+✔ observation has owned finite geometry, clear camera sightline and grounded replaceable slots (193.1278ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 539.2882

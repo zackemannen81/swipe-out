@@ -1,5 +1,15 @@
 # File Structure
 
+## 2026-11-11 — Environment editor
+
+- `src/environment-format.js` — validated scene documents and track conversion
+- `src/environment-storage.js` — isolated IndexedDB scene persistence
+- `src/editor.js`, `src/editor-view.js`, `src/editor.css` — environment authoring mode
+- `tests/environment-format.test.js` — roundtrip, conversion and validation tests
+- `tools/verify-environment-editor.mjs` — browser save/reload/import/preview regression
+- `docs/ENVIRONMENT_EDITOR.md` — author quickstart and integration boundaries
+- `docs/archive/TOUR-ASSET-COLLECTION-001-in-progress.md` — preceding task checkpoint
+
 ## 2026-11-06 — EDITOR-SKY-FLY-001
 
 - `src/editor-object-actions.js` — pure selection/copy/paste/delete helpers and scene capacity guardrails
@@ -553,3 +563,37 @@ New regression tests: tests/finish-features.test.js. Prior task archived in
 - tools/verify-tour-blockout.mjs: desktop/mobile room and narration checks.
 - docs/TOUR_BUS_OBJECTS.md/.json: regenerated 143 named replacement groups.
 - docs/archive/PROGRESS-SAVE-001.md: completed previous task.
+
+## 2026-11-11 — Asset delivery review
+- docs/TOUR_ASSET_DELIVERY_2026-11-11.md/.json: review, mapping, counts and source hashes.
+- public/models/tour-bus/observation-{bench,console,vine}.glb: supplied runtime copies.
+- tools/review-tour-delivery.mjs: isolated 3D candidate preview.
+- tools/verify-tour-delivery.mjs: loaded prop grounding and room regression verification.
+
+## Meshy archive review tools
+- tools/audit-meshy-library.py: non-destructive GLB inventory and SHA-256 grouping.
+- tools/review-meshy-shortlist.mjs: twelve selected candidate 3D previews.
+- docs/MESHY_LIBRARY_INVENTORY.json: all file metadata and exact duplicates.
+- docs/MESHY_LIBRARY_REVIEW.md: visually reviewed shortlist and next-use mapping.
+
+## 2026-11-11 - Observation greenery
+- public/models/tour-bus/observation-{tree,bush}.glb: reviewed supplied copies
+- public/images/tour-bus/soil/{basecolor,roughness}.jpg: supplied 2K soil maps
+- docs/OBSERVATION_GREENERY_ASSETS.json: source paths, bytes and SHA-256
+- tools/verify-tour-greenery.mjs: placement, sharing, textures and navigation
+- docs/archive/ENVIRONMENT-EDITOR-001.md: preceding completed task
+
+## 2026-11-11 - Observation art direction
+- docs/OBSERVATION_ART_DIRECTION.md: visual target and remaining art passes
+- docs/references/observation-target.jpg: supplied concept reference copy
+- docs/archive/TOUR-OBS-GREENERY-001.md: preceding completed task
+- public/images/tour-bus/space.jpg: user-supplied carrier sky (existing file)
+
+## 2026-11-11 - Observation polish
+- src/tour-observation.js: segmented vault/reveal and planting lights
+- src/tour-bus.js: orbital composition, atmosphere and shared-model traffic
+- src/tour-bus-ui.js, src/tour-bus.css: quiet observation view and return controls
+- tests/tour-orbit.test.js: traffic bounds/motion freeze and atmosphere disposal
+- tools/verify-observation-polish.mjs: three-world and quiet-view browser checks
+- docs/archive/TOUR-OBS-SKY-001.md: previous task checkpoint
+- docs/TOUR_BUS_OBJECTS.md/.json: 156 registered replacement groups

@@ -1,3 +1,5 @@
+import {newEnvironment,normalizeEnvironment,serializeEnvironment,parseEnvironment} from './environment-format.js';
+import {loadEnvironments,persistEnvironment,removeEnvironment} from './environment-storage.js';
 import editorMedia from 'virtual:track-editor-media';
 import { loadGlb, validateGlb } from './glb-scenery.js';
 import { CATHEDRAL_KIT, createCathedralObjects } from './cathedral-kit.js';
@@ -5,7 +7,7 @@ import { suggestBoostPads } from './track-pads.js';
 import { createTrack, disposeTrackGroup } from './track.js';
 import { BUILTIN_TRACKS } from './track-library.js';
 import { loadTrackLibrary, persistTrack, removePersistedTrack } from './track-storage.js';
-import { normalizeTrack, parseTrack, serializeTrack, MAX_TRACK_BYTES } from './track-format.js';
+import { normalizeTrack as normalizeRaceTrack, parseTrack as parseRaceTrack, serializeTrack as serializeRaceTrack, MAX_TRACK_BYTES } from './track-format.js';
 import { createHistory } from './editor-history.js';
 import { selectedObjectIndexes, copySceneObjects, createPastedObjects, withoutSceneObjects } from './editor-object-actions.js';
 import { createEditorView } from './editor-view.js';
@@ -13,13 +15,35 @@ import { createTrackCurve, getTrackFrame, progressAtControlPoint } from './track
 import './editor.css';
 
 const $ = selector => document.querySelector(selector);
-const library = await loadTrackLibrary(localStorage);
+const environmentMode=new URLSearchParams(location.search).get('mode')==='environment';
+const normalizeTrack=environmentMode?normalizeEnvironment:normalizeRaceTrack;
+const parseTrack=environmentMode?parseEnvironment:parseRaceTrack;
+const serializeTrack=environmentMode?serializeEnvironment:serializeRaceTrack;
+const library = environmentMode?await loadEnvironments():await loadTrackLibrary(localStorage);
+if(environmentMode&&!Object.keys(library.entries).length){const key='scene-'+crypto.randomUUID();library.entries[key]={data:newEnvironment(key)};}
+const modeLink=document.createElement('a');modeLink.className='game-link';modeLink.href=environmentMode?'./editor.html':'./editor.html?mode=environment';modeLink.textContent=environmentMode?'TRACK EDITOR ↗':'ENVIRONMENT EDITOR ↗';$('.editor-header').append(modeLink);
+if(environmentMode){
+ document.title='SwipeOut — Environment Editor';document.body.classList.add('environment-editor');
+ $('.eyebrow').textContent='DEV TOOL / ENVIRONMENT AUTHORING';$('.canvas-panel .panel-heading span').textContent='3D ENVIRONMENT EDITOR';$('.controls-panel .panel-heading span').textContent='SCENE SETTINGS';
+ $('#fit-button').textContent='FIT SCENE';$('#save-button').textContent='SAVE SCENE';$('#test-button').textContent='PREVIEW CAMERA';$('#import-button').textContent='IMPORT SCENE / TRACK JSON';
+ $('#track-select').parentElement.firstChild.textContent='SCENE ';$('#scale-input').parentElement.firstChild.textContent='OBJECT X/Z SCALE ';
+ $('#width-input').parentElement.hidden=true;$('#magnetic-input').parentElement.hidden=true;
+ document.querySelectorAll('.point-editor,.cathedral-kit').forEach(e=>e.hidden=true);
+ document.querySelectorAll('.gap-editor').forEach(e=>{if(!e.contains($('#track-sky')))e.hidden=true;});
+ $('#track-alt-music').parentElement.hidden=true;
+ document.querySelectorAll('.field-help').forEach(e=>{if(e.textContent.startsWith('Embedded GLB'))e.textContent='Embedded GLB up to 32 MB. For larger models use /models/name.glb under public/models. Materials are preserved; scenery has no collision.';});
+ $('#track-sky').closest('.gap-editor').querySelector('.field-help').textContent='Scene music is stored as a reference. The editor does not play it.';
+ $('footer').textContent='ENVIRONMENTS SAVE SEPARATELY FROM TRACKS · DOWNLOAD JSON FOR BACKUP · MODEL PATHS REQUIRE THEIR FILES';
+ const controls=document.createElement('section');controls.className='environment-controls';controls.innerHTML=`<div class="button-row"><button id="new-scene">NEW EMPTY SCENE</button><button id="new-room">NEW ROOM TEMPLATE</button></div><p class="field-help">1 unit ≈ 1 metre at scale 1. Add models or primitives, then capture a camera. Scenes do not appear in the race selector.</p><div class="button-row"><button id="capture-camera">CAPTURE CAMERA</button><button id="restore-camera">RESTORE CAMERA</button></div><label>CAMERA FOV <input id="scene-fov" type="number" min="15" max="100" value="45"></label><label>AMBIENT LIGHT <input id="scene-ambient" type="number" min="0" max="10" step="0.1"></label><label>KEY LIGHT <input id="scene-key" type="number" min="0" max="10" step="0.1"></label><label>BACKGROUND COLOR <input id="scene-background" type="color"></label><p class="field-help">Preview hides grid and edit handles. Press Escape or the preview button to return.</p>`;
+ $('.controls-panel').prepend(controls);
+}
+
 const drafts = new Map();
 for (const [key, entry] of Object.entries(library.entries)) {
   drafts.set(key, { track: entry.data, saved: JSON.stringify(entry.data), history: createHistory(entry.data) });
 }
 const requestedKey = new URLSearchParams(location.search).get('track');
-let currentKey = drafts.has(requestedKey) ? requestedKey : 'track1';
+let currentKey = drafts.has(requestedKey) ? requestedKey : environmentMode?drafts.keys().next().value:'track1';
 let selection = { kind: 'point', index: 0 };
 let selectedObjects = new Set();
 let objectClipboard = [];
@@ -75,6 +99,7 @@ function themeRailColors(definition) {
 }
 function message(text, error = false) { status.textContent = text; status.classList.toggle('error', error); }
 const view = createEditorView($('#editor-canvas'), {
+  environmentMode,
   onError(error) { message(error, true); },
   onSelect(value, options) { chooseSelection(value, options); },
   onMove(value, position) {
@@ -102,7 +127,7 @@ function edit(change, commit = true) {
     if (commit) current().history.push(track());
     render();
     view.setTrack(track(), selection, selectedIndexes());
-    message('Unsaved changes. Save to Game or Save & Test when ready.');
+    message(environmentMode?'Unsaved scene. Save Scene or Download when ready.':'Unsaved changes. Save to Game or Save & Test when ready.');
     return true;
   } catch (error) {
     render();
@@ -133,17 +158,19 @@ function render() {
   }));
   select.value = currentKey;
   $('#save-state').textContent = isDirty(current()) ? 'UNSAVED' : 'SAVED';
-  $('#point-count').textContent = `${value.centerline.length} POINTS · ${value.objects.length} OBJECTS`;
+  $('#point-count').textContent = environmentMode?`${value.objects.length} OBJECTS · ENVIRONMENT`:`${value.centerline.length} POINTS · ${value.objects.length} OBJECTS`;
+  if(environmentMode){setValue('#scene-fov',value.environment.camera.fov);setValue('#scene-ambient',value.environment.lighting.ambient);setValue('#scene-key',value.environment.lighting.key);setValue('#scene-background',value.environment.background);}
   setValue('#track-name', value.name);
   setValue('#width-input', value.width);
   setValue('#scale-input', value.horizontalScale);
   $('#width-value').textContent = value.width.toFixed(2);
   $('#scale-value').textContent = value.horizontalScale.toFixed(2);
   $('#magnetic-input').checked = value.magnetic === true;
-  const defaults=library.entries[currentKey]??BUILTIN_TRACKS[currentKey]??BUILTIN_TRACKS.track1;
+  const defaults=environmentMode?{}:library.entries[currentKey]??BUILTIN_TRACKS[currentKey]??BUILTIN_TRACKS.track1;
   syncMediaChoice('#track-music',value.music,defaults.defaultAudio);
   syncMediaChoice('#track-alt-music',value.alternateMusic);
   syncMediaChoice('#track-sky',value.sky,defaults.backdrop);
+  if(environmentMode)$('#track-sky').options[0].textContent='Use background color';
   syncMediaChoice('#road-texture',value.roadTexture);
   setValue('#road-material',value.roadMaterial??'default');
   const rails=themeRailColors(value);
@@ -151,7 +178,7 @@ function render() {
   setValue('#rail-right',value.railColors?.right??rails.right);
   setValue('#cpu-multiplier',value.cpuMultiplier??1);
   $('#cpu-multiplier-value').textContent=(value.cpuMultiplier??1).toFixed(2);
-  view.setSky(value.sky??defaults.backdrop);
+  view.setSky(value.sky??(environmentMode?'':defaults.backdrop));
   $('#undo-button').disabled = !current().history.canUndo;
   $('#redo-button').disabled = !current().history.canRedo;
   $('#reset-button').textContent = BUILTIN_TRACKS[currentKey] ? 'RESTORE BUILT-IN' : 'REMOVE CUSTOM';
@@ -434,7 +461,8 @@ function activate(key) {
   selectedObjects.clear();
   selection = { kind: 'point', index: 0 };
   render(); view.setTrack(track(), selection, []); view.fit();
-  message('Drafts are kept while switching tracks. Save or download before closing the editor.');
+  if(environmentMode)view.setCamera(track().environment.camera);
+  message('Drafts are kept while switching. Save or download before closing the editor.');
 }
 $('#track-select').addEventListener('change', event => activate(event.target.value));
 $('#object-select').addEventListener('change', event => {
@@ -479,9 +507,9 @@ $('#add-point-btn').addEventListener('click', () => {
 $('#del-point-btn').addEventListener('click', () => edit(next => { pointCollection(next).splice(selection.index, 1); if(selection.kind==='point') next.pointWidths?.splice(selection.index,1); }));
 for (const button of document.querySelectorAll('[data-primitive]')) {
   button.addEventListener('click', () => {
-    const position = track().centerline[selection.kind === 'point' ? selection.index : 0].slice(0, 3);
+    const position = environmentMode?[0,0,0]:track().centerline[selection.kind === 'point' ? selection.index : 0].slice(0, 3);
     position[1] += 2;
-    edit(next => next.objects.push({ id: crypto.randomUUID(), type: button.dataset.primitive, position, scale: button.dataset.primitive==='light'?[1,1,1]:[5,5,5] }));
+    edit(next => next.objects.push({ id: crypto.randomUUID(), type: button.dataset.primitive, position, scale: button.dataset.primitive==='light'||environmentMode?[1,1,1]:[5,5,5] }));
     chooseSelection({kind:'object', index:track().objects.length - 1});
   });
 }
@@ -495,6 +523,7 @@ function historyAction(action) {
 $('#undo-button').addEventListener('click', () => historyAction('undo'));
 $('#redo-button').addEventListener('click', () => historyAction('redo'));
 window.addEventListener('keydown', event => {
+  if(environmentMode&&scenePreview)return;
   if (event.target instanceof Element && event.target.closest('input, textarea, select, [contenteditable="true"]')) return;
   const modifier = event.ctrlKey || event.metaKey;
   if ((event.code === 'Delete' || event.code === 'Backspace') && !modifier && selectedIndexes().length) {
@@ -531,17 +560,18 @@ async function save() {
   const key = currentKey;
   const snapshot = structuredClone(track());
   try {
-    const normalized = await persistTrack(localStorage, key, snapshot);
+    const normalized = await (environmentMode?persistEnvironment(key,snapshot):persistTrack(localStorage, key, snapshot));
     const draft = drafts.get(key);
     draft.saved = JSON.stringify(normalized);
     render();
-    message('Saved to IndexedDB in this browser. The track is now available in the race selector.');
+    message(environmentMode?'Scene saved in this browser. Download JSON for a portable backup.':'Saved to IndexedDB in this browser. The track is now available in the race selector.');
     return true;
   } catch (error) { message(error.message, true); return false; }
   finally { saveInProgress = false; }
 }
 $('#save-button').addEventListener('click', () => { void save(); });
 $('#test-button').addEventListener('click', async () => {
+  if(environmentMode){toggleScenePreview();return;}
   // Open synchronously to avoid popup blockers while IndexedDB writes asynchronously.
   const tab = window.open('about:blank', '_blank');
   if (await save()) {
@@ -550,9 +580,10 @@ $('#test-button').addEventListener('click', async () => {
   } else tab?.close();
 });
 $('#reset-button').addEventListener('click', async () => {
-  const builtIn = BUILTIN_TRACKS[currentKey];
-  if (!window.confirm(builtIn ? 'Restore this built-in track and discard its saved override and draft? Other tracks are kept.' : 'Remove this custom track and its draft? Download it first if you want to keep a copy.')) return;
+  const builtIn = environmentMode?null:BUILTIN_TRACKS[currentKey];
+  if (!window.confirm(builtIn ? 'Restore this built-in track and discard its saved override and draft? Other tracks are kept.' : `Remove this custom ${environmentMode?'scene':'track'} and its draft? Download it first if you want to keep a copy.`)) return;
   try {
+    if(environmentMode){await removeEnvironment(currentKey);drafts.delete(currentKey);if(!drafts.size)addEnvironment(false);else activate(drafts.keys().next().value);message('Scene removed. Other scenes and tracks were kept.');return;}
     await removePersistedTrack(localStorage, currentKey);
     if (builtIn) {
       const restored = normalizeTrack(builtIn.data);
@@ -563,7 +594,7 @@ $('#reset-button').addEventListener('click', async () => {
   } catch (error) { message(error.message, true); }
 });
 $('#copy-button').addEventListener('click', async () => {
-  try { await navigator.clipboard.writeText(serializeTrack(track())); message('Track JSON copied.'); }
+  try { await navigator.clipboard.writeText(serializeTrack(track())); message(environmentMode?'Scene JSON copied.':'Track JSON copied.'); }
   catch (error) { message(`Could not copy: ${error.message} Use Download instead.`, true); }
 });
 $('#download-button').addEventListener('click', () => {
@@ -572,7 +603,7 @@ $('#download-button').addEventListener('click', () => {
     const link = document.createElement('a'); link.href = url;
     link.download = `${track().id.replace(/[^a-z0-9_-]/gi, '-').slice(0, 80) || 'track'}.json`;
     link.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
-    message('Versioned track JSON downloaded. Embedded textures travel with the file.');
+    message('Versioned JSON downloaded. Embedded models/textures travel with the file; path references require their files.');
   } catch (error) { message(error.message, true); }
 });
 $('#import-button').addEventListener('click', () => $('#import-file').click());
@@ -584,13 +615,14 @@ $('#import-file').addEventListener('change', async event => {
     const key = `custom-${crypto.randomUUID()}`;
     drafts.set(key, { track: value, saved: null, history: createHistory(value) });
     activate(key);
-    message('Imported as a new draft. Existing tracks are kept. Save to Game to make this track playable.');
+    message(environmentMode?'Imported as a new scene draft. Track objects retain their X/Z scale; racing geometry is omitted. Save Scene when ready.':'Imported as a new draft. Existing tracks are kept. Save to Game to make this track playable.');
   } catch (error) { message(`Import failed — ${error.message}`, true); }
 });
 window.addEventListener('beforeunload', event => {
   if ([...drafts.values()].some(isDirty)) { event.preventDefault(); event.returnValue = ''; }
 });
 render(); view.setTrack(track(), selection); view.fit();
+if(environmentMode)view.setCamera(track().environment.camera);
 if (library.issues.length) message(library.issues.join(' '), true);
 
 function authoredPads(next) {
@@ -674,8 +706,8 @@ async function addGlb(source) {
   const key=currentKey, draft=track();
   const model=await loadGlb(source);disposeTrackGroup(model);
   if(key!==currentKey || draft!==track())throw new Error('Draft changed during import. Please try again.');
-  const position=[...track().centerline[0].slice(0,3)];
-  if(selection.kind==='point')position.splice(0,3,...track().centerline[selection.index].slice(0,3));
+  const position=environmentMode?[0,0,0]:[...track().centerline[0].slice(0,3)];
+  if(!environmentMode&&selection.kind==='point')position.splice(0,3,...track().centerline[selection.index].slice(0,3));
   const object={id:crypto.randomUUID(),type:'glb',model:source,position,rotation:[0,0,0],scale:[1,1,1]};
   // Verify portable export budget before changing the draft.
   serializeTrack({...track(),objects:[...track().objects,object]});
@@ -734,7 +766,8 @@ $('#add-glb').onclick=()=>$('#glb-file').click();
 $('#glb-file').onchange=async event=>{
  const file=event.target.files[0];event.target.value='';if(!file)return;
  try {
-  if(file.size>8*1024*1024)throw new Error('GLB exceeds 8 MB. Use a public/models path for larger models.');
+  const limit=environmentMode?32:8;
+  if(file.size>limit*1024*1024)throw new Error(`GLB exceeds ${limit} MB. Use a public/models path for larger models.`);
   validateGlb(await file.arrayBuffer());
   const source=await new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve('data:model/gltf-binary;base64,'+r.result.split(',')[1]);r.onerror=reject;r.readAsDataURL(file);});
   await addGlb(source);
@@ -747,3 +780,27 @@ $('#add-glb-path').onclick=async()=>{
   await addGlb(source);
  }catch(error){message(error.message,true);}
 };
+
+let scenePreview=false,editingCamera=null;
+function toggleScenePreview(force){
+ if(!environmentMode)return;
+ const enable=force??!scenePreview;
+ if(enable===scenePreview)return;
+ if(flyEnabled)toggleFly(false);
+ if(enable){editingCamera=view.getCamera();view.setCamera(track().environment.camera);}else if(editingCamera)view.setCamera(editingCamera);
+ scenePreview=enable;view.setPreview(enable);document.body.classList.toggle('scene-preview',enable);
+ $('#test-button').textContent=enable?'RETURN TO EDITING · ESC':'PREVIEW CAMERA';
+}
+function addEnvironment(room){
+ toggleScenePreview(false);const key='scene-'+crypto.randomUUID(),value=newEnvironment(key,room?'New room':'Untitled scene',room);
+ drafts.set(key,{track:value,saved:null,history:createHistory(value)});activate(key);
+}
+if(environmentMode){
+ $('#new-scene').onclick=()=>addEnvironment(false);$('#new-room').onclick=()=>addEnvironment(true);
+ $('#capture-camera').onclick=()=>{const camera=view.getCamera();edit(n=>{n.environment.camera=camera;});message('Camera captured. Save Scene to keep it.');};
+ $('#restore-camera').onclick=()=>{if(flyEnabled)toggleFly(false);view.setCamera(track().environment.camera);};
+ $('#scene-fov').onchange=e=>{const value=e.target.valueAsNumber;if(edit(n=>{n.environment.camera.fov=value;}))view.setCamera({...view.getCamera(),fov:value});};
+ for(const name of ['ambient','key'])$('#scene-'+name).onchange=e=>{const value=e.target.valueAsNumber;edit(n=>{n.environment.lighting[name]=value;});};
+ $('#scene-background').onchange=e=>{const value=e.target.value;edit(n=>{n.environment.background=value;});};
+ window.addEventListener('keydown',e=>{if(e.code==='Escape'&&scenePreview){e.preventDefault();toggleScenePreview(false);}});
+}

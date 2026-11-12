@@ -1,5 +1,15 @@
 # Current Status
 
+## 2026-11-11 — ENVIRONMENT-EDITOR-001
+
+Environment mode at `editor.html?mode=environment` supplies an independent scene
+library, blank/24m room starter, object-only viewport, camera capture/restore,
+FOV/lighting/background controls and clean preview. Existing object tools work;
+GLB embeds allow 32 MB per file (64 MB JSON budget), larger assets use model paths.
+Scenes save to separate IndexedDB and export versioned environment JSON. Track
+JSON imports retain object transforms/XZ scale without roads. No automatic Tour
+Bus installation, collisions or photo projection. Guide: ENVIRONMENT_EDITOR.md.
+
 ## 2026-11-06 — EDITOR-SKY-FLY-001
 
 Game and editor use matching equirectangular panorama mapping. The game no longer
@@ -1386,3 +1396,60 @@ object manifest and ATT_GENERERA.md. Copied existing Leafy Fern download unchang
 This is a candidate needing optimization/license verification, not an integrated model.
 CUA and node_repl cannot initialize (kernel assets path missing, OS error 3); Browser
 MCP has no connection. No new remote downloads; all remaining types are unsearched.
+
+## 2026-11-11 — Local asset delivery / observation furniture
+Reviewed eight supplied GLBs in a rendered preview and validated loader compatibility,
+embedded resources, bounds and triangle counts. Inspected four 2K PBR base-color
+sets from ZIPs without overwriting existing unpacked files. Audit and source hashes
+in TOUR_ASSET_DELIVERY_2026-11-11.md/.json; status copy in Desktop assets.
+Imported supplied bench, console and vine into two slots each on observation deck.
+Source GLBs load once per type, clones share resources and existing disposal owner.
+Originals unchanged; 145 replacement groups in updated manifest. Planter/fern models
+(98,857 / 84,201 triangles) await optimization; textures, LED and wall panel remain
+candidates. No claim of finished material pass or verified source licenses.
+Five focused tests and build pass. Chrome verifies six loaded/grounded placements,
+Necros/Vitrum switch, mobile and Back without page errors. Screenshots inspected;
+vines moved forward to visible side ribs. No new remote downloads. Collection ongoing.
+
+## 2026-11-11 — Meshy archive inventory
+Scanned 331 GLBs / 14.66 GB; 301 unique SHA-256 contents, 30 extra exact copies.
+All passed structural header/JSON/resource/required-codec checks; twelve selected
+candidates rendered and visually inspected. Tree, bush and sliding door are useful
+candidates; panel sheet needs splitting. Heavy cargo/engine/planter require reduction.
+Console visually resembles our existing 20,824-triangle model but has 860,098 triangles.
+Bio plant (1) is untextured with same triangle count, not a cheaper geometric model.
+No runtime changes or model imports this pass. Original files untouched. Reports in
+MESHY_LIBRARY_REVIEW.md/.json inventory and Desktop assets/meshyai/GRANSKNING.
+
+## 2026-11-11 — TOUR-OBS-GREENERY-001
+Two supplied potted trees and four shrubs now dress observation zone 06. Source
+models load once per type with shared geometry/materials and existing fallback /
+disposal. Planter shells remain procedural; vegetation proxies are separate named
+replacement groups. Supplied 2K soil base color (sRGB) and roughness (linear) tile
+across the planting surfaces. Normal/displacement maps not used. Source copies
+are unchanged; SHA-256 provenance is in OBSERVATION_GREENERY_ASSETS.json.
+Two room/architecture tests, Chrome loaded bounds/shared resources/clear sightline,
+soil loads/world switch/mobile/Back and production build pass. Screenshots inspected;
+plants remain subdued pending the wider lighting pass. No device FPS measurement.
+Manifest now has 151 groups. Dense fern has not been imported or simplified.
+
+## 2026-11-11 - TOUR-OBS-SKY-001
+Carrier sky sphere now uses supplied space.jpg (7556 x 2400) through existing
+texture ownership. Live Chrome confirms image decode/path, observation rendering,
+Necros/Vitrum, mobile and Back without page errors. Screenshot inspected.
+Reference image archived in docs/references/observation-target.jpg; art direction
+and remaining composition/material/lighting work in OBSERVATION_ART_DIRECTION.md.
+No planet position or room geometry changes in this pass.
+Production build passes with existing chunk-size advisory.
+
+## 2026-11-11 - TOUR-OBS-POLISH-001
+Observation now has a low orbital horizon (planet at [-185,-65,-8], scale 3.7),
+world-tinted atmospheric rim, segmented vault/reveal panels and two planting washes.
+Three distant service shuttles reuse the existing shared cargo-shuttle source;
+slow motion freezes with menu motion disabled. All remain outside the room.
+ENJOY THE VIEW hides room controls, with a focusable return button and Escape;
+intro/audio pipeline remains active. Returning restores focus without leaving room.
+11 focused tests and Chrome all-worlds/loaded models/sightline/quiet view/mobile/
+Back checks pass; production build passes with existing chunk advisory. Final
+screenshots inspected. No device FPS benchmark. Vitrum/Collective surface art
+remains placeholder; no exact reference match, NPCs or real floor reflections yet.

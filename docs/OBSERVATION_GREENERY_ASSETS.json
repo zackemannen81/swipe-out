@@ -1,0 +1,26 @@
+[
+  {
+    "source": "C:\\Users\\zakri\\Desktop\\tourbus\\assets\\meshyai\\Meshy_AI_Braided_Money_Tree_1111005553_texture.glb",
+    "runtime": "public\\models\\tour-bus\\observation-tree.glb",
+    "sha256": "09d6db7f130c806508b3a236ed90d1dbfd1b1057705bab19186ad7afd4a730f8",
+    "bytes": 11118956
+  },
+  {
+    "source": "C:\\Users\\zakri\\Desktop\\tourbus\\assets\\meshyai\\Meshy_AI_Realistic_Bush_1109124741_texture.glb",
+    "runtime": "public\\models\\tour-bus\\observation-bush.glb",
+    "sha256": "6eff9694a59f5f0d33f0ade2c9083cc6eee758e9e5463513f2e2d78aebcfe2e8",
+    "bytes": 16816084
+  },
+  {
+    "source": "C:\\Users\\zakri\\Desktop\\tourbus\\assets\\dark_soil_scmlbap0_2k.zip!Dark_Soil_scmlbap0_2K_BaseColor.jpg",
+    "runtime": "public\\images\\tour-bus\\soil\\basecolor.jpg",
+    "sha256": "62a972b70563078113aac2930b480902a9504433d257cc6fc544a1415c710e54",
+    "bytes": 5558950
+  },
+  {
+    "source": "C:\\Users\\zakri\\Desktop\\tourbus\\assets\\dark_soil_scmlbap0_2k.zip!Dark_Soil_scmlbap0_2K_Roughness.jpg",
+    "runtime": "public\\images\\tour-bus\\soil\\roughness.jpg",
+    "sha256": "c44098235158de819f465eedfd327bbaa71714ff9d2cd822de200434e1bfd6bc",
+    "bytes": 3163443
+  }
+]

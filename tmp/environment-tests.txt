@@ -1,0 +1,24 @@
+✔ multi-select is sorted and excludes stale indexes (4.4697ms)
+✔ multi-copy and paste preserve exact transforms while giving unique IDs (1.8381ms)
+✔ paste rejects object and point light capacity overflow (0.8851ms)
+✔ scene exports only environment data, retaining transforms/camera/light and undo (5.6903ms)
+✔ track import preserves every scenery field and horizontal scale without race export fields (13.3428ms)
+✔ malformed camera, version and fields rejected; minimum scale is portable (1.3281ms)
+✔ texture alpha modes round-trip through export, storage and undo; versions 1–7 stay readable (67.2338ms)
+✔ every shipped track migrates and round-trips without losing geometry, scenery or textures (905.4096ms)
+✔ legacy optional fields and fourth-coordinate bank metadata survive migration (0.7204ms)
+✔ reject malformed, unsupported, degenerate and excessive track data with field-specific errors (3.5427ms)
+✔ mixed legacy/versioned library isolates corrupt records and safely loads built-in fallback (60.8781ms)
+✔ save/reset affect only the chosen track; invalid writes and quota failure preserve prior data (81.0325ms)
+✔ undo/redo retain scenery and edits independently of saved snapshots, and discard redo after new edits (0.9234ms)
+✔ history bounds large snapshots while keeping the most recent undo step (0.431ms)
+✔ v9 editor settings survive JSON and storage; older circuit files remain valid (24.6926ms)
+✔ road presets and independent rail tint apply to actual road meshes (55.9647ms)
+ℹ tests 16
+ℹ suites 0
+ℹ pass 16
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1721.1363

@@ -75,9 +75,12 @@ Position och mått anges som X / Y / Z. Varje rad motsvarar en utbytbar grupp; d
 | TB-CARGO-07 | 01 | Reservdelscontainer | P2 | 17 / 0 / 2 | 1.5 / 1.4 / 2.1 | Stapelbar låda med lås, hörnskydd och märkning. En modell kan återanvändas. |
 | TB-WINDOW-01 | 06 | Orbitalfönstrets ram | P1 | -100 / 24 / 0 | 2.24 / 13.42 / 32.84 | Öppen 32 m panoramaram med elliptiskt valv och tre lager metall/ljustätning; fri central planetvy. |
 | TB-RAIL-01 | 06 | Observationsräcke | P2 | -84 / 24 / 0 | 2.04 / 1.22 / 30.24 | Böjt 30 m observationsräcke, 1,15 m högt, med metallstolpar och tunna horisontella stag. |
-| TB-PLANET-01 | 06 | Planetkuliss | P1 | -158 / 38 / 0 | 77.91 / 55.1 / 77.91 | Necros: brinnande yttextur på sfär och separat molnskal med opacitet 0,25. Vitrum använder tills vidare en färgad sfär. |
-| TB-MOON-01 | 06 | Necros måne | P2 | -174 / 49 / -37 | 10.4 / 10.4 / 10.4 | Liten stenig måne med användarens grå yttextur. Syns tillsammans med Necros utanför orbitalfönstret. |
-| TB-STARS-01 | 01 | Stjärnfält | P2 | 0 / 0 / 0 | 560 / 560 / 560 | Användarens varma rymdbild (space-skybox-warm.jpg) på en inåtvänd sfär, kompletterad med ett glest punktstjärnfält bakom fönstret. |
+| TB-PLANET-01 | 06 | Planetkuliss | P1 | -185 / -65 / -8 | 288.28 / 203.87 / 288.28 | Necros: brinnande yttextur på sfär och separat molnskal med opacitet 0,25. Vitrum använder tills vidare en färgad sfär. |
+| TB-MOON-01 | 06 | Necros måne | P2 | -205 / 60 / -58 | 10.4 / 10.4 / 10.4 | Liten stenig måne med användarens grå yttextur. Syns tillsammans med Necros utanför orbitalfönstret. |
+| TB-STARS-01 | 01 | Stjärnfält | P2 | 0 / 0 / 0 | 560 / 560 / 560 | Användarens valda rymdbild (space.jpg) på en inåtvänd sfär, kompletterad med ett glest punktstjärnfält bakom fönstret. |
+| TB-ORBIT-SHUTTLE-1 | 06 | Orbital service traffic | P2 | -128 / 35 / -25 | 3 / 0.5 / 1 | Slow background shuttle outside the observation window; visual scale cue only, no race or gameplay collision. |
+| TB-ORBIT-SHUTTLE-2 | 06 | Orbital service traffic | P2 | -145 / 39 / 4 | 3 / 0.5 / 1 | Slow background shuttle outside the observation window; visual scale cue only, no race or gameplay collision. |
+| TB-ORBIT-SHUTTLE-3 | 06 | Orbital service traffic | P2 | -122 / 33 / -4 | 3 / 0.5 / 1 | Slow background shuttle outside the observation window; visual scale cue only, no race or gameplay collision. |
 | TB-ROOM-03 | 03 | Workshop / Service Bay | P1 | 0 / 0 / 52 | 32.5 / 12.6 / 30.5 | Separat rum med golv, tak, slutna väggar och markerad passage. |
 | TB-DOOR-03 | 03 | Passage / lift | P2 | 15.65 / 0 / 52 | 0.23 / 4.3 / 3.28 | Stängd markerad passage; scenövergång representerar färden mellan däck. |
 | TB-ROOM-05 | 05 | Tournament Nexus | P1 | -46 / 12 / 6 | 28.5 / 11.6 / 28.5 | Separat rum med golv, tak, slutna väggar och markerad passage. |
@@ -89,15 +92,25 @@ Position och mått anges som X / Y / Z. Varje rad motsvarar en utbytbar grupp; d
 | TB-OBS-RIB-02 | 06 | Observationsvalv | P1 | -79 / 24 / 0 | 1.7 / 13.48 / 33.7 | Elliptiskt bärverk med varm integrerad ljuslist och låga pelarfötter. |
 | TB-OBS-RIB-03 | 06 | Observationsvalv | P1 | -69 / 24 / 0 | 1.7 / 13.48 / 33.7 | Elliptiskt bärverk med varm integrerad ljuslist och låga pelarfötter. |
 | TB-OBS-CEILING | 06 | Takpaneler och ljuslister | P1 | -84 / 24 / 0 | 32 / 8.74 / 32.15 | Längsgående takribbor, varma ljusfält och panelindelning under det välvda taket. |
+| TB-OBS-CLADDING | 06 | Segmented vault panels | P1 | -84 / 24 / 0 | 31.58 / 10.33 / 32.92 | Dark inset ceiling panels, transverse seams and alternating warm/cool maintenance lights. |
+| TB-OBS-WINDOW-REVEAL | 06 | Layered window reveal | P1 | -99.5 / 24 / 0 | 2.2 / 10.46 / 32.05 | Recessed panoramic window reveal with segmented structural covers and restrained guide lighting. |
 | TB-DOOR-06 | 06 | Panoramahissens tröskel | P1 | -67.35 / 24 / 0 | 0.85 / 4.2 / 4.4 | Markerad stängd hissport mot Nexus, med dubbla dörrblad och infälld tröskel. |
-| TB-OBS-PLANTER-01 | 06 | Observation: planter | P2 | -92 / 24 / -12 | 5 / 3.05 / 2.45 | Utbytbar inredningsplatshållare; byt gruppens innehåll med matchande GLB enligt observationsdäckets assetlista. |
-| TB-OBS-PLANTER-02 | 06 | Observation: planter | P2 | -92 / 24 / 12 | 5 / 3.05 / 2.45 | Utbytbar inredningsplatshållare; byt gruppens innehåll med matchande GLB enligt observationsdäckets assetlista. |
-| TB-OBS-PLANTER-03 | 06 | Observation: planter | P2 | -79 / 24 / -12 | 5 / 3.05 / 2.45 | Utbytbar inredningsplatshållare; byt gruppens innehåll med matchande GLB enligt observationsdäckets assetlista. |
-| TB-OBS-PLANTER-04 | 06 | Observation: planter | P2 | -79 / 24 / 12 | 5 / 3.05 / 2.45 | Utbytbar inredningsplatshållare; byt gruppens innehåll med matchande GLB enligt observationsdäckets assetlista. |
-| TB-OBS-BENCH-01 | 06 | Observation: bench | P2 | -84 / 24 / -8 | 1.03 / 1.05 / 3 | Utbytbar inredningsplatshållare; byt gruppens innehåll med matchande GLB enligt observationsdäckets assetlista. |
-| TB-OBS-BENCH-02 | 06 | Observation: bench | P2 | -84 / 24 / 8 | 1.03 / 1.05 / 3 | Utbytbar inredningsplatshållare; byt gruppens innehåll med matchande GLB enligt observationsdäckets assetlista. |
-| TB-OBS-CONSOLE-01 | 06 | Observation: console | P2 | -95 / 24 / -7 | 0.7 / 1.28 / 1.4 | Utbytbar inredningsplatshållare; byt gruppens innehåll med matchande GLB enligt observationsdäckets assetlista. |
-| TB-OBS-CONSOLE-02 | 06 | Observation: console | P2 | -95 / 24 / 7 | 0.7 / 1.28 / 1.4 | Utbytbar inredningsplatshållare; byt gruppens innehåll med matchande GLB enligt observationsdäckets assetlista. |
+| TB-OBS-PLANTER-01 | 06 | Observation: planter | P2 | -92 / 24 / -12 | 5 / 1.09 / 2.45 | Utbytbar inredningsplatshållare; byt gruppens innehåll med matchande GLB enligt observationsdäckets assetlista. |
+| TB-OBS-FOLIAGE-01 | 06 | Observation: planted shrub | P2 | -92 / 25.1 / -12 | 1.922 / 1.268 / 2.2 | Supplied bush model rooted in the soil; shared geometry and materials. |
+| TB-OBS-PLANTER-02 | 06 | Observation: planter | P2 | -92 / 24 / 12 | 5 / 1.09 / 2.45 | Utbytbar inredningsplatshållare; byt gruppens innehåll med matchande GLB enligt observationsdäckets assetlista. |
+| TB-OBS-FOLIAGE-02 | 06 | Observation: planted shrub | P2 | -92 / 25.1 / 12 | 1.922 / 1.268 / 2.2 | Supplied bush model rooted in the soil; shared geometry and materials. |
+| TB-OBS-PLANTER-03 | 06 | Observation: planter | P2 | -79 / 24 / -12 | 5 / 1.09 / 2.45 | Utbytbar inredningsplatshållare; byt gruppens innehåll med matchande GLB enligt observationsdäckets assetlista. |
+| TB-OBS-FOLIAGE-03 | 06 | Observation: planted shrub | P2 | -79 / 25.1 / -12 | 1.922 / 1.268 / 2.2 | Supplied bush model rooted in the soil; shared geometry and materials. |
+| TB-OBS-PLANTER-04 | 06 | Observation: planter | P2 | -79 / 24 / 12 | 5 / 1.09 / 2.45 | Utbytbar inredningsplatshållare; byt gruppens innehåll med matchande GLB enligt observationsdäckets assetlista. |
+| TB-OBS-FOLIAGE-04 | 06 | Observation: planted shrub | P2 | -79 / 25.1 / 12 | 1.922 / 1.268 / 2.2 | Supplied bush model rooted in the soil; shared geometry and materials. |
+| TB-OBS-BENCH-01 | 06 | Observation: bench | P2 | -84 / 24 / -8 | 3 / 0.426 / 1.252 | Supplied modular bench GLB, shared between the two observation seating slots. |
+| TB-OBS-BENCH-02 | 06 | Observation: bench | P2 | -84 / 24 / 8 | 3 / 0.426 / 1.252 | Supplied modular bench GLB, shared between the two observation seating slots. |
+| TB-OBS-CONSOLE-01 | 06 | Observation: console | P2 | -95 / 24 / -7 | 1.25 / 1.352 / 0.842 | Supplied information console GLB, proportionally fitted and grounded; decorative screen, existing UI retains controls. |
+| TB-OBS-CONSOLE-02 | 06 | Observation: console | P2 | -95 / 24 / 7 | 1.25 / 1.352 / 0.842 | Supplied information console GLB, proportionally fitted and grounded; decorative screen, existing UI retains controls. |
+| TB-OBS-TREE-L | 06 | Observation: indoor tree | P2 | -86 / 24 / -13.5 | 2.387 / 3.229 / 2.4 | Supplied potted money tree, grounded beside the planting beds; keeps the central panorama clear. |
+| TB-OBS-TREE-R | 06 | Observation: indoor tree | P2 | -86 / 24 / 13.5 | 2.387 / 3.229 / 2.4 | Supplied potted money tree, grounded beside the planting beds; keeps the central panorama clear. |
+| TB-OBS-VINE-L | 06 | Observation: hanging vine | P2 | -91 / 27 / -15.5 | 1.3 / 2.35 / 0.411 | Supplied climbing-vine GLB mounted along the side wall, outside the central panorama sightline. |
+| TB-OBS-VINE-R | 06 | Observation: hanging vine | P2 | -91 / 27 / 15.5 | 1.3 / 2.35 / 0.411 | Supplied climbing-vine GLB mounted along the side wall, outside the central panorama sightline. |
 | TB-ROOM-04 | 04 | Spare Parts Market | P1 | -30 / 0 / 52 | 20.5 / 9.6 / 24.5 | Separat rum med golv, tak, slutna väggar och markerad passage. |
 | TB-DOOR-04 | 04 | Passage / lift | P2 | -20.35 / 0 / 52 | 0.23 / 4.3 / 3.28 | Stängd markerad passage; scenövergång representerar färden mellan däck. |
 | TB-FIT-04 | 04 | SPARE PARTS MARKET | P2 | -30 / 0 / 52 | 18.4 / 9 / 21.3 | Independent stalls, component displays and a clear central aisle. |

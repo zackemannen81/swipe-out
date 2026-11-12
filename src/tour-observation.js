@@ -11,9 +11,16 @@ export const OBSERVATION_SLOTS=[
  {id:'TB-OBS-CONSOLE-02',type:'console',position:[-11,0,7],size:[1.4,1.25,.7],yaw:Math.PI/2},
 ];
 // All geometry/materials are owned by the existing Tour Bus resource sets.
-export function buildObservationDeck({asset,box,mesh,beam,mat,registry,scene,materials,geometries}){
+export function buildObservationDeck({asset,box,mesh,beam,mat,registry,scene,materials,geometries,texture}){
  const origin=new THREE.Vector3(...OBSERVATION_ORIGIN);
- const shell=mat(0x1b2d39,.65,.48),panel=mat(0x3e515a,.65,.38),floor=mat(0x33434c,.65,.3),trim=mat(0xb59661,.75,.32),rubber=mat(0x0e1921,.15,.85),cushion=mat(0x24444a,.1,.8),soil=mat(0x182019,0,1),green=mat(0x35604b,0,.85);
+ const shell=mat(0x1b2d39,.65,.48),panel=mat(0x3e515a,.65,.38),floor=mat(0x24333e,.5,.34),trim=mat(0x887758,.65,.38),rubber=mat(0x0e1921,.15,.85),cushion=mat(0x24444a,.1,.8),soil=mat(0x182019,0,1),green=mat(0x35604b,0,.85);
+ // Use supplied soil color/roughness; normal direction is not assumed.
+ if(texture){
+  soil.color.set(0xffffff);
+  soil.map=texture('/images/tour-bus/soil/basecolor.jpg');
+  soil.roughnessMap=texture('/images/tour-bus/soil/roughness.jpg',false);
+  for(const t of [soil.map,soil.roughnessMap])if(t){t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(2,1);}
+ }
  const warm=mat(0xffd297,.1,.4);warm.emissive.set(0xffb963);warm.emissiveIntensity=2;
  const cool=mat(0x8bddd8,.1,.4);cool.emissive.set(0x71cec9);cool.emissiveIntensity=1.3;
  function group(id,kind,label,pos,description,priority='P1'){
@@ -47,6 +54,22 @@ export function buildObservationDeck({asset,box,mesh,beam,mat,registry,scene,mat
  const ceiling=group('TB-OBS-CEILING','architecture','Takpaneler och ljuslister',[0,0,0],'Längsgående takribbor, varma ljusfält och panelindelning under det välvda taket.');
  for(let i=1;i<12;i++){const a=i*Math.PI/12,y=2+11.55*Math.sin(a),z=16.55*Math.cos(a);beam(ceiling,[-16,y,z],[16,y,z],.09,trim);}
  for(const x of [-12,-1,10])for(const side of [-1,1]){const a=side<0?Math.PI*.23:Math.PI*.77;const light=box(ceiling,[3,.08,.4],[x,2+11.3*Math.sin(a),16.3*Math.cos(a)],warm);light.rotation.x=a-Math.PI/2;}
+ // Segmented interior cladding follows the ellipse; narrow gaps expose ribs.
+ const cladding=group('TB-OBS-CLADDING','architecture','Segmented vault panels',[0,0,0],'Dark inset ceiling panels, transverse seams and alternating warm/cool maintenance lights.');
+ const inset=mat(0x14222d,.45,.62),edge=mat(0x43535c,.55,.42);
+ for(let i=1;i<16;i++){
+  const a=i*Math.PI/16,y=2+11.42*Math.sin(a),z=16.42*Math.cos(a);
+  for(const x of [-12,-4,4,12]){
+   const tile=box(cladding,[7.5,.09,2.1],[x,y,z],inset);tile.rotation.x=Math.atan2(-11*Math.cos(a),-16*Math.sin(a));
+   const seam=box(cladding,[.06,.12,2.15],[x+3.8,y-.04,z],edge);seam.rotation.x=tile.rotation.x;
+   if(i%4===0){const slit=box(cladding,[1.5,.12,.045],[x,y-.09,z],i===8?cool:warm);slit.rotation.x=tile.rotation.x;}
+  }
+ }
+ const sill=group('TB-OBS-WINDOW-REVEAL','architecture','Layered window reveal',[-15.5,0,0],'Recessed panoramic window reveal with segmented structural covers and restrained guide lighting.');
+ for(let i=1;i<24;i++){
+  const a=i*Math.PI/24;
+  const cover=box(sill,[2.2,.2,1.75],[0,2+10.9*Math.sin(a),15.9*Math.cos(a)],inset);cover.rotation.x=Math.atan2(-11*Math.cos(a),-16*Math.sin(a));
+ }
  const rail=reuse('TB-RAIL-01',[0,0,0]);
  registry.find(r=>r.id==='TB-RAIL-01').description='Böjt 30 m observationsräcke, 1,15 m högt, med metallstolpar och tunna horisontella stag.';
  const railX=z=>-14+z*z*.008;
@@ -59,13 +82,20 @@ export function buildObservationDeck({asset,box,mesh,beam,mat,registry,scene,mat
   const g=group(slot.id,slot.type,`Observation: ${slot.type}`,slot.position,'Utbytbar inredningsplatshållare; byt gruppens innehåll med matchande GLB enligt observationsdäckets assetlista.','P2');g.rotation.y=slot.yaw;g.userData.assetSlot=slot.type;
   if(slot.type==='planter'){
    box(g,slot.size,[0,.5,0],shell);box(g,[4.8,.08,2.2],[0,1.02,0],trim);box(g,[4.5,.1,1.9],[0,1.04,0],soil);box(g,[4.6,.06,.06],[0,.25,1.22],cool);
-   // Explicit vegetation proxies, replaced by one shared foliage GLB later.
-   for(const x of [-1.6,0,1.6]){beam(g,[x,1.1,0],[x,2.8,0],.035,trim);for(let i=0;i<5;i++){const leaf=mesh(g,new THREE.SphereGeometry(1,8,6),green,[x+Math.sin(i*2)*.35,1.5+i*.3,Math.cos(i*2)*.3]);leaf.scale.set(.55,.12,.25);leaf.rotation.z=(i%2?1:-1)*.45;}}
+   // Keep a small fallback until the shared shrub model loads.
+   const foliage=group(slot.id.replace('PLANTER','FOLIAGE'),'foliage','Observation: planted shrub',[slot.position[0],1.1,slot.position[2]],'Supplied bush model rooted in the soil; shared geometry and materials.','P2');
+   for(const x of [-.6,0,.6]){beam(foliage,[x,0,0],[x,1.7,0],.035,trim);for(let i=0;i<5;i++){const leaf=mesh(foliage,new THREE.SphereGeometry(1,8,6),green,[x+Math.sin(i*2)*.35,.4+i*.3,Math.cos(i*2)*.3]);leaf.scale.set(.55,.12,.25);leaf.rotation.z=(i%2?1:-1)*.45;}}
   }else if(slot.type==='bench'){
    box(g,[3,.3,1],[0,.55,0],cushion);box(g,[3,.4,.15],[0,.85,.45],cushion);for(const x of [-1.1,1.1])box(g,[.15,.4,.8],[x,.2,0],trim);
   }else{
    box(g,[.65,.9,.5],[0,.45,0],shell);const top=box(g,[1.4,.12,.7],[0,1.12,0],panel);top.rotation.x=.3;const screen=box(g,[1.15,.015,.5],[0,1.2,0],cool);screen.rotation.x=.3;
   }
+ }
+ // Two broad planting washes illuminate imported foliage without a light per prop.
+ for(const side of [-1,1]){
+  const wash=new THREE.PointLight(0xc9e9c2,210,22,2);
+  wash.position.copy(origin).add(new THREE.Vector3(-3,5,side*10));
+  wash.name=`TB-OBS-GARDEN-${side}`;scene.add(wash);
  }
  const light=new THREE.PointLight(0xffd49e,220,35,2);light.position.copy(origin).add(new THREE.Vector3(-4,7,0));light.name='TB-OBS-LIGHT';scene.add(light);
  const fill=new THREE.PointLight(0xa2d5ed,130,30,2);fill.position.copy(origin).add(new THREE.Vector3(-14,7,0));fill.name='TB-OBS-FILL';scene.add(fill);

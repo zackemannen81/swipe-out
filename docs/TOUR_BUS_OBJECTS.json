@@ -993,9 +993,9 @@
     "kind": "planet",
     "label": "Planetkuliss",
     "position": [
-      -158,
-      38,
-      0
+      -185,
+      -65,
+      -8
     ],
     "description": "Necros: brinnande yttextur på sfär och separat molnskal med opacitet 0,25. Vitrum använder tills vidare en färgad sfär.",
     "priority": "P1",
@@ -1006,9 +1006,9 @@
       0
     ],
     "size": [
-      77.91,
-      55.1,
-      77.91
+      288.28,
+      203.87,
+      288.28
     ]
   },
   {
@@ -1016,9 +1016,9 @@
     "kind": "moon",
     "label": "Necros måne",
     "position": [
-      -174,
-      49,
-      -37
+      -205,
+      60,
+      -58
     ],
     "description": "Liten stenig måne med användarens grå yttextur. Syns tillsammans med Necros utanför orbitalfönstret.",
     "priority": "P2",
@@ -1043,7 +1043,7 @@
       0,
       0
     ],
-    "description": "Användarens varma rymdbild (space-skybox-warm.jpg) på en inåtvänd sfär, kompletterad med ett glest punktstjärnfält bakom fönstret.",
+    "description": "Användarens valda rymdbild (space.jpg) på en inåtvänd sfär, kompletterad med ett glest punktstjärnfält bakom fönstret.",
     "priority": "P2",
     "zoneId": "01",
     "rotation": [
@@ -1055,6 +1055,75 @@
       560,
       560,
       560
+    ]
+  },
+  {
+    "id": "TB-ORBIT-SHUTTLE-1",
+    "kind": "orbital-traffic",
+    "label": "Orbital service traffic",
+    "position": [
+      -128,
+      35,
+      -25
+    ],
+    "description": "Slow background shuttle outside the observation window; visual scale cue only, no race or gameplay collision.",
+    "priority": "P2",
+    "zoneId": "06",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      3,
+      0.5,
+      1
+    ]
+  },
+  {
+    "id": "TB-ORBIT-SHUTTLE-2",
+    "kind": "orbital-traffic",
+    "label": "Orbital service traffic",
+    "position": [
+      -145,
+      39,
+      4
+    ],
+    "description": "Slow background shuttle outside the observation window; visual scale cue only, no race or gameplay collision.",
+    "priority": "P2",
+    "zoneId": "06",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      3,
+      0.5,
+      1
+    ]
+  },
+  {
+    "id": "TB-ORBIT-SHUTTLE-3",
+    "kind": "orbital-traffic",
+    "label": "Orbital service traffic",
+    "position": [
+      -122,
+      33,
+      -4
+    ],
+    "description": "Slow background shuttle outside the observation window; visual scale cue only, no race or gameplay collision.",
+    "priority": "P2",
+    "zoneId": "06",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      3,
+      0.5,
+      1
     ]
   },
   {
@@ -1311,6 +1380,52 @@
     ]
   },
   {
+    "id": "TB-OBS-CLADDING",
+    "kind": "architecture",
+    "label": "Segmented vault panels",
+    "position": [
+      -84,
+      24,
+      0
+    ],
+    "description": "Dark inset ceiling panels, transverse seams and alternating warm/cool maintenance lights.",
+    "priority": "P1",
+    "zoneId": "06",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      31.58,
+      10.33,
+      32.92
+    ]
+  },
+  {
+    "id": "TB-OBS-WINDOW-REVEAL",
+    "kind": "architecture",
+    "label": "Layered window reveal",
+    "position": [
+      -99.5,
+      24,
+      0
+    ],
+    "description": "Recessed panoramic window reveal with segmented structural covers and restrained guide lighting.",
+    "priority": "P1",
+    "zoneId": "06",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      2.2,
+      10.46,
+      32.05
+    ]
+  },
+  {
     "id": "TB-DOOR-06",
     "kind": "door",
     "label": "Panoramahissens tröskel",
@@ -1352,8 +1467,31 @@
     ],
     "size": [
       5,
-      3.05,
+      1.09,
       2.45
+    ]
+  },
+  {
+    "id": "TB-OBS-FOLIAGE-01",
+    "kind": "foliage",
+    "label": "Observation: planted shrub",
+    "position": [
+      -92,
+      25.1,
+      -12
+    ],
+    "description": "Supplied bush model rooted in the soil; shared geometry and materials.",
+    "priority": "P2",
+    "zoneId": "06",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      1.922,
+      1.268,
+      2.2
     ]
   },
   {
@@ -1375,8 +1513,31 @@
     ],
     "size": [
       5,
-      3.05,
+      1.09,
       2.45
+    ]
+  },
+  {
+    "id": "TB-OBS-FOLIAGE-02",
+    "kind": "foliage",
+    "label": "Observation: planted shrub",
+    "position": [
+      -92,
+      25.1,
+      12
+    ],
+    "description": "Supplied bush model rooted in the soil; shared geometry and materials.",
+    "priority": "P2",
+    "zoneId": "06",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      1.922,
+      1.268,
+      2.2
     ]
   },
   {
@@ -1398,8 +1559,31 @@
     ],
     "size": [
       5,
-      3.05,
+      1.09,
       2.45
+    ]
+  },
+  {
+    "id": "TB-OBS-FOLIAGE-03",
+    "kind": "foliage",
+    "label": "Observation: planted shrub",
+    "position": [
+      -79,
+      25.1,
+      -12
+    ],
+    "description": "Supplied bush model rooted in the soil; shared geometry and materials.",
+    "priority": "P2",
+    "zoneId": "06",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      1.922,
+      1.268,
+      2.2
     ]
   },
   {
@@ -1421,8 +1605,31 @@
     ],
     "size": [
       5,
-      3.05,
+      1.09,
       2.45
+    ]
+  },
+  {
+    "id": "TB-OBS-FOLIAGE-04",
+    "kind": "foliage",
+    "label": "Observation: planted shrub",
+    "position": [
+      -79,
+      25.1,
+      12
+    ],
+    "description": "Supplied bush model rooted in the soil; shared geometry and materials.",
+    "priority": "P2",
+    "zoneId": "06",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      1.922,
+      1.268,
+      2.2
     ]
   },
   {
@@ -1434,7 +1641,7 @@
       24,
       -8
     ],
-    "description": "Utbytbar inredningsplatshållare; byt gruppens innehåll med matchande GLB enligt observationsdäckets assetlista.",
+    "description": "Supplied modular bench GLB, shared between the two observation seating slots.",
     "priority": "P2",
     "zoneId": "06",
     "rotation": [
@@ -1443,9 +1650,9 @@
       0
     ],
     "size": [
-      1.03,
-      1.05,
-      3
+      3,
+      0.426,
+      1.252
     ]
   },
   {
@@ -1457,7 +1664,7 @@
       24,
       8
     ],
-    "description": "Utbytbar inredningsplatshållare; byt gruppens innehåll med matchande GLB enligt observationsdäckets assetlista.",
+    "description": "Supplied modular bench GLB, shared between the two observation seating slots.",
     "priority": "P2",
     "zoneId": "06",
     "rotation": [
@@ -1466,9 +1673,9 @@
       0
     ],
     "size": [
-      1.03,
-      1.05,
-      3
+      3,
+      0.426,
+      1.252
     ]
   },
   {
@@ -1480,7 +1687,7 @@
       24,
       -7
     ],
-    "description": "Utbytbar inredningsplatshållare; byt gruppens innehåll med matchande GLB enligt observationsdäckets assetlista.",
+    "description": "Supplied information console GLB, proportionally fitted and grounded; decorative screen, existing UI retains controls.",
     "priority": "P2",
     "zoneId": "06",
     "rotation": [
@@ -1489,9 +1696,9 @@
       0
     ],
     "size": [
-      0.7,
-      1.28,
-      1.4
+      1.25,
+      1.352,
+      0.842
     ]
   },
   {
@@ -1503,7 +1710,7 @@
       24,
       7
     ],
-    "description": "Utbytbar inredningsplatshållare; byt gruppens innehåll med matchande GLB enligt observationsdäckets assetlista.",
+    "description": "Supplied information console GLB, proportionally fitted and grounded; decorative screen, existing UI retains controls.",
     "priority": "P2",
     "zoneId": "06",
     "rotation": [
@@ -1512,9 +1719,101 @@
       0
     ],
     "size": [
-      0.7,
-      1.28,
-      1.4
+      1.25,
+      1.352,
+      0.842
+    ]
+  },
+  {
+    "id": "TB-OBS-TREE-L",
+    "kind": "foliage",
+    "label": "Observation: indoor tree",
+    "position": [
+      -86,
+      24,
+      -13.5
+    ],
+    "description": "Supplied potted money tree, grounded beside the planting beds; keeps the central panorama clear.",
+    "priority": "P2",
+    "zoneId": "06",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      2.387,
+      3.229,
+      2.4
+    ]
+  },
+  {
+    "id": "TB-OBS-TREE-R",
+    "kind": "foliage",
+    "label": "Observation: indoor tree",
+    "position": [
+      -86,
+      24,
+      13.5
+    ],
+    "description": "Supplied potted money tree, grounded beside the planting beds; keeps the central panorama clear.",
+    "priority": "P2",
+    "zoneId": "06",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      2.387,
+      3.229,
+      2.4
+    ]
+  },
+  {
+    "id": "TB-OBS-VINE-L",
+    "kind": "foliage",
+    "label": "Observation: hanging vine",
+    "position": [
+      -91,
+      27,
+      -15.5
+    ],
+    "description": "Supplied climbing-vine GLB mounted along the side wall, outside the central panorama sightline.",
+    "priority": "P2",
+    "zoneId": "06",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      1.3,
+      2.35,
+      0.411
+    ]
+  },
+  {
+    "id": "TB-OBS-VINE-R",
+    "kind": "foliage",
+    "label": "Observation: hanging vine",
+    "position": [
+      -91,
+      27,
+      15.5
+    ],
+    "description": "Supplied climbing-vine GLB mounted along the side wall, outside the central panorama sightline.",
+    "priority": "P2",
+    "zoneId": "06",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      1.3,
+      2.35,
+      0.411
     ]
   },
   {

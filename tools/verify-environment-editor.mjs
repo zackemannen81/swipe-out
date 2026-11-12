@@ -1,0 +1,30 @@
+import assert from 'node:assert/strict';
+import {pathToFileURL} from 'node:url';
+const {chromium}=await import(pathToFileURL(process.env.PLAYWRIGHT_MODULE).href);
+const browser=await chromium.launch({channel:'chrome',headless:true,args:['--use-angle=d3d11']});
+const context=await browser.newContext({viewport:{width:1440,height:1000},serviceWorkers:'block'});
+await context.route('**/src/editor.js*',async r=>{const response=await r.fetch();await r.fulfill({response,body:(await response.text())+'\nwindow.__env={view,track,current,environmentMode};'});});
+try{
+ const page=await context.newPage(),errors=[];page.on('pageerror',e=>{errors.push(e.message);console.log('PAGE ERROR',e.message);});
+ const ready=()=>page.waitForFunction(()=>window.__env,null,{timeout:60000});
+ await page.goto('http://127.0.0.1:5173/editor.html?mode=environment');await ready();
+ await page.locator('#new-room').click();await page.locator('#track-name').fill('Observation test');await page.locator('#track-name').press('Tab');
+ assert.equal(await page.evaluate(()=>__env.track().objects.length),4);
+ await page.locator('[data-primitive=box]').click();assert.equal(await page.evaluate(()=>__env.track().objects.length),5);await page.locator('#undo-button').click();assert.equal(await page.evaluate(()=>__env.track().objects.length),4);await page.locator('#redo-button').click();
+ await page.locator('#glb-file').setInputFiles('public/models/tour-bus/observation-vine.glb');await page.waitForFunction(()=>__env.track().objects.some(o=>o.type==='glb'),null,{timeout:60000});
+ await page.locator('#fit-button').click();await page.waitForTimeout(400);
+ await page.locator('#scene-fov').fill('60');await page.locator('#scene-fov').press('Tab');await page.locator('#capture-camera').click();
+ const expected=await page.evaluate(()=>structuredClone(__env.track()));
+ await page.locator('#save-button').click();await page.waitForFunction(()=>document.querySelector('#status').textContent.startsWith('Scene saved'));
+ const key=await page.locator('#track-select').inputValue();
+ await page.locator('#test-button').click();assert.ok(await page.locator('body').evaluate(e=>e.classList.contains('scene-preview')));await page.screenshot({path:'tmp/environment-preview.png'});await page.keyboard.press('Escape');
+ const downloadEvent=page.waitForEvent('download');await page.locator('#download-button').click();const download=await downloadEvent;await download.saveAs('tmp/environment-export.json');
+ page.on('dialog',d=>d.accept());await page.reload();await ready();await page.locator('#track-select').selectOption(key);
+ assert.deepEqual(await page.evaluate(()=>__env.track()),expected);
+ await page.locator('#import-file').setInputFiles('tmp/environment-export.json');await page.waitForFunction(()=>document.querySelector('#status').textContent.startsWith('Imported as a new scene'));
+ assert.deepEqual(await page.evaluate(()=>__env.track().objects),expected.objects);assert.deepEqual(await page.evaluate(()=>__env.track().environment.camera),expected.environment.camera);
+ await page.locator('#save-button').click();await page.waitForFunction(()=>document.querySelector('#status').textContent.startsWith('Scene saved'));await page.screenshot({path:'tmp/environment-editor.png'});
+ await page.goto('http://127.0.0.1:5173/editor.html');await ready();assert.equal(await page.evaluate(()=>__env.environmentMode),false);assert.equal(await page.locator('#track-select option').evaluateAll(options=>options.some(o=>o.textContent.includes('Observation test'))),false);assert.ok(await page.locator('#width-input').isVisible());
+ const raceCount=await page.evaluate(()=>__env.track().objects.length);await page.locator('[data-primitive=box]').click();assert.equal(await page.evaluate(()=>__env.track().objects.length),raceCount+1);await page.locator('#undo-button').click();assert.equal(await page.evaluate(()=>__env.track().objects.length),raceCount);
+ assert.deepEqual(errors,[]);console.log('PASS room/objects/undo/GLB/camera/preview/save/reload/export/import; track library isolated');
+}finally{await browser.close();}

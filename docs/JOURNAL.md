@@ -1219,3 +1219,59 @@ initialization failed in both CUA and node_repl; Chrome connector also unconnect
 Prepared external candidate folder and copied user's already-downloaded Leafy Fern,
 verified exact SHA-256 and parsed GLB metadata. Did not label unsearched types as
 missing or claim downloads. Task remains in progress pending working browser tools.
+
+## 2026-11-11 — Local supplied observation assets
+User supplied eight models and four material archives while browser automation is
+unavailable. Rendered all eight and inspected material swatches; retained source
+hashes and provenance gaps. First furniture pass imports bench/console/vine copies
+into existing observation resource lifecycle. No unknown mass imports or changes
+to race behavior. Heavy fern/planted container pending optimization, material packs
+pending matching surfaces. Local report identifies supplied versus still-needed
+assets without falsely claiming failed searches. Originals untouched.
+Five tests/build pass; browser six loaded ground-aligned props and navigation pass.
+
+## 2026-11-11 — Meshy archive inventory
+Completed full local GLB metadata/hash scan, exact duplicate grouping and twelve
+rendered candidate previews. Created local review folder with contact sheet, CSV and
+JSON, plus repository review. No removal of duplicates; no mass runtime import.
+User then asks about using track editor exports or still images for carrier rooms;
+this is a design discussion, not an implemented environment-import feature.
+
+## 2026-11-11 � ENVIRONMENT-EDITOR-001
+
+- Added independent environment mode to existing editor with room/empty starters,
+  separate scene persistence and versioned JSON; track JSON can supply scenery.
+- Reused object transforms, textures, GLB import, multi-selection and history.
+  Added camera capture/restore, FOV, light/background controls and clean preview.
+- Scene primitives use neutral rough surfaces for legibility; GLB materials remain
+  intact. Scene GLB embed cap 32 MB; overall export cap 64 MB; model paths supported.
+- Verified 16 Node tests, Chrome create/edit/GLB/save/reload/export/import/preview,
+  track-library isolation and ordinary track add/undo. No page exceptions. Build
+  passes with existing chunk-size advisory. Inspected preview screenshot.
+- Added ENVIRONMENT_EDITOR.md. No automatic Tour Bus install or collision system.
+
+## 2026-11-11 - TOUR-OBS-GREENERY-001
+User prefers continuing development over modelling rooms personally. Added two
+reviewed supplied trees, four shrubs and 2K soil maps to observation zone 06.
+Reused shared loader, texture ownership, fallback and disposal; source files kept.
+Two tests, Chrome loaded bounds/sharing/sightline/soil/world/mobile/Back and build
+pass. Screenshots inspected. First planting pass; room lighting polish remains.
+
+## 2026-11-11 - TOUR-OBS-SKY-001
+User supplied sky texture choice and original visual goal. Switched the carrier
+sky sphere to space.jpg, retained original image, copied concept to a stable docs
+reference and recorded staged art direction. Chrome sky decode and existing
+observation/world/mobile/Back checks pass. Screenshot inspected.
+Production build passes with existing chunk-size advisory.
+
+## 2026-11-11 - TOUR-OBS-POLISH-001
+Autonomous continuation authorized by user. Followed supplied concept and master
+GDD section 5, preserving camera-station navigation and all race behavior.
+Added layered vault panels, planting lighting, low planetary horizon/atmosphere,
+three sparse shared-model traffic props and a quiet observation UI mode.
+Visual inspection caught incorrect panel tangents; corrected before final run.
+Mobile click check caught inherited pointer-events on return control; corrected.
+11 focused tests and final Chrome three-world/quiet-focus/mobile/Back checks pass;
+production build passes with existing size advisory. No page exceptions. Saved
+screenshots in tmp/polish-observation-*.png. Planet placeholders and full material
+polish remain future work; no secret content exposed.

@@ -1,0 +1,19 @@
+✔ voice ducks music, end/skip restores mix, lifecycle pauses both, mute applies to both (2.2281ms)
+✔ failed autoplay retries only on gesture; stale voice rejection cannot alter next presentation (0.7963ms)
+✔ visited intros migrate conservatively and survive normalized profile saves (3.8716ms)
+✔ all new public interiors have grounded shells, interior cameras, narration and persistent destinations (160.7279ms)
+✔ plan registry has sixteen locations, fifteen destinations and valid reciprocal links (3.021ms)
+✔ all station pairs cut only under full mask and settle exactly; rapid input is rejected (275.1907ms)
+✔ Tour Bus replacement inventory covers named groups and navigation has finite camera poses (201.0751ms)
+✔ observation has owned finite geometry, clear camera sightline and grounded replaceable slots (182.3925ms)
+✔ orbital traffic stays outside carrier, freezes with reduced motion and owns atmosphere disposal (146.2527ms)
+✔ carrier reload retains world and station; setup and race restore safe destinations (3.2969ms)
+✔ invalid/unavailable storage falls back safely and cannot introduce unknown destinations (2.602ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 11
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 550.8668

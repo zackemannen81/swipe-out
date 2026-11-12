@@ -1,0 +1,38 @@
+{"root": "C:\\Users\\zakri\\Desktop\\tourbus\\assets\\meshyai", "files": 331, "bytes": 14655755396, "unique": 301, "duplicateCopies": 30}
+bio_flora_plant_lowpo (1).glb 12484 0.2 MB True
+bio_flora_plant_lowpo.glb 12484 4.6 MB True
+Meshy_AI_Braided_Money_Tree_1111005553_texture.glb 25015 11.1 MB True
+Meshy_AI_Cattail_Planter_1111140114_texture.glb 1763995 63.5 MB True
+Meshy_AI_Cosmic_Cargo_Carrier_1109221303_texture.glb 1574964 81.5 MB True
+Meshy_AI_Cratered_Moon_1031114641_texture.glb 222352 16.5 MB True
+Meshy_AI_Crimson_Core_1104234651_texture.glb 2789968 92.1 MB True
+Meshy_AI_Cyber_Command_Console_1111135606_texture.glb 860098 33.4 MB True
+Meshy_AI_CyberCore_Nexus_1111013416_texture.glb 5101479 200.7 MB True
+Meshy_AI_Door_07_No_Abrir_1111135326_texture.glb 9428 14.4 MB True
+Meshy_AI_Eldertree_s_Spiral_1102200732_texture.glb 8217872 386.8 MB True
+Meshy_AI_fern_3d_1111135331_image-to-3d-texture.glb 791864 52.8 MB True
+Meshy_AI_Flatbed_1111013455_texture.glb 373690 20.0 MB True
+Meshy_AI_Inferno_Core_1103110105_texture.glb 1895290 67.7 MB True
+Meshy_AI_Leafy_Fern__1110140643_texture.glb 84201 7.2 MB True
+Meshy_AI_Light_Pylon_Low_Poly_1030021914_texture.glb 7403 8.0 MB True
+Meshy_AI_NX_01_Futuristic_Door_1103110239_texture.glb 1972352 81.8 MB True
+Meshy_AI_object_Sci_Fi_Cargo__1103125004_texture.glb 342496 11.8 MB True
+Meshy_AI_object_Sci_Fi_Cargo__1103125006_texture.glb 195242 6.9 MB True
+Meshy_AI_object_Sci_Fi_Cargo__1103125009_texture.glb 185953 6.8 MB True
+Meshy_AI_Orbital_Core_Engine_1103110046_texture.glb 1560856 53.9 MB True
+Meshy_AI_panels_1111013319_texture (1).glb 2430 9.2 MB True
+Meshy_AI_panels_1111013319_texture (2).glb 2430 9.2 MB True
+Meshy_AI_panels_1111013319_texture.glb 2430 9.2 MB True
+Meshy_AI_Quantum_Cargo_Pod_1031114439_texture.glb 216332 17.7 MB True
+Meshy_AI_Quantum_Cargo_Pod_1111141149_texture.glb 216332 17.7 MB True
+Meshy_AI_Realistic_Bush_1109124741_texture.glb 22758 16.8 MB True
+Meshy_AI_Realistic_Bush_1111005733_texture.glb 22758 16.8 MB True
+Meshy_AI_Red_Alien_Plant_06_1103105314_texture.glb 795431 29.7 MB True
+Meshy_AI_Red_Alien_Plant_07_1103105817_texture.glb 571207 22.7 MB True
+Meshy_AI_Rusty_Orbital_Cargo_P_1111013356_texture.glb 961944 61.0 MB True
+Meshy_AI_sci_fi_sliding_door_1111013338_texture.glb 10000 1.1 MB True
+Meshy_AI_SCP_Door_Blast_A_1103110010_image-to-3d-texture.glb 343566 33.8 MB True
+Meshy_AI_side_wrap_console_3d_1102172344_image-to-3d-texture.glb 1989112 93.8 MB True
+Meshy_AI_Willowlight_Marsh_1103105400_texture.glb 2968346 161.9 MB True
+mushroom_lamp_lowpoly (1).glb 12633 0.2 MB True
+mushroom_lamp_lowpoly.glb 12629 4.1 MB True

@@ -1,0 +1,13 @@
+quiet click {
+  station: 'observation',
+  pending: null,
+  opacity: 0,
+  route: [ '05', '06' ]
+}
+quiet click {
+  station: 'observation',
+  pending: null,
+  opacity: 0,
+  route: [ '05', '06' ]
+}
+PASS: six loaded/shared/grounded greenery props, clear sightline, soil textures, observation architecture, Necros/Vitrum, mobile and Back; no page errors
